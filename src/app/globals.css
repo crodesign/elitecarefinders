@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Primary Background */
+  --bg-primary: #09090b;
+  /* Secondary Background (cards, tables, inputs) */
+  --bg-secondary: #0b1115;
+  /* Accent Color - New primary blue */
+  --accent: #239ddb;
+  --accent-light: #4bb3e8;
+  --accent-dark: #1a7fb3;
+  /* Text Colors */
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  /* Border */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-hover: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', system-ui, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Custom utility classes */
+@layer components {
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-light text-white font-bold rounded-lg px-4 py-2 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply border border-white/10 bg-transparent hover:bg-white/5 text-white rounded-lg px-4 py-2 transition-colors;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-white/5 text-zinc-400 hover:text-white rounded-lg p-2 transition-colors;
+  }
+
+  .btn-danger {
+    @apply bg-transparent hover:bg-red-500/10 text-zinc-400 hover:text-red-400 rounded-lg p-2 transition-colors;
+  }
+
+  .input-field {
+    @apply w-full bg-[#0b1115] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:outline-none transition-colors;
+    --tw-ring-color: rgba(35, 157, 219, 0.5);
+  }
+
+  .input-field:focus {
+    border-color: rgba(35, 157, 219, 0.5);
+  }
+
+  .card {
+    @apply bg-[#0b1115] border border-white/5 rounded-xl;
+  }
+
+  .table-header {
+    @apply text-xs font-semibold uppercase tracking-wider text-zinc-400;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .table-row {
+    @apply border-b border-white/5 hover:bg-white/5 transition-colors;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-neighborhood {
+    @apply bg-blue-500/10 text-blue-400;
+  }
+
+  .badge-amenity {
+    @apply bg-green-500/10 text-green-400;
+  }
+
+  .badge-service {
+    @apply bg-purple-500/10 text-purple-400;
+  }
+
+  .badge-care-type {
+    @apply bg-orange-500/10 text-orange-400;
+  }
+}
