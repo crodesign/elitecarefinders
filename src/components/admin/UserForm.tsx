@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SlidePanel } from "./SlidePanel";
-import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users } from 'lucide-react';
+import { ImageCropModal } from "./ImageCropModal";
+import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff } from 'lucide-react';
 import type { UserProfile, UserRole } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { EnhancedSelect } from "./EnhancedSelect";
+import { SimpleSelect } from "./SimpleSelect";
 
 // Get icon based on role type
 const getRoleIcon = (roleValue: UserRole) => {
@@ -80,13 +83,19 @@ interface UserFormProps {
 }
 
 export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
-    const { canCreateRole } = useAuth();
+    const { canCreateRole, isSuperAdmin, isSystemAdmin } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isResettingPassword, setIsResettingPassword] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [photoUrl, setPhotoUrl] = useState<string>('');
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string>('');
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // Form state
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [fullName, setFullName] = useState('');
     const [nickname, setNickname] = useState('');
     const [phone, setPhone] = useState('');
@@ -109,6 +118,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setNickname(user.profile?.nickname || '');
                 setPhone(user.profile?.phone || '');
                 setRole(user.role.role);
+                setPhotoUrl(user.profile?.photo_url || '');
                 setStreet(user.profile?.address?.street || '');
                 setCity(user.profile?.address?.city || '');
                 setState(user.profile?.address?.state || '');
@@ -120,6 +130,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setNickname('');
                 setPhone('');
                 setRole('local_user');
+                setPhotoUrl('');
                 setStreet('');
                 setCity('');
                 setState('');
@@ -127,6 +138,65 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
             }
         }
     }, [isOpen, user]);
+
+    const handleResetPassword = async () => {
+        if (!user?.email) return;
+
+        const confirmReset = confirm(`Reset password for ${user.email}?\n\nA password reset email will be sent to this user.`);
+        if (!confirmReset) return;
+
+        setIsResettingPassword(true);
+        try {
+            const response = await fetch('/api/admin/reset-user-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to reset password');
+            }
+
+            alert(`Password reset email sent to ${user.email}`);
+        } catch (err) {
+            console.error('Error resetting password:', err);
+            setError(err instanceof Error ? err.message : 'Failed to reset password');
+        } finally {
+            setIsResettingPassword(false);
+        }
+    };
+
+    const handlePhotoClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedImageUrl(reader.result as string);
+                setIsCropModalOpen(true);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCropSave = (croppedImageUrl: string) => {
+        setPhotoUrl(croppedImageUrl);
+        setIsCropModalOpen(false);
+        setSelectedImageUrl('');
+    };
+
+    const handleCropCancel = () => {
+        setIsCropModalOpen(false);
+        setSelectedImageUrl('');
+        // Reset file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
 
     const formatPhoneNumber = (value: string) => {
         const numbers = value.replace(/\D/g, '');
@@ -171,6 +241,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                     full_name: fullName.trim(),
                     ...(nickname && { nickname: nickname.trim() }),
                     ...(phone && { phone }),
+                    ...(photoUrl && { photo_url: photoUrl }),
                     ...(street || city || state || zip ? {
                         address: { street, city, state, zip }
                     } : {})
@@ -223,33 +294,72 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                 Account Information
                             </h3>
 
+                            <div className="flex gap-4 mb-3">
+                                <div className="flex-1 space-y-3">
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                            Full Name
+                                            <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            placeholder="John Doe"
+                                            autoComplete="off"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium text-white/80">Nickname</label>
+                                        <input
+                                            type="text"
+                                            value={nickname}
+                                            onChange={(e) => setNickname(e.target.value)}
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            placeholder="Optional nickname"
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex-shrink-0">
+                                    <label className="text-sm font-medium text-white/80 block mb-1">Photo</label>
+                                    <div className="relative w-24 h-24">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handlePhotoChange}
+                                            className="hidden"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handlePhotoClick}
+                                            className="w-full h-full rounded-full overflow-hidden bg-black/30 hover:bg-black/40 transition-colors group"
+                                        >
+                                            {photoUrl ? (
+                                                <img
+                                                    src={photoUrl}
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-white/40">
+                                                    <User className="h-10 w-10" />
+                                                </div>
+                                            )}
+                                        </button>
+                                        <div className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5 border-2 border-[rgb(13,17,21)] shadow-lg hover:bg-accent-light transition-colors cursor-pointer z-10" onClick={handlePhotoClick}>
+                                            <Upload className="h-3 w-3 text-white" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="space-y-3">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-white/80 flex items-center gap-1">
-                                        Full Name
-                                        <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={fullName}
-                                        onChange={(e) => setFullName(e.target.value)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
-                                        placeholder="John Doe"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-white/80">Nickname</label>
-                                    <input
-                                        type="text"
-                                        value={nickname}
-                                        onChange={(e) => setNickname(e.target.value)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
-                                        placeholder="Optional nickname"
-                                    />
-                                </div>
-
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium text-white/80 flex items-center gap-1">
                                         Email
@@ -262,8 +372,9 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             disabled={isEditing}
-                                            className="w-full rounded-md py-1.5 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
+                                            className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
                                             placeholder="user@example.com"
+                                            autoComplete="off"
                                             required
                                         />
                                     </div>
@@ -275,31 +386,82 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             Password
                                             <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                                         </label>
-                                        <input
-                                            type="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
-                                            placeholder="Min. 8 characters"
-                                            required
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                placeholder="Min. 8 characters"
+                                                autoComplete="new-password"
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                            >
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isEditing && (isSuperAdmin || isSystemAdmin) && (
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium text-white/80">Password</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="password"
+                                                value="••••••••"
+                                                disabled
+                                                className="flex-1 rounded-md py-1.5 px-3 text-sm bg-black/20 text-white/40 cursor-not-allowed"
+                                            />
+                                            <Tooltip content="Send password reset email">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleResetPassword}
+                                                    disabled={isResettingPassword}
+                                                    className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+                                                >
+                                                    <RotateCw className={`h-3.5 w-3.5 ${isResettingPassword ? 'animate-spin' : ''}`} />
+                                                    Reset
+                                                </button>
+                                            </Tooltip>
+                                        </div>
                                     </div>
                                 )}
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                    <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
                                         Role
                                         <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                        <Tooltip content={<div className="space-y-2">
+                                            {ROLE_OPTIONS.map(opt => (
+                                                <div key={opt.value} className="flex items-start gap-2">
+                                                    <Shield className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" />
+                                                    <div>
+                                                        <div className="font-medium text-xs">{opt.label}</div>
+                                                        <div className="text-[10px] text-white/60">{opt.description}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>}>
+                                            <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
+                                        </Tooltip>
                                     </label>
-                                    <select
+                                    <EnhancedSelect
                                         value={role}
-                                        onChange={(e) => setRole(e.target.value as UserRole)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white hover:bg-black/50 focus:bg-black/50 border border-white/10"
-                                    >
-                                        {availableRoles.map(opt => (
-                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                        ))}
-                                    </select>
+                                        onChange={(value) => setRole(value as UserRole)}
+                                        options={availableRoles.map(opt => ({
+                                            value: opt.value,
+                                            label: opt.label,
+                                            description: opt.description,
+                                            icon: Shield
+                                        }))}
+                                        placeholder="Select Role"
+                                        leftIcon={Shield}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -321,8 +483,9 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             type="tel"
                                             value={phone}
                                             onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-                                            className="w-full rounded-md py-1.5 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
+                                            className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
                                             placeholder="(555) 555-5555"
+                                            autoComplete="off"
                                         />
                                     </div>
                                 </div>
@@ -342,8 +505,9 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         type="text"
                                         value={street}
                                         onChange={(e) => setStreet(e.target.value)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
+                                        className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
                                         placeholder="123 Main St"
+                                        autoComplete="off"
                                     />
                                 </div>
 
@@ -353,24 +517,23 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         type="text"
                                         value={city}
                                         onChange={(e) => setCity(e.target.value)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
+                                        className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
                                         placeholder="Honolulu"
+                                        autoComplete="off"
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-white/80">State</label>
-                                        <select
+                                        <SimpleSelect
                                             value={state}
-                                            onChange={(e) => setState(e.target.value)}
-                                            className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white hover:bg-black/50 focus:bg-black/50 border border-white/10"
-                                        >
-                                            <option value="">Select State</option>
-                                            {US_STATES.map(s => (
-                                                <option key={s.code} value={s.code}>{s.name}</option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => setState(val)}
+                                            options={US_STATES.map(s => s.name)}
+                                            placeholder="Select State..."
+                                            className="w-full"
+                                            textSize="text-sm"
+                                        />
                                     </div>
 
                                     <div className="space-y-1">
@@ -379,9 +542,10 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             type="text"
                                             value={zip}
                                             onChange={(e) => setZip(e.target.value)}
-                                            className="w-full rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 border border-white/10"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
                                             placeholder="96801"
                                             maxLength={10}
+                                            autoComplete="off"
                                         />
                                     </div>
                                 </div>
@@ -390,6 +554,13 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                     </div>
                 </div>
             </form>
+
+            <ImageCropModal
+                isOpen={isCropModalOpen}
+                imageUrl={selectedImageUrl}
+                onClose={handleCropCancel}
+                onSave={handleCropSave}
+            />
         </SlidePanel>
     );
 }

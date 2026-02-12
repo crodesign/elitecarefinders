@@ -212,8 +212,21 @@ export default function SettingsUsersPage() {
                 <button
                     type="button"
                     onClick={() => handleEdit(user)}
-                    className="flex items-center text-left hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
                 >
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-black/30 border-2 border-white/10">
+                        {user.profile?.photo_url ? (
+                            <img
+                                src={user.profile.photo_url}
+                                alt={user.profile.full_name || 'User'}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white/40">
+                                <User className="h-5 w-5" />
+                            </div>
+                        )}
+                    </div>
                     <div>
                         <div className="font-medium text-white hover:text-accent transition-colors">
                             {user.profile?.full_name || 'No name'}

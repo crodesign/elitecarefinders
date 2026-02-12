@@ -129,3 +129,17 @@ body {
     @apply opacity-100;
   }
 }
+
+/* Style select dropdown options for dark theme */
+select option {
+  background-color: rgb(13, 17, 21);
+  color: white;
+  padding: 8px 12px;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
