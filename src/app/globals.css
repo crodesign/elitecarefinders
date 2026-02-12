@@ -114,4 +114,18 @@ body {
   .badge-care-type {
     @apply bg-orange-500/10 text-orange-400;
   }
+
+  /* Custom Tooltip */
+  .tooltip {
+    @apply relative;
+  }
+
+  .tooltip::after {
+    content: attr(data-tooltip);
+    @apply absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 text-xs text-white bg-zinc-800 border border-zinc-600 rounded-md whitespace-nowrap opacity-0 pointer-events-none transition-opacity z-50;
+  }
+
+  .tooltip:hover::after {
+    @apply opacity-100;
+  }
 }

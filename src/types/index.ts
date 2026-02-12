@@ -1,11 +1,14 @@
-export type TaxonomyType = 'neighborhood' | 'amenity' | 'service' | 'care-type';
-
+// Taxonomy represents a category for organizing content (e.g., State, Neighborhood)
 export interface Taxonomy {
     id: string;
-    type: TaxonomyType;
-    name: string;
+    singularName: string;
+    pluralName: string;
     slug: string;
-    description?: string;
+    // Legacy field for backwards compatibility during migration
+    name?: string;
+    type?: string;
+    // Associated content types
+    contentTypes?: string[];
 }
 
 export interface Address {
@@ -31,11 +34,18 @@ export interface BaseEntity {
 
 export interface Home extends BaseEntity {
     address: Address;
-    price: number;
-    bedrooms: number;
-    bathrooms: number;
-    sqft: number;
-    taxonomyIds: string[]; // References to Taxonomies
+    displayReferenceNumber?: boolean;
+    showAddress?: boolean;
+    phone?: string;
+    email?: string;
+    status: 'published' | 'draft';
+    taxonomyEntryIds?: string[]; // IDs of selected entries (e.g. specific cities, care types)
+    isFeatured?: boolean;
+    hasFeaturedVideo?: boolean;
+    isHomeOfMonth?: boolean;
+    featuredLabel?: string;
+    homeOfMonthDescription?: string;
+    roomDetails?: RoomDetails;
 }
 
 export interface Facility extends BaseEntity {
@@ -43,6 +53,7 @@ export interface Facility extends BaseEntity {
     licenseNumber: string;
     capacity: number;
     taxonomyIds: string[]; // References to Taxonomies
+    status: 'published' | 'draft';
 }
 
 export interface Review {
@@ -62,3 +73,87 @@ export interface BlogPost extends BaseEntity {
     publishedAt?: string;
     tags: string[];
 }
+
+// Media Manager Types
+export interface MediaFolder {
+    id: string;
+    name: string;
+    slug: string;
+    parentId?: string;
+    path: string;
+    stateId?: string; // Reference to state taxonomy entry
+    children?: MediaFolder[];
+    itemCount?: number;
+    displayOrder?: number;
+    isSeparatorBefore?: boolean;
+    createdAt: string;
+}
+
+export interface MediaItem {
+    id: string;
+    folderId?: string;
+    filename: string;
+    originalFilename: string;
+    title?: string;
+    altText?: string;
+    caption?: string;
+    description?: string;
+    mimeType: string;
+    fileSize: number;
+    width?: number;
+    height?: number;
+    storagePath: string;
+    url: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// Room Field Types
+export interface RoomFieldCategory {
+    id: string;
+    name: string;
+    slug: string;
+    displayOrder: number;
+    section: 'room_details' | 'location_details' | 'care_provider_details';
+    columnNumber: number;
+    icon?: string;
+    createdAt: string;
+}
+
+export interface RoomFieldDefinition {
+    id: string;
+    name: string;
+    slug: string;
+    type: 'boolean' | 'single' | 'multi' | 'text' | 'textarea' | 'number' | 'currency' | 'phone' | 'email' | 'dropdown';
+    targetType: 'home' | 'facility' | 'both';
+    options?: string[];
+    categoryId: string;
+    displayOrder: number;
+    isActive: boolean;
+    createdAt: string;
+}
+
+export type FixedFieldType = 'bedroom' | 'bathroom' | 'shower' | 'roomType' | 'levelOfCare' | 'language';
+
+export interface RoomFixedFieldOption {
+    id: string;
+    fieldType: FixedFieldType;
+    value: string;
+    displayOrder: number;
+    isActive: boolean;
+    icon?: string;
+}
+
+export interface RoomDetails {
+    roomPrice?: number;
+    bedroomType?: string;
+    bathroomType?: string;
+    showerType?: string;
+    roomTypes?: string[];
+    levelOfCare?: string[];
+    languages?: string[];
+    customFields: {
+        [fieldId: string]: boolean | string | string[];
+    };
+}
+

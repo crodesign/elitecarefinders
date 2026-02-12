@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Tags, Pencil, Trash2, Loader2, Search } from "lucide-react";
-import type { Taxonomy, TaxonomyType } from "@/types";
+import type { Taxonomy } from "@/types";
 import { TaxonomyForm } from "@/components/admin/TaxonomyForm";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
@@ -13,10 +14,16 @@ import {
     deleteTaxonomy,
     type CreateTaxonomyInput,
 } from "@/lib/services/taxonomyService";
+import { useNotification } from "@/contexts/NotificationContext";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function TaxonomiesPage() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const manageId = searchParams.get('id');
+
     const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
     const [filteredTaxonomies, setFilteredTaxonomies] = useState<Taxonomy[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -25,11 +32,18 @@ export default function TaxonomiesPage() {
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingTaxonomy, setEditingTaxonomy] = useState<Taxonomy | null>(null);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+
+    // Delete state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<Taxonomy | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+
+    const { showNotification } = useNotification();
 
     const fetchTaxonomies = useCallback(async () => {
         try {
@@ -48,13 +62,24 @@ export default function TaxonomiesPage() {
         fetchTaxonomies();
     }, [fetchTaxonomies]);
 
+    // Handle URL-based management mode
+    useEffect(() => {
+        if (!isLoading && manageId && taxonomies.length > 0) {
+            const target = taxonomies.find(t => t.id === manageId);
+            if (target) {
+                setEditingTaxonomy(target);
+                setIsFormOpen(true);
+            }
+        }
+    }, [isLoading, manageId, taxonomies]);
+
     // Filter taxonomies based on search
     useEffect(() => {
         const filtered = taxonomies.filter(
             (t) =>
-                t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                t.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                t.type.toLowerCase().includes(searchQuery.toLowerCase())
+                t.singularName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.pluralName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.slug.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredTaxonomies(filtered);
         setCurrentPage(1);
@@ -73,6 +98,10 @@ export default function TaxonomiesPage() {
     const handleCloseForm = () => {
         setIsFormOpen(false);
         setEditingTaxonomy(null);
+        // Clear ID from URL
+        if (manageId) {
+            router.push('/admin/taxonomies');
+        }
     };
 
     const handleSave = async (data: CreateTaxonomyInput) => {
@@ -82,34 +111,28 @@ export default function TaxonomiesPage() {
             await createTaxonomy(data);
         }
         await fetchTaxonomies();
+        showNotification("Taxonomy Saved", data.singularName);
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this taxonomy?")) return;
+    const handleDelete = (taxonomy: Taxonomy) => {
+        setItemToDelete(taxonomy);
+        setDeleteModalOpen(true);
+    };
 
-        setDeletingId(id);
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
+
+        setIsDeleting(true);
         try {
-            await deleteTaxonomy(id);
+            await deleteTaxonomy(itemToDelete.id);
             await fetchTaxonomies();
+            showNotification("Taxonomy Deleted", itemToDelete.singularName);
         } catch (err) {
             alert(err instanceof Error ? err.message : "Failed to delete");
         } finally {
-            setDeletingId(null);
-        }
-    };
-
-    const getBadgeClass = (type: TaxonomyType) => {
-        switch (type) {
-            case "neighborhood":
-                return "badge-neighborhood";
-            case "amenity":
-                return "badge-amenity";
-            case "service":
-                return "badge-service";
-            case "care-type":
-                return "badge-care-type";
-            default:
-                return "bg-zinc-500/10 text-zinc-400";
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
         }
     };
 
@@ -123,22 +146,40 @@ export default function TaxonomiesPage() {
     // Column definitions for DataTable
     const columns: ColumnDef<Taxonomy>[] = [
         {
-            key: "name",
-            header: "Name",
+            key: "singularName",
+            header: "Singular Name",
             render: (taxonomy) => (
                 <div className="flex items-center">
                     <Tags className="mr-2 h-5 w-5 text-zinc-500 hidden md:block" />
-                    <span className="font-medium text-white">{taxonomy.name}</span>
+                    <span className="font-medium text-white">{taxonomy.singularName}</span>
                 </div>
             ),
         },
         {
-            key: "type",
-            header: "Type",
+            key: "pluralName",
+            header: "Plural Name",
             render: (taxonomy) => (
-                <span className={`badge ${getBadgeClass(taxonomy.type)}`}>
-                    {taxonomy.type}
-                </span>
+                <span className="text-white">{taxonomy.pluralName}</span>
+            ),
+        },
+        {
+            key: "contentTypes",
+            header: "Content Types",
+            render: (taxonomy) => (
+                <div className="flex flex-wrap gap-1">
+                    {taxonomy.contentTypes && taxonomy.contentTypes.length > 0 ? (
+                        taxonomy.contentTypes.map((type) => (
+                            <span
+                                key={type}
+                                className="px-2 py-0.5 rounded text-xs bg-white/10 text-zinc-300 capitalize"
+                            >
+                                {type}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-zinc-600 text-xs">-</span>
+                    )}
+                </div>
             ),
         },
         {
@@ -148,16 +189,6 @@ export default function TaxonomiesPage() {
                 <span className="text-sm text-zinc-400">{taxonomy.slug}</span>
             ),
         },
-        {
-            key: "description",
-            header: "Description",
-            hideOnMobile: true,
-            render: (taxonomy) => (
-                <span className="text-sm text-zinc-400 max-w-xs truncate block">
-                    {taxonomy.description || "-"}
-                </span>
-            ),
-        },
     ];
 
     const renderActions = (taxonomy: Taxonomy) => (
@@ -165,17 +196,15 @@ export default function TaxonomiesPage() {
             <button
                 onClick={() => handleOpenEdit(taxonomy)}
                 className="btn-ghost"
-                title="Edit"
             >
                 <Pencil className="h-4 w-4" />
             </button>
             <button
-                onClick={() => handleDelete(taxonomy.id)}
-                disabled={deletingId === taxonomy.id}
+                onClick={() => handleDelete(taxonomy)}
+                disabled={isDeleting && itemToDelete?.id === taxonomy.id}
                 className="btn-danger"
-                title="Delete"
             >
-                {deletingId === taxonomy.id ? (
+                {isDeleting && itemToDelete?.id === taxonomy.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                     <Trash2 className="h-4 w-4" />
@@ -186,28 +215,49 @@ export default function TaxonomiesPage() {
 
     if (isLoading) {
         return (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex items-center justify-center h-full">
                 <Loader2 className="h-8 w-8 animate-spin text-accent" />
             </div>
         );
     }
 
+
+    // If in manage mode (ID in URL), hide the main list
+    if (!isLoading && manageId) {
+        return (
+            <div className="h-full bg-[#0b1115]">
+                <TaxonomyForm
+                    isOpen={isFormOpen}
+                    onClose={handleCloseForm}
+                    onSave={handleSave}
+                    taxonomy={editingTaxonomy}
+                    autoOpenEntries={true}
+                />
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div className="h-full flex flex-col">
             {/* Fixed Header Section */}
-            <div className="flex-none p-4 md:p-8 pb-4 md:pb-6 space-y-4 md:space-y-6">
-                {/* Title Row */}
-                <div className="flex items-center justify-between">
+            <div className="flex-none space-y-4 md:space-y-6 p-4 md:p-8 pb-4">
+                {/* Page Header */}
+                <div className="flex items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-white">Taxonomies</h1>
-                        <p className="text-xs md:text-sm text-zinc-400 mt-1">
-                            Manage categories, neighborhoods, amenities, and more
+                        <h1 className="text-2xl md:text-3xl font-bold text-white">Taxonomies</h1>
+                        <p className="text-zinc-400 mt-1 text-sm md:text-base">
+                            Manage categories for filtering and URL structure
                         </p>
                     </div>
-                    <button onClick={handleOpenCreate} className="btn-primary text-sm">
-                        <Plus className="-ml-1 mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5 inline" />
-                        <span className="hidden md:inline">Add Taxonomy</span>
-                        <span className="md:hidden">Add</span>
+                    <button
+                        onClick={handleOpenCreate}
+                        className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2"
+                    >
+                        <Plus className="h-5 w-5 md:hidden" />
+                        <span className="hidden md:flex md:items-center md:gap-2">
+                            <Plus className="h-5 w-5" />
+                            Add Taxonomy
+                        </span>
                     </button>
                 </div>
 
@@ -240,11 +290,11 @@ export default function TaxonomiesPage() {
                             data={paginatedTaxonomies}
                             keyField="id"
                             actions={renderActions}
-                            primaryColumn="name"
+                            primaryColumn="singularName"
                             emptyMessage={
                                 searchQuery
                                     ? "No taxonomies match your search."
-                                    : 'No taxonomies yet. Click "Add Taxonomy" to create one.'
+                                    : 'No taxonomies yet. Click "Add" to create one.'
                             }
                         />
                     </div>
@@ -257,19 +307,42 @@ export default function TaxonomiesPage() {
                             totalItems={filteredTaxonomies.length}
                             itemsPerPage={itemsPerPage}
                             onPageChange={setCurrentPage}
-                            onItemsPerPageChange={setItemsPerPage}
+                            onItemsPerPageChange={(count) => {
+                                setItemsPerPage(count);
+                                setCurrentPage(1);
+                            }}
                         />
                     )}
                 </div>
             </div>
 
-            {/* Slide-in Form Panel */}
+            {/* Form Slide Panel */}
             <TaxonomyForm
                 isOpen={isFormOpen}
                 onClose={handleCloseForm}
                 onSave={handleSave}
                 taxonomy={editingTaxonomy}
             />
-        </>
+
+            <ConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => {
+                    setDeleteModalOpen(false);
+                    setItemToDelete(null);
+                }}
+                onConfirm={confirmDelete}
+                title="Delete Taxonomy"
+                message={
+                    <span>
+                        Are you sure you want to delete <strong>{itemToDelete?.singularName}</strong>?
+                        <br />
+                        This action cannot be undone.
+                    </span>
+                }
+                confirmLabel="Delete Taxonomy"
+                isDangerous={true}
+                isLoading={isDeleting}
+            />
+        </div>
     );
 }

@@ -1,60 +1,143 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 import type { Home } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
+import { HomeForm } from "@/components/admin/HomeForm";
+import { getHomes, createHome, updateHome, deleteHome, type CreateHomeInput } from "@/lib/services/homeService";
+import { useNotification } from "@/contexts/NotificationContext";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
-// Mock data - will be replaced with Supabase
-const initialHomes: Home[] = [
-    {
-        id: "1",
-        title: "Sunnyvale Estate",
-        slug: "sunnyvale-estate",
-        description: "Beautiful estate in sunny valley",
-        images: [],
-        createdAt: "2024-01-15T12:00:00Z",
-        updatedAt: "2024-01-15T12:00:00Z",
-        address: { street: "123 Solar Way", city: "Phoenix", state: "AZ", zip: "85001" },
-        price: 4500,
-        bedrooms: 4,
-        bathrooms: 3,
-        sqft: 2500,
-        taxonomyIds: ["1", "2"]
-    },
-    {
-        id: "2",
-        title: "Mountain Retreat",
-        slug: "mountain-retreat",
-        description: "Cozy cabin",
-        images: [],
-        createdAt: "2024-01-16T12:00:00Z",
-        updatedAt: "2024-01-16T12:00:00Z",
-        address: { street: "456 Peak Lane", city: "Flagstaff", state: "AZ", zip: "86001" },
-        price: 3800,
-        bedrooms: 3,
-        bathrooms: 2,
-        sqft: 1800,
-        taxonomyIds: ["2"]
-    }
-];
+const ITEMS_PER_PAGE = 10;
 
 export default function HomesPage() {
-    const [homes] = useState<Home[]>(initialHomes);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    const [homes, setHomes] = useState<Home[]>([]);
+    const [filteredHomes, setFilteredHomes] = useState<Home[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
 
-    const filteredHomes = useMemo(() =>
-        homes.filter(
-            (h) =>
-                h.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                h.address.city.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        [homes, searchQuery]
-    );
+    // Form state
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingHome, setEditingHome] = useState<Home | null>(null);
 
+
+    // Delete state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<Home | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const { showNotification } = useNotification();
+
+    const fetchHomes = useCallback(async () => {
+        try {
+            setError(null);
+            const data = await getHomes();
+            setHomes(data);
+            setFilteredHomes(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to load homes");
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchHomes();
+    }, [fetchHomes]);
+
+    // Handle ?action=create query param
+    useEffect(() => {
+        if (searchParams.get('action') === 'create') {
+            setEditingHome(null);
+            setIsFormOpen(true);
+            // Clear the query param
+            router.replace('/admin/homes', { scroll: false });
+        }
+    }, [searchParams, router]);
+
+
+    // Search Filtering
+    useEffect(() => {
+        const query = searchQuery.toLowerCase();
+        const filtered = homes.filter((h) =>
+            h.title.toLowerCase().includes(query) ||
+            h.slug.toLowerCase().includes(query) ||
+            (h.address?.city || "").toLowerCase().includes(query)
+        );
+        setFilteredHomes(filtered);
+        setCurrentPage(1);
+    }, [searchQuery, homes]);
+
+    const handleOpenCreate = () => {
+        setEditingHome(null);
+        setIsFormOpen(true);
+    };
+
+    const handleOpenEdit = (home: Home) => {
+        setEditingHome(home);
+        setIsFormOpen(true);
+    };
+
+    const handleCloseForm = () => {
+        setIsFormOpen(false);
+        setEditingHome(null);
+    };
+
+    const handleSave = async (data: Partial<Home>) => {
+        try {
+            if (editingHome) {
+                await updateHome(editingHome.id, data);
+                showNotification("Home Updated", data.title || "Home updated successfully");
+            } else {
+                // Ensure required fields for create
+                if (!data.title || !data.slug) {
+                    throw new Error("Title and Slug are required");
+                }
+                await createHome(data as CreateHomeInput);
+                showNotification("Home Created", data.title);
+            }
+            await fetchHomes();
+            handleCloseForm();
+        } catch (err) {
+            console.error("Save error:", err);
+            throw err; // Re-throw for form to handle
+        }
+    };
+
+    const handleDelete = (home: Home) => {
+        setItemToDelete(home);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await deleteHome(itemToDelete.id);
+            await fetchHomes();
+            showNotification("Home Deleted", "Home has been removed");
+        } catch (err) {
+            alert(err instanceof Error ? err.message : "Failed to delete");
+        } finally {
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
+        }
+    };
+
+    // Pagination calculations
     const totalPages = Math.ceil(filteredHomes.length / itemsPerPage);
     const paginatedHomes = filteredHomes.slice(
         (currentPage - 1) * itemsPerPage,
@@ -66,58 +149,86 @@ export default function HomesPage() {
             key: "title",
             header: "Home",
             render: (home) => (
-                <div className="flex items-center">
-                    <HomeIcon className="mr-2 h-5 w-5 text-zinc-500 hidden md:block" />
+                <button
+                    type="button"
+                    onClick={() => handleOpenEdit(home)}
+                    className="flex items-center text-left hover:opacity-80 transition-opacity"
+                >
+                    <HomeIcon className={`mr-2 h-5 w-5 hidden md:block ${home.status === 'published' ? 'text-emerald-500' : 'text-zinc-500'}`} />
                     <div>
-                        <div className="font-medium text-white">{home.title}</div>
+                        <div className="font-medium text-white hover:text-accent transition-colors">
+                            {home.displayReferenceNumber ? "Ref: " : ""}{home.title}
+                        </div>
                         <div className="text-xs text-zinc-500 hidden md:block">{home.slug}</div>
                     </div>
-                </div>
+                </button>
             ),
         },
         {
-            key: "location",
+            key: "address",
             header: "Location",
             render: (home) => (
                 <div className="flex items-center text-sm text-zinc-400">
                     <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
-                    {home.address.city}, {home.address.state}
+                    {home.showAddress !== false ? (
+                        <span>
+                            {home.address?.city || "Unknown City"}, {home.address?.state || "State"}
+                        </span>
+                    ) : (
+                        <span className="italic opacity-50">Address Hidden</span>
+                    )}
                 </div>
             ),
         },
-        {
-            key: "details",
-            header: "Details",
-            render: (home) => (
-                <span className="text-sm text-zinc-400">
-                    {home.bedrooms} Bed · {home.bathrooms} Bath · {home.sqft} sqft
-                </span>
-            ),
-        },
-        {
-            key: "price",
-            header: "Price",
-            render: (home) => (
-                <span className="text-sm font-medium text-accent">
-                    ${home.price.toLocaleString()}
-                </span>
-            ),
-        },
+        // {
+        //     key: "details",
+        //     header: "Details",
+        //     render: (home) => (
+        //         <span className="text-sm text-zinc-400">
+        //             {home.bedrooms ?? '-'} Bed · {home.bathrooms ?? '-'} Bath
+        //         </span>
+        //     ),
+        // },
+        // {
+        //     key: "price",
+        //     header: "Price",
+        //     render: (home) => (
+        //         <span className="text-sm font-medium text-accent">
+        //             {home.price ? `$${home.price.toLocaleString()}` : '-'}
+        //         </span>
+        //     ),
+        // },
     ];
 
     const renderActions = (home: Home) => (
         <>
-            <button className="btn-ghost" title="Edit">
+            <button className="btn-ghost" onClick={() => handleOpenEdit(home)}>
                 <Pencil className="h-4 w-4" />
             </button>
-            <button className="btn-danger" title="Delete">
-                <Trash2 className="h-4 w-4" />
+            <button
+                className="btn-danger"
+                onClick={() => handleDelete(home)}
+                disabled={isDeleting && itemToDelete?.id === home.id}
+            >
+                {isDeleting && itemToDelete?.id === home.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    <Trash2 className="h-4 w-4" />
+                )}
             </button>
         </>
     );
 
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div className="h-full flex flex-col">
             {/* Fixed Header Section */}
             <div className="flex-none p-4 md:p-8 pb-4 md:pb-6 space-y-4 md:space-y-6">
                 <div className="flex items-center justify-between">
@@ -125,10 +236,15 @@ export default function HomesPage() {
                         <h1 className="text-xl md:text-2xl font-bold text-white">Homes</h1>
                         <p className="text-xs md:text-sm text-zinc-400 mt-1">Manage residential care home listings</p>
                     </div>
-                    <button className="btn-primary text-sm">
-                        <Plus className="-ml-1 mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5 inline" />
-                        <span className="hidden md:inline">Add Home</span>
-                        <span className="md:hidden">Add</span>
+                    <button
+                        onClick={handleOpenCreate}
+                        className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2"
+                    >
+                        <Plus className="h-5 w-5 md:hidden" />
+                        <span className="hidden md:flex md:items-center md:gap-2">
+                            <Plus className="h-5 w-5" />
+                            Add Home
+                        </span>
                     </button>
                 </div>
 
@@ -171,6 +287,34 @@ export default function HomesPage() {
                     )}
                 </div>
             </div>
-        </>
+
+            {/* Slide-in Form Panel */}
+            <HomeForm
+                isOpen={isFormOpen}
+                onClose={handleCloseForm}
+                onSave={handleSave}
+                home={editingHome}
+            />
+
+            <ConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => {
+                    setDeleteModalOpen(false);
+                    setItemToDelete(null);
+                }}
+                onConfirm={confirmDelete}
+                title="Delete Home"
+                message={
+                    <span>
+                        Are you sure you want to delete <strong>{itemToDelete?.title}</strong>?
+                        <br />
+                        This action cannot be undone.
+                    </span>
+                }
+                confirmLabel="Delete Home"
+                isDangerous={true}
+                isLoading={isDeleting}
+            />
+        </div>
     );
 }

@@ -107,10 +107,10 @@ export default function BlogPage() {
 
     const renderActions = (post: BlogPost) => (
         <>
-            <button className="btn-ghost" title="Edit">
+            <button className="btn-ghost">
                 <Pencil className="h-4 w-4" />
             </button>
-            <button className="btn-danger" title="Delete">
+            <button className="btn-danger">
                 <Trash2 className="h-4 w-4" />
             </button>
         </>
@@ -125,10 +125,14 @@ export default function BlogPage() {
                         <h1 className="text-xl md:text-2xl font-bold text-white">Blog Posts</h1>
                         <p className="text-xs md:text-sm text-zinc-400 mt-1">Manage blog content and articles</p>
                     </div>
-                    <button className="btn-primary text-sm">
-                        <Plus className="-ml-1 mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5 inline" />
-                        <span className="hidden md:inline">New Post</span>
-                        <span className="md:hidden">Add</span>
+                    <button
+                        className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2"
+                    >
+                        <Plus className="h-5 w-5 md:hidden" />
+                        <span className="hidden md:flex md:items-center md:gap-2">
+                            <Plus className="h-5 w-5" />
+                            New Post
+                        </span>
                     </button>
                 </div>
 

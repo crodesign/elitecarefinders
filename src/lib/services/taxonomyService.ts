@@ -1,13 +1,13 @@
 import { supabase } from '@/lib/supabase';
-import type { Taxonomy, TaxonomyType } from '@/types';
+import type { Taxonomy } from '@/types';
 
-// Database row type (snake_case from Supabase)
+// Database row type (matches actual Supabase schema)
 interface TaxonomyRow {
     id: string;
-    type: TaxonomyType;
-    name: string;
+    name: string;      // This is the "plural" display name in the DB
+    type: string;      // This is the "singular" type identifier in the DB
     slug: string;
-    description: string | null;
+    content_types?: string[]; // Array column
     created_at: string;
     updated_at: string;
 }
@@ -16,10 +16,10 @@ interface TaxonomyRow {
 function toTaxonomy(row: TaxonomyRow): Taxonomy {
     return {
         id: row.id,
-        type: row.type,
-        name: row.name,
+        singularName: row.type,    // 'type' maps to singularName
+        pluralName: row.name,      // 'name' maps to pluralName
         slug: row.slug,
-        description: row.description || undefined,
+        contentTypes: row.content_types || [], // Map DB column to frontend property
     };
 }
 
@@ -27,7 +27,7 @@ export async function getTaxonomies(): Promise<Taxonomy[]> {
     const { data, error } = await supabase
         .from('taxonomies')
         .select('*')
-        .order('name');
+        .order('name');  // Order by 'name' since 'singular_name' doesn't exist
 
     if (error) throw error;
     return (data as TaxonomyRow[]).map(toTaxonomy);
@@ -48,20 +48,20 @@ export async function getTaxonomyById(id: string): Promise<Taxonomy | null> {
 }
 
 export interface CreateTaxonomyInput {
-    type: TaxonomyType;
-    name: string;
+    singularName: string;
+    pluralName: string;
     slug: string;
-    description?: string;
+    contentTypes?: string[];
 }
 
 export async function createTaxonomy(input: CreateTaxonomyInput): Promise<Taxonomy> {
     const { data, error } = await supabase
         .from('taxonomies')
         .insert({
-            type: input.type,
-            name: input.name,
+            type: input.singularName,   // 'type' column for singular name
+            name: input.pluralName,     // 'name' column for plural name
             slug: input.slug,
-            description: input.description || null,
+            content_types: input.contentTypes,
         })
         .select()
         .single();
@@ -71,12 +71,19 @@ export async function createTaxonomy(input: CreateTaxonomyInput): Promise<Taxono
 }
 
 export async function updateTaxonomy(id: string, input: Partial<CreateTaxonomyInput>): Promise<Taxonomy> {
+    const updateData: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+    };
+
+    if (input.singularName !== undefined) updateData.type = input.singularName;  // 'type' column
+    if (input.pluralName !== undefined) updateData.name = input.pluralName;      // 'name' column
+    if (input.pluralName !== undefined) updateData.name = input.pluralName;      // 'name' column
+    if (input.slug !== undefined) updateData.slug = input.slug;
+    if (input.contentTypes !== undefined) updateData.content_types = input.contentTypes;
+
     const { data, error } = await supabase
         .from('taxonomies')
-        .update({
-            ...input,
-            updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();

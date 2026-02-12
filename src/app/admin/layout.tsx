@@ -4,13 +4,11 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Logo } from "@/components/icons/Logo";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 
-export default function AdminLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
+    const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed } = useSidebar();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -20,10 +18,10 @@ export default function AdminLayout({
                 className="fixed inset-0 pointer-events-none z-0"
                 style={{
                     background: `
-                        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(35, 157, 219, 0.15), transparent 50%),
-                        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(35, 157, 219, 0.12), transparent 50%),
-                        radial-gradient(ellipse 50% 30% at 50% 50%, rgba(35, 157, 219, 0.05), transparent 60%)
-                    `
+                    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(35, 157, 219, 0.15), transparent 50%),
+                    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(35, 157, 219, 0.12), transparent 50%),
+                    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(35, 157, 219, 0.05), transparent 60%)
+                `
                 }}
             />
 
@@ -52,11 +50,11 @@ export default function AdminLayout({
 
             {/* Sidebar - hidden on mobile, shown when menu open */}
             <div className={`
-                fixed top-0 left-0 z-[60] h-screen
-                transition-transform duration-300
-                md:translate-x-0
-                ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            fixed top-0 left-0 z-[60] h-screen
+            transition-transform duration-300
+            md:translate-x-0
+            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
                 <AdminSidebar
                     collapsed={sidebarCollapsed}
                     onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -69,10 +67,29 @@ export default function AdminLayout({
                 className={`relative z-10 transition-all duration-300 pt-14 md:pt-0 ${sidebarCollapsed ? "md:ml-20" : "md:ml-64"
                     }`}
             >
-                <div className="flex flex-col h-[calc(100vh-56px)] md:h-screen">
+                <div className="flex flex-col h-[calc(100dvh-56px)] md:h-screen">
                     {children}
                 </div>
             </main>
         </div>
     );
 }
+
+import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <SidebarProvider>
+            <NotificationProvider>
+                <UnsavedChangesProvider>
+                    <AdminLayoutInner>{children}</AdminLayoutInner>
+                </UnsavedChangesProvider>
+            </NotificationProvider>
+        </SidebarProvider>
+    );
+}
+

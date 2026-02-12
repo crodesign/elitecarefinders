@@ -131,13 +131,11 @@ export default function ReviewsPage() {
         <>
             <button
                 className="btn-ghost text-green-400 hover:bg-green-500/10"
-                title="Approve"
             >
                 <Check className="h-4 w-4" />
             </button>
             <button
                 className="btn-danger"
-                title="Reject"
             >
                 <X className="h-4 w-4" />
             </button>
