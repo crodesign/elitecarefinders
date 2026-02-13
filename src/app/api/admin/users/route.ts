@@ -112,6 +112,7 @@ export async function GET(request: Request) {
                 photo_url: '',
                 address: { street: '', city: '', state: '', zip: '' }
             },
+            location_ids: userLocations.map(l => l.location_id),
             location_count: userLocations.length
         };
     });
@@ -142,12 +143,16 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password, role, profile, location_ids } = body;
 
+    console.log('[POST /api/admin/users] Creating user:', { email, role, hasPassword: !!password, hasProfile: !!profile?.full_name, locationCount: location_ids?.length });
+
     // Validate input
     if (!email || !password || !role || !profile?.full_name) {
+        console.error('[POST /api/admin/users] Validation failed:', { email: !!email, password: !!password, role: !!role, full_name: !!profile?.full_name });
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // 2. Create Auth User
+    console.log('[POST /api/admin/users] Calling auth.admin.createUser for:', email);
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
@@ -155,9 +160,11 @@ export async function POST(request: Request) {
     });
 
     if (authError) {
+        console.error('[POST /api/admin/users] Auth error:', JSON.stringify({ message: authError.message, status: authError.status, name: authError.name }));
         return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
+    console.log('[POST /api/admin/users] Auth user created:', authData.user.id);
     const userId = authData.user.id;
 
     try {

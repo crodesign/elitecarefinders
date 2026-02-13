@@ -100,9 +100,18 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     const body = await request.json();
-    const { role, profile, location_ids } = body;
+    const { role, profile, location_ids, password } = body;
 
     try {
+        // Update password if provided
+        if (password) {
+            const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(
+                id,
+                { password }
+            );
+            if (passwordError) throw passwordError;
+        }
+
         if (role) {
             // Handle both update and insert (upsert)
             const { error: roleError } = await supabaseAdmin

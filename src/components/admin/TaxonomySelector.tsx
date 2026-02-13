@@ -190,14 +190,14 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full flex items-center justify-between rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors ${selectedEntry
-                    ? `bg-accent/40 text-white shadow-sm shadow-accent/10 ${isOpen ? "bg-accent/50" : "hover:bg-accent/50"}`
+                    ? `bg-black/30 text-white ${isOpen ? "bg-black/50" : "hover:bg-black/50"}`
                     : `text-white ${isOpen ? "bg-black/50" : "bg-black/30 hover:bg-black/50"}`
                     }`}
             >
                 <span className={selectedEntry ? "text-white" : "text-zinc-500"}>
                     {selectedEntry ? selectedEntry.fullPath : `Select ${taxonomy.singularName}...`}
                 </span>
-                <ChevronDown className="h-4 w-4 text-zinc-500" />
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${selectedEntry ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (

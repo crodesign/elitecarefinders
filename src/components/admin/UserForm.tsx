@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { SlidePanel } from "./SlidePanel";
 import { ImageCropModal } from "./ImageCropModal";
-import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search } from 'lucide-react';
+import { createClientComponentClient } from "@/lib/supabase";
 import type { UserProfile, UserRole } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -83,7 +84,7 @@ interface UserFormProps {
 }
 
 export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
-    const { canCreateRole, isSuperAdmin, isSystemAdmin } = useAuth();
+    const { canCreateRole, isSuperAdmin, isSystemAdmin, user: currentUser } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isResettingPassword, setIsResettingPassword] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +97,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [editPassword, setEditPassword] = useState(''); // For admin editing existing users
+    const [showEditPassword, setShowEditPassword] = useState(false);
     const [fullName, setFullName] = useState('');
     const [nickname, setNickname] = useState('');
     const [phone, setPhone] = useState('');
@@ -104,6 +107,86 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
     const [zip, setZip] = useState('');
+
+    // Location assignment state
+    const [locationIds, setLocationIds] = useState<string[]>([]);
+    const [taxonomyEntries, setTaxonomyEntries] = useState<{ id: string; name: string; parent_id: string | null; slug: string }[]>([]);
+    const [locationSearch, setLocationSearch] = useState('');
+    const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+    const locationDropdownRef = useRef<HTMLDivElement>(null);
+    const supabaseClient = createClientComponentClient();
+
+    // Fetch taxonomy entries for location selector
+    useEffect(() => {
+        const fetchTaxonomy = async () => {
+            try {
+                const { data: taxonomyData } = await supabaseClient
+                    .from('taxonomies')
+                    .select('id')
+                    .or('type.eq.location,slug.eq.location')
+                    .single();
+
+                if (taxonomyData) {
+                    const { data: entries } = await supabaseClient
+                        .from('taxonomy_entries')
+                        .select('id, name, parent_id, slug')
+                        .eq('taxonomy_id', taxonomyData.id)
+                        .order('name');
+
+                    if (entries) setTaxonomyEntries(entries);
+                }
+            } catch (err) {
+                console.error('Failed to load taxonomy:', err);
+            }
+        };
+        fetchTaxonomy();
+    }, []);
+
+    // Close location dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
+                setIsLocationDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Determine available locations based on role and current user
+    const getAvailableLocations = useCallback(() => {
+        const states = taxonomyEntries.filter(e => e.parent_id === null);
+        const cities = taxonomyEntries.filter(e => e.parent_id !== null);
+
+        if (role === 'regional_manager') {
+            // RMs can only be assigned to states
+            return states.map(s => ({ ...s, level: 'state' as const, children: [] }));
+        }
+
+        if (role === 'local_user') {
+            if (isSuperAdmin || isSystemAdmin) {
+                // Super/System admins can assign any location
+                return states.map(s => ({
+                    ...s,
+                    level: 'state' as const,
+                    children: cities.filter(c => c.parent_id === s.id)
+                }));
+            }
+
+            // Regional managers can only assign to their own states and children
+            const rmLocationIds = currentUser?.locationAssignments?.map(la => la.location_id) || [];
+            const rmStates = states.filter(s => rmLocationIds.includes(s.id));
+            return rmStates.map(s => ({
+                ...s,
+                level: 'state' as const,
+                children: cities.filter(c => c.parent_id === s.id)
+            }));
+        }
+
+        return [];
+    }, [taxonomyEntries, role, isSuperAdmin, isSystemAdmin, currentUser]);
+
+    const showLocationSelector = role === 'regional_manager' || role === 'local_user';
 
     const isEditing = !!user;
 
@@ -114,6 +197,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
             if (user) {
                 setEmail(user.email);
                 setPassword('');
+                setEditPassword(''); // Reset admin edit password
                 setFullName(user.profile?.full_name || '');
                 setNickname(user.profile?.nickname || '');
                 setPhone(user.profile?.phone || '');
@@ -123,9 +207,11 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setCity(user.profile?.address?.city || '');
                 setState(user.profile?.address?.state || '');
                 setZip(user.profile?.address?.zip || '');
+                setLocationIds(user.location_ids || []);
             } else {
                 setEmail('');
                 setPassword('');
+                setEditPassword('');
                 setFullName('');
                 setNickname('');
                 setPhone('');
@@ -135,6 +221,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setCity('');
                 setState('');
                 setZip('');
+                setLocationIds([]);
             }
         }
     }, [isOpen, user]);
@@ -235,7 +322,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
         try {
             const formData: UserFormData = {
                 email: email.trim(),
-                ...(password && { password }),
+                ...((isEditing ? editPassword : password) && { password: isEditing ? editPassword : password }),
                 role,
                 profile: {
                     full_name: fullName.trim(),
@@ -246,7 +333,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                         address: { street, city, state, zip }
                     } : {})
                 },
-                locationIds: []
+                locationIds: showLocationSelector ? locationIds : []
             };
 
             await onSave(formData);
@@ -407,22 +494,35 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
                                 )}
 
-                                {isEditing && (isSuperAdmin || isSystemAdmin) && (
+                                {isEditing && (isSuperAdmin || isSystemAdmin || (currentUser?.id === user?.id)) && (
                                     <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80">Password</label>
+                                        <label className="text-sm font-medium text-white/80">
+                                            Password (optional - leave blank to keep current)
+                                        </label>
                                         <div className="flex items-center gap-2">
-                                            <input
-                                                type="password"
-                                                value="••••••••"
-                                                disabled
-                                                className="flex-1 rounded-md py-1.5 px-3 text-sm bg-black/20 text-white/40 cursor-not-allowed"
-                                            />
+                                            <div className="relative flex-1">
+                                                <input
+                                                    type={showEditPassword ? "text" : "password"}
+                                                    value={editPassword}
+                                                    onChange={(e) => setEditPassword(e.target.value)}
+                                                    className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="Enter new password to change"
+                                                    autoComplete="new-password"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowEditPassword(!showEditPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                                >
+                                                    {showEditPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
                                             <Tooltip content="Send password reset email">
                                                 <button
                                                     type="button"
                                                     onClick={handleResetPassword}
                                                     disabled={isResettingPassword}
-                                                    className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+                                                    className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 h-[38px]"
                                                 >
                                                     <RotateCw className={`h-3.5 w-3.5 ${isResettingPassword ? 'animate-spin' : ''}`} />
                                                     Reset
@@ -463,6 +563,138 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         leftIcon={Shield}
                                     />
                                 </div>
+
+                                {/* Location Assignments - shown for RM and Local User */}
+                                {showLocationSelector && (
+                                    <div className="mt-4 pt-4 border-t border-white/5">
+                                        <label className="text-sm font-medium text-white/80 flex items-center gap-1.5 mb-2">
+                                            <Globe className="h-3.5 w-3.5 text-accent" />
+                                            Location Assignments
+                                            <span className="text-xs text-zinc-500 font-normal ml-1">
+                                                ({role === 'regional_manager' ? 'States' : 'States & Cities'})
+                                            </span>
+                                        </label>
+
+                                        {/* Selected locations as chips */}
+                                        {locationIds.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5 mb-2">
+                                                {locationIds.map(lid => {
+                                                    const entry = taxonomyEntries.find(e => e.id === lid);
+                                                    const parent = entry?.parent_id ? taxonomyEntries.find(e => e.id === entry.parent_id) : null;
+                                                    return (
+                                                        <span
+                                                            key={lid}
+                                                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-xs font-medium"
+                                                        >
+                                                            {parent ? `${parent.name} › ${entry?.name}` : entry?.name || lid}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setLocationIds(prev => prev.filter(id => id !== lid))}
+                                                                className="hover:text-white transition-colors"
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </button>
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Location dropdown */}
+                                        <div className="relative" ref={locationDropdownRef}>
+                                            <div className="relative">
+                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+                                                <input
+                                                    type="text"
+                                                    value={locationSearch}
+                                                    onChange={(e) => {
+                                                        setLocationSearch(e.target.value);
+                                                        setIsLocationDropdownOpen(true);
+                                                    }}
+                                                    onFocus={() => setIsLocationDropdownOpen(true)}
+                                                    className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="Search locations..."
+                                                    autoComplete="off"
+                                                />
+                                            </div>
+
+                                            {isLocationDropdownOpen && (() => {
+                                                const availableLocations = getAvailableLocations();
+                                                const searchLower = locationSearch.toLowerCase();
+
+                                                return (
+                                                    <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl border border-white/10 max-h-48 overflow-y-auto p-1">
+                                                        {availableLocations.length === 0 ? (
+                                                            <div className="px-3 py-2 text-xs text-zinc-500">No locations available</div>
+                                                        ) : (
+                                                            availableLocations.map(loc => {
+                                                                const isStateSelected = locationIds.includes(loc.id);
+                                                                const matchesSearch = !searchLower || loc.name.toLowerCase().includes(searchLower);
+                                                                const childrenMatchSearch = loc.children?.some((c: { name: string }) => c.name.toLowerCase().includes(searchLower));
+
+                                                                if (!matchesSearch && !childrenMatchSearch) return null;
+
+                                                                return (
+                                                                    <div key={loc.id}>
+                                                                        {/* State entry */}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                if (isStateSelected) {
+                                                                                    setLocationIds(prev => prev.filter(id => id !== loc.id));
+                                                                                } else {
+                                                                                    setLocationIds(prev => [...prev, loc.id]);
+                                                                                }
+                                                                            }}
+                                                                            className={`w-full text-left px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${isStateSelected
+                                                                                ? 'bg-accent/10 text-accent'
+                                                                                : 'text-zinc-300 hover:bg-white/5 hover:text-white'
+                                                                                }`}
+                                                                        >
+                                                                            <span className="font-medium">{loc.name}</span>
+                                                                            {isStateSelected && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                                                                        </button>
+
+                                                                        {/* City children (only for local_user role) */}
+                                                                        {role === 'local_user' && loc.children && loc.children.length > 0 && (
+                                                                            <div className="ml-4">
+                                                                                {loc.children
+                                                                                    .filter((c: { name: string }) => !searchLower || c.name.toLowerCase().includes(searchLower) || matchesSearch)
+                                                                                    .map((child: { id: string; name: string }) => {
+                                                                                        const isCitySelected = locationIds.includes(child.id);
+                                                                                        return (
+                                                                                            <button
+                                                                                                key={child.id}
+                                                                                                type="button"
+                                                                                                onClick={() => {
+                                                                                                    if (isCitySelected) {
+                                                                                                        setLocationIds(prev => prev.filter(id => id !== child.id));
+                                                                                                    } else {
+                                                                                                        setLocationIds(prev => [...prev, child.id]);
+                                                                                                    }
+                                                                                                }}
+                                                                                                className={`w-full text-left px-3 py-1.5 rounded text-xs flex items-center gap-2 transition-colors ${isCitySelected
+                                                                                                    ? 'bg-accent/10 text-accent'
+                                                                                                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                                                                                                    }`}
+                                                                                            >
+                                                                                                <span>{child.name}</span>
+                                                                                                {isCitySelected && <Check className="h-3 w-3 ml-auto text-accent" />}
+                                                                                            </button>
+                                                                                        );
+                                                                                    })}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

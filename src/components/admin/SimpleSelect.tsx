@@ -30,14 +30,14 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full flex items-center justify-between rounded-md px-2 py-1 ${textSize} focus:outline-none transition-colors h-full min-h-[28px] ${value
-                    ? `bg-accent/40 text-white shadow-sm shadow-accent/10 ${isOpen ? "bg-accent/50" : "hover:bg-accent/50"}`
+                    ? `bg-black/30 text-white ${isOpen ? "bg-black/50" : "hover:bg-black/50"}`
                     : `text-white ${isOpen ? "bg-black/50" : "bg-black/30 hover:bg-black/50 focus:bg-black/50"}`
                     }`}
             >
                 <span className={`truncate mr-2 ${value ? "text-white" : "text-zinc-500"}`}>
                     {value || placeholder}
                 </span>
-                <ChevronDown className={`h-4 w-4 flex-shrink-0 ${value ? "text-white/80" : "text-zinc-500"}`} />
+                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${value ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (

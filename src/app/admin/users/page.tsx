@@ -115,7 +115,7 @@ export default function UsersPage() {
             });
 
             if (updateError) {
-                throw new Error('Failed to update user');
+                throw new Error(updateError);
             }
 
             showNotification('User Updated', formData.profile.full_name);
@@ -130,7 +130,7 @@ export default function UsersPage() {
             });
 
             if (createError) {
-                throw new Error('Failed to create user');
+                throw new Error(createError);
             }
 
             showNotification('User Created', formData.profile.full_name);

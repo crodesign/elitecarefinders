@@ -61,7 +61,7 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 autoComplete="username"
-                                className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50 autofill:bg-black/30 autofill:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_rgb(13_17_21)_inset]"
+                                className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-zinc-600 hover:bg-black/90 focus:bg-black/90"
                                 placeholder="you@example.com or nickname"
                                 disabled={loading}
                             />
@@ -82,7 +82,7 @@ export default function LoginPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     autoComplete="current-password"
-                                    className="w-full rounded-md px-3 py-2 pr-10 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50 autofill:bg-black/30 autofill:text-white [&:-webkit-autofill]:[-webkit-text-fill-color:white] [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0px_1000px_rgb(13_17_21)_inset]"
+                                    className="w-full rounded-md px-3 py-2 pr-10 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-zinc-600 hover:bg-black/90 focus:bg-black/90"
                                     placeholder="••••••••"
                                     disabled={loading}
                                 />

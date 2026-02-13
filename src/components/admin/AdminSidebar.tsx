@@ -256,12 +256,24 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                         <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                             Settings
                         </h3>
-                        <button
-                            onClick={() => setShowSettingsMenu(false)}
-                            className="text-zinc-400 hover:text-white transition-colors"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setShowSettingsMenu(false);
+                                }}
+                                className="text-zinc-400 hover:text-red-400 transition-colors"
+                                title="Logout"
+                            >
+                                <LogOut className="h-4 w-4" />
+                            </button>
+                            <button
+                                onClick={() => setShowSettingsMenu(false)}
+                                className="text-zinc-400 hover:text-white transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
                     </div>
                     <div className="p-2 space-y-1">
                         <Link
@@ -308,17 +320,6 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-zinc-500 group-hover:text-white"}`} />
                             Users
                         </Link>
-                        <div className="h-px bg-white/10 my-1"></div>
-                        <button
-                            onClick={() => {
-                                handleLogout();
-                                setShowSettingsMenu(false);
-                            }}
-                            className="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-400/10 hover:text-red-400 w-full text-left"
-                        >
-                            <LogOut className="h-5 w-5 mr-3 flex-shrink-0 text-zinc-500 group-hover:text-red-400" />
-                            Logout
-                        </button>
                     </div>
                 </div>
             )}

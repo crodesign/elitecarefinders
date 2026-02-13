@@ -67,6 +67,10 @@ function TruncatedText({ text, className }: { text: string; className?: string }
 const PRIMARY_FOLDER_SLUGS = ["home-images", "facility-images"];
 // Folders that appear below the divider
 const SECONDARY_FOLDER_SLUGS = ["blog-images", "site-images", "temp"];
+// Folders restricted to super_admin only
+const SUPER_ADMIN_ONLY_SLUGS = ["site-images"];
+// Folders that cannot have subfolders
+const NO_SUBFOLDER_SLUGS = ["temp"];
 // Protected system folders that cannot be renamed or deleted
 const PROTECTED_FOLDER_SLUGS = [...PRIMARY_FOLDER_SLUGS, ...SECONDARY_FOLDER_SLUGS];
 
@@ -81,6 +85,7 @@ interface FolderTreeProps {
     states: StateOption[];
     selectedStateId: string | null;
     onSelectState: (stateId: string | null) => void;
+    isSuperAdmin?: boolean;
 }
 
 export function FolderTree({
@@ -93,6 +98,7 @@ export function FolderTree({
     states,
     selectedStateId,
     onSelectState,
+    isSuperAdmin = false,
 }: FolderTreeProps) {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
@@ -122,6 +128,10 @@ export function FolderTree({
         }
     }, [isHawaiiSelected]);
 
+    const [isCreating, setIsCreating] = useState(false);
+    const [newFolderName, setNewFolderName] = useState("");
+    const [creatingParentId, setCreatingParentId] = useState<string | undefined>();
+
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -147,7 +157,7 @@ export function FolderTree({
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [editingId]);
+    }, [editingId, isCreating]);
 
     // Auto-expand parent folders when selected folder changes
     useEffect(() => {
@@ -177,9 +187,7 @@ export function FolderTree({
         }
     }, [selectedFolderId, folders]);
 
-    const [isCreating, setIsCreating] = useState(false);
-    const [newFolderName, setNewFolderName] = useState("");
-    const [creatingParentId, setCreatingParentId] = useState<string | undefined>();
+
 
     const toggleExpand = (id: string) => {
         const newExpanded = new Set(expandedIds);
@@ -257,7 +265,12 @@ export function FolderTree({
         primaryFolders = islandFolder?.children || [];
     }
 
-    const secondaryFolders = folders.filter(f => SECONDARY_FOLDER_SLUGS.includes(f.slug));
+    const secondaryFolders = folders.filter(f => {
+        if (!SECONDARY_FOLDER_SLUGS.includes(f.slug)) return false;
+        // Site Images only visible to super admins
+        if (SUPER_ADMIN_ONLY_SLUGS.includes(f.slug) && !isSuperAdmin) return false;
+        return true;
+    });
 
     // Get selected state name
     const selectedState = states.find(s => s.id === selectedStateId);
@@ -406,8 +419,8 @@ export function FolderTree({
                         </div>
                     )}
 
-                    {/* Add subfolder button */}
-                    {!isEditing && (
+                    {/* Add subfolder button - hidden for folders that don't allow subfolders */}
+                    {!isEditing && !NO_SUBFOLDER_SLUGS.includes(folder.slug) && (
                         <Tooltip.Provider delayDuration={500}>
                             <Tooltip.Root>
                                 <Tooltip.Trigger asChild>

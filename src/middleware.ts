@@ -56,7 +56,28 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    await supabase.auth.getUser()
+    // Check if user is authenticated
+    let user = null;
+    try {
+        const { data } = await supabase.auth.getUser()
+        user = data.user
+    } catch (e) {
+        console.error("Middleware Auth Error:", e);
+    }
+
+    // Define protected routes
+    const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+    const isLoginRoute = request.nextUrl.pathname === '/login'
+
+    // Redirect unauthenticated users trying to access admin routes to login
+    if (isAdminRoute && !user) {
+        return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    // Redirect authenticated users trying to access login page to admin dashboard
+    if (isLoginRoute && user) {
+        return NextResponse.redirect(new URL('/admin', request.url))
+    }
 
     return response
 }

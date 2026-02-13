@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
     getFolders,
     createFolder,
@@ -422,6 +423,7 @@ export default function MediaPage() {
     const LAST_FOLDER_KEY = "media_last_folder_id";
 
     const { showNotification } = useNotification();
+    const { isSuperAdmin } = useAuth();
 
     // Folder actions menu state
     const [isFolderMenuOpen, setIsFolderMenuOpen] = useState(false);
@@ -534,7 +536,11 @@ export default function MediaPage() {
 
     // Reload media when folder changes
     useEffect(() => {
-        // Don't clear items immediately - let old items stay visible while new ones load
+        if (!selectedFolder) {
+            // No folder selected - clear items, don't fetch
+            setMediaItems([]);
+            return;
+        }
         loadMediaItems();
     }, [selectedFolder, loadMediaItems]);
 
@@ -1050,6 +1056,7 @@ export default function MediaPage() {
                                 states={states}
                                 selectedStateId={selectedStateId}
                                 onSelectState={setSelectedStateId}
+                                isSuperAdmin={isSuperAdmin}
                             />
                         </div>
                     </div>
@@ -1081,6 +1088,7 @@ export default function MediaPage() {
                                     states={states}
                                     selectedStateId={selectedStateId}
                                     onSelectState={setSelectedStateId}
+                                    isSuperAdmin={isSuperAdmin}
                                 />
                             </div>
                         </div>
@@ -1114,49 +1122,9 @@ export default function MediaPage() {
                                     <div className="flex flex-col items-center justify-start h-full text-center pt-[100px]">
                                         <ImageIcon className="h-20 w-20 text-accent/50 mb-6" />
                                         <h2 className="text-2xl font-semibold text-white mb-3">Add Media to Your Library</h2>
-                                        <p className="text-zinc-400 max-w-md mb-8">
-                                            Select a folder below to view and upload images. Each folder organizes media for different sections of your site.
+                                        <p className="text-zinc-400 max-w-md">
+                                            Select a folder from the sidebar to view and upload images. Each folder organizes media for different sections of your site.
                                         </p>
-
-                                        {/* Folder Quick Access Buttons - Two Rows */}
-                                        <div className="w-full max-w-2xl space-y-4">
-                                            {/* Top Row: Home, Facility, Blog */}
-                                            <div className="grid grid-cols-3 gap-4">
-                                                {folders.filter(f => ['home-images', 'facility-images', 'blog-images'].includes(f.slug)).map((folder) => (
-                                                    <button
-                                                        key={folder.id}
-                                                        onClick={() => handleSelectFolder(folder)}
-                                                        className="flex flex-col items-center gap-3 p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-accent/10 hover:border-accent/30 transition-all group"
-                                                    >
-                                                        <Folder className="h-10 w-10 text-zinc-400 group-hover:text-accent transition-colors" />
-                                                        <span className="text-sm font-medium text-white">{folder.name}</span>
-                                                        {folder.children && folder.children.length > 0 && (
-                                                            <span className="text-xs text-zinc-500">
-                                                                {folder.children.length} {folder.children.length === 1 ? 'folder' : 'folders'}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            {/* Bottom Row: Site Images, Temp */}
-                                            <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-                                                {folders.filter(f => ['site-images', 'temp'].includes(f.slug)).map((folder) => (
-                                                    <button
-                                                        key={folder.id}
-                                                        onClick={() => handleSelectFolder(folder)}
-                                                        className="flex flex-col items-center gap-3 p-6 bg-white/5 border border-white/10 rounded-xl hover:bg-accent/10 hover:border-accent/30 transition-all group"
-                                                    >
-                                                        <Folder className="h-10 w-10 text-zinc-400 group-hover:text-accent transition-colors" />
-                                                        <span className="text-sm font-medium text-white">{folder.name}</span>
-                                                        {folder.children && folder.children.length > 0 && (
-                                                            <span className="text-xs text-zinc-500">
-                                                                {folder.children.length} {folder.children.length === 1 ? 'folder' : 'folders'}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
                                     </div>
                                 ) : isLoadingMedia && mediaItems.length === 0 ? (
                                     /* Loading state - only show when initially loading with no items */

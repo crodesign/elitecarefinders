@@ -955,8 +955,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                                                     }
                                                                 }}
                                                                 placeholder="Search or select..."
-                                                                className="w-full px-3 py-1.5 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+                                                                className="w-full pl-3 pr-8 py-1.5 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
                                                             />
+                                                            <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
                                                             {showLabelDropdown && (
                                                                 <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] rounded-lg shadow-lg max-h-40 overflow-auto z-50">
                                                                     <button

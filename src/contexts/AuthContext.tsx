@@ -108,16 +108,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         }
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        console.log('[AuthContext] Attempting server-side login for:', email);
 
-        if (error) {
-            return { error };
+        try {
+            // Use server-side API route to avoid CORS issues
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('[AuthContext] Response was not JSON. Raw Text:', text.slice(0, 500));
+                return {
+                    error: {
+                        message: 'Server returned unexpected response (not JSON)',
+                        status: response.status,
+                        name: 'AuthFormatError'
+                    } as any
+                };
+            }
+
+            if (!response.ok) {
+                console.error('[AuthContext] Server-side login failed:', data.error);
+                return {
+                    error: {
+                        message: data.error || 'Login failed',
+                        name: 'AuthMessage',
+                        status: response.status
+                    } as any
+                };
+            }
+
+            console.log('[AuthContext] Server-side login successful');
+
+            // Refresh the session client-side to pick up the cookies set by the server
+            const { error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) {
+                console.warn('[AuthContext] Session refresh warning:', sessionError);
+            }
+
+            // Force a router refresh to update server components if needed
+            // Window reload might be safer to ensure all cookies are picked up cleanly
+            return { error: null };
+        } catch (unexpectedErr: any) {
+            console.error('[AuthContext] Unexpected exception during login:', unexpectedErr);
+            return { error: new Error(unexpectedErr.message || 'Unexpected error during sign in') };
         }
-
-        return { error: null };
     };
 
     const signOut = async () => {
