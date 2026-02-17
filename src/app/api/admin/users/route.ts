@@ -141,7 +141,12 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, role, profile, location_ids } = body;
+    const { email, password, role, profile, location_ids, manager_id } = body;
+
+    // Determine manager_id:
+    // 1. If explicitly provided (by Admin), use it.
+    // 2. If not provided, default to the creator (Admin or RM).
+    const finalManagerId = manager_id || session.user.id;
 
     console.log('[POST /api/admin/users] Creating user:', { email, role, hasPassword: !!password, hasProfile: !!profile?.full_name, locationCount: location_ids?.length });
 
@@ -186,7 +191,8 @@ export async function POST(request: Request) {
                 full_name: profile.full_name,
                 phone: profile.phone,
                 photo_url: profile.photo_url,
-                address: profile.address
+                address: profile.address,
+                manager_id: finalManagerId
             });
 
         if (profileError) throw profileError;

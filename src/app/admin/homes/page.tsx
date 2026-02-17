@@ -2,14 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2 } from "lucide-react";
-import type { Home } from "@/types";
+import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2, Tag } from "lucide-react";
+import type { Home, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import { HomeForm } from "@/components/admin/HomeForm";
 import { getHomes, createHome, updateHome, deleteHome, type CreateHomeInput } from "@/lib/services/homeService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { getTaxonomies } from "@/lib/services/taxonomyService";
+import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -22,6 +24,8 @@ export default function HomesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
+    const [taxonomyEntries, setTaxonomyEntries] = useState<Record<string, TaxonomyEntry>>({});
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -52,19 +56,59 @@ export default function HomesPage() {
         }
     }, []);
 
+    const fetchTaxonomies = useCallback(async () => {
+        try {
+            const taxonomyData = await getTaxonomies();
+            setTaxonomies(taxonomyData);
+
+            // Fetch all entries for each taxonomy
+            const entriesMap: Record<string, TaxonomyEntry> = {};
+            for (const taxonomy of taxonomyData) {
+                const entries = await getTaxonomyEntries(taxonomy.id);
+                // Flatten the tree structure and create a map
+                const flattenEntries = (entries: TaxonomyEntry[]): void => {
+                    entries.forEach(entry => {
+                        entriesMap[entry.id] = entry;
+                        if (entry.children && entry.children.length > 0) {
+                            flattenEntries(entry.children);
+                        }
+                    });
+                };
+                flattenEntries(entries);
+            }
+            setTaxonomyEntries(entriesMap);
+        } catch (err) {
+            console.error("Failed to fetch taxonomies:", err);
+        }
+    }, []);
+
     useEffect(() => {
         fetchHomes();
-    }, [fetchHomes]);
+        fetchTaxonomies();
+    }, [fetchHomes, fetchTaxonomies]);
 
-    // Handle ?action=create query param
+    // Handle URL query params: ?action=create or ?edit=home-slug
     useEffect(() => {
-        if (searchParams.get('action') === 'create') {
+        const action = searchParams.get('action');
+        const editSlug = searchParams.get('edit');
+
+        if (action === 'create') {
             setEditingHome(null);
             setIsFormOpen(true);
             // Clear the query param
             router.replace('/admin/homes', { scroll: false });
+        } else if (editSlug && homes.length > 0) {
+            // Find the home to edit by slug
+            const homeToEdit = homes.find(h => h.slug === editSlug);
+            if (homeToEdit) {
+                setEditingHome(homeToEdit);
+                setIsFormOpen(true);
+            } else {
+                // Home not found, clear the param
+                router.replace('/admin/homes', { scroll: false });
+            }
         }
-    }, [searchParams, router]);
+    }, [searchParams, router, homes]);
 
 
     // Search Filtering
@@ -87,11 +131,15 @@ export default function HomesPage() {
     const handleOpenEdit = (home: Home) => {
         setEditingHome(home);
         setIsFormOpen(true);
+        // Update URL to reflect editing state
+        router.push(`/admin/homes?edit=${home.slug}`, { scroll: false });
     };
 
     const handleCloseForm = () => {
         setIsFormOpen(false);
         setEditingHome(null);
+        // Clear URL parameter
+        router.push('/admin/homes', { scroll: false });
     };
 
     const handleSave = async (data: Partial<Home>) => {
@@ -165,20 +213,54 @@ export default function HomesPage() {
             ),
         },
         {
-            key: "address",
+            key: "location-classification",
             header: "Location",
-            render: (home) => (
-                <div className="flex items-center text-sm text-zinc-400">
-                    <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
-                    {home.showAddress !== false ? (
-                        <span>
-                            {home.address?.city || "Unknown City"}, {home.address?.state || "State"}
-                        </span>
-                    ) : (
-                        <span className="italic opacity-50">Address Hidden</span>
-                    )}
-                </div>
-            ),
+            render: (home) => {
+                const locationTaxonomy = taxonomies.find(t =>
+                    t.singularName?.toLowerCase() === 'location' || t.pluralName?.toLowerCase() === 'locations'
+                );
+                const locationEntry = home.taxonomyEntryIds?.map(id => taxonomyEntries[id]).find(entry => entry && locationTaxonomy && entry.taxonomyId === locationTaxonomy.id);
+
+                // Build full path (e.g., "Hawaii - Oahu - Aiea")
+                const buildPath = (entry: TaxonomyEntry | undefined): string => {
+                    if (!entry) return "—";
+                    const path: string[] = [entry.name];
+                    let current = entry;
+                    while (current?.parentId) {
+                        const parent = taxonomyEntries[current.parentId];
+                        if (parent) {
+                            path.unshift(parent.name);
+                            current = parent;
+                        } else {
+                            break;
+                        }
+                    }
+                    return path.join(' - ');
+                };
+
+                return (
+                    <div className="flex items-center text-sm text-zinc-400">
+                        <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
+                        {buildPath(locationEntry)}
+                    </div>
+                );
+            },
+        },
+        {
+            key: "type",
+            header: "Type",
+            render: (home) => {
+                const typeTaxonomy = taxonomies.find(t =>
+                    t.singularName?.toLowerCase() === 'home type' || t.pluralName?.toLowerCase() === 'home types'
+                );
+                const typeEntry = home.taxonomyEntryIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
+                return (
+                    <div className="flex items-center text-sm text-zinc-400">
+                        <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
+                        {typeEntry ? typeEntry.name : "—"}
+                    </div>
+                );
+            },
         },
         // {
         //     key: "details",

@@ -31,6 +31,8 @@ import { SlidePanel } from "./SlidePanel";
 import { TaxonomySelector } from "./TaxonomySelector";
 import { SimpleSelect } from "./SimpleSelect";
 import { EntryTree } from "./taxonomy/EntryTree";
+import { MediaGallery } from "@/components/admin/media/MediaGallery";
+import { ensureLocationFolders } from "@/lib/services/mediaFolderService";
 import { useNotification } from "@/contexts/NotificationContext";
 
 const RichTextEditor = dynamic(
@@ -221,6 +223,34 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [taxonomyEntries, setTaxonomyEntries] = useState<TaxonomyEntry[]>([]);
     const [loadingEntries, setLoadingEntries] = useState(false);
 
+    // Media Gallery State
+    const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
+
+    // Fetch Gallery Folder on Location Change
+    // This ensures that if the user changes location, the folder ID is recalculated
+    useEffect(() => {
+        const fetchFolder = async () => {
+            // Only recalculate if we have all required fields
+            if (state && city && title) {
+                // Use full state name for folder structure
+                const stateObj = US_STATES.find(s => s.code === state || s.name === state);
+                const stateName = stateObj ? stateObj.name : state;
+
+                try {
+                    const id = await ensureLocationFolders(stateName, city, title, 'home');
+                    setGalleryFolderId(id);
+                } catch (error) {
+                    console.error("Error ensuring location folders:", error);
+                    // Reset folder ID if location structure creation fails
+                    setGalleryFolderId(null);
+                }
+            } else {
+                // Clear folder ID if required fields are missing
+                setGalleryFolderId(null);
+            }
+        };
+        fetchFolder();
+    }, [state, city, title]); // Removed activeTab dependency - always recalculate when location changes
 
     // Room Fields State
     // Room Fields State
@@ -1564,8 +1594,20 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 );
             case "gallery":
                 return (
-                    <div className="p-8 text-center text-zinc-500">
-                        Gallery implementation coming soon.
+                    <div className="space-y-6">
+                        <div className="bg-[#0b1115] border border-white/5 rounded-lg p-6">
+                            {!state || !city || !title ? (
+                                <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
+                                    <p className="text-zinc-400 mb-2">Location and Name Required</p>
+                                    <p className="text-sm text-zinc-500">Please enter the Home Name, State, and City to access the media gallery.</p>
+                                </div>
+                            ) : (
+                                <MediaGallery
+                                    folderId={galleryFolderId}
+                                    title={`${title} Gallery`}
+                                />
+                            )}
+                        </div>
                     </div>
                 );
             case "provider":

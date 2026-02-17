@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getUsers, getUserProfile, deleteUser, updateUser, createUser, UserListItem } from '@/lib/services/userService';
-import { Users as UsersIcon, Plus, Pencil, Trash2, MapPin, Loader2, Search } from 'lucide-react';
+import { Users as UsersIcon, Plus, Pencil, Trash2, MapPin, Loader2, Search, User, Shield } from 'lucide-react';
 import { DataTable, type ColumnDef } from '@/components/admin/DataTable';
 import { Pagination } from '@/components/admin/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
@@ -111,7 +111,8 @@ export default function UsersPage() {
             const { error: updateError } = await updateUser(editingUser.id, {
                 role: formData.role,
                 profile: formData.profile,
-                location_ids: formData.locationIds
+                location_ids: formData.locationIds,
+                manager_id: formData.manager_id
             });
 
             if (updateError) {
@@ -126,7 +127,8 @@ export default function UsersPage() {
                 password: formData.password!,
                 role: formData.role,
                 profile: formData.profile,
-                location_ids: formData.locationIds
+                location_ids: formData.locationIds,
+                manager_id: formData.manager_id
             });
 
             if (createError) {
@@ -162,6 +164,19 @@ export default function UsersPage() {
         }
     };
 
+    const getRoleIcon = (role: string) => {
+        switch (role) {
+            case 'local_user':
+                return User;
+            case 'regional_manager':
+                return UsersIcon;
+            case 'system_admin':
+            case 'super_admin':
+            default:
+                return Shield;
+        }
+    };
+
     const getRoleBadge = (role: string) => {
         const badges = {
             super_admin: { bg: 'bg-accent/10', text: 'text-accent', label: 'Super Admin' },
@@ -171,9 +186,11 @@ export default function UsersPage() {
         };
 
         const badge = badges[role as keyof typeof badges] || badges.local_user;
+        const RoleIcon = getRoleIcon(role);
 
         return (
             <span className={`inline-flex items-center gap-1.5 ${badge.bg} rounded-full px-2.5 py-1 text-xs font-medium ${badge.text}`}>
+                <RoleIcon className="h-3.5 w-3.5" />
                 {badge.label}
             </span>
         );

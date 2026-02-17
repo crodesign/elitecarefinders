@@ -29,6 +29,8 @@ export interface UserProfile {
     phone?: string;
     created_at?: string;
     updated_at?: string;
+    manager_id?: string;
+    manager_name?: string; // For display
 }
 
 export interface AuthUser {

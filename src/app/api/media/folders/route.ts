@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server"; // Use server client
 
 import { buildPhysicalPath } from "@/lib/mediaUtils";
 
 export async function POST(request: NextRequest) {
+    // Create authenticated client
+    const supabase = createClient();
     try {
         const body = await request.json();
         const { name, parentId } = body;
@@ -24,8 +26,9 @@ export async function POST(request: NextRequest) {
             .replace(/^-|-$/g, "");
 
         // Special handling for standard system folders to keep slugs short and clean
-        if (slug === "home-images") slug = "home";
-        if (slug === "facility-images") slug = "facility";
+        // UPDATE: User requested "home-images" and "facility-images" explicitly
+        if (slug === "home-images") slug = "home-images";
+        if (slug === "facility-images") slug = "facility-images";
         if (slug === "site-images") slug = "site";
         if (slug === "blog-images") slug = "blog";
 
@@ -47,18 +50,77 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Check if folder already exists
-        const { data: existingFolder } = await supabase
+        // Check for existing folder with same parent and slug (to avoid unique constraint errors manually)
+        // OR check for "home" vs "home-images" conflict
+        let existingQuery = supabase
             .from("media_folders")
-            .select("id")
-            .eq("path", dbPath)
-            .single();
+            .select("id, name, slug, parent_id, path, created_at"); // Select all fields needed for response
 
-        if (existingFolder) {
-            return NextResponse.json(
-                { error: "A folder with this name already exists in this location." },
-                { status: 409 }
-            );
+        if (parentId) {
+            existingQuery = existingQuery.eq("parent_id", parentId);
+        } else {
+            existingQuery = existingQuery.is("parent_id", null);
+        }
+
+        if (slug === 'home-images') {
+            existingQuery = existingQuery.in('slug', ['home', 'home-images']);
+        } else if (slug === 'facility-images') {
+            existingQuery = existingQuery.in('slug', ['facility', 'facility-images']);
+        } else {
+            existingQuery = existingQuery.eq('slug', slug);
+        }
+
+        const { data: existing } = await existingQuery.limit(1).maybeSingle();
+
+        if (existing) {
+            // If we found a folder, use it.
+            // If it has the WRONG slug (e.g. 'home'), currently we just return it to avoid errors.
+            // Ideally we'd update it, but simpler to just return it for now to unblock.
+            // But wait, user specifically complained about "home" slug.
+            // So if we find 'home', we should probably rename it?
+            // Updating is safer than deleting.
+            if ((slug === 'home-images' && existing.slug === 'home') ||
+                (slug === 'facility-images' && existing.slug === 'facility')) {
+
+                // Attempt to update the slug
+                const { data: updatedFolder, error: updateError } = await supabase
+                    .from('media_folders')
+                    .update({ slug: slug }) // Set to correct long slug
+                    .eq('id', existing.id)
+                    .select()
+                    .single();
+
+                if (updateError) {
+                    console.error("Error updating folder slug:", updateError);
+                    return NextResponse.json({ error: "Failed to update existing folder slug" }, { status: 500 });
+                }
+
+                // Return the updated folder
+                return NextResponse.json({
+                    success: true,
+                    folder: {
+                        id: updatedFolder.id,
+                        name: updatedFolder.name,
+                        slug: updatedFolder.slug,
+                        parentId: updatedFolder.parent_id,
+                        path: updatedFolder.path,
+                        createdAt: updatedFolder.created_at,
+                    },
+                });
+            }
+
+            // If it's an exact match or a non-conflicting existing folder, return it
+            return NextResponse.json({
+                success: true,
+                folder: {
+                    id: existing.id,
+                    name: existing.name,
+                    slug: existing.slug,
+                    parentId: existing.parent_id,
+                    path: existing.path,
+                    createdAt: existing.created_at,
+                },
+            });
         }
 
         // Create physical directory
@@ -94,16 +156,18 @@ export async function POST(request: NextRequest) {
                 createdAt: data.created_at,
             },
         });
-    } catch (error) {
-        console.error("Folder creation error:", error);
-        return NextResponse.json(
-            { error: error instanceof Error ? error.message : "Folder creation failed" },
-            { status: 500 }
-        );
+    } catch (err: any) {
+        console.error("Error creating folder:", err);
+        // Handle unique constraint violation specifically
+        if (err.code === '23505') {
+            return NextResponse.json({ error: "Folder already exists" }, { status: 409 });
+        }
+        return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
     }
 }
 
 export async function DELETE(request: NextRequest) {
+    const supabase = createClient();
     try {
         const body = await request.json();
         const { folderId } = body;
@@ -169,7 +233,7 @@ export async function DELETE(request: NextRequest) {
             await supabase
                 .from("media_folders")
                 .delete()
-                .in("id", childFolders.map(c => c.id));
+                .in("id", childFolders.map((c: { id: string }) => c.id));
         }
 
         // Delete the physical folder from disk

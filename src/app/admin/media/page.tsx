@@ -19,6 +19,7 @@ import { MediaUploader } from "@/components/admin/media/MediaUploader";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
     getFolders,
     createFolder,
@@ -30,379 +31,8 @@ import {
     bulkUploadMedia,
     seedDefaultFolders,
 } from "@/lib/services/mediaService";
+import { MediaTile } from "@/components/admin/media/MediaTile";
 
-// Media tile component with thumbnail, caption input, and edit button
-function MediaTile({
-    item,
-    isSelected,
-    folders,
-    onClick,
-    onUpdate,
-    onDelete,
-    onClose,
-    isBulkSelectMode = false,
-    isBulkSelected = false,
-    onToggleBulkSelect,
-}: {
-    item: MediaItem;
-    isSelected: boolean;
-    folders: MediaFolder[];
-    onClick: () => void;
-    onUpdate: (id: string, updates: Partial<MediaItem>) => Promise<void>;
-    onDelete: (id: string) => Promise<void>;
-    onClose: () => void;
-    isBulkSelectMode?: boolean;
-    isBulkSelected?: boolean;
-    onToggleBulkSelect?: () => void;
-}) {
-    const [caption, setCaption] = useState(item.altText || "");
-    const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [folderSearch, setFolderSearch] = useState("");
-    const [showFolderDropdown, setShowFolderDropdown] = useState(false);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-    // Sync local state when item changes (fixes stale state issues)
-    useEffect(() => {
-        setCaption(item.altText || "");
-        setFolderId(item.folderId || null);
-    }, [item]);
-
-    // Check if caption or folder has changed
-    const captionChanged = caption !== (item.altText || "");
-    const folderChanged = folderId !== (item.folderId || null);
-    const hasChanges = captionChanged || folderChanged;
-
-    const handleSaveClick = () => {
-        if (!hasChanges) {
-            onClose();
-            return;
-        }
-
-        // Show confirmation modal only for folder changes
-        if (folderChanged) {
-            setShowConfirmModal(true);
-        } else {
-            // If only caption changed, save immediately
-            handleSaveConfirmed();
-        }
-    };
-
-    const handleSaveConfirmed = async () => {
-        setIsSaving(true);
-        try {
-            const response = await fetch("/api/media/update", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mediaId: item.id,
-                    newFolderId: folderChanged ? folderId : undefined,
-                    altText: captionChanged ? caption : undefined,
-                }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || "Update failed");
-            }
-
-            // Refresh the media list
-            await onUpdate(item.id, {});
-            onClose();
-        } catch (error) {
-            console.error("Save error:", error);
-            alert("Failed to save changes: " + (error instanceof Error ? error.message : "Unknown error"));
-        } finally {
-            setIsSaving(false);
-            setShowConfirmModal(false);
-        }
-    };
-
-    const handleCancelSave = () => {
-        setShowConfirmModal(false);
-        // Reset folder selection to original
-        setFolderId(item.folderId || null);
-    };
-
-    const handleSaveCaptionOnly = async () => {
-        if (!captionChanged) return;
-        setIsSaving(true);
-        try {
-            const response = await fetch("/api/media/update", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mediaId: item.id,
-                    altText: caption,
-                }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || "Update failed");
-            }
-
-            // Refresh the media list
-            await onUpdate(item.id, {});
-
-            // Blur the active element to remove cursor
-            if (document.activeElement instanceof HTMLElement) {
-                document.activeElement.blur();
-            }
-        } catch (error) {
-            console.error("Save error:", error);
-        }
-        setIsSaving(false);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && captionChanged) {
-            e.preventDefault();
-            handleSaveCaptionOnly();
-        }
-    };
-
-    // Flatten folders for the dropdown
-    const flattenFolders = (folderList: MediaFolder[], depth = 0): { folder: MediaFolder; depth: number }[] => {
-        const result: { folder: MediaFolder; depth: number }[] = [];
-        folderList.forEach((folder) => {
-            result.push({ folder, depth });
-            if (folder.children && folder.children.length > 0) {
-                result.push(...flattenFolders(folder.children, depth + 1));
-            }
-        });
-        return result;
-    };
-
-    const flatFolders = flattenFolders(folders);
-
-    // Filter folders based on search
-    const filteredFolders = flatFolders.filter(({ folder }) =>
-        folder.name.toLowerCase().includes(folderSearch.toLowerCase())
-    );
-
-    // Get current folder name based on local state
-    const currentFolder = flatFolders.find(({ folder }) => folder.id === folderId);
-    const currentFolderName = currentFolder ? currentFolder.folder.name : "";
-
-    return (
-        <div className={`flex flex-col rounded-xl transition-all ${isSelected ? "ring-2 ring-accent overflow-visible" : "overflow-hidden"}`}>
-            {/* Image container */}
-            <div className="relative w-full aspect-square bg-black/30 rounded-t-xl overflow-hidden">
-                {item.mimeType.startsWith("image/") ? (
-                    <img
-                        src={item.url}
-                        alt={item.altText || item.filename}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-500">
-                        <span className="text-sm">{item.mimeType.split("/")[1]}</span>
-                    </div>
-                )}
-
-                {/* Image info overlay in top left */}
-                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-lg bg-black/60 text-white/70 text-[10px] flex items-center gap-1.5">
-                    {item.width && item.height && (
-                        <span>{item.width}×{item.height}</span>
-                    )}
-                    <span className="uppercase">{item.mimeType.split("/")[1]}</span>
-                </div>
-
-                {/* Edit/Close button in upper right - or checkbox in bulk mode */}
-                {isBulkSelectMode ? (
-                    <button
-                        onClick={onToggleBulkSelect}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isBulkSelected
-                            ? "bg-accent text-white"
-                            : "bg-black/60 text-white/70 hover:bg-black/80 hover:text-white"
-                            }`}
-                    >
-                        {isBulkSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
-                    </button>
-                ) : (
-                    <button
-                        onClick={onClick}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected
-                            ? "bg-accent text-white"
-                            : "bg-black/60 text-white/70 hover:bg-black/80 hover:text-white"
-                            }`}
-                    >
-                        {isSelected ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-                    </button>
-                )}
-            </div>
-
-            {/* Caption and edit fields container */}
-            <div className={`p-3 bg-[#151b23] border-t border-white/10 ${isSelected ? "space-y-2 rounded-b-xl" : ""}`}>
-                {/* Caption row */}
-                <div className="flex items-center gap-2">
-                    {isSelected && (
-                        <label className="text-xs text-zinc-400 flex-shrink-0 w-12">Caption</label>
-                    )}
-                    <input
-                        type="text"
-                        value={caption}
-                        onChange={(e) => setCaption(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Add caption..."
-                        className={`flex-1 min-w-0 text-sm text-white placeholder-zinc-500 focus:outline-none ${isSelected
-                            ? "bg-black/20 rounded px-2 py-1.5"
-                            : "bg-transparent"
-                            }`}
-                    />
-                    {/* Only show Save button when NOT in edit mode and has changes */}
-                    {!isSelected && captionChanged && (
-                        <button
-                            onClick={handleSaveCaptionOnly}
-                            disabled={isSaving}
-                            className="flex-shrink-0 px-2 py-0.5 text-xs bg-accent text-white rounded hover:bg-accent-light transition-colors disabled:opacity-50"
-                            title="Save caption (Enter)"
-                        >
-                            {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
-                        </button>
-                    )}
-                </div>
-
-                {/* Edit fields - only when selected */}
-                {isSelected && (
-                    <>
-                        {/* URL row */}
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs text-zinc-400 flex-shrink-0 w-12">URL</label>
-                            <input
-                                type="text"
-                                value={item.url}
-                                readOnly
-                                className="flex-1 min-w-0 bg-black/20 rounded px-2 py-1.5 text-xs text-zinc-400 truncate"
-                            />
-                            <button
-                                onClick={() => {
-                                    navigator.clipboard.writeText(item.url);
-                                }}
-                                className="flex-shrink-0 px-2 py-1.5 bg-white/5 border border-white/10 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
-                                title="Copy URL"
-                            >
-                                <Copy className="h-3 w-3" />
-                            </button>
-                        </div>
-
-                        {/* Folder row - searchable dropdown */}
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs text-zinc-400 flex-shrink-0 w-12">Folder</label>
-                            <div className="flex-1 min-w-0 relative">
-                                <input
-                                    type="text"
-                                    value={showFolderDropdown ? folderSearch : currentFolderName}
-                                    onChange={(e) => {
-                                        setFolderSearch(e.target.value);
-                                        setShowFolderDropdown(true);
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onFocus={() => {
-                                        setFolderSearch("");
-                                        setShowFolderDropdown(true);
-                                    }}
-                                    onBlur={() => {
-                                        // Delay to allow click on dropdown item
-                                        setTimeout(() => setShowFolderDropdown(false), 150);
-                                    }}
-                                    placeholder="Search folders..."
-                                    className="w-full bg-black/20 rounded px-2 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none"
-                                />
-                                {showFolderDropdown && (
-                                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded shadow-lg max-h-40 overflow-auto z-50">
-                                        <button
-                                            type="button"
-                                            // Use onMouseDown to prevent blur from closing dropdown before click registers
-                                            onMouseDown={(e) => {
-                                                e.preventDefault(); // Prevent focus loss
-                                                setFolderId(null);
-                                                setShowFolderDropdown(false);
-                                                setFolderSearch("");
-                                            }}
-                                            className="w-full text-left px-2 py-1.5 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
-                                        >
-                                            No folder
-                                        </button>
-                                        {filteredFolders.map(({ folder, depth }) => {
-                                            const isRestricted = isRestrictedFolder(folder);
-                                            return (
-                                                <button
-                                                    key={folder.id}
-                                                    type="button"
-                                                    disabled={isRestricted}
-                                                    // Use onMouseDown to prevent blur from closing dropdown before click registers
-                                                    onMouseDown={(e) => {
-                                                        if (isRestricted) return;
-                                                        e.preventDefault(); // Prevent focus loss
-                                                        setFolderId(folder.id);
-                                                        setShowFolderDropdown(false);
-                                                        setFolderSearch("");
-                                                    }}
-                                                    className={`w-full text-left px-2 py-1.5 text-xs flex items-center justify-between group ${isRestricted
-                                                        ? "text-zinc-600 cursor-not-allowed"
-                                                        : "text-white hover:bg-white/10"
-                                                        }`}
-                                                >
-                                                    <span>{"—".repeat(depth)} {folder.name}</span>
-                                                    {isRestricted && (
-                                                        <span className="text-[10px] text-zinc-600 group-hover:text-zinc-500">(Restricted)</span>
-                                                    )}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Actions row */}
-                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                            <button
-                                onClick={() => onDelete(item.id)}
-                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={onClose}
-                                    className="px-3 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSaveClick}
-                                    disabled={isSaving || !hasChanges}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-xs bg-accent text-white font-medium rounded hover:bg-accent-light transition-colors disabled:opacity-50"
-                                >
-                                    {isSaving && <Loader2 className="h-3 w-3 animate-spin" />}
-                                    Save
-                                </button>
-                            </div>
-                        </div>
-
-                        <ConfirmationModal
-                            isOpen={showConfirmModal}
-                            onClose={handleCancelSave}
-                            onConfirm={handleSaveConfirmed}
-                            title="Move File?"
-                            message={
-                                <div>
-                                    <p>Are you sure you want to move this file to <strong>{currentFolderName || "the root folder"}</strong>?</p>
-                                    <p className="mt-2 text-zinc-500 text-xs">This will physically relocate the file on the server and update all database references.</p>
-                                </div>
-                            }
-                            confirmLabel="Move File"
-                            isLoading={isSaving}
-                        />
-                    </>
-                )}
-            </div>
-        </div>
-    );
-}
 
 export default function MediaPage() {
     const [folders, setFolders] = useState<MediaFolder[]>([]);
@@ -423,7 +53,9 @@ export default function MediaPage() {
     const LAST_FOLDER_KEY = "media_last_folder_id";
 
     const { showNotification } = useNotification();
-    const { isSuperAdmin } = useAuth();
+    const { user: currentUser, isSuperAdmin, isSystemAdmin } = useAuth();
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     // Folder actions menu state
     const [isFolderMenuOpen, setIsFolderMenuOpen] = useState(false);
@@ -456,6 +88,43 @@ export default function MediaPage() {
             }
         }
         return null;
+    };
+
+    // Helper to find folder by path (including nested)
+    const findFolderByPath = (folders: MediaFolder[], path: string): MediaFolder | null => {
+        for (const folder of folders) {
+            if (folder.path === path) return folder;
+            if (folder.children) {
+                const found = findFolderByPath(folder.children, path);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    // Convert folder path to URL-friendly slug (e.g., "Home Images/Hawaii" -> "home-images/hawaii")
+    const pathToSlug = (path: string): string => {
+        return path
+            .split('/')
+            .map(segment => segment.toLowerCase().replace(/\s+/g, '-'))
+            .join('/');
+    };
+
+    // Convert URL slug back to original path (e.g., "home-images/hawaii" -> "Home Images/Hawaii")
+    const slugToPath = (slug: string, folders: MediaFolder[]): string | null => {
+        // Try to find a folder whose slugified path matches the input slug
+        const findBySlug = (folderList: MediaFolder[]): MediaFolder | null => {
+            for (const folder of folderList) {
+                if (pathToSlug(folder.path) === slug) return folder;
+                if (folder.children) {
+                    const found = findBySlug(folder.children);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+        const folder = findBySlug(folders);
+        return folder ? folder.path : null;
     };
 
     // Load folders and seed defaults if needed
@@ -520,8 +189,63 @@ export default function MediaPage() {
                         .order('name');
 
                     if (statesData && statesData.length > 0) {
-                        setStates(statesData);
-                        // Start with no state selected - user must choose
+                        // Filter states for Regional Managers and Local Users
+                        // based on their assigned locations
+                        if (!isSuperAdmin && !isSystemAdmin && currentUser?.locationAssignments?.length) {
+                            const assignedLocationIds = new Set(
+                                currentUser.locationAssignments.map(la => la.location_id)
+                            );
+
+                            // Check if any assignments are directly to states
+                            const directStateIds = new Set(
+                                statesData.filter(s => assignedLocationIds.has(s.id)).map(s => s.id)
+                            );
+
+                            // For assignments that aren't states (i.e. cities),
+                            // look up their parent to find the state
+                            const nonStateIds = Array.from(assignedLocationIds).filter(id => !directStateIds.has(id));
+                            if (nonStateIds.length > 0) {
+                                const { data: childEntries } = await supabase
+                                    .from('taxonomy_entries')
+                                    .select('id, parent_id')
+                                    .in('id', nonStateIds);
+
+                                if (childEntries) {
+                                    for (const entry of childEntries) {
+                                        if (entry.parent_id) {
+                                            // Check if parent is a state
+                                            const parentState = statesData.find(s => s.id === entry.parent_id);
+                                            if (parentState) {
+                                                directStateIds.add(parentState.id);
+                                            } else {
+                                                // Parent might be an island (grandparent is state)
+                                                // Fetch the parent's parent
+                                                const { data: parentEntry } = await supabase
+                                                    .from('taxonomy_entries')
+                                                    .select('parent_id')
+                                                    .eq('id', entry.parent_id)
+                                                    .single();
+                                                if (parentEntry?.parent_id) {
+                                                    const grandparentState = statesData.find(s => s.id === parentEntry.parent_id);
+                                                    if (grandparentState) {
+                                                        directStateIds.add(grandparentState.id);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            const filteredStates = statesData.filter(s => directStateIds.has(s.id));
+                            setStates(filteredStates);
+                            // Auto-select if only one state
+                            if (filteredStates.length === 1) {
+                                setSelectedStateId(filteredStates[0].id);
+                            }
+                        } else {
+                            setStates(statesData);
+                        }
                     }
                 }
             } catch (err) {
@@ -533,6 +257,25 @@ export default function MediaPage() {
         init();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Handle ?folder=folder-slug URL parameter for deep linking
+    useEffect(() => {
+        const folderSlug = searchParams.get('folder');
+        if (folderSlug && folders.length > 0) {
+            // Convert slug back to original path
+            const folderPath = slugToPath(folderSlug, folders);
+            if (folderPath) {
+                const folder = findFolderByPath(folders, folderPath);
+                if (folder && folder !== selectedFolder) {
+                    setSelectedFolder(folder);
+                    setSelectedItemId(null);
+                }
+            } else {
+                // Folder not found, clear the parameter
+                router.replace('/admin/media', { scroll: false });
+            }
+        }
+    }, [searchParams, folders, selectedFolder, router]);
 
     // Reload media when folder changes
     useEffect(() => {
@@ -557,12 +300,12 @@ export default function MediaPage() {
         setSelectedFolder(folder);
         setIsMobileFolderOpen(false);
         setSelectedItemId(null);
-        // LocalStorage logic removed
-        // if (folder) {
-        //     localStorage.setItem(LAST_FOLDER_KEY, folder.id);
-        // } else {
-        //     localStorage.removeItem(LAST_FOLDER_KEY);
-        // }
+        // Update URL parameter with slugified folder path
+        if (folder) {
+            router.push(`/admin/media?folder=${pathToSlug(folder.path)}`, { scroll: false });
+        } else {
+            router.push('/admin/media', { scroll: false });
+        }
     };
 
     const handleCreateFolder = async (name: string, parentId?: string) => {

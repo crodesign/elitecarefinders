@@ -68,8 +68,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
         full_name: user.email?.split('@')[0] || 'Unknown User',
         phone: '',
         photo_url: '',
-        address: { street: '', city: '', state: '', zip: '' }
+        address: { street: '', city: '', state: '', zip: '' },
+        manager_id: undefined
     };
+
+    let managerName = undefined;
+    if (safeProfile.manager_id) {
+        const { data: managerProfile } = await supabaseAdmin
+            .from('user_profiles')
+            .select('full_name')
+            .eq('user_id', safeProfile.manager_id)
+            .single();
+        if (managerProfile) {
+            managerName = managerProfile.full_name;
+        }
+    }
 
     const safeRole = role || { role: 'local_user' };
 
@@ -78,7 +91,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
         email: user.email,
         role: safeRole,
         profile: safeProfile,
-        location_ids: locations?.map(l => l.location_id) || []
+        location_ids: locations?.map(l => l.location_id) || [],
+        manager_id: safeProfile.manager_id,
+        manager_name: managerName
     });
 }
 
@@ -100,7 +115,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     const body = await request.json();
-    const { role, profile, location_ids, password } = body;
+    const { role, profile, location_ids, password, manager_id } = body;
 
     try {
         // Update password if provided
@@ -131,6 +146,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
                 })
                 .select();
             if (profileError) throw profileError;
+        }
+
+        if (manager_id !== undefined) {
+            const { error: managerError } = await supabaseAdmin
+                .from('user_profiles')
+                .update({ manager_id })
+                .eq('user_id', id);
+            if (managerError) throw managerError;
         }
 
         if (location_ids !== undefined) {

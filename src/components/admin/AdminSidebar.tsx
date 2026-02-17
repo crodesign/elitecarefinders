@@ -199,47 +199,64 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             {/* Profile Section */}
             <div className="flex-none border-t border-white/5 p-4 relative z-10">
                 <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
-                    <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                        <User className="h-5 w-5 text-white" />
-                    </div>
-                    {!collapsed && (
-                        <>
+                    <Link
+                        href="/admin/profile"
+                        onClick={(e) => handleNavClick(e, "/admin/profile")}
+                        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg transition-colors hover:bg-white/5 ${collapsed ? "justify-center p-1" : "p-1 -m-1"}`}
+                    >
+                        {user?.profile?.photo_url ? (
+                            <Image
+                                src={user.profile.photo_url}
+                                alt={user.profile.full_name || 'Profile'}
+                                width={36}
+                                height={36}
+                                className="h-9 w-9 rounded-full object-cover flex-shrink-0"
+                            />
+                        ) : (
+                            <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                                <User className="h-5 w-5 text-white" />
+                            </div>
+                        )}
+                        {!collapsed && (
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-white truncate">
-                                    {user?.email || 'Admin'}
+                                    {user?.profile?.nickname || user?.profile?.full_name?.split(' ')[0] || user?.email || 'User'}
                                 </p>
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-2 w-2 rounded-full bg-green-400"></span>
                                     <span className="text-xs text-zinc-500">
                                         {user?.role?.role === 'super_admin' ? 'Super Admin' :
                                             user?.role?.role === 'system_admin' ? 'System Admin' :
-                                                user?.role?.role === 'local_user' ? 'Local User' : 'Online'}
+                                                user?.role?.role === 'regional_manager' ? 'Regional Manager' :
+                                                    user?.role?.role === 'local_user' ? 'Local User' : 'Online'}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                {canAccessSettings && (
-                                    <button
-                                        onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                                        className={`p-2 rounded-lg transition-colors ${showSettingsMenu
-                                            ? "text-accent bg-accent/10"
-                                            : "text-zinc-400 hover:text-accent hover:bg-accent/10"
-                                            }`}
-                                    >
-                                        <Settings className="h-5 w-5" />
-                                    </button>
-                                )}
-                                {!canAccessSettings && (
-                                    <button
-                                        onClick={handleLogout}
-                                        className="p-2 rounded-lg transition-colors text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
-                                        title="Logout"
-                                    >
-                                        <LogOut className="h-5 w-5" />
-                                    </button>
-                                )}
-                            </div>
-                        </>
+                        )}
+                    </Link>
+                    {!collapsed && (
+                        <div className="flex flex-col gap-1">
+                            {canAccessSettings && (
+                                <button
+                                    onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                                    className={`p-2 rounded-lg transition-colors ${showSettingsMenu
+                                        ? "text-accent bg-accent/10"
+                                        : "text-zinc-400 hover:text-accent hover:bg-accent/10"
+                                        }`}
+                                >
+                                    <Settings className="h-5 w-5" />
+                                </button>
+                            )}
+                            {!canAccessSettings && (
+                                <button
+                                    onClick={handleLogout}
+                                    className="p-2 rounded-lg transition-colors text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
+                                    title="Logout"
+                                >
+                                    <LogOut className="h-5 w-5" />
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

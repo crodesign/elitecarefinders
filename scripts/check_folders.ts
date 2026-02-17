@@ -32,7 +32,7 @@ async function checkFolders() {
     }
 
     console.log("DB Folders:");
-    folders.forEach(f => {
+    folders.forEach((f: any) => {
         console.log(`ID: ${f.id} | Name: ${f.name} | Slug: ${f.slug} | Parent: ${f.parent_id} | Path: ${f.path}`);
     });
 }

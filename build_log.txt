@@ -1,0 +1,30 @@
+
+> elitecarefinders@0.1.0 build
+> next build
+
+   ▲ Next.js 14.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+./src/app/api/admin/reset-user-password/route.ts
+Attempted import error: 'createServerComponentClient' is not exported from '@/lib/supabase-server' (imported as 'createServerComponentClient').
+
+Import trace for requested module:
+./src/app/api/admin/reset-user-password/route.ts
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./scripts/check_folders.ts:35:21
+Type error: Parameter 'f' implicitly has an 'any' type.
+
+[0m [90m 33 |[39m[0m
+[0m [90m 34 |[39m     console[33m.[39mlog([32m"DB Folders:"[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 35 |[39m     folders[33m.[39mforEach(f [33m=>[39m {[0m
+[0m [90m    |[39m                     [31m[1m^[22m[39m[0m
+[0m [90m 36 |[39m         console[33m.[39mlog([32m`ID: ${f.id} | Name: ${f.name} | Slug: ${f.slug} | Parent: ${f.parent_id} | Path: ${f.path}`[39m)[33m;[39m[0m
+[0m [90m 37 |[39m     })[33m;[39m[0m
+[0m [90m 38 |[39m }[0m

@@ -1,3 +1,4 @@
+// Force recompile
 export default function Home() {
     console.log('[Client Debug] NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 

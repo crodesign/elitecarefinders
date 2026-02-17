@@ -224,7 +224,10 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="singularName" className="block text-sm font-medium text-white/80 mb-2">
-                                            Singular Name
+                                            <span className="flex items-center gap-1">
+                                                Singular Name
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                            </span>
                                         </label>
                                         <input
                                             type="text"
@@ -246,7 +249,10 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
 
                                     <div>
                                         <label htmlFor="pluralName" className="block text-sm font-medium text-white/80 mb-2">
-                                            Plural Name
+                                            <span className="flex items-center gap-1">
+                                                Plural Name
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                            </span>
                                         </label>
                                         <input
                                             type="text"

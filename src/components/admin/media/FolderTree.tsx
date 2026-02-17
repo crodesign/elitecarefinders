@@ -495,37 +495,46 @@ export function FolderTree({
 
     return (
         <div className="flex flex-col h-full">
-            {/* State Dropdown */}
+            {/* State Dropdown or Static Label */}
             <div className="flex-none px-3 py-3" ref={stateDropdownRef}>
                 <div className="relative">
-                    <button
-                        onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white hover:border-white/20 transition-colors"
-                    >
-                        <span className="truncate">
-                            {selectedState ? selectedState.name : "Select State..."}
-                        </span>
-                        <ChevronsUpDown className="h-4 w-4 text-zinc-400 flex-shrink-0" />
-                    </button>
-
-                    {isStateDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-auto z-[9999]">
-                            {states.map((state) => (
-                                <button
-                                    key={state.id}
-                                    onClick={() => {
-                                        onSelectState(state.id);
-                                        setIsStateDropdownOpen(false);
-                                    }}
-                                    className={`w-full text-left px-3 py-2 text-sm transition-colors ${state.id === selectedStateId
-                                        ? "bg-accent/10 text-accent"
-                                        : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                                        }`}
-                                >
-                                    {state.name}
-                                </button>
-                            ))}
+                    {states.length === 1 ? (
+                        /* Single location — show as static label, no dropdown */
+                        <div className="w-full flex items-center gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white">
+                            <span className="truncate">{states[0].name}</span>
                         </div>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
+                                className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white hover:border-white/20 transition-colors"
+                            >
+                                <span className="truncate">
+                                    {selectedState ? selectedState.name : "Select State..."}
+                                </span>
+                                <ChevronsUpDown className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                            </button>
+
+                            {isStateDropdownOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-auto z-[9999]">
+                                    {states.map((state) => (
+                                        <button
+                                            key={state.id}
+                                            onClick={() => {
+                                                onSelectState(state.id);
+                                                setIsStateDropdownOpen(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm transition-colors ${state.id === selectedStateId
+                                                ? "bg-accent/10 text-accent"
+                                                : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                                                }`}
+                                        >
+                                            {state.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

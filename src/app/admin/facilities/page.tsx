@@ -2,14 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2 } from "lucide-react";
-import type { Facility } from "@/types";
+import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag } from "lucide-react";
+import type { Facility, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import { FacilityForm } from "@/components/admin/FacilityForm";
 import { getFacilities, createFacility, updateFacility, deleteFacility, type CreateFacilityInput } from "@/lib/services/facilityService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { getTaxonomies } from "@/lib/services/taxonomyService";
+import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -22,6 +24,8 @@ export default function FacilitiesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
+    const [taxonomyEntries, setTaxonomyEntries] = useState<Record<string, TaxonomyEntry>>({});
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -52,19 +56,59 @@ export default function FacilitiesPage() {
         }
     }, []);
 
+    const fetchTaxonomies = useCallback(async () => {
+        try {
+            const taxonomyData = await getTaxonomies();
+            setTaxonomies(taxonomyData);
+
+            // Fetch all entries for each taxonomy
+            const entriesMap: Record<string, TaxonomyEntry> = {};
+            for (const taxonomy of taxonomyData) {
+                const entries = await getTaxonomyEntries(taxonomy.id);
+                // Flatten the tree structure and create a map
+                const flattenEntries = (entries: TaxonomyEntry[]): void => {
+                    entries.forEach(entry => {
+                        entriesMap[entry.id] = entry;
+                        if (entry.children && entry.children.length > 0) {
+                            flattenEntries(entry.children);
+                        }
+                    });
+                };
+                flattenEntries(entries);
+            }
+            setTaxonomyEntries(entriesMap);
+        } catch (err) {
+            console.error("Failed to fetch taxonomies:", err);
+        }
+    }, []);
+
     useEffect(() => {
         fetchFacilities();
-    }, [fetchFacilities]);
+        fetchTaxonomies();
+    }, [fetchFacilities, fetchTaxonomies]);
 
-    // Handle ?action=create query param
+    // Handle URL query params: ?action=create or ?edit=facility-slug
     useEffect(() => {
-        if (searchParams.get('action') === 'create') {
+        const action = searchParams.get('action');
+        const editSlug = searchParams.get('edit');
+
+        if (action === 'create') {
             setEditingFacility(null);
             setIsFormOpen(true);
             // Clear the query param
             router.replace('/admin/facilities', { scroll: false });
+        } else if (editSlug && facilities.length > 0) {
+            // Find the facility to edit by slug
+            const facilityToEdit = facilities.find(f => f.slug === editSlug);
+            if (facilityToEdit) {
+                setEditingFacility(facilityToEdit);
+                setIsFormOpen(true);
+            } else {
+                // Facility not found, clear the param
+                router.replace('/admin/facilities', { scroll: false });
+            }
         }
-    }, [searchParams, router]);
+    }, [searchParams, router, facilities]);
 
 
     // Search Filtering
@@ -88,11 +132,15 @@ export default function FacilitiesPage() {
     const handleOpenEdit = (facility: Facility) => {
         setEditingFacility(facility);
         setIsFormOpen(true);
+        // Update URL to reflect editing state
+        router.push(`/admin/facilities?edit=${facility.slug}`, { scroll: false });
     };
 
     const handleCloseForm = () => {
         setIsFormOpen(false);
         setEditingFacility(null);
+        // Clear URL parameter
+        router.push('/admin/facilities', { scroll: false });
     };
 
     const handleSave = async (data: Partial<Facility>) => {
@@ -164,28 +212,55 @@ export default function FacilitiesPage() {
             ),
         },
         {
-            key: "location",
+            key: "location-classification",
             header: "Location",
-            render: (facility) => (
-                <div className="flex items-center text-sm text-zinc-400">
-                    <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
-                    {facility.address?.city || "Unknown City"}, {facility.address?.state || "State"}
-                </div>
-            ),
+            render: (facility) => {
+                const locationTaxonomy = taxonomies.find(t =>
+                    t.singularName?.toLowerCase() === 'location' || t.pluralName?.toLowerCase() === 'locations'
+                );
+                // Note: Using taxonomyIds for facilities (should be taxonomyEntryIds for consistency)
+                const locationEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && locationTaxonomy && entry.taxonomyId === locationTaxonomy.id);
+
+                // Build full path (e.g., "Hawaii - Oahu - Aiea")
+                const buildPath = (entry: TaxonomyEntry | undefined): string => {
+                    if (!entry) return "—";
+                    const path: string[] = [entry.name];
+                    let current = entry;
+                    while (current?.parentId) {
+                        const parent = taxonomyEntries[current.parentId];
+                        if (parent) {
+                            path.unshift(parent.name);
+                            current = parent;
+                        } else {
+                            break;
+                        }
+                    }
+                    return path.join(' - ');
+                };
+
+                return (
+                    <div className="flex items-center text-sm text-zinc-400">
+                        <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
+                        {buildPath(locationEntry)}
+                    </div>
+                );
+            },
         },
         {
-            key: "license",
-            header: "License",
-            render: (facility) => (
-                <span className="text-sm text-zinc-400">{facility.licenseNumber || "-"}</span>
-            ),
-        },
-        {
-            key: "capacity",
-            header: "Capacity",
-            render: (facility) => (
-                <span className="text-sm text-zinc-400">{facility.capacity ? `${facility.capacity} residents` : "-"}</span>
-            ),
+            key: "type",
+            header: "Type",
+            render: (facility) => {
+                const typeTaxonomy = taxonomies.find(t =>
+                    t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
+                );
+                const typeEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
+                return (
+                    <div className="flex items-center text-sm text-zinc-400">
+                        <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
+                        {typeEntry ? typeEntry.name : "—"}
+                    </div>
+                );
+            },
         },
     ];
 

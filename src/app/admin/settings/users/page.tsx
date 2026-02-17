@@ -114,7 +114,8 @@ export default function SettingsUsersPage() {
             const { error: updateError } = await updateUser(editingUser.id, {
                 role: formData.role,
                 profile: formData.profile,
-                location_ids: formData.locationIds
+                location_ids: formData.locationIds,
+                manager_id: formData.manager_id
             });
 
             if (updateError) {
@@ -129,7 +130,8 @@ export default function SettingsUsersPage() {
                 password: formData.password!,
                 role: formData.role,
                 profile: formData.profile,
-                location_ids: formData.locationIds
+                location_ids: formData.locationIds,
+                manager_id: formData.manager_id
             });
 
             if (createError) {

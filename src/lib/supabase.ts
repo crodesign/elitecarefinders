@@ -8,4 +8,7 @@ export function createClientComponentClient() {
 }
 
 // For backwards compatibility, export a default instance
-export const supabase = createClientComponentClient()
+// Only create if running in browser to avoid server-side errors
+export const supabase = typeof window !== 'undefined'
+    ? createClientComponentClient()
+    : null as any

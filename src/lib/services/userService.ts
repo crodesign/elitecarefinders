@@ -16,12 +16,14 @@ export interface CreateUserData {
         };
     };
     location_ids?: string[];
+    manager_id?: string;
 }
 
 export interface UpdateUserData {
     profile?: Partial<UserProfile>;
     role?: UserRole;
     location_ids?: string[];
+    manager_id?: string;
 }
 
 export interface UserListItem {
@@ -30,6 +32,8 @@ export interface UserListItem {
     role: UserRoleRecord;
     profile: UserProfile | null;
     location_count: number;
+    manager_id?: string;
+    manager_name?: string;
 }
 
 /**

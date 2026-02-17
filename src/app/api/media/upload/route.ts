@@ -2,10 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { supabase } from "@/lib/supabase";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
     try {
+        // Create session-aware Supabase client for authenticated requests
+        const cookieStore = await cookies();
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    getAll: () => cookieStore.getAll(),
+                    setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        );
+                    },
+                },
+            }
+        );
+
         const formData = await request.formData();
         const file = formData.get("file") as File;
         const folderId = formData.get("folderId") as string | null;

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerComponentClient } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
     try {
-        const supabase = await createServerComponentClient();
+        const supabase = createClient();
 
         // Check if user is authenticated and has admin privileges
         const { data: { user: authUser } } = await supabase.auth.getUser();

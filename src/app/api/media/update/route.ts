@@ -31,117 +31,117 @@ export async function POST(request: NextRequest) {
         };
 
         // Handle caption change with file rename
-        if (altText !== undefined && altText !== mediaItem.alt_text && altText.trim() !== "") {
+        if (altText !== undefined && altText !== mediaItem.alt_text) {
             updates.alt_text = altText;
 
-            // Get folder slug for the new filename
-            let folderSlug = "media";
-            const folderId = mediaItem.folder_id;
-            if (folderId) {
-                const { data: folder } = await supabase
-                    .from("media_folders")
-                    .select("slug")
-                    .eq("id", folderId)
-                    .single();
-                if (folder) {
-                    folderSlug = folder.slug as string;
+            // Only rename file if caption is not empty
+            if (altText.trim() !== "") {
+                // Get folder slug for the new filename
+                let folderSlug = "media";
+                const folderId = mediaItem.folder_id;
+                if (folderId) {
+                    const { data: folder } = await supabase
+                        .from("media_folders")
+                        .select("slug")
+                        .eq("id", folderId)
+                        .single();
+                    if (folder) {
+                        folderSlug = folder.slug as string;
+                    }
                 }
-            }
 
-            // Create sanitized caption for filename
-            const sanitizedCaption = altText
-                .toLowerCase()
-                .replace(/\s+/g, "-")
-                .replace(/[^a-z0-9-]/g, "")
-                .replace(/-+/g, "-")
-                .replace(/^-|-$/g, "");
+                // Create sanitized caption for filename
+                const sanitizedCaption = altText
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, "")
+                    .replace(/-+/g, "-")
+                    .replace(/^-|-$/g, "");
 
-            // Get file extension from current filename
-            const currentFilename = mediaItem.filename as string;
-            const extension = currentFilename.split('.').pop()?.toLowerCase() || "jpg";
+                // Get file extension from current filename
+                const currentFilename = mediaItem.filename as string;
+                const extension = currentFilename.split('.').pop()?.toLowerCase() || "jpg";
 
-            // Base filename: folder-caption
-            const baseFilename = `${folderSlug}-${sanitizedCaption}`;
+                // Base filename: folder-caption
+                const baseFilename = `${folderSlug}-${sanitizedCaption}`;
 
-            // Check if this filename already exists (excluding current file)
-            const { data: existingFiles } = await supabase
-                .from("media_items")
-                .select("filename")
-                .eq("folder_id", folderId)
-                .neq("id", mediaId)
-                .like("filename", `${baseFilename}%`);
+                // Check if this filename already exists (excluding current file)
+                const { data: existingFiles } = await supabase
+                    .from("media_items")
+                    .select("filename")
+                    .eq("folder_id", folderId)
+                    .neq("id", mediaId)
+                    .like("filename", `${baseFilename}%`);
 
-            // Determine unique filename
-            let newFilename = `${baseFilename}.${extension}`;
-            if (existingFiles && existingFiles.length > 0) {
-                // Check if exact match exists
-                const exactMatch = existingFiles.some(f => f.filename === newFilename);
-                if (exactMatch) {
-                    // Find highest existing number
-                    const pattern = new RegExp(`^${baseFilename}-(\\d+)\\.${extension}$`, 'i');
-                    const numbers = existingFiles.map(f => {
-                        const match = (f.filename as string).match(pattern);
-                        return match ? parseInt(match[1]) : 0;
-                    });
-                    const nextNumber = Math.max(1, ...numbers) + 1;
-                    newFilename = `${baseFilename}-${nextNumber}.${extension}`;
+                // Determine unique filename
+                let newFilename = `${baseFilename}.${extension}`;
+                if (existingFiles && existingFiles.length > 0) {
+                    // Check if exact match exists
+                    const exactMatch = existingFiles.some(f => f.filename === newFilename);
+                    if (exactMatch) {
+                        // Find highest existing number
+                        const pattern = new RegExp(`^${baseFilename}-(\\d+)\\.${extension}$`, 'i');
+                        const numbers = existingFiles.map(f => {
+                            const match = (f.filename as string).match(pattern);
+                            return match ? parseInt(match[1]) : 0;
+                        });
+                        const nextNumber = Math.max(1, ...numbers) + 1;
+                        newFilename = `${baseFilename}-${nextNumber}.${extension}`;
+                    }
                 }
-            }
 
-            // Only rename if filename actually changed
-            if (newFilename !== currentFilename) {
-                console.log("[Media Update] Caption rename:", { currentFilename, newFilename });
+                // Only rename if filename actually changed
+                if (newFilename !== currentFilename) {
+                    console.log("[Media Update] Caption rename:", { currentFilename, newFilename });
 
-                // Build physical path for current folder
-                const buildPhysicalPath = async (currentFolderId: string): Promise<string> => {
-                    const pathParts: string[] = [];
-                    let currentId: string | null = currentFolderId;
+                    // Build physical path for current folder
+                    const buildPhysicalPath = async (currentFolderId: string): Promise<string> => {
+                        const pathParts: string[] = [];
+                        let currentId: string | null = currentFolderId;
 
-                    while (currentId) {
-                        const { data: f } = await supabase
-                            .from("media_folders")
-                            .select("slug, parent_id")
-                            .eq("id", currentId)
-                            .single();
+                        while (currentId) {
+                            const { data: f } = await supabase
+                                .from("media_folders")
+                                .select("slug, parent_id")
+                                .eq("id", currentId)
+                                .single();
 
-                        if (f) {
-                            pathParts.unshift(f.slug as string);
-                            currentId = f.parent_id as string | null;
-                        } else {
-                            break;
+                            if (f) {
+                                pathParts.unshift(f.slug as string);
+                                currentId = f.parent_id as string | null;
+                            } else {
+                                break;
+                            }
                         }
+
+                        return pathParts.join("/");
+                    };
+
+                    const folderPath = folderId ? await buildPhysicalPath(folderId) : "";
+                    const mediaRoot = path.join(process.cwd(), "public", "images", "media");
+
+                    const oldFilePath = path.join(mediaRoot, folderPath, currentFilename);
+                    const newFilePath = path.join(mediaRoot, folderPath, newFilename);
+
+                    // Rename physical file
+                    if (existsSync(oldFilePath)) {
+                        try {
+                            await rename(oldFilePath, newFilePath);
+                            console.log("[Media Update] File renamed successfully");
+
+                            // Update database fields
+                            updates.filename = newFilename;
+                            updates.url = `/images/media/${folderPath}/${newFilename}`;
+                            updates.storage_path = `/images/media/${folderPath}/${newFilename}`;
+                        } catch (renameErr) {
+                            console.error("[Media Update] Failed to rename file:", renameErr);
+                            // Continue without renaming if file rename fails
+                        }
+                    } else {
+                        console.warn("[Media Update] File not found for rename:", oldFilePath);
                     }
-
-                    return pathParts.join("/");
-                };
-
-                const folderPath = folderId ? await buildPhysicalPath(folderId) : "";
-                const mediaRoot = path.join(process.cwd(), "public", "images", "media");
-
-                const oldFilePath = path.join(mediaRoot, folderPath, currentFilename);
-                const newFilePath = path.join(mediaRoot, folderPath, newFilename);
-
-                // Rename physical file
-                if (existsSync(oldFilePath)) {
-                    try {
-                        await rename(oldFilePath, newFilePath);
-                        console.log("[Media Update] File renamed successfully");
-
-                        // Update database fields
-                        updates.filename = newFilename;
-                        updates.url = `/images/media/${folderPath}/${newFilename}`;
-                        updates.storage_path = `/images/media/${folderPath}/${newFilename}`;
-                    } catch (renameErr) {
-                        console.error("[Media Update] Failed to rename file:", renameErr);
-                        // Continue without renaming if file rename fails
-                    }
-                } else {
-                    console.warn("[Media Update] File not found for rename:", oldFilePath);
                 }
             }
-        } else if (altText !== undefined) {
-            // Just update the alt_text without renaming
-            updates.alt_text = altText;
         }
 
         // Handle folder change

@@ -30,6 +30,8 @@ import { SlidePanel } from "./SlidePanel";
 import { TaxonomySelector } from "./TaxonomySelector";
 import { SimpleSelect } from "./SimpleSelect";
 import { EntryTree } from "./taxonomy/EntryTree";
+import { MediaGallery } from "@/components/admin/media/MediaGallery";
+import { ensureLocationFolders } from "@/lib/services/mediaFolderService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
 
@@ -148,6 +150,25 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [managingTaxonomy, setManagingTaxonomy] = useState<Taxonomy | null>(null);
     const [taxonomyEntries, setTaxonomyEntries] = useState<TaxonomyEntry[]>([]);
     const [loadingEntries, setLoadingEntries] = useState(false);
+
+    // Media Gallery State
+    const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
+
+    // Fetch Gallery Folder on Tab Change
+    useEffect(() => {
+        const fetchFolder = async () => {
+            if (activeTab === "gallery" && state && city && title) {
+                if (!title) return;
+                // Use full state name for folder structure
+                const stateObj = US_STATES.find(s => s.code === state || s.name === state);
+                const stateName = stateObj ? stateObj.name : state;
+
+                const id = await ensureLocationFolders(stateName, city, title, 'facility');
+                setGalleryFolderId(id);
+            }
+        };
+        fetchFolder();
+    }, [activeTab, state, city, title]);
 
     // Room Fields State (for Facility Details tab)
     const [roomCategories, setRoomCategories] = useState<RoomFieldCategory[]>([]);
@@ -1598,6 +1619,25 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             {roomCategories
                                 .filter(c => c.section === 'location_details' && c.columnNumber === 4)
                                 .map(renderCategory)}
+                        </div>
+                    </div>
+                );
+
+            case "gallery":
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-[#0b1115] border border-white/5 rounded-lg p-6">
+                            {!state || !city || !title ? (
+                                <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
+                                    <p className="text-zinc-400 mb-2">Location and Name Required</p>
+                                    <p className="text-sm text-zinc-500">Please enter the Facility Name, State, and City to access the media gallery.</p>
+                                </div>
+                            ) : (
+                                <MediaGallery
+                                    folderId={galleryFolderId}
+                                    title={`${title} Gallery`}
+                                />
+                            )}
                         </div>
                     </div>
                 );
