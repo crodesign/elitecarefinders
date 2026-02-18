@@ -31,6 +31,8 @@ import type { Taxonomy } from "@/types";
 const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users, requireSystemAdmin: true }, // Only System Admins can see this
+    { name: "Invoices", href: "/admin/invoices", icon: FileText, requireInvoiceManager: true }, // Replaced Blog icon which was FileText
+    { name: "Contacts", href: "/admin/contacts", icon: Users },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
     { name: "Homes", href: "/admin/homes", icon: Home, hasAddButton: true },
     { name: "Facilities", href: "/admin/facilities", icon: Building2, hasAddButton: true },
@@ -79,10 +81,19 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
     // Filter navigation items based on permissions
     const navItems = navigation.filter(item => {
+        // Invoice managers only see Invoices
+        if (user?.role?.role === 'invoice_manager') {
+            return item.name === 'Invoices';
+        }
+
         // Show Users link only to System Admins (not Super Admins)
         if (item.requireSystemAdmin) {
             return isSystemAdmin && !canAccessSettings; // System Admins but not Super Admins
         }
+
+        // Hide Invoices from others if needed, or show it. 
+        // Let's assume admins can see it too.
+
         return true;
     });
 

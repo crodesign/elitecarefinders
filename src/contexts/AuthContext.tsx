@@ -14,6 +14,7 @@ interface AuthContextType {
     isSystemAdmin: boolean;
     isRegionalManager: boolean;
     isLocalUser: boolean;
+    isInvoiceManager: boolean;
     isAdmin: boolean;
     canAccessSettings: boolean;
     canManageUsers: boolean;
@@ -172,6 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const isSystemAdmin = user?.role?.role === 'system_admin' || isSuperAdmin;
     const isRegionalManager = user?.role?.role === 'regional_manager' || isSystemAdmin;
     const isLocalUser = user?.role?.role === 'local_user';
+    const isInvoiceManager = user?.role?.role === 'invoice_manager';
     const isAdmin = isSuperAdmin || isSystemAdmin;
     const canAccessSettings = isAdmin;
     const canManageUsers = isAdmin || isRegionalManager;
@@ -194,6 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 isSystemAdmin,
                 isRegionalManager,
                 isLocalUser,
+                isInvoiceManager,
                 isAdmin,
                 canAccessSettings,
                 canManageUsers,

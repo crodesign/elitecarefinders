@@ -7,7 +7,7 @@ import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, Rot
 import { createClientComponentClient } from "@/lib/supabase";
 import type { UserProfile, UserRole } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
-import { Tooltip } from "@/components/ui/Tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import { EnhancedSelect } from "./EnhancedSelect";
 import { SimpleSelect } from "./SimpleSelect";
 

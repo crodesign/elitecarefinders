@@ -161,3 +161,340 @@ select:-webkit-autofill:active {
   box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.8) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ========================================= */
+/* MERGED LOVABLE UI STYLES                  */
+/* ========================================= */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 202 75% 51%;
+    /* #239ddb - Blue for Add/Edit buttons */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    /* Custom Button Colors */
+    --button-save: 152 75% 51%;
+    /* #23db87 - Green for Save buttons */
+    --button-save-foreground: 0 0% 100%;
+    --button-grey: 0 0% 87%;
+    /* #dddddd - Light Grey */
+    --button-grey-foreground: 0 0% 0%;
+
+    /* Lead Classification Colors */
+    --lead-new: 218 72% 20%;
+    /* Dark Blue */
+    --lead-new-foreground: 0 0% 100%;
+    --lead-prospects: 210 67% 39%;
+    /* Medium Blue */
+    --lead-prospects-foreground: 0 0% 100%;
+    --lead-connected: 202 85% 55%;
+    /* Bright Blue */
+    --lead-connected-foreground: 0 0% 100%;
+    --lead-won: 142 71% 45%;
+    /* Green */
+    --lead-won-foreground: 0 0% 100%;
+    --lead-closed: 0 0% 60%;
+    /* Grey */
+    --lead-closed-foreground: 0 0% 100%;
+
+    /* Status Indicator Colors */
+    --status-active: 152 75% 51%;
+    /* #23db87 - Green */
+    --status-paused: 0 0% 40%;
+    /* #239ddb - Blue */
+    --status-disabled: 0 0% 53%;
+    /* #888888 - Gray */
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 202 75% 51%;
+    /* #239ddb - Blue for Add/Edit buttons */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Custom Button Colors - Dark Mode */
+    --button-save: 152 75% 51%;
+    /* #23db87 - Green for Save buttons */
+    --button-save-foreground: 0 0% 100%;
+    --button-grey: 0 0% 87%;
+    /* #dddddd - Light Grey */
+    --button-grey-foreground: 0 0% 0%;
+
+    /* Lead Classification Colors - Dark Mode */
+    --lead-new: 218 72% 20%;
+    /* Dark Blue */
+    --lead-new-foreground: 0 0% 100%;
+    --lead-prospects: 210 67% 39%;
+    /* Medium Blue */
+    --lead-prospects-foreground: 0 0% 100%;
+    --lead-connected: 202 85% 55%;
+    /* Bright Blue */
+    --lead-connected-foreground: 0 0% 100%;
+    --lead-won: 142 71% 45%;
+    /* Green */
+    --lead-won-foreground: 0 0% 100%;
+    --lead-closed: 0 0% 60%;
+    /* Grey */
+    --lead-closed-foreground: 0 0% 100%;
+
+    /* Status Indicator Colors - Dark Mode */
+    --status-active: 152 75% 51%;
+    /* #23db87 - Green */
+    --status-paused: 0 0% 40%;
+    /* #239ddb - Blue */
+    --status-disabled: 0 0% 53%;
+    /* #888888 - Gray */
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Lead Classification Badge Styles */
+.badge-lead-new {
+  background-color: hsl(var(--lead-new)) !important;
+  color: hsl(var(--lead-new-foreground)) !important;
+}
+
+.badge-lead-new:hover {
+  background-color: hsl(var(--lead-new)) !important;
+  color: hsl(var(--lead-new-foreground)) !important;
+}
+
+.badge-lead-prospects {
+  background-color: hsl(var(--lead-prospects)) !important;
+  color: hsl(var(--lead-prospects-foreground)) !important;
+}
+
+.badge-lead-prospects:hover {
+  background-color: hsl(var(--lead-prospects)) !important;
+  color: hsl(var(--lead-prospects-foreground)) !important;
+}
+
+.badge-lead-connected {
+  background-color: hsl(var(--lead-connected)) !important;
+  color: hsl(var(--lead-connected-foreground)) !important;
+}
+
+.badge-lead-connected:hover {
+  background-color: hsl(var(--lead-connected)) !important;
+  color: hsl(var(--lead-connected-foreground)) !important;
+}
+
+.badge-lead-won {
+  background-color: hsl(var(--lead-won)) !important;
+  color: hsl(var(--lead-won-foreground)) !important;
+}
+
+.badge-lead-won:hover {
+  background-color: hsl(var(--lead-won)) !important;
+  color: hsl(var(--lead-won-foreground)) !important;
+}
+
+.badge-lead-closed {
+  background-color: hsl(var(--lead-closed)) !important;
+  color: hsl(var(--lead-closed-foreground)) !important;
+}
+
+.badge-lead-closed:hover {
+  background-color: hsl(var(--lead-closed)) !important;
+  color: hsl(var(--lead-closed-foreground)) !important;
+}
+
+/* Status Indicator Dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.status-dot-active {
+  background-color: hsl(var(--status-active));
+}
+
+.status-dot-paused {
+  background-color: hsl(var(--status-paused));
+}
+
+.status-dot-disabled {
+  background-color: hsl(var(--status-disabled));
+}
+
+/* Lead Classification Dots */
+.lead-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.lead-dot-new {
+  background-color: hsl(var(--lead-new));
+}
+
+.lead-dot-prospects {
+  background-color: hsl(var(--lead-prospects));
+}
+
+.lead-dot-connected {
+  background-color: hsl(var(--lead-connected));
+}
+
+.lead-dot-won {
+  background-color: hsl(var(--lead-won));
+}
+
+.lead-dot-closed {
+  background-color: hsl(var(--lead-closed));
+}
+
+/* Invoice Status Dots */
+.invoice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.invoice-dot-paid {
+  background-color: hsl(var(--lead-won));
+  /* Green */
+}
+
+.invoice-dot-sent {
+  background-color: hsl(var(--lead-connected));
+  /* Blue */
+}
+
+.invoice-dot-not-sent {
+  background-color: hsl(0 84.2% 60.2%);
+  /* Red */
+}
+
+/* Data Display Typography Classes */
+.data-heading-primary {
+  @apply text-3xl font-bold text-foreground;
+}
+
+.data-heading-secondary {
+  @apply text-2xl font-bold text-foreground;
+}
+
+.data-heading-mobile {
+  @apply text-xl font-bold text-foreground;
+}
+
+.data-section-header {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+.data-label {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+.data-value-primary {
+  @apply font-medium text-foreground;
+}
+
+.data-value-secondary {
+  @apply text-sm font-normal text-muted-foreground;
+}
+
+.data-value-resident {
+  @apply font-medium text-foreground text-xs;
+  font-size: 0.85em;
+}
+
+.data-tab-active {
+  @apply text-sm font-medium text-foreground;
+}
+
+.data-tab-inactive {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+.data-status-text {
+  @apply font-medium;
+}

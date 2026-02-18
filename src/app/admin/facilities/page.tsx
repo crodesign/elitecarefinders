@@ -145,19 +145,32 @@ export default function FacilitiesPage() {
 
     const handleSave = async (data: Partial<Facility>) => {
         try {
+            let savedFacility: Facility;
             if (editingFacility) {
-                await updateFacility(editingFacility.id, data);
+                savedFacility = await updateFacility(editingFacility.id, data);
                 showNotification("Facility Updated", data.title || "Facility updated successfully");
             } else {
                 // Ensure required fields for create
                 if (!data.title || !data.slug) {
                     throw new Error("Title and Slug are required");
                 }
-                await createFacility(data as CreateFacilityInput);
+                savedFacility = await createFacility(data as CreateFacilityInput);
                 showNotification("Facility Created", data.title);
             }
+
+            // Update the list
             await fetchFacilities();
-            handleCloseForm();
+
+            // Stay on the form, but update the editing state to the saved facility
+            setEditingFacility(savedFacility);
+
+            // Update URL to reflect the current resource
+            const currentParams = new URLSearchParams(searchParams.toString());
+            currentParams.delete('action');
+            currentParams.set('edit', savedFacility.slug);
+
+            router.replace(`/admin/facilities?${currentParams.toString()}`, { scroll: false });
+
         } catch (err) {
             console.error("Save error:", err);
             throw err; // Re-throw for form to handle

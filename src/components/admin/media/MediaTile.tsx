@@ -30,6 +30,7 @@ interface MediaTileProps {
     showFolderMove?: boolean;
     showDimensions?: boolean;
     onMediaSelect?: (item: MediaItem) => void;
+    isGalleryImage?: boolean;
 }
 
 export function MediaTile({
@@ -47,6 +48,7 @@ export function MediaTile({
     showFolderMove = true,
     showDimensions = true,
     onMediaSelect,
+    isGalleryImage = false,
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
@@ -94,13 +96,14 @@ export function MediaTile({
                 }),
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || "Update failed");
+                throw new Error(result.error || "Update failed");
             }
 
-            // Refresh the media list
-            await onUpdate(item.id, {});
+            // Refresh the media list with the updated item
+            await onUpdate(item.id, result.item);
             onClose();
         } catch (error) {
             console.error("Save error:", error);
@@ -130,13 +133,14 @@ export function MediaTile({
                 }),
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || "Update failed");
+                throw new Error(result.error || "Update failed");
             }
 
-            // Refresh the media list
-            await onUpdate(item.id, {});
+            // Refresh the media list with updated item
+            await onUpdate(item.id, result.item);
 
             // Blur the active element to remove cursor
             if (document.activeElement instanceof HTMLElement) {
@@ -187,14 +191,14 @@ export function MediaTile({
     const currentFolderName = currentFolder ? currentFolder.folder.name : "";
 
     return (
-        <div className={`flex flex-col rounded-xl transition-all ${isSelected ? "ring-2 ring-accent overflow-visible" : "overflow-hidden"}`}>
+        <div className={`flex flex-col rounded-xl transition-all ${isSelected && !onMediaSelect ? "ring-2 ring-accent overflow-visible" : "overflow-hidden"}`}>
             {/* Image container */}
             <div className="relative w-full aspect-square bg-black/30 rounded-t-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
                     <img
                         src={item.url}
                         alt={item.altText || item.filename}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-500">
@@ -204,27 +208,44 @@ export function MediaTile({
 
                 {/* Image info overlay in top left */}
                 {showDimensions && (
-                    <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-lg bg-black/60 text-white/70 text-[10px] flex items-center gap-1.5">
-                        {item.width && item.height && (
-                            <span>{item.width}×{item.height}</span>
+                    <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                        <div className="px-1.5 py-0.5 rounded-lg bg-black/60 text-white/70 text-[10px] flex items-center gap-1.5 backdrop-blur-sm">
+                            {item.width && item.height && (
+                                <span>{item.width}×{item.height}</span>
+                            )}
+                            <span className="uppercase">{item.mimeType.split("/")[1]}</span>
+                        </div>
+                        {isGalleryImage && (
+                            <div className="px-1.5 py-0.5 rounded-lg bg-emerald-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
+                                In Gallery
+                            </div>
                         )}
-                        <span className="uppercase">{item.mimeType.split("/")[1]}</span>
                     </div>
                 )}
 
-                {/* Edit/Close button in upper right - or checkbox in bulk mode */}
-                {isBulkSelectMode ? (
+                {/* Edit/Close button in upper right - or checkbox in bulk/selection mode */}
+                {(isBulkSelectMode || onMediaSelect) ? (
                     <button
-                        onClick={onToggleBulkSelect}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isBulkSelected
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (onMediaSelect) {
+                                onMediaSelect(item);
+                            } else if (onToggleBulkSelect) {
+                                onToggleBulkSelect();
+                            }
+                        }}
+                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected || isBulkSelected
                             ? "bg-accent text-white"
                             : "bg-black/60 text-white/70 hover:bg-black/80 hover:text-white"
                             }`}
                     >
-                        {isBulkSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                        {(isSelected || isBulkSelected) ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                     </button>
                 ) : (
                     <button
+                        type="button"
                         onClick={handleTileClick}
                         className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected
                             ? "bg-accent text-white"
@@ -237,10 +258,10 @@ export function MediaTile({
             </div>
 
             {/* Caption and edit fields container */}
-            <div className={`p-3 bg-[#151b23] border-t border-white/10 ${isSelected ? "space-y-2 rounded-b-xl" : ""}`}>
+            <div className={`p-3 bg-[#151b23] border-t border-white/10 ${isSelected && !onMediaSelect ? "space-y-2 rounded-b-xl" : ""}`}>
                 {/* Caption row */}
                 <div className="flex items-center gap-2">
-                    {isSelected && (
+                    {isSelected && !onMediaSelect && (
                         <label className="text-xs text-zinc-400 flex-shrink-0 w-12">Caption</label>
                     )}
                     <input
@@ -249,14 +270,15 @@ export function MediaTile({
                         onChange={(e) => setCaption(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Add caption..."
-                        className={`flex-1 min-w-0 text-sm text-white placeholder-zinc-500 focus:outline-none ${isSelected
+                        className={`flex-1 min-w-0 text-sm text-white placeholder-zinc-500 focus:outline-none ${isSelected && !onMediaSelect
                             ? "bg-black/20 rounded px-2 py-1.5"
                             : "bg-transparent"
                             }`}
                     />
                     {/* Only show Save button when NOT in edit mode and has changes */}
-                    {!isSelected && captionChanged && (
+                    {(!isSelected || onMediaSelect) && captionChanged && (
                         <button
+                            type="button"
                             onClick={handleSaveCaptionOnly}
                             disabled={isSaving}
                             className="flex-shrink-0 px-2 py-0.5 text-xs bg-accent text-white rounded hover:bg-accent-light transition-colors disabled:opacity-50"
@@ -267,8 +289,8 @@ export function MediaTile({
                     )}
                 </div>
 
-                {/* Edit fields - only when selected */}
-                {isSelected && (
+                {/* Edit fields - only when selected AND NOT in selection mode */}
+                {isSelected && !onMediaSelect && (
                     <>
                         {/* URL row */}
                         {showUrlField && (
@@ -281,6 +303,7 @@ export function MediaTile({
                                     className="flex-1 min-w-0 bg-black/20 rounded px-2 py-1.5 text-xs text-zinc-400 truncate"
                                 />
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         navigator.clipboard.writeText(item.url);
                                     }}
@@ -367,6 +390,7 @@ export function MediaTile({
                         {/* Actions row */}
                         <div className="flex items-center justify-between pt-2 border-t border-white/5">
                             <button
+                                type="button"
                                 onClick={() => onDelete(item.id)}
                                 className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
                             >
@@ -374,12 +398,14 @@ export function MediaTile({
                             </button>
                             <div className="flex gap-2">
                                 <button
+                                    type="button"
                                     onClick={onClose}
                                     className="px-3 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={handleSaveClick}
                                     disabled={isSaving || !hasChanges}
                                     className="flex items-center gap-1 px-3 py-1.5 text-xs bg-accent text-white font-medium rounded hover:bg-accent-light transition-colors disabled:opacity-50"

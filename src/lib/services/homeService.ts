@@ -26,6 +26,7 @@ export async function getHomes(): Promise<Home[]> {
         homeOfMonthDescription: home.home_of_month_description,
         // Ensure other fields match expected types if needed
         images: home.images || [],
+        roomDetails: home.room_details || { customFields: {} },
     }));
 }
 
@@ -53,6 +54,7 @@ export async function getHome(id: string): Promise<Home | null> {
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 
@@ -75,7 +77,8 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         is_home_of_month: home.isHomeOfMonth,
         featured_label: home.featuredLabel,
         home_of_month_description: home.homeOfMonthDescription,
-        // images: home.images || [], // Images removed from schema request
+        images: home.images || [],
+        room_details: home.roomDetails || {},
     };
 
     const { data, error } = await supabase
@@ -101,6 +104,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
         images: [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 
@@ -122,6 +126,8 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.isHomeOfMonth !== undefined) dbUpdates.is_home_of_month = updates.isHomeOfMonth;
     if (updates.featuredLabel !== undefined) dbUpdates.featured_label = updates.featuredLabel;
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
+    if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
 
     const { data, error } = await supabase
         .from("homes")
@@ -146,7 +152,8 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         isHomeOfMonth: data.is_home_of_month,
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
-        images: [],
+        images: data.images || [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 

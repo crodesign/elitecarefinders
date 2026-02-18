@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Tooltip } from "@/components/ui/Tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import {
     // General / UI
     Search, X, Smile, Layout, Grid, Layers, Box, Package, Tag, Hash,

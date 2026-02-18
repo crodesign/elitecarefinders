@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { rename, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
     try {
+        const supabase = createClient();
         const body = await request.json();
         const { mediaId, newFolderId, altText } = body;
 

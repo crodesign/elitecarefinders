@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { ToastContainer } from "@/components/ui/Toast";
+import { ToastContainer } from "@/components/ui/Toast.legacy";
 
 interface Notification {
     id: string;

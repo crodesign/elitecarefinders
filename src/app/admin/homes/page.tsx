@@ -144,19 +144,35 @@ export default function HomesPage() {
 
     const handleSave = async (data: Partial<Home>) => {
         try {
+            let savedHome: Home;
             if (editingHome) {
-                await updateHome(editingHome.id, data);
+                savedHome = await updateHome(editingHome.id, data);
                 showNotification("Home Updated", data.title || "Home updated successfully");
             } else {
                 // Ensure required fields for create
                 if (!data.title || !data.slug) {
                     throw new Error("Title and Slug are required");
                 }
-                await createHome(data as CreateHomeInput);
+                savedHome = await createHome(data as CreateHomeInput);
                 showNotification("Home Created", data.title);
             }
+
+            // Update the list
             await fetchHomes();
-            handleCloseForm();
+
+            // Stay on the form, but update the editing state to the saved home
+            // This handles the transition from Create -> Edit, and keeps schema/dirty state in sync
+            setEditingHome(savedHome);
+
+            // Update URL to reflect the current resource
+            const currentParams = new URLSearchParams(searchParams.toString());
+            // If we were creating, remove action=create
+            currentParams.delete('action');
+            // set edit param
+            currentParams.set('edit', savedHome.slug);
+
+            router.replace(`/admin/homes?${currentParams.toString()}`, { scroll: false });
+
         } catch (err) {
             console.error("Save error:", err);
             throw err; // Re-throw for form to handle

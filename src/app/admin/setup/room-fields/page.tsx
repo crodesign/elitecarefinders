@@ -38,7 +38,7 @@ import {
     verticalListSortingStrategy,
     useSortable,
 } from '@dnd-kit/sortable';
-import { Tooltip } from "@/components/ui/Tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 import { CSS } from '@dnd-kit/utilities';
 import { reorderRoomFields } from "@/lib/services/roomFieldService";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";

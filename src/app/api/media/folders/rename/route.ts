@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 import fs from "fs/promises";
 import path from "path";
 import { buildPhysicalPath } from "@/lib/mediaUtils";
 
 export async function POST(request: NextRequest) {
     try {
+        const supabase = createClient();
         const { folderId, newName } = await request.json();
 
         if (!folderId || !newName) {

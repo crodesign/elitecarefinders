@@ -165,6 +165,25 @@ export async function deleteFolder(id: string): Promise<void> {
     }
 }
 
+export async function moveFolderContents(sourceId: string, destinationId: string): Promise<{ count: number; updatedItems: MediaItem[] }> {
+    const response = await fetch("/api/media/move-folder-contents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourceFolderId: sourceId, destinationFolderId: destinationId }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to move folder contents");
+    }
+
+    const result = await response.json();
+    return {
+        count: result.count,
+        updatedItems: (result.updatedItems || []).map(transformMediaItem)
+    };
+}
+
 export async function seedDefaultFolders(): Promise<void> {
     for (const folder of DEFAULT_FOLDERS) {
         const { data: existing } = await supabase
@@ -181,7 +200,47 @@ export async function seedDefaultFolders(): Promise<void> {
     }
 }
 
-// Media Item Operations
+// Check if images are used in galleries
+export async function getAllUsedImageUrls(): Promise<Set<string>> {
+    try {
+        const [homesResult, facilitiesResult] = await Promise.all([
+            supabase.from('homes').select('images'),
+            supabase.from('facilities').select('images')
+        ]);
+
+        if (homesResult.error) {
+            console.error("Error fetching homes for image usage:", homesResult.error);
+        }
+
+        if (facilitiesResult.error) {
+            console.error("Error fetching facilities for image usage:", facilitiesResult.error);
+        }
+
+        const urls = new Set<string>();
+
+        (homesResult.data || []).forEach((home: any) => {
+            if (Array.isArray(home.images)) {
+                home.images.forEach((url: string) => {
+                    if (url) urls.add(url);
+                });
+            }
+        });
+
+        (facilitiesResult.data || []).forEach((facility: any) => {
+            if (Array.isArray(facility.images)) {
+                facility.images.forEach((url: string) => {
+                    if (url) urls.add(url);
+                });
+            }
+        });
+
+        return urls;
+    } catch (error) {
+        console.error("Error calculating used image URLs:", error);
+        return new Set();
+    }
+}
+
 export async function getMediaItems(folderId?: string): Promise<MediaItem[]> {
     let query = supabase
         .from("media_items")

@@ -18,6 +18,7 @@ export async function getFacilities(): Promise<Facility[]> {
         licenseNumber: facility.license_number,
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
+        roomDetails: facility.room_details || { customFields: {} },
     }));
 }
 
@@ -39,12 +40,15 @@ export async function getFacility(id: string): Promise<Facility | null> {
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 
 export type CreateFacilityInput = Omit<Facility, "id" | "createdAt" | "updatedAt" | "images"> & { images?: string[] };
 
 export async function createFacility(facility: CreateFacilityInput): Promise<Facility> {
+    const { data: { user } } = await supabase.auth.getUser();
+
     const dbPayload = {
         title: facility.title,
         slug: facility.slug,
@@ -54,6 +58,9 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         capacity: facility.capacity,
         taxonomy_ids: facility.taxonomyIds,
         status: facility.status || 'draft',
+        images: facility.images || [],
+        room_details: (facility as any).roomDetails || {},
+        created_by: user?.id,
     };
 
     const { data, error } = await supabase
@@ -73,6 +80,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 
@@ -87,6 +95,8 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.capacity !== undefined) dbUpdates.capacity = updates.capacity;
     if (updates.taxonomyIds !== undefined) dbUpdates.taxonomy_ids = updates.taxonomyIds;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if ((updates as any).roomDetails !== undefined) dbUpdates.room_details = (updates as any).roomDetails;
 
     const { data, error } = await supabase
         .from("facilities")
@@ -106,6 +116,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        roomDetails: data.room_details || { customFields: {} },
     };
 }
 

@@ -30,6 +30,7 @@ import {
     deleteMediaItem,
     bulkUploadMedia,
     seedDefaultFolders,
+    getAllUsedImageUrls,
 } from "@/lib/services/mediaService";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 
@@ -37,6 +38,7 @@ import { MediaTile } from "@/components/admin/media/MediaTile";
 export default function MediaPage() {
     const [folders, setFolders] = useState<MediaFolder[]>([]);
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+    const [usedImageUrls, setUsedImageUrls] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMedia, setIsLoadingMedia] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -145,9 +147,19 @@ export default function MediaPage() {
     const loadMediaItems = useCallback(async () => {
         setIsLoadingMedia(true);
         try {
-            const items = await getMediaItems(selectedFolder?.id);
+            const [items, usedUrls] = await Promise.all([
+                getMediaItems(selectedFolder?.id),
+                getAllUsedImageUrls()
+            ]);
+            console.log("MediaPage loaded items:", items.length);
+            console.log("MediaPage usedUrls count:", usedUrls.size);
+            if (usedUrls.size > 0) {
+                console.log("Sample used URL:", Array.from(usedUrls)[0]);
+            }
+
             // Only update media items after successfully loading
             setMediaItems(items);
+            setUsedImageUrls(usedUrls);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to load media");
             // On error, clear the items
@@ -162,13 +174,18 @@ export default function MediaPage() {
         const init = async () => {
             setIsLoading(true);
 
-            // Load folders first
-            let folderData = await getFolders();
+            // Load folders and used URLs first
+            let [folderData, usedUrls] = await Promise.all([
+                getFolders(),
+                getAllUsedImageUrls()
+            ]);
+
             if (folderData.length === 0) {
                 await seedDefaultFolders();
                 folderData = await getFolders();
             }
             setFolders(folderData);
+            setUsedImageUrls(usedUrls);
 
             // Load states from location taxonomy
             try {
@@ -198,12 +215,16 @@ export default function MediaPage() {
 
                             // Check if any assignments are directly to states
                             const directStateIds = new Set(
-                                statesData.filter(s => assignedLocationIds.has(s.id)).map(s => s.id)
+                                statesData.filter((s: StateOption) => assignedLocationIds.has(s.id)).map((s: StateOption) => s.id)
                             );
 
-                            // For assignments that aren't states (i.e. cities),
-                            // look up their parent to find the state
-                            const nonStateIds = Array.from(assignedLocationIds).filter(id => !directStateIds.has(id));
+
+                            const nonStateIds: string[] = [];
+                            assignedLocationIds.forEach(id => {
+                                if (!directStateIds.has(id)) {
+                                    nonStateIds.push(id);
+                                }
+                            });
                             if (nonStateIds.length > 0) {
                                 const { data: childEntries } = await supabase
                                     .from('taxonomy_entries')
@@ -214,7 +235,7 @@ export default function MediaPage() {
                                     for (const entry of childEntries) {
                                         if (entry.parent_id) {
                                             // Check if parent is a state
-                                            const parentState = statesData.find(s => s.id === entry.parent_id);
+                                            const parentState = statesData.find((s: StateOption) => s.id === entry.parent_id);
                                             if (parentState) {
                                                 directStateIds.add(parentState.id);
                                             } else {
@@ -226,7 +247,7 @@ export default function MediaPage() {
                                                     .eq('id', entry.parent_id)
                                                     .single();
                                                 if (parentEntry?.parent_id) {
-                                                    const grandparentState = statesData.find(s => s.id === parentEntry.parent_id);
+                                                    const grandparentState = statesData.find((s: StateOption) => s.id === parentEntry.parent_id);
                                                     if (grandparentState) {
                                                         directStateIds.add(grandparentState.id);
                                                     }
@@ -237,7 +258,7 @@ export default function MediaPage() {
                                 }
                             }
 
-                            const filteredStates = statesData.filter(s => directStateIds.has(s.id));
+                            const filteredStates = statesData.filter((s: StateOption) => directStateIds.has(s.id));
                             setStates(filteredStates);
                             // Auto-select if only one state
                             if (filteredStates.length === 1) {
@@ -923,6 +944,7 @@ export default function MediaPage() {
                                                     isBulkSelectMode={isBulkSelectMode}
                                                     isBulkSelected={selectedItems.has(item.id)}
                                                     onToggleBulkSelect={() => handleToggleSelectItem(item.id)}
+                                                    isGalleryImage={usedImageUrls.has(item.url)}
                                                 />
                                             </div>
                                         ))}
@@ -970,6 +992,16 @@ export default function MediaPage() {
                 message={
                     <div>
                         <p>Are you sure you want to delete <strong>&quot;{pendingDeleteItem?.filename}&quot;</strong>?</p>
+                        {pendingDeleteItem && usedImageUrls.has(pendingDeleteItem.url) && (
+                            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                <p className="text-red-200 text-sm font-medium flex items-center gap-2">
+                                    <span className="text-lg">⚠️</span> Warning: Image in Use
+                                </p>
+                                <p className="mt-1 text-red-300/80 text-xs pl-7">
+                                    This image is currently displayed in a gallery. Deleting it will remove it from the live site.
+                                </p>
+                            </div>
+                        )}
                         <p className="mt-2 text-red-400 text-xs">
                             This file will be permanently removed. This action cannot be undone.
                         </p>
@@ -989,6 +1021,26 @@ export default function MediaPage() {
                 message={
                     <div>
                         <p>Are you sure you want to delete <strong>{selectedItems.size} file{selectedItems.size !== 1 ? "s" : ""}</strong>?</p>
+                        {(() => {
+                            const usedCount = Array.from(selectedItems).filter(id => {
+                                const item = mediaItems.find(m => m.id === id);
+                                return item && usedImageUrls.has(item.url);
+                            }).length;
+
+                            if (usedCount > 0) {
+                                return (
+                                    <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                        <p className="text-red-200 text-sm font-medium flex items-center gap-2">
+                                            <span className="text-lg">⚠️</span> Warning: {usedCount} Image{usedCount !== 1 ? "s" : ""} in Use
+                                        </p>
+                                        <p className="mt-1 text-red-300/80 text-xs pl-7">
+                                            {usedCount === 1 ? "One image is" : "Some images are"} currently displayed in galleries. Deleting {usedCount === 1 ? "it" : "them"} will remove {usedCount === 1 ? "it" : "them"} from the live site.
+                                        </p>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })()}
                         <p className="mt-2 text-red-400 text-xs">
                             These files will be permanently removed. This action cannot be undone.
                         </p>

@@ -1,12 +1,12 @@
 export interface UserRoleRecord {
     user_id: string;
-    role: 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user';
+    role: 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user' | 'invoice_manager';
     display_name?: string;
     created_at: string;
     updated_at: string;
 }
 
-export type UserRole = 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user';
+export type UserRole = 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user' | 'invoice_manager';
 
 export interface LocationAssignment {
     id: string;

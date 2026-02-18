@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { unlink } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 
 export async function DELETE(request: NextRequest) {
     try {
+        const supabase = createClient();
         const body = await request.json();
         const { mediaId } = body;
 

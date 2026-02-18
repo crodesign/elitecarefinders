@@ -38,7 +38,7 @@ export interface Home extends BaseEntity {
     showAddress?: boolean;
     phone?: string;
     email?: string;
-    status: 'published' | 'draft';
+    status: 'published' | 'draft' | 'archived';
     taxonomyEntryIds?: string[]; // IDs of selected entries (e.g. specific cities, care types)
     isFeatured?: boolean;
     hasFeaturedVideo?: boolean;

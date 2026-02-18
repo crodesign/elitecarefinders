@@ -47,7 +47,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
         }, []);
     };
 
-    const flatEntries = useMemo(() => flattenTree(taxonomy.entries), [taxonomy.entries]);
+    const flatEntries = useMemo(() => flattenTree(taxonomy?.entries || []), [taxonomy?.entries]);
     const selectedEntry = flatEntries.find(e => e.id === value);
 
     // Auto-expand path to selected entry when dropdown opens
@@ -67,7 +67,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                 return null;
             };
 
-            const path = findPathToEntry(taxonomy.entries, value);
+            const path = findPathToEntry(taxonomy?.entries || [], value);
             if (path && path.length > 0) {
                 setExpandedIds(prev => {
                     const next = new Set(prev);
@@ -81,7 +81,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                 selectedRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
             }, 50);
         }
-    }, [isOpen, value, taxonomy.entries]);
+    }, [isOpen, value, taxonomy?.entries]);
 
     // Filter for search
     const filteredEntries = useMemo(() => {
@@ -183,7 +183,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
     return (
         <div className="relative" ref={containerRef}>
             <label className="text-sm font-medium text-white/80 block mb-1">
-                {taxonomy.singularName}
+                {taxonomy?.singularName || 'Select'}
             </label>
 
             <button
@@ -195,7 +195,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                     }`}
             >
                 <span className={selectedEntry ? "text-white" : "text-zinc-500"}>
-                    {selectedEntry ? selectedEntry.fullPath : `Select ${taxonomy.singularName}...`}
+                    {selectedEntry ? selectedEntry.fullPath : `Select ${taxonomy?.singularName || 'option'}...`}
                 </span>
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${selectedEntry ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
             </button>
@@ -249,7 +249,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                                     }, []);
                                 };
 
-                                const filteredTree = filterTree(taxonomy.entries);
+                                const filteredTree = filterTree(taxonomy?.entries || []);
 
                                 // Auto-expand matching entries when searching
                                 const matchingIds = new Set<string>();
@@ -261,7 +261,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                                         if (e.children) collectMatchingIds(e.children);
                                     });
                                 };
-                                collectMatchingIds(taxonomy.entries);
+                                collectMatchingIds(taxonomy?.entries || []);
 
                                 if (filteredTree.length === 0) {
                                     return (
@@ -329,12 +329,12 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                                 return filteredTree.map(entry => renderSearchEntry(entry, 0));
                             })()
                         ) : (
-                            taxonomy.entries.length === 0 ? (
+                            (taxonomy?.entries || []).length === 0 ? (
                                 <div className="px-2 py-4 text-center text-xs text-zinc-500">
                                     No entries available
                                 </div>
                             ) : (
-                                taxonomy.entries.map((entry) => renderTreeEntry(entry, 0))
+                                (taxonomy?.entries || []).map((entry) => renderTreeEntry(entry, 0))
                             )
                         )}
                     </div>
