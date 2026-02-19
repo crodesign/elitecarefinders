@@ -36,6 +36,7 @@ export function HomeProviderTab({
                             setRoomDetails={setRoomDetails}
                             setIsDirty={setIsDirty}
                             invalidEmailFields={invalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                             setInvalidEmailFields={setInvalidEmailFields}
                         />
                     ))}
@@ -54,6 +55,7 @@ export function HomeProviderTab({
                             setRoomDetails={setRoomDetails}
                             setIsDirty={setIsDirty}
                             invalidEmailFields={invalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                             setInvalidEmailFields={setInvalidEmailFields}
                         />
                     ))}
@@ -72,6 +74,7 @@ export function HomeProviderTab({
                             setRoomDetails={setRoomDetails}
                             setIsDirty={setIsDirty}
                             invalidEmailFields={invalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                             setInvalidEmailFields={setInvalidEmailFields}
                         />
                     ))}
@@ -90,6 +93,7 @@ export function HomeProviderTab({
                             setRoomDetails={setRoomDetails}
                             setIsDirty={setIsDirty}
                             invalidEmailFields={invalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                             setInvalidEmailFields={setInvalidEmailFields}
                         />
                     ))}

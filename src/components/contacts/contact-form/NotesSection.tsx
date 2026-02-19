@@ -29,10 +29,12 @@ const ContactFormNotesSection = ({ contactId, formData, readOnly = false, onNext
   }
 
   return (
-    <div className="space-y-6">
-      <NotesSection contactId={id} readOnly={readOnly} />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0">
+        <NotesSection contactId={id} readOnly={readOnly} />
+      </div>
       {onNext && (
-        <div className="flex justify-end mt-4">
+        <div className="flex-none flex justify-end mt-4 pt-2 border-t border-white/10">
           <Button onClick={onNext}>Next Step</Button>
         </div>
       )}

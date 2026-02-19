@@ -91,13 +91,13 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
 
           {/* Full Name */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
               <input
                 type="text"
                 value={formData?.resident_full_name || ""}
                 onChange={(e) => updateField('resident_full_name', e.target.value)}
-                className="bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                 placeholder="Enter full name"
               />
             </div>
@@ -107,27 +107,27 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           <div className="space-y-2 pt-1">
             <h4 className="text-sm font-medium text-white/80">Address</h4>
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">Street</label>
                 <input
                   type="text"
                   value={formData?.street_address || ""}
                   onChange={(e) => updateField('street_address', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                   placeholder="Street address"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">City</label>
                 <input
                   type="text"
                   value={formData?.city || ""}
                   onChange={(e) => updateField('city', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                   placeholder="City"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">State</label>
                 <input
                   type="text"
@@ -138,7 +138,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     if (val.length <= 2) updateField('state', val);
                     else updateField('state', e.target.value);
                   }}
-                  className="bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                   maxLength={20}
                   placeholder="State"
                 />
@@ -148,13 +148,13 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   ))}
                 </datalist>
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">Zip</label>
                 <input
                   type="text"
                   value={formData?.zip_code || ""}
                   onChange={(e) => updateField('zip_code', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                   placeholder="Zip code"
                 />
               </div>
@@ -170,7 +170,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </h3>
 
           {/* Date of Birth */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <label className="text-sm font-medium text-white/80 whitespace-nowrap">Date of Birth</label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
@@ -299,31 +299,31 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Gender */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <span className="font-medium text-sm text-white/80">Gender</span>
             <SimpleSelect
               value={formData?.gender || ""}
               onChange={(val) => updateField('gender', val)}
               options={genderOptions}
               placeholder="Select..."
-              className="w-36 text-sm text-right"
+              className="w-36 text-sm text-left"
             />
           </div>
 
           {/* Ethnicity */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <span className="font-medium text-sm text-white/80">Ethnicity</span>
             <SimpleSelect
               value={formData?.ethnicity || ""}
               onChange={(val) => updateField('ethnicity', val)}
               options={ethnicityOptions}
               placeholder="Select..."
-              className="w-44 text-sm text-right"
+              className="w-44 text-sm text-left"
             />
           </div>
 
           {/* Height & Weight */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <div className="flex items-center gap-1.5">
               <label className="text-sm font-medium text-white/80">Height</label>
               <div className="relative w-14">
@@ -379,7 +379,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             Preferred Location
           </h3>
           {/* Island - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <span className="font-medium text-sm text-white/80">Island</span>
             <SimpleSelect
               value={formData?.preferred_island || ""}
@@ -389,24 +389,24 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
               }}
               options={islandOptions}
               placeholder="Select..."
-              className="w-36 text-sm text-right"
+              className="w-36 text-sm text-left"
             />
           </div>
 
           {/* Neighborhood - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <span className="font-medium text-sm text-white/80">Neighborhood</span>
             <SimpleSelect
               value={formData?.preferred_neighborhood || ""}
               onChange={(val) => updateField('preferred_neighborhood', val)}
               options={neighborhoodMap[formData?.preferred_island || "Oahu"] || []}
               placeholder="Select..."
-              className="w-36 text-sm text-right"
+              className="w-36 text-sm text-left"
             />
           </div>
 
           {/* Min Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <label className="text-sm font-medium text-white/80">Min Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.minimum_budget ? "text-white/80" : "text-zinc-500"}`}>$</span>
@@ -445,7 +445,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Max Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <label className="text-sm font-medium text-white/80">Max Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.maximum_budget ? "text-white/80" : "text-zinc-500"}`}>$</span>
@@ -491,49 +491,22 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             Primary Care Physician
           </h3>
 
-          {/* PCP Name */}
-          <div className="space-y-1">
-            <input
-              type="text"
-              value={formData?.pcp_name || ""}
-              onChange={(e) => updateField('pcp_name', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-              placeholder="Name"
-            />
-          </div>
-
-          {/* PCP Email */}
-          <div className="space-y-1">
-            <div className="relative">
-              <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${pcpEmailError ? 'text-red-400' : 'text-zinc-500'}`} />
+          <div className="space-y-2">
+            {/* PCP Name */}
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Name</label>
               <input
-                type="email"
-                value={formData?.pcp_email || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  updateField('pcp_email', val);
-                  if (val && (!val.includes('@') || val.indexOf('.', val.indexOf('@')) === -1)) {
-                    setPcpEmailError("Invalid email format");
-                  } else {
-                    setPcpEmailError(null);
-                  }
-                }}
-                className={`w-full rounded-md pl-9 pr-3 py-1.5 text-sm text-left focus:outline-none transition-colors ${pcpEmailError
-                  ? "bg-red-500/10 text-white placeholder-red-300/50 focus:bg-red-500/20"
-                  : "bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                  }`}
-                placeholder="Email"
+                type="text"
+                value={formData?.pcp_name || ""}
+                onChange={(e) => updateField('pcp_name', e.target.value)}
+                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                placeholder="Physician name"
               />
             </div>
-            {pcpEmailError && (
-              <span className="text-[10px] text-red-400 font-medium px-1">Invalid format</span>
-            )}
-          </div>
 
-          {/* PCP Phone */}
-          <div className="space-y-1">
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            {/* PCP Phone */}
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
               <input
                 type="tel"
                 value={formData?.pcp_phone || ""}
@@ -541,9 +514,34 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   const formatted = formatPhoneNumber(e.target.value);
                   updateField('pcp_phone', formatted);
                 }}
-                className="w-full rounded-md pl-9 pr-3 py-1.5 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                placeholder="Phone"
+                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                placeholder="(123) 456-7890"
               />
+            </div>
+
+            {/* PCP Email */}
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
+              <div className="flex flex-col items-end">
+                <input
+                  type="email"
+                  value={formData?.pcp_email || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updateField('pcp_email', val);
+                    if (val && (!val.includes('@') || val.indexOf('.', val.indexOf('@')) === -1)) {
+                      setPcpEmailError("Invalid email format");
+                    } else {
+                      setPcpEmailError(null);
+                    }
+                  }}
+                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${pcpEmailError ? 'border-red-500/50' : ''}`}
+                  placeholder="name@example.com"
+                />
+                {pcpEmailError && (
+                  <span className="text-[10px] text-red-400 font-medium mt-1">Invalid format</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -558,26 +556,30 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             Insurance Information
           </h3>
 
-          {/* Primary Insurance */}
-          <div className="space-y-1">
-            <input
-              type="text"
-              value={formData?.primary_insurance || ""}
-              onChange={(e) => updateField('primary_insurance', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-              placeholder="Primary Insurance"
-            />
-          </div>
+          <div className="space-y-2">
+            {/* Primary Insurance */}
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Primary</label>
+              <input
+                type="text"
+                value={formData?.primary_insurance || ""}
+                onChange={(e) => updateField('primary_insurance', e.target.value)}
+                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                placeholder="Primary insurance"
+              />
+            </div>
 
-          {/* Secondary Insurance */}
-          <div className="space-y-1">
-            <input
-              type="text"
-              value={formData?.secondary_insurance || ""}
-              onChange={(e) => updateField('secondary_insurance', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-              placeholder="Secondary Insurance"
-            />
+            {/* Secondary Insurance */}
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Secondary</label>
+              <input
+                type="text"
+                value={formData?.secondary_insurance || ""}
+                onChange={(e) => updateField('secondary_insurance', e.target.value)}
+                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                placeholder="Secondary insurance"
+              />
+            </div>
           </div>
         </div>
 
@@ -592,7 +594,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.diagnoses || ""}
               onChange={(e) => updateField('diagnoses', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
               placeholder="Medical diagnoses and relevant health conditions..."
               disabled={readOnly}
             />
@@ -614,7 +616,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.diet_restrictions || ""}
               onChange={(e) => updateField('diet_restrictions', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
               placeholder="Diet Restrictions/Preferences"
             />
           </div>
@@ -624,7 +626,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.supplements || ""}
               onChange={(e) => updateField('supplements', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
               placeholder="Supplements"
             />
           </div>
@@ -635,7 +637,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
               type="text"
               value={formData?.dentition || ""}
               onChange={(e) => updateField('dentition', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15"
               placeholder="Dentition"
             />
           </div>
@@ -646,7 +648,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
               type="text"
               value={formData?.vision || ""}
               onChange={(e) => updateField('vision', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15"
               placeholder="Vision"
             />
           </div>

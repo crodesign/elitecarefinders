@@ -41,7 +41,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
           </h3>
           <div className="space-y-2">
             <Select value={formData?.timeToMove || ""} onValueChange={(value) => updateField('timeToMove', value)}>
-              <SelectTrigger className="bg-black/30 border-transparent text-white placeholder-zinc-500 hover:bg-black/50 focus:ring-0">
+              <SelectTrigger className="bg-white/10 border-transparent text-white placeholder-zinc-500 hover:bg-white/15 focus:ring-0">
                 <SelectValue placeholder="1-3 months" />
               </SelectTrigger>
               <SelectContent className="bg-[#0b1115] border-white/10 text-white">
@@ -67,7 +67,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
               "Adult Foster Homes", "Adult Residential Care Homes",
               "Expanded - Adult Residential Care Homes"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -93,7 +93,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
               "Assisted Living", "Independent Living",
               "Skilled Nursing Facility", "Intermediate Care Facility"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -118,7 +118,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
             {[
               "Memory Care"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -148,7 +148,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
               "Shared Suite", "Private Suite", "Studio",
               "1 Bedroom", "2 Bedroom", "Other"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`rt-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -175,7 +175,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
               "Private full bath", "Private Half Bath", "Full Shared",
               "Half Shared", "Separate Full Bath", "Separate Half Bath", "Jack & Jill"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`bt-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -204,7 +204,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
             {[
               "Step-In Shower", "Wheel-in Shower", "Bathtub"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`st-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -232,7 +232,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
               "Walk or Physical Activity", "Being Outdoors",
               "A Good Meal", "TV, Movies or Music"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`int-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -254,14 +254,13 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
             <StickyNote className="h-4 w-4 text-primary" />
             Additional Notes
           </h3>
-          <Textarea
+          <textarea
             id="housing-additional-notes"
             placeholder="Any additional housing preferences or requirements..."
             value={formData?.housingAdditionalNotes || ''}
             onChange={(e) => updateField('housingAdditionalNotes', e.target.value)}
             disabled={readOnly}
-            rows={8}
-            className="bg-black/30 border-transparent text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:ring-0 focus:border-white/10 transition-colors resize-none"
+            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
           />
         </div>
       </div>

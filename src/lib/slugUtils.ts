@@ -1,32 +1,30 @@
 /**
- * Generates a URL-safe slug from a name string.
- * Example: "John Doe" -> "john-doe"
+ * Generates a URL-friendly slug from a name string.
+ * e.g. "George Asato" -> "george-asato"
  */
-export function generateSlug(name: string | null | undefined): string {
-    if (!name || name.trim() === '') return 'contact';
+export function toSlug(name: string): string {
     return name
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-        .replace(/\s+/g, '-')          // Replace spaces with hyphens
-        .replace(/-+/g, '-')           // Collapse multiple hyphens
-        .replace(/^-|-$/g, '');        // Remove leading/trailing hyphens
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
 }
 
 /**
- * Builds a contact edit URL with a resident name slug.
- * Example: buildContactEditUrl("abc-123", "John Doe") -> "/admin/contacts/abc-123/john-doe/edit"
+ * Builds the canonical contact edit URL.
+ * Pattern: /admin/contacts/[id]/[slug]/edit
  */
 export function buildContactEditUrl(
-    contactId: string,
-    residentName?: string | null,
-    queryParams?: Record<string, string>
+    id: string,
+    name?: string | null,
+    params?: Record<string, string>
 ): string {
-    const slug = generateSlug(residentName);
-    const base = `/admin/contacts/${contactId}/${slug}/edit`;
-    if (queryParams && Object.keys(queryParams).length > 0) {
-        const qs = new URLSearchParams(queryParams).toString();
-        return `${base}?${qs}`;
+    const slug = name ? toSlug(name) : "contact";
+    let url = `/admin/contacts/${id}/${slug}/edit`;
+    if (params && Object.keys(params).length > 0) {
+        const qs = new URLSearchParams(params).toString();
+        url += `?${qs}`;
     }
-    return base;
+    return url;
 }

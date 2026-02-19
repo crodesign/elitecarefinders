@@ -52,7 +52,7 @@ export function FacilityRoomsTab({
                         <h3 className="text-base font-medium text-white">General Info</h3>
                     </div>
                     {/* Room Price */}
-                    <div className="min-h-[40px] flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-black/20">
+                    <div className="min-h-[40px] flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                         <label className="text-sm font-medium text-white/80">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-white/80" : "text-zinc-500"}`}>$</span>
@@ -92,7 +92,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bedroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-black/20">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                         <label className="text-sm font-medium text-white/80">Bedroom Type</label>
                         <SimpleSelect
                             value={roomDetails.bedroomType || ""}
@@ -107,7 +107,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-black/20">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                         <label className="text-sm font-medium text-white/80">Bathroom Type</label>
                         <SimpleSelect
                             value={roomDetails.bathroomType || ""}
@@ -122,7 +122,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-black/20">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                         <label className="text-sm font-medium text-white/80">Shower Type</label>
                         <SimpleSelect
                             value={roomDetails.showerType || ""}
@@ -137,7 +137,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Room Types Available */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-black/20">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                         <label className="text-sm font-medium text-white/80">Room Types</label>
                         <SimpleSelect
                             value={roomDetails.roomTypes?.[0] || ""}

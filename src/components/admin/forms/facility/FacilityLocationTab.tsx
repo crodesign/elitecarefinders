@@ -80,8 +80,8 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                ? "bg-black/20 border-transparent text-white"
-                                                : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                ? "bg-white/10 border-transparent text-white"
+                                                : "bg-white/10 border-transparent hover:bg-white/15 text-zinc-400"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
@@ -131,8 +131,8 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                ? "bg-black/20 border-transparent text-white"
-                                                : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                ? "bg-white/10 border-transparent text-white"
+                                                : "bg-white/10 border-transparent hover:bg-white/15 text-zinc-400"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>

@@ -38,7 +38,7 @@ export function HomeRoomsTab({
                         <h3 className="text-base font-medium text-white">General Info</h3>
                     </div>
                     {/* Room Price */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                         <label className="text-sm font-medium text-white/80">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-white/80" : "text-zinc-500"}`}>$</span>
@@ -90,7 +90,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bedroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                         <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                             {fixedFieldIcons['bedroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bedroomType'];
@@ -114,7 +114,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                         <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                             {fixedFieldIcons['bathroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bathroomType'];
@@ -138,7 +138,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                         <label className="text-sm font-medium text-white/80 flex items-center gap-2">
                             {fixedFieldIcons['showerType'] && (() => {
                                 const Icon = fixedFieldIcons['showerType'];
@@ -188,8 +188,8 @@ export function HomeRoomsTab({
                                         });
                                     }}
                                     className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                        ? "bg-black/20 border-transparent text-white"
-                                        : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                        ? "bg-white/10 border-transparent text-white"
+                                        : "bg-white/10 border-transparent hover:bg-white/15 text-zinc-400"
                                         }`}
                                 >
                                     <span className="text-sm font-medium">{lang}</span>

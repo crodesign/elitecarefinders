@@ -42,7 +42,7 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
               "Mobility Assistance", "Personal Hygiene Assistance", "Bathing Assistance",
               "Dressing Assistance", "Soft Foods"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`cn-${option.toLowerCase().replace(/\s+/g, '-')}`}
@@ -64,7 +64,7 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
               "Low Sugar Diet", "Diabetes", "Soft Pureed Diet", "Hypertension",
               "Heart Condition", "Stroke", "Arthritis", "Cancer", "Kidney Disease"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`mc-${option.toLowerCase().replace(/\s+/g, '-')}`}
@@ -88,7 +88,7 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
               "Hoyer Lift", "Non Ambulatory", "Wheelchair", "Cane",
               "1-Person Transfer", "Walker", "2-Person Transfer", "Independent"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`mob-${option.toLowerCase().replace(/\s+/g, '-')}`}
@@ -111,7 +111,7 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
               "Mild Cognitive Impairment (MCI)", "Alzheimer's", "Sundowning", "Combativeness",
               "Doesn't Sleep Through Night"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`mh-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -135,7 +135,7 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
               "Independent", "Reminders Only", "Setup Assistance", "Full Assistance",
               "Pill Crushing", "Injection Assistance", "24/7 Supervision", "Bubble Pack Management"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-black/20 border-transparent transition-all hover:bg-black/40">
+              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
                 <span className="text-sm font-medium text-zinc-400">{option}</span>
                 <Checkbox
                   id={`med-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
@@ -157,14 +157,13 @@ const CombinedCareSection = ({ formData, setFormData, readOnly = false }: Combin
             <StickyNote className="h-4 w-4 text-primary" />
             Additional Notes
           </h3>
-          <Textarea
+          <textarea
             id="care-additional-notes"
             placeholder="Any additional care needs or medical information..."
             value={formData?.careAdditionalNotes || ''}
             onChange={(e) => updateField('careAdditionalNotes', e.target.value)}
             disabled={readOnly}
-            rows={8}
-            className="bg-black/30 border-transparent text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:ring-0 focus:border-white/10 transition-colors resize-none"
+            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
           />
         </div>
       </div>

@@ -7,9 +7,7 @@ import { Plus, Minus, Calendar, Trash2, Edit2, Check, X, Download } from "lucide
 import { useNotes } from "@/hooks/useNotes";
 import { useNoteEdits } from "@/hooks/useNoteEdits";
 import { format } from "date-fns";
-import ContactEditsSection from "./ContactEditsSection";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 interface NotesSectionProps {
   contactId: string;
@@ -20,20 +18,9 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   const [newNote, setNewNote] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
-  const [editsLoaded, setEditsLoaded] = useState(false);
-  const [editsLoading, setEditsLoading] = useState(false);
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(contactId);
 
-  const handleEditsTabClick = () => {
-    if (!editsLoaded) {
-      setEditsLoading(true);
-      // Simulate loading delay for better UX
-      setTimeout(() => {
-        setEditsLoaded(true);
-        setEditsLoading(false);
-      }, 500);
-    }
-  };
+
 
   const handleAddNote = async () => {
     if (newNote.trim()) {
@@ -130,100 +117,81 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   }
 
   return (
-    <Tabs defaultValue="notes" className="space-y-6 pb-[400px]">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="notes">Notes</TabsTrigger>
-        <TabsTrigger value="edits" onClick={handleEditsTabClick}>Edits</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="notes" className="space-y-6">
-        {/* Add New Note */}
-        {!readOnly && (
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
-                  Add New Note
+    <div className="h-full flex flex-col min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+        {/* Column 1: Add New Note — fixed content, no scroll needed */}
+        <div className="overflow-y-auto">
+          {!readOnly && (
+            <Card className="bg-white/5 border-transparent">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-5 w-5" />
+                    Add New Note
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleDownloadNotes}
+                    disabled={notes.length === 0}
+                    className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="hidden sm:inline">Download Notes</span>
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-note" className="text-zinc-400">Note Content</Label>
+                  <textarea
+                    id="new-note"
+                    placeholder="Enter your note here..."
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[200px] resize-y"
+                  />
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownloadNotes}
-                  disabled={notes.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="hidden sm:inline">Download Notes</span>
+                <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Note
                 </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="new-note" className="text-zinc-400">Note Content</Label>
-                <Textarea
-                  id="new-note"
-                  placeholder="Enter your note here..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="min-h-[200px] bg-black/30 border-transparent text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:ring-0 focus:border-white/10 transition-colors resize-none"
-                />
-              </div>
-              <Button onClick={handleAddNote} disabled={!newNote.trim()}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Note
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Existing Notes */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Notes History</h3>
-          {notes.length === 0 ? (
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground italic text-center">No notes added yet</p>
               </CardContent>
             </Card>
-          ) : (
-            <div className="space-y-0 divide-y-2 divide-white/10">
-              {notes.map((note) => (
-                <NoteItem
-                  key={note.id}
-                  note={note}
-                  editingNoteId={editingNoteId}
-                  editContent={editContent}
-                  readOnly={readOnly}
-                  formatDate={formatDate}
-                  formatTime={formatTime}
-                  onEdit={handleEditNote}
-                  onSave={() => handleSaveEdit(note.id)}
-                  onCancel={handleCancelEdit}
-                  onDelete={handleDeleteNote}
-                  onEditContentChange={setEditContent}
-                />
-              ))}
-            </div>
           )}
         </div>
-      </TabsContent>
 
-      <TabsContent value="edits" className="space-y-6">
-        {editsLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">Loading contact edits...</p>
+        {/* Column 2: Notes History — fixed header, scrollable body only */}
+        <div className="flex flex-col min-h-0 border border-white/10 rounded-md">
+          <h3 className="flex-none text-lg font-semibold text-white py-3 px-6 border-b border-white/10 bg-white/5 rounded-t-md">Notes History</h3>
+          <div className="flex-1 min-h-0 overflow-y-auto pb-4">
+            {notes.length === 0 ? (
+              <div className="px-6 py-4">
+                <p className="text-muted-foreground italic text-center">No notes added yet</p>
+              </div>
+            ) : (
+              <div className="divide-y-2 divide-white/10 px-6">
+                {notes.map((note) => (
+                  <NoteItem
+                    key={note.id}
+                    note={note}
+                    editingNoteId={editingNoteId}
+                    editContent={editContent}
+                    readOnly={readOnly}
+                    formatDate={formatDate}
+                    formatTime={formatTime}
+                    onEdit={handleEditNote}
+                    onSave={() => handleSaveEdit(note.id)}
+                    onCancel={handleCancelEdit}
+                    onDelete={handleDeleteNote}
+                    onEditContentChange={setEditContent}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : editsLoaded ? (
-          <ContactEditsSection contactId={contactId} />
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Click to load contact edits</p>
-          </div>
-        )}
-      </TabsContent>
-    </Tabs>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -312,11 +280,11 @@ const NoteItem = ({
     <div className="py-4 first:pt-0">
       {editingNoteId === note.id ? (
         <div className="space-y-2">
-          <Textarea
+          <textarea
             ref={textareaRef}
             value={editContent}
             onChange={(e) => onEditContentChange(e.target.value)}
-            className="min-h-[200px] bg-black/30 border-transparent text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:ring-0 focus:border-white/10 transition-colors resize-none"
+            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[200px] resize-y"
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={onSave}>
@@ -330,28 +298,27 @@ const NoteItem = ({
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* First row: timestamp and buttons */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
               <Calendar className="h-4 w-4" />
               <span>{formatDate(note.created_at)} at {formatTime(note.created_at)}</span>
             </div>
             {!readOnly && (
               <div className="flex gap-1">
-                <Button
-                  size="sm"
+                <button
+                  className="btn-ghost"
                   onClick={() => onEdit(note.id, note.content)}
                 >
                   <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-red-500 hover:bg-red-600 text-white"
+                </button>
+                <button
+                  className="btn-danger"
                   onClick={() => onDelete(note.id)}
                 >
                   <Trash2 className="h-4 w-4" />
-                </Button>
+                </button>
               </div>
             )}
           </div>
@@ -360,7 +327,7 @@ const NoteItem = ({
           <div className="space-y-4">
             {/* Original note content */}
             {sortedEdits.length > 0 && (
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
                 {sortedEdits[0].content}
               </p>
             )}
@@ -377,11 +344,11 @@ const NoteItem = ({
 
                   return (
                     <div key={edit.id}>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <div className="flex items-center gap-2 text-sm text-zinc-400 mb-2">
                         {!isLastEdit && (
                           <button
                             onClick={() => toggleEdit(edit.id)}
-                            className="hover:text-foreground transition-colors"
+                            className="text-zinc-400 hover:text-white transition-colors"
                             aria-label={isExpanded ? "Collapse edit" : "Expand edit"}
                           >
                             {isExpanded ? (
@@ -396,7 +363,7 @@ const NoteItem = ({
                       </div>
                       {(isLastEdit || isExpanded) && (
                         <div className="overflow-hidden animate-accordion-down">
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
                             {contentAfterEdit}
                           </p>
                         </div>
@@ -409,7 +376,7 @@ const NoteItem = ({
 
             {/* If no edits exist, show current content */}
             {sortedEdits.length === 0 && (
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{note.content}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">{note.content}</p>
             )}
           </div>
         </div>

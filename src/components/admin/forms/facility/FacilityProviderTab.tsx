@@ -54,6 +54,7 @@ export function FacilityProviderTab({
                             roomDefinitions={roomDefinitions}
                             invalidEmailFields={invalidEmailFields}
                             setInvalidEmailFields={setInvalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                         />
                     ))}
             </div>
@@ -72,6 +73,7 @@ export function FacilityProviderTab({
                             roomDefinitions={roomDefinitions}
                             invalidEmailFields={invalidEmailFields}
                             setInvalidEmailFields={setInvalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                         />
                     ))}
             </div>
@@ -90,6 +92,7 @@ export function FacilityProviderTab({
                             roomDefinitions={roomDefinitions}
                             invalidEmailFields={invalidEmailFields}
                             setInvalidEmailFields={setInvalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                         />
                     ))}
             </div>
@@ -108,6 +111,7 @@ export function FacilityProviderTab({
                             roomDefinitions={roomDefinitions}
                             invalidEmailFields={invalidEmailFields}
                             setInvalidEmailFields={setInvalidEmailFields}
+                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
                         />
                     ))}
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { SlidePanel } from "@/components/admin/SlidePanel";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
@@ -44,6 +44,8 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
 
     // Using any for form data to match the loose typing of the sub-components
     const [formData, setFormData] = useState<any>({});
+    // Snapshot of the saved data — used to detect if user has reverted all changes
+    const originalDataRef = useRef<any>({});
 
     // Sync activeTab with URL
     useEffect(() => {
@@ -128,10 +130,13 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 // ChecklistSection uses camelCase: formData?.referralLocation
             };
             setFormData(mappedData);
+            originalDataRef.current = mappedData;
+            setIsDirty(false); // Reset dirty on fresh load
         } else {
-            setFormData({
-                status: "Active"
-            });
+            const emptyData = { status: "Active" };
+            setFormData(emptyData);
+            originalDataRef.current = emptyData;
+            setIsDirty(false);
         }
     }, [contact, isOpen]);
 
@@ -139,10 +144,9 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         setFormData((prevData: any) => {
             const updatedData = typeof newData === 'function' ? newData(prevData) : newData;
 
-            // Simple dirty check
-            if (JSON.stringify(prevData) !== JSON.stringify(updatedData)) {
-                setIsDirty(true);
-            }
+            // Compare against the original saved snapshot
+            const isUnchanged = JSON.stringify(updatedData) === JSON.stringify(originalDataRef.current);
+            setIsDirty(!isUnchanged);
             return updatedData;
         });
     };
@@ -357,6 +361,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 title={contact ? "Edit Contact" : "New Contact"}
                 subtitle={contact ? `Manage details for ${contact.first_name} ${contact.last_name}` : "Add a new lead or contact"}
                 fullScreen
+                contentClassName={activeTab === "notes" ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
                 headerChildren={
                     <div className="flex items-center justify-between px-6 border-b border-white/5">
                         <div className="flex overflow-x-auto overflow-y-hidden">
@@ -400,8 +405,8 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                     </div>
                 }
             >
-                <form id="contact-form" onSubmit={handleSave} className="h-full flex flex-col">
-                    <div className="w-full pb-20">
+                <form id="contact-form" onSubmit={handleSave} className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "h-full flex flex-col"}>
+                    <div className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "w-full pb-20"}>
                         {activeTab === "contact-info" && (
                             <ContactInfoSection
                                 formData={formData}

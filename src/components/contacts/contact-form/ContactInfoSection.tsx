@@ -349,7 +349,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
         {!hideProgressAndStatus && (
           <div className="bg-white/5 rounded-lg p-4 space-y-3">
             {/* Progress */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Progress</label>
               <div className="relative w-40" ref={progressRef}>
                 <button
@@ -397,7 +397,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
             </div>
 
             {/* Status */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Status</label>
               <div className="relative w-40" ref={statusRef}>
                 <button
@@ -478,7 +478,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
             Primary Contact
           </h3>
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
               <input
                 id="contact-name"
@@ -487,10 +487,10 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.contactName || ""}
                 onChange={(e) => updateField('contactName', e.target.value)}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
               <input
                 id="contact-phone"
@@ -499,10 +499,10 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.contactPhone || ""}
                 onChange={(e) => handlePhoneInput(e.target.value, updateField, 'contactPhone')}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
               <div className="flex flex-col items-end">
                 <input
@@ -511,7 +511,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   placeholder="name@example.com"
                   value={formData?.contactEmail || ""}
                   onChange={(e) => updateField('contactEmail', e.target.value)}
-                  className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${emailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${emailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={readOnly}
                 />
                 {emailError && (
@@ -543,7 +543,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
 
           {formData?.enableSecondaryContact && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
                 <input
                   id="secondary-contact-name"
@@ -552,10 +552,10 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   value={formData?.secondaryContactName || ""}
                   onChange={(e) => updateField('secondaryContactName', e.target.value)}
                   disabled={readOnly}
-                  className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
                 <input
                   id="secondary-contact-phone"
@@ -564,10 +564,10 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   value={formData?.secondaryContactPhone || ""}
                   onChange={(e) => handlePhoneInput(e.target.value, updateField, 'secondaryContactPhone')}
                   disabled={readOnly}
-                  className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                 <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
                 <div className="flex flex-col items-end">
                   <input
@@ -576,7 +576,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                     placeholder="name@example.com"
                     value={formData?.secondaryContactEmail || ""}
                     onChange={(e) => updateField('secondaryContactEmail', e.target.value)}
-                    className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${secondaryEmailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${secondaryEmailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={readOnly}
                   />
                   {secondaryEmailError && (
@@ -592,14 +592,14 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
       {/* Column 2: Looking For + Referral Details */}
       < div className="space-y-3" >
         <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <span className="font-medium text-sm text-white/80">Looking For</span>
             <SimpleSelect
               value={formData?.lookingFor || ""}
               onChange={(val) => updateField('lookingFor', val)}
               options={["Self", "Self + Partner", "Mother", "Father", "Parents", "Spouse", "Other"]}
               placeholder="Select..."
-              className="w-40 text-sm text-right"
+              className="w-40 text-sm text-left"
             />
           </div>
         </div>
@@ -612,7 +612,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
           </h3>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Date</label>
               <Popover open={referralCalendarOpen} onOpenChange={setReferralCalendarOpen}>
                 <PopoverTrigger asChild>
@@ -734,7 +734,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
               </Popover>
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Name</label>
               <input
                 id="referral-name"
@@ -743,11 +743,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.referralName || ""}
                 onChange={(e) => updateField('referralName', e.target.value)}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
               <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Phone</label>
               <input
                 id="referral-phone"
@@ -756,7 +756,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.referralPhone || ""}
                 onChange={(e) => handlePhoneInput(e.target.value, updateField, 'referralPhone')}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-right placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
           </div>

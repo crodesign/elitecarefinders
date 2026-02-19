@@ -24,6 +24,8 @@ interface SlidePanelProps {
     headerChildren?: React.ReactNode;
     /** Optional actions to render in the header next to the close button */
     actions?: React.ReactNode;
+    /** Optional className override for the content area (default: "flex-1 overflow-y-auto p-6") */
+    contentClassName?: string;
 }
 
 export function SlidePanel({
@@ -39,6 +41,7 @@ export function SlidePanel({
     offsetSidebar = false,
     headerChildren,
     actions,
+    contentClassName,
 }: SlidePanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const { collapsed: sidebarCollapsed } = useSidebar();
@@ -133,7 +136,7 @@ export function SlidePanel({
                     )}
 
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-6">
+                    <div className={contentClassName ?? "flex-1 overflow-y-auto p-6"}>
                         {children}
                     </div>
                 </div>

@@ -61,9 +61,11 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
         }
     }, [initialData]);
 
-    // Scroll to top when tab changes
+    // Scroll to top when tab changes (skip for notes tab which uses fixed layout)
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (activeTab !== 'notes') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }, [activeTab]);
 
     // Enhanced getAvailableTabs function with next tab logic
@@ -407,9 +409,9 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
 
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Sticky navigation - both mobile and desktop */}
-            <div className="sticky top-0 z-50 bg-background w-full pt-2.5">
+        <div className={`bg-background w-full ${activeTab === "notes" ? "h-full flex flex-col overflow-hidden" : "min-h-screen"}`}>
+            {/* Sticky navigation - both mobile and desktop. In notes mode, we use flex-none instead of sticky to prevent scroll issues */}
+            <div className={`${activeTab === "notes" ? "flex-none" : "sticky top-0 z-50"} bg-background w-full pt-2.5`}>
                 <div className="w-full">
                     {/* Mobile Layout */}
                     <div className="md:hidden">
@@ -657,8 +659,8 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                 </div>
             </div>
 
-            <div className="w-full py-2 pb-20">
-                <div className="space-y-6">
+            <div className={`w-full ${activeTab === "notes" ? "flex-1 min-h-0 overflow-hidden flex flex-col" : "py-2 pb-20"}`}>
+                <div className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "space-y-6"}>
                     {activeTab === "notes" && !isInvoiceEditMode && (
                         <NotesSection
                             formData={formData}

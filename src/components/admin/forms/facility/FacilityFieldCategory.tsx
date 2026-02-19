@@ -14,6 +14,7 @@ interface FacilityFieldCategoryProps {
     roomDefinitions: RoomFieldDefinition[];
     invalidEmailFields: Set<string>;
     setInvalidEmailFields: Dispatch<SetStateAction<Set<string>>>;
+    lighterCheckboxes?: boolean;
 }
 
 const formatPhoneNumber = (value: string) => {
@@ -32,6 +33,7 @@ export function FacilityFieldCategory({
     roomDefinitions,
     invalidEmailFields,
     setInvalidEmailFields,
+    lighterCheckboxes = false,
 }: FacilityFieldCategoryProps) {
     const categoryFields = roomDefinitions.filter(f =>
         f.categoryId === category.id &&
@@ -58,7 +60,7 @@ export function FacilityFieldCategory({
 
                         {/* Boolean Field */}
                         {field.type === 'boolean' && (
-                            <div className="bg-white/5 border border-white/5 rounded-lg p-3 flex items-center justify-between gap-3">
+                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 flex items-center justify-between gap-3">
                                 <span className="font-medium text-sm text-white/80">{field.name}</span>
                                 <button
                                     type="button"
@@ -108,7 +110,7 @@ export function FacilityFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-white/5 border border-white/5 rounded-lg p-3 space-y-3">
+                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 space-y-3">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => (
@@ -146,7 +148,7 @@ export function FacilityFieldCategory({
 
                         {/* Dropdown */}
                         {field.type === 'dropdown' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/5">
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/10">
                                 <span className="font-medium text-sm text-white/80">{field.name}</span>
                                 <SimpleSelect
                                     value={customFields[field.id] as string || ""}
@@ -166,7 +168,7 @@ export function FacilityFieldCategory({
 
                         {/* Text Field */}
                         {field.type === 'text' && (
-                            <div className="bg-white/5 rounded-lg p-3 transition-all space-y-2">
+                            <div className="bg-white/10 rounded-lg p-3 transition-all space-y-2">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <input
                                     type="text"
@@ -186,7 +188,7 @@ export function FacilityFieldCategory({
 
                         {/* Text Block (Textarea) */}
                         {field.type === 'textarea' && (
-                            <div className="bg-white/5 rounded-lg p-3 transition-all space-y-2">
+                            <div className="bg-white/10 rounded-lg p-3 transition-all space-y-2">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <textarea
                                     value={customFields[field.id] as string || ""}
@@ -205,7 +207,7 @@ export function FacilityFieldCategory({
 
                         {/* Number Field */}
                         {field.type === 'number' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/5 rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                                 <label className="text-sm font-medium text-white/80">{field.name}</label>
                                 <div className="relative w-32">
                                     <input
@@ -257,7 +259,7 @@ export function FacilityFieldCategory({
 
                         {/* Phone Field */}
                         {field.type === 'phone' && (
-                            <div className="bg-white/5 rounded-lg p-3 transition-all space-y-2">
+                            <div className="bg-white/10 rounded-lg p-3 transition-all space-y-2">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <div className="relative">
                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
@@ -281,7 +283,7 @@ export function FacilityFieldCategory({
 
                         {/* Email Field */}
                         {field.type === 'email' && (
-                            <div className={`bg-white/5 rounded-lg p-3 transition-all space-y-2 ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
+                            <div className={`bg-white/10 rounded-lg p-3 transition-all space-y-2 ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
                                 <div className="flex items-center justify-between">
                                     <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                     {invalidEmailFields.has(field.id) && (
@@ -322,7 +324,7 @@ export function FacilityFieldCategory({
 
                         {/* Currency Field */}
                         {field.type === 'currency' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/5 rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
                                 <label className="text-sm font-medium text-white/80">{field.name}</label>
                                 <div className="relative w-32">
                                     <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${customFields[field.id] ? "text-white/80" : "text-zinc-500"}`}>$</span>
@@ -376,7 +378,7 @@ export function FacilityFieldCategory({
 
                         {/* Multi Select */}
                         {field.type === 'multi' && (
-                            <div className="bg-white/5 border border-white/5 rounded-lg p-3 space-y-3">
+                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 space-y-3">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => {
@@ -397,8 +399,8 @@ export function FacilityFieldCategory({
                                                     setIsDirty(true);
                                                 }}
                                                 className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                    ? "bg-black/20 border-transparent text-white"
-                                                    : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                    ? `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} border-transparent text-white`
+                                                    : `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} border-transparent ${lighterCheckboxes ? 'hover:bg-white/15' : 'hover:bg-black/40'} text-zinc-400`
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
