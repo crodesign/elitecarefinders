@@ -383,11 +383,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                           key={opt.value}
                           type="button"
                           onClick={() => { updateField('leadClassification', opt.value); setProgressOpen(false); }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.leadClassification === opt.value ? 'bg-accent/10 text-accent' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
+                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.leadClassification === opt.value ? 'bg-white/10 text-white' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
                         >
                           <span className={`h-2 w-2 rounded-full ${opt.color} flex-shrink-0`}></span>
                           <span>{opt.label}</span>
-                          {formData?.leadClassification === opt.value && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                          {formData?.leadClassification === opt.value && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                         </button>
                       ))}
                     </div>
@@ -427,11 +427,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                           key={opt.value}
                           type="button"
                           onClick={() => { handleStatusChange(opt.value); setStatusOpen(false); }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.status === opt.value ? 'bg-accent/10 text-accent' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
+                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.status === opt.value ? 'bg-white/10 text-white' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
                         >
                           <span className={`h-2 w-2 rounded-full ${opt.color} flex-shrink-0`}></span>
                           <span>{opt.label}</span>
-                          {formData?.status === opt.value && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                          {formData?.status === opt.value && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                         </button>
                       ))}
                     </div>
@@ -783,7 +783,7 @@ In consideration of the opportunity to obtain the Services, I hereby RELEASE, WA
 
 This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by facsimile, email, or other electronic medium. Such signature shall be treated in all respects as having the same force and effect as original handwritten signatures.`}
             onChange={(e) => updateField('waiverText', e.target.value)}
-            className="h-[160px] text-xs leading-relaxed bg-black/20 border-transparent text-zinc-300 resize-none focus:ring-0 focus:bg-black/30 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
+            className="h-[160px] text-xs leading-relaxed bg-white/10 border-0 text-zinc-300 resize-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
             readOnly
           />
 
@@ -805,7 +805,7 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Legal Name</label>
             <input
               id="signature-name"
@@ -814,17 +814,17 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
               value={formData?.contactName || ""}
               onChange={(e) => updateField('signatureName', e.target.value)}
               readOnly
-              className="bg-black/30 border-0 text-zinc-500 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
+              className="bg-black/30 border-0 text-white/70 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-black/20 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
             <label className="text-sm font-medium text-white/80 whitespace-nowrap">Date</label>
             <input
               type="text"
               value={localSignatureDate ? (parseHawaiiDate(localSignatureDate) ? format(parseHawaiiDate(localSignatureDate)!, "PPP") : "Invalid date") : format(new Date(), "PPP")}
               readOnly
-              className="bg-black/30 border-0 text-zinc-500 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
+              className="bg-black/30 border-0 text-white/70 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
             />
           </div>
         </div>

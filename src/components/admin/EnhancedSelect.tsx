@@ -74,7 +74,7 @@ export function EnhancedSelect({
                             >
                                 <Ban className="h-3.5 w-3.5" />
                                 <span>None</span>
-                                {value === "" && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                                {value === "" && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                             </button>
                         )}
 
@@ -90,7 +90,7 @@ export function EnhancedSelect({
                                         onChange(opt.value);
                                         setIsOpen(false);
                                     }}
-                                    className={`w-full text-left px-3 py-2 rounded ${textSize} flex items-start gap-2.5 group transition-colors ${isSelected ? "bg-accent/10 text-accent" : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                                    className={`w-full text-left px-3 py-2 rounded ${textSize} flex items-start gap-2.5 group transition-colors ${isSelected ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5 hover:text-white"
                                         }`}
                                 >
                                     {OptionIcon && (
@@ -99,7 +99,7 @@ export function EnhancedSelect({
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium">{opt.label}</span>
-                                            {isSelected && <Check className="h-3.5 w-3.5 ml-auto text-accent flex-shrink-0" />}
+                                            {isSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                                         </div>
                                         {opt.description && (
                                             <p className="text-xs text-white/60 mt-0.5">{opt.description}</p>

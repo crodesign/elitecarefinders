@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronRight, Ban, Check, Tag, Layers } from "lucide-react";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import type { Taxonomy } from "@/types";
 import { SlidePanel } from "./SlidePanel";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -40,7 +41,22 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
     const [slug, setSlug] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { setIsDirty, registerSaveHandler } = useUnsavedChanges();
+    const [showCloseWarning, setShowCloseWarning] = useState(false);
+    const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
+
+    const handleCloseInternal = () => {
+        if (isDirty) {
+            setShowCloseWarning(true);
+        } else {
+            onClose();
+        }
+    };
+
+    const handleDiscardChanges = () => {
+        setShowCloseWarning(false);
+        setIsDirty(false);
+        onClose();
+    };
 
     // Use ref to keep track of latest handleSaveInternal without re-registering
     const saveHandlerRef = useRef<() => Promise<boolean>>(async () => false);
@@ -191,7 +207,7 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
         <>
             <SlidePanel
                 isOpen={isOpen}
-                onClose={onClose}
+                onClose={handleCloseInternal}
                 title={isEditing ? "Edit Taxonomy" : "New Taxonomy"}
                 subtitle={isEditing ? `Editing "${taxonomy?.singularName || taxonomy?.name}"` : "Create a new taxonomy category"}
                 closeOnOverlayClick={true}
@@ -346,7 +362,16 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                 </div>
             </SlidePanel>
 
-
+            <ConfirmationModal
+                isOpen={showCloseWarning}
+                onClose={() => setShowCloseWarning(false)}
+                onConfirm={handleDiscardChanges}
+                title="Unsaved Changes"
+                message="You have unsaved changes. Are you sure you want to close? Your changes will be lost."
+                confirmLabel="Discard Changes"
+                cancelLabel="Keep Editing"
+                isDangerous={true}
+            />
         </>
     );
 }

@@ -19,7 +19,7 @@ export const US_STATES = [
 ];
 
 export const FEATURED_LABELS = [
-    "Featured Home",
+    "Featured",
     "Coming Soon",
     "New Listing",
     "Great Value",

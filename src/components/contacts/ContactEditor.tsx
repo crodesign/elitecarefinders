@@ -70,7 +70,10 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
 
     // Enhanced getAvailableTabs function with next tab logic
     const getAvailableTabs = () => {
-        const baseTabs = ["notes", "contact-info", "resident-info", "housing", "care"];
+        // New contacts: Notes is last. Editing contacts: Notes is first.
+        const baseTabs = isNew
+            ? ["contact-info", "resident-info", "housing", "care", "notes"]
+            : ["notes", "contact-info", "resident-info", "housing", "care"];
         if ((formData as any)?.leadClassification === "won" || ((formData as any)?.leadClassification === "closed" && (formData as any)?.previouslyWon)) {
             baseTabs.push("checklist");
         }
@@ -468,15 +471,18 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                             {!isInvoiceEditMode && (
                                 <div className="w-full m-0 p-2.5 bg-muted">
                                     <div className="grid grid-cols-3 gap-1">
-                                        <button
-                                            onClick={() => setActiveTab("notes")}
-                                            className={`px-4 py-1.5 text-sm font-medium rounded-lg border-2 transition-colors text-center ${activeTab === "notes"
-                                                ? 'bg-primary text-primary-foreground border-primary'
-                                                : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                                }`}
-                                        >
-                                            Notes
-                                        </button>
+                                        {/* Edit mode: Notes first */}
+                                        {!isNew && (
+                                            <button
+                                                onClick={() => setActiveTab("notes")}
+                                                className={`px-4 py-1.5 text-sm font-medium rounded-lg border-2 transition-colors text-center ${activeTab === "notes"
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+                                                    }`}
+                                            >
+                                                Notes
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => setActiveTab("contact-info")}
                                             className={`px-4 py-1.5 text-sm font-medium rounded-lg border-2 transition-colors text-center ${activeTab === "contact-info"
@@ -522,6 +528,18 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                                     }`}
                                             >
                                                 Checklist
+                                            </button>
+                                        )}
+                                        {/* New contact mode: Notes last */}
+                                        {isNew && (
+                                            <button
+                                                onClick={() => setActiveTab("notes")}
+                                                className={`px-4 py-1.5 text-sm font-medium rounded-lg border-2 transition-colors text-center ${activeTab === "notes"
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/50'
+                                                    }`}
+                                            >
+                                                Notes
                                             </button>
                                         )}
                                     </div>
@@ -589,15 +607,18 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                         {!isInvoiceEditMode && (
                             <div className="w-full flex justify-center border-b border-border mb-6">
                                 <div className="flex gap-8">
-                                    <button
-                                        onClick={() => setActiveTab("notes")}
-                                        className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "notes"
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                            }`}
-                                    >
-                                        Notes
-                                    </button>
+                                    {/* Edit mode: Notes first */}
+                                    {!isNew && (
+                                        <button
+                                            onClick={() => setActiveTab("notes")}
+                                            className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "notes"
+                                                ? 'border-primary text-primary'
+                                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
+                                                }`}
+                                        >
+                                            Notes
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => setActiveTab("contact-info")}
                                         className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "contact-info"
@@ -643,6 +664,18 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                                 }`}
                                         >
                                             Checklist
+                                        </button>
+                                    )}
+                                    {/* New contact mode: Notes last */}
+                                    {isNew && (
+                                        <button
+                                            onClick={() => setActiveTab("notes")}
+                                            className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "notes"
+                                                ? 'border-primary text-primary'
+                                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
+                                                }`}
+                                        >
+                                            Notes
                                         </button>
                                     )}
                                 </div>

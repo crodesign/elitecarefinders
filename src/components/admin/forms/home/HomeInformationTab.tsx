@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { Check, Ban, X, ChevronDown, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
@@ -82,348 +83,144 @@ export function HomeInformationTab({
 }: HomeInformationTabProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Left Column (2/3) */}
-            <div className="lg:col-span-2 space-y-6">
-                {/* Home Name & Slug */}
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <label className="text-base font-medium text-white flex items-center gap-1.5">
-                            {displayReferenceNumber ? "Reference Number" : "Home Name"}
-                            <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                        </label>
-
-                        {/* Display Mode Toggle */}
-                        <div className="flex items-center bg-white/5 rounded-lg p-0.5">
-                            <button
-                                type="button"
-                                onClick={() => setDisplayReferenceNumber(true)}
-                                className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber
-                                    ? "bg-accent text-white shadow-sm"
-                                    : "text-zinc-500 hover:text-zinc-300"
-                                    }`}
-                            >
-                                No.
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setDisplayReferenceNumber(false)}
-                                className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber
-                                    ? "bg-accent text-white shadow-sm"
-                                    : "text-zinc-500 hover:text-zinc-300"
-                                    }`}
-                            >
-                                Name
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="relative">
-                        {displayReferenceNumber ? (
-                            <Hash className="absolute left-3 top-4 h-5 w-5 text-zinc-500" />
-                        ) : (
-                            <Home className="absolute left-3 top-4 h-5 w-5 text-zinc-500" />
-                        )}
-                        <input
-                            type="text"
-                            required
-                            value={title}
-                            onChange={(e) => {
-                                const newTitle = e.target.value;
-                                setTitle(newTitle);
-                                // Always update slug when title changes
-                                setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
-                                setIsDirty(true);
-                            }}
-                            className="w-full rounded-lg py-3 pl-10 pr-4 text-lg text-white focus:outline-none transition-colors bg-black/30 placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                            placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
-                            title=""
-                        />
-                    </div>
-                    {/* Slug Display */}
-                    <div className="px-1">
-                        <p className="text-[10px] text-zinc-500 font-mono flex items-center gap-1">
-                            <span className="text-zinc-600">slug:</span>
-                            {slug || "..."}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                    <label className="text-base font-medium text-white">
-                        Description
-                    </label>
-                    <RichTextEditor
-                        value={description}
-                        onChange={(val) => {
-                            setDescription(val);
-                            setIsDirty(true);
-                        }}
-                        placeholder="Describe the facility location, amenities, and care offered..."
-                        minHeight="min-h-[300px]"
-                    />
-                </div>
-
-                {/* Promotions Section */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 items-start">
-                    {/* Featured Home */}
-                    <div className="space-y-0">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const newValue = !isFeatured;
-                                setIsFeatured(newValue);
-                                setIsDirty(true);
-                                if (newValue) {
-                                    // Default to "Featured Home" when turning on
-                                    if (!featuredLabel) {
-                                        setFeaturedLabel("Featured Home");
-                                    }
-                                } else {
-                                    // Clear label when turning off
-                                    setFeaturedLabel("");
-                                }
-                            }}
-                            className={`w-full flex items-center gap-3 p-3 transition-all duration-200 ${isFeatured
-                                ? "bg-white/5 text-white rounded-t-lg"
-                                : "bg-white/5 text-zinc-400 hover:bg-white/10 rounded-lg"
-                                }`}
-                        >
-                            <div className={`p-1 rounded-full ${isFeatured ? "bg-accent/20" : "bg-red-500/10"}`}>
-                                {isFeatured ? (
-                                    <Check className="h-4 w-4 text-accent" />
-                                ) : (
-                                    <Ban className="h-4 w-4 text-red-500" />
-                                )}
-                            </div>
-                            <span className="font-medium text-sm">Featured Home</span>
-                        </button>
-
-                        {/* Featured Label Selector */}
-                        {isFeatured && (
-                            <div className="p-3 bg-white/5 rounded-b-lg -mt-[5px] animate-in fade-in slide-in-from-top-2 duration-200">
-                                <label className="text-xs font-medium text-zinc-400 mb-2 block">
-                                    Label <span className="text-zinc-500 font-normal">(card tag)</span>
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    {isCustomLabelMode ? (
-                                        <>
-                                            <div className="relative flex-1 flex items-center">
-                                                <input
-                                                    type="text"
-                                                    value={featuredLabel}
-                                                    onChange={(e) => {
-                                                        setFeaturedLabel(e.target.value);
-                                                        setIsDirty(true);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter" && featuredLabel.trim()) {
-                                                            setIsCustomLabelMode(false);
-                                                        }
-                                                        if (e.key === "Escape") {
-                                                            setFeaturedLabel("");
-                                                            setIsCustomLabelMode(false);
-                                                        }
-                                                    }}
-                                                    className="w-full px-3 py-1.5 pr-14 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
-                                                    placeholder="Custom label..."
-                                                    autoFocus
-                                                />
-                                                {/* Save button inside field */}
-                                                {featuredLabel.trim() && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setIsCustomLabelMode(false)}
-                                                        className="absolute right-1.5 px-2 py-0.5 text-xs bg-accent text-white rounded hover:bg-accent-light transition-colors"
-                                                    >
-                                                        Save
-                                                    </button>
-                                                )}
-                                            </div>
-                                            {/* X close button outside */}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setFeaturedLabel("");
-                                                    setIsCustomLabelMode(false);
-                                                }}
-                                                className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-colors"
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {/* Searchable dropdown */}
-                                            <div className="flex-1 relative">
-                                                <input
-                                                    type="text"
-                                                    value={showLabelDropdown ? labelSearch : featuredLabel || "None"}
-                                                    onChange={(e) => {
-                                                        setLabelSearch(e.target.value);
-                                                        setShowLabelDropdown(true);
-                                                    }}
-                                                    onFocus={() => {
-                                                        setLabelSearch("");
-                                                        setShowLabelDropdown(true);
-                                                    }}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setShowLabelDropdown(false), 150);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Escape") {
-                                                            setShowLabelDropdown(false);
-                                                            (e.target as HTMLInputElement).blur();
-                                                        }
-                                                    }}
-                                                    placeholder="Search or select..."
-                                                    className="w-full pl-3 pr-8 py-1.5 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
-                                                />
-                                                <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
-                                                {showLabelDropdown && (
-                                                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] rounded-lg shadow-lg max-h-40 overflow-auto z-50">
-                                                        <button
-                                                            type="button"
-                                                            onMouseDown={(e) => {
-                                                                e.preventDefault();
-                                                                setFeaturedLabel("");
-                                                                setIsDirty(true);
-                                                                setShowLabelDropdown(false);
-                                                                setLabelSearch("");
-                                                            }}
-                                                            className="w-full text-left px-3 py-1.5 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
-                                                        >
-                                                            None
-                                                        </button>
-                                                        {FEATURED_LABELS
-                                                            .filter(label => label.toLowerCase().includes(labelSearch.toLowerCase()))
-                                                            .map(label => (
-                                                                <button
-                                                                    key={label}
-                                                                    type="button"
-                                                                    onMouseDown={(e) => {
-                                                                        e.preventDefault();
-                                                                        setFeaturedLabel(label);
-                                                                        setShowLabelDropdown(false);
-                                                                        setLabelSearch("");
-                                                                    }}
-                                                                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-white/10 ${featuredLabel === label ? "text-accent" : "text-white"}`}
-                                                                >
-                                                                    {label}
-                                                                </button>
-                                                            ))}
-                                                        {/* Show custom value if set and not in list */}
-                                                        {!FEATURED_LABELS.includes(featuredLabel) && featuredLabel && (
-                                                            <button
-                                                                type="button"
-                                                                onMouseDown={(e) => {
-                                                                    e.preventDefault();
-                                                                    setShowLabelDropdown(false);
-                                                                    setLabelSearch("");
-                                                                }}
-                                                                className="w-full text-left px-3 py-1.5 text-xs text-accent hover:bg-white/10"
-                                                            >
-                                                                {featuredLabel} (custom)
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {/* Plus button to switch to custom mode */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsCustomLabelMode(true)}
-                                                className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                                            >
-                                                <Plus className="h-4 w-4" />
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Featured Video */}
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setHasFeaturedVideo(!hasFeaturedVideo);
-                            setIsDirty(true);
-                        }}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${hasFeaturedVideo
-                            ? "bg-white/5 text-white"
-                            : "bg-white/5 text-zinc-400 hover:bg-white/10"
-                            }`}
-                    >
-                        <div className={`p-1 rounded-full ${hasFeaturedVideo ? "bg-accent/20" : "bg-red-500/10"}`}>
-                            {hasFeaturedVideo ? (
-                                <Check className="h-4 w-4 text-accent" />
-                            ) : (
-                                <Ban className="h-4 w-4 text-red-500" />
-                            )}
-                        </div>
-                        <span className="font-medium text-sm">Featured Video</span>
-                    </button>
-
-                    {/* Home of the Month */}
-                    <div className="space-y-0">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsHomeOfMonth(!isHomeOfMonth);
-                                setIsDirty(true);
-                            }}
-                            className={`w-full flex items-center gap-3 p-3 transition-all duration-200 ${isHomeOfMonth
-                                ? "bg-white/5 text-white rounded-t-lg"
-                                : "bg-white/5 text-zinc-400 hover:bg-white/10 rounded-lg"
-                                }`}
-                        >
-                            <div className={`p-1 rounded-full ${isHomeOfMonth ? "bg-accent/20" : "bg-red-500/10"}`}>
-                                {isHomeOfMonth ? (
-                                    <Check className="h-4 w-4 text-accent" />
-                                ) : (
-                                    <Ban className="h-4 w-4 text-red-500" />
-                                )}
-                            </div>
-                            <span className="font-medium text-sm">Home of Month</span>
-                        </button>
-
-                        {/* Home of Month Description */}
-                        {isHomeOfMonth && (
-                            <div className="p-3 bg-white/5 rounded-b-lg -mt-[5px] animate-in fade-in slide-in-from-top-2 duration-200">
-                                <label className="text-xs font-medium text-zinc-400 mb-2 block">
-                                    Description <span className="text-zinc-500 font-normal">(optional)</span>
-                                </label>
-                                <textarea
-                                    ref={(el) => {
-                                        if (el) {
-                                            el.style.height = 'auto';
-                                            el.style.height = el.scrollHeight + 'px';
-                                        }
-                                    }}
-                                    value={homeOfMonthDescription}
+            {/* Col B — Name + Description (order-2, wide) */}
+            <div className="order-2 lg:col-span-2 space-y-6">
+                <div className="bg-white/5 rounded-lg p-4 space-y-4">
+                    {/* Home Name & Slug */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap flex items-center gap-1.5">
+                                {displayReferenceNumber ? "Reference No." : "Home Name"}
+                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                            </label>
+                            <div className="flex items-center gap-2 flex-1">
+                                <input
+                                    type="text"
+                                    required
+                                    value={title}
                                     onChange={(e) => {
-                                        setHomeOfMonthDescription(e.target.value);
+                                        const newTitle = e.target.value;
+                                        setTitle(newTitle);
+                                        setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                         setIsDirty(true);
                                     }}
-                                    onInput={(e) => {
-                                        const target = e.target as HTMLTextAreaElement;
-                                        target.style.height = 'auto';
-                                        target.style.height = target.scrollHeight + 'px';
-                                    }}
-                                    placeholder="Why this home is featured..."
-                                    rows={2}
-                                    className="w-full bg-black/30 rounded-lg py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none resize-none overflow-hidden hover:bg-black/50 focus:bg-black/50 transition-colors"
+                                    className="bg-black/30 text-white text-sm placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors rounded-md px-3 h-8 flex-1"
+                                    placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
                                 />
+                                {/* No./Name toggle */}
+                                <div className="flex items-center bg-white/5 rounded-lg p-0.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setDisplayReferenceNumber(true)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber
+                                            ? "bg-accent text-white shadow-sm"
+                                            : "text-zinc-500 hover:text-zinc-300"
+                                            }`}
+                                    >
+                                        No.
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setDisplayReferenceNumber(false)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber
+                                            ? "bg-accent text-white shadow-sm"
+                                            : "text-zinc-500 hover:text-zinc-300"
+                                            }`}
+                                    >
+                                        Name
+                                    </button>
+                                </div>
                             </div>
-                        )}
+                        </div>
+                        {/* Slug Display */}
+                        <div className="px-1">
+                            <p className="text-[10px] text-zinc-500 font-mono flex items-center gap-1">
+                                <span className="text-zinc-600">slug:</span>
+                                {slug || "..."}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                        <label className="text-base font-medium text-white">
+                            Description
+                        </label>
+                        <RichTextEditor
+                            value={description}
+                            onChange={(val) => {
+                                setDescription(val);
+                                setIsDirty(true);
+                            }}
+                            placeholder="Describe the facility location, amenities, and care offered..."
+                            minHeight="min-h-[300px]"
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Middle Column (1/4) */}
-            <div className="space-y-6">
+            {/* Col A — Classification + Location + Contact (order-1) */}
+            <div className="order-1 space-y-6">
+                {/* Classification Section */}
+                {availableTaxonomies.length > 0 && (
+                    <div className="bg-white/5 rounded-lg p-4 space-y-4">
+                        <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-3">
+                            <Tags className="h-4 w-4 text-accent" />
+                            Classification
+                        </h3>
+                        <div className="space-y-2">
+                            {availableTaxonomies.map(taxonomy => {
+                                const findEntryInTree = (entries: any[], id: string): boolean => {
+                                    return entries.some(e => {
+                                        if (e.id === id) return true;
+                                        if (e.children) return findEntryInTree(e.children, id);
+                                        return false;
+                                    });
+                                };
+                                const selectedId = taxonomyEntryIds.find(id =>
+                                    findEntryInTree(taxonomy.entries, id)
+                                ) || "";
+                                return (
+                                    <div key={taxonomy.id} className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg">
+                                        <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
+                                            {taxonomy.singularName}
+                                            {(taxonomy.singularName === "Home Type" || taxonomy.singularName === "Location") && (
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                                            )}
+                                        </label>
+                                        <div className="flex items-center gap-1">
+                                            <TaxonomySelector
+                                                taxonomy={taxonomy}
+                                                value={selectedId}
+                                                className="w-44 text-sm"
+                                                onChange={(newId: string) => {
+                                                    const otherIds = taxonomyEntryIds.filter(id =>
+                                                        !findEntryInTree(taxonomy.entries, id)
+                                                    );
+                                                    if (newId) {
+                                                        setTaxonomyEntryIds([...otherIds, newId]);
+                                                    } else {
+                                                        setTaxonomyEntryIds(otherIds);
+                                                    }
+                                                    setIsDirty(true);
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setManagingTaxonomy(taxonomy)}
+                                                className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                                                title={`Manage ${taxonomy.singularName}`}
+                                            >
+                                                <Layers className="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* Location Section */}
                 <div className="bg-white/5 rounded-lg p-4 space-y-4">
                     <div className="flex items-center justify-between pb-3">
@@ -462,9 +259,9 @@ export function HomeInformationTab({
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-white/80 block">Address</label>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Street</label>
                             <input
                                 type="text"
                                 value={street}
@@ -472,11 +269,12 @@ export function HomeInformationTab({
                                     setStreet(e.target.value);
                                     setIsDirty(true);
                                 }}
-                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                                placeholder="Street"
+                                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                                placeholder="Street address"
                             />
                         </div>
-                        <div className="space-y-1">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">City</label>
                             <input
                                 type="text"
                                 value={city}
@@ -484,33 +282,32 @@ export function HomeInformationTab({
                                     setCity(e.target.value);
                                     setIsDirty(true);
                                 }}
-                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
                                 placeholder="City"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all flex-1">
+                                <label className="text-sm font-medium text-white/80 whitespace-nowrap">State</label>
                                 <input
                                     type="text"
                                     list="states-list"
                                     value={state}
                                     onChange={(e) => {
-                                        const val = e.target.value.toUpperCase();
-                                        if (val.length <= 2) setState(val);
-                                        else setState(e.target.value);
+                                        setState(e.target.value);
                                         setIsDirty(true);
                                     }}
-                                    className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                                    maxLength={20}
+                                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-32 h-8 rounded-md px-2"
                                     placeholder="State"
                                 />
                                 <datalist id="states-list">
                                     {US_STATES.map((s) => (
-                                        <option key={s.code} value={s.code}>{s.name}</option>
+                                        <option key={s.code} value={s.name} />
                                     ))}
                                 </datalist>
                             </div>
-                            <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Zip</label>
                                 <input
                                     type="text"
                                     value={zip}
@@ -518,7 +315,7 @@ export function HomeInformationTab({
                                         setZip(e.target.value);
                                         setIsDirty(true);
                                     }}
-                                    className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-20 h-8 rounded-md px-2"
                                     placeholder="Zip"
                                 />
                             </div>
@@ -532,46 +329,48 @@ export function HomeInformationTab({
                         <Phone className="h-4 w-4 text-accent" />
                         Contact
                     </h3>
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-white/80 block">Phone</label>
-                        <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, "");
-                                let formatted = val;
-                                if (val.length > 0) {
-                                    if (val.length <= 3) formatted = val;
-                                    else if (val.length <= 6) formatted = `(${val.slice(0, 3)}) ${val.slice(3)}`;
-                                    else formatted = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
-                                }
-                                setPhone(formatted);
-                                setIsDirty(true);
-                            }}
-                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                            placeholder="(555) 123-4567"
-                            maxLength={14}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-white/80 block">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => {
-                                setEmail(e.target.value);
-                                setIsDirty(true);
-                            }}
-                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
-                            placeholder="contact@example.com"
-                        />
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
+                            <input
+                                type="tel"
+                                value={phone}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/\D/g, "");
+                                    let formatted = val;
+                                    if (val.length > 0) {
+                                        if (val.length <= 3) formatted = val;
+                                        else if (val.length <= 6) formatted = `(${val.slice(0, 3)}) ${val.slice(3)}`;
+                                        else formatted = `(${val.slice(0, 3)}) ${val.slice(3, 6)}-${val.slice(6, 10)}`;
+                                    }
+                                    setPhone(formatted);
+                                    setIsDirty(true);
+                                }}
+                                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-40 h-8 rounded-md px-3"
+                                placeholder="(555) 123-4567"
+                                maxLength={14}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setIsDirty(true);
+                                }}
+                                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-40 h-8 rounded-md px-3"
+                                placeholder="contact@example.com"
+                            />
+                        </div>
                     </div>
                 </div>
 
             </div>
 
-            {/* Right Column (1/4) */}
-            <div className="space-y-6">
+            {/* Col C — Status + Classification + Promotions (order-3) */}
+            <div className="order-3 space-y-6">
                 {/* Status Section */}
                 <div className="bg-white/5 rounded-lg p-4 space-y-4">
                     <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-3">
@@ -608,61 +407,139 @@ export function HomeInformationTab({
                     </div>
                 </div>
 
-                {/* Taxonomies Section */}
-                {availableTaxonomies.length > 0 && (
-                    <div className="bg-white/5 rounded-lg p-4 space-y-4">
-                        <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-3">
-                            <Tags className="h-4 w-4 text-accent" />
-                            Classification
-                        </h3>
-                        <div className="space-y-3">
-                            {availableTaxonomies.map(taxonomy => {
-                                // Recursively search for entry in tree
-                                const findEntryInTree = (entries: any[], id: string): boolean => {
-                                    return entries.some(e => {
-                                        if (e.id === id) return true;
-                                        if (e.children) return findEntryInTree(e.children, id);
-                                        return false;
-                                    });
-                                };
-
-                                const selectedId = taxonomyEntryIds.find(id =>
-                                    findEntryInTree(taxonomy.entries, id)
-                                ) || "";
-
-                                return (
-                                    <div key={taxonomy.id} className="space-y-2">
-                                        <TaxonomySelector
-                                            taxonomy={taxonomy}
-                                            value={selectedId}
-                                            onChange={(newId: string) => {
-                                                // Remove any existing entry from this taxonomy
-                                                const otherIds = taxonomyEntryIds.filter(id =>
-                                                    !findEntryInTree(taxonomy.entries, id)
-                                                );
-                                                // Add new ID if selected (not empty)
-                                                if (newId) {
-                                                    setTaxonomyEntryIds([...otherIds, newId]);
-                                                } else {
-                                                    setTaxonomyEntryIds(otherIds);
-                                                }
-                                                setIsDirty(true);
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setManagingTaxonomy(taxonomy)}
-                                            className="w-fit py-1.5 text-xs text-left px-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
-                                        >
-                                            Manage {taxonomy.name}
-                                            <Layers className="h-3 w-3" />
-                                        </button>
-                                    </div>
-                                );
-                            })}
+                {/* Promotions */}
+                <div className="space-y-3">
+                    {/* Featured Home */}
+                    <div className="bg-white/10 rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Featured Home</label>
+                            <Switch
+                                checked={isFeatured}
+                                onCheckedChange={(checked) => {
+                                    setIsFeatured(checked);
+                                    setIsDirty(true);
+                                    if (checked && !featuredLabel) setFeaturedLabel("Featured");
+                                    if (!checked) setFeaturedLabel("");
+                                }}
+                                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-white/10"
+                            />
                         </div>
+                        {isFeatured && (
+                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 border-white/5 animate-in fade-in slide-in-from-top-1 duration-150">
+                                <label className="text-xs font-medium text-white/60 whitespace-nowrap">Featured Label</label>
+                                <div className="flex items-center gap-1.5">
+                                    {isCustomLabelMode ? (
+                                        <>
+                                            <input
+                                                type="text"
+                                                value={featuredLabel}
+                                                onChange={(e) => { setFeaturedLabel(e.target.value); setIsDirty(true); }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter" && featuredLabel.trim()) setIsCustomLabelMode(false);
+                                                    if (e.key === "Escape") { setFeaturedLabel(""); setIsCustomLabelMode(false); }
+                                                }}
+                                                className="w-36 px-3 h-8 text-sm bg-black/30 rounded-md text-white placeholder-zinc-500 focus:outline-none"
+                                                placeholder="Custom label..."
+                                                autoFocus
+                                            />
+                                            {featuredLabel.trim() && (
+                                                <button type="button" onClick={() => setIsCustomLabelMode(false)}
+                                                    className="px-2 py-0.5 text-xs bg-accent text-white rounded hover:bg-accent-light transition-colors">Save</button>
+                                            )}
+                                            <button type="button" onClick={() => { setFeaturedLabel(""); setIsCustomLabelMode(false); }}
+                                                className="p-1 text-zinc-400 hover:text-white transition-colors">
+                                                <X className="h-3.5 w-3.5" />
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={showLabelDropdown ? labelSearch : featuredLabel || "None"}
+                                                    onChange={(e) => { setLabelSearch(e.target.value); setShowLabelDropdown(true); }}
+                                                    onFocus={() => { setLabelSearch(""); setShowLabelDropdown(true); }}
+                                                    onBlur={() => setTimeout(() => setShowLabelDropdown(false), 150)}
+                                                    onKeyDown={(e) => { if (e.key === "Escape") { setShowLabelDropdown(false); (e.target as HTMLInputElement).blur(); } }}
+                                                    placeholder="Select..."
+                                                    className="w-36 pl-3 pr-8 h-8 text-sm bg-black/30 rounded-md text-white placeholder-zinc-500 focus:outline-none"
+                                                />
+                                                <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-500 pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
+                                                {showLabelDropdown && (
+                                                    <div className="absolute top-full right-0 mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 overflow-hidden z-50 min-w-[150px] flex flex-col">
+                                                        <div className="overflow-y-auto flex-1 p-1">
+                                                            <button type="button" onMouseDown={(e) => { e.preventDefault(); setFeaturedLabel(""); setIsDirty(true); setShowLabelDropdown(false); setLabelSearch(""); }}
+                                                                className="w-full text-left px-2 py-1.5 rounded text-sm text-zinc-400 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                                                                <Ban className="h-3.5 w-3.5" />
+                                                                <span>None</span>
+                                                                {!featuredLabel && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
+                                                            </button>
+                                                            {FEATURED_LABELS.filter(label => label.toLowerCase().includes(labelSearch.toLowerCase())).map(label => (
+                                                                <button key={label} type="button"
+                                                                    onMouseDown={(e) => { e.preventDefault(); setFeaturedLabel(label); setShowLabelDropdown(false); setLabelSearch(""); }}
+                                                                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${featuredLabel === label ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5 hover:text-white"}`}>
+                                                                    <span>{label}</span>
+                                                                    {featuredLabel === label && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
+                                                                </button>
+                                                            ))}
+                                                            {!FEATURED_LABELS.includes(featuredLabel) && featuredLabel && (
+                                                                <button type="button" onMouseDown={(e) => { e.preventDefault(); setShowLabelDropdown(false); setLabelSearch(""); }}
+                                                                    className="w-full text-left px-2 py-1.5 rounded text-sm flex items-center bg-white/10 text-white">
+                                                                    <span>{featuredLabel} (custom)</span>
+                                                                    <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <button type="button" onClick={() => setIsCustomLabelMode(true)}
+                                                className="p-1 text-zinc-400 hover:text-white hover:bg-white/10 rounded transition-colors">
+                                                <Plus className="h-3.5 w-3.5" />
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
+
+                    {/* Featured Video */}
+                    <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5 bg-white/10 rounded-lg transition-all">
+                        <label className="text-sm font-medium text-white/80 whitespace-nowrap">Featured Video</label>
+                        <Switch
+                            checked={hasFeaturedVideo}
+                            onCheckedChange={(checked) => { setHasFeaturedVideo(checked); setIsDirty(true); }}
+                            className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-white/10"
+                        />
+                    </div>
+
+                    {/* Home of the Month */}
+                    <div className="bg-white/10 rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5">
+                            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Home of Month</label>
+                            <Switch
+                                checked={isHomeOfMonth}
+                                onCheckedChange={(checked) => { setIsHomeOfMonth(checked); setIsDirty(true); }}
+                                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-white/10"
+                            />
+                        </div>
+                        {isHomeOfMonth && (
+                            <div className="flex items-start justify-between gap-2 py-2 pr-2 pl-3.5 border-white/5 animate-in fade-in slide-in-from-top-1 duration-150">
+                                <label className="text-xs font-medium text-white/60 whitespace-nowrap pt-1">Description</label>
+                                <textarea
+                                    ref={(el) => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
+                                    value={homeOfMonthDescription}
+                                    onChange={(e) => { setHomeOfMonthDescription(e.target.value); setIsDirty(true); }}
+                                    onInput={(e) => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }}
+                                    placeholder="Why this home is featured..."
+                                    rows={3}
+                                    className="w-48 bg-black/30 rounded-md py-1 px-2 text-xs text-white placeholder-zinc-500 focus:outline-none resize-none overflow-hidden hover:bg-black/50 focus:bg-black/50 transition-colors"
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div >
     );

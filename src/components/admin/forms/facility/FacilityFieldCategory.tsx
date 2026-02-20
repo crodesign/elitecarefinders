@@ -60,7 +60,7 @@ export function FacilityFieldCategory({
 
                         {/* Boolean Field */}
                         {field.type === 'boolean' && (
-                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 flex items-center justify-between gap-3">
+                            <div className="bg-white/10 rounded-lg p-3 flex items-center justify-between gap-3">
                                 <span className="font-medium text-sm text-white/80">{field.name}</span>
                                 <button
                                     type="button"
@@ -110,7 +110,7 @@ export function FacilityFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 space-y-3">
+                            <div className="bg-white/10 rounded-lg p-3 space-y-3">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => (
@@ -128,17 +128,19 @@ export function FacilityFieldCategory({
                                                 setIsDirty(true);
                                                 return { ...prev, customFields: newCustomFields };
                                             })}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${customFields[field.id] === opt
-                                                ? "bg-black/20 border-transparent text-white"
-                                                : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${customFields[field.id] === opt
+                                                ? "bg-black/20 text-white"
+                                                : "bg-black/20 hover:bg-black/40 text-zinc-400"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt}</span>
-                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${customFields[field.id] === opt
-                                                ? "border-accent bg-accent text-white"
-                                                : "border-zinc-600 bg-transparent"
+                                            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${customFields[field.id] === opt
+                                                ? "border border-accent bg-accent text-white"
+                                                : "bg-black/80"
                                                 }`}>
-                                                {customFields[field.id] === opt && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                                {customFields[field.id] === opt
+                                                    ? <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                                                    : <X className="h-2.5 w-2.5 text-zinc-500" />}
                                             </div>
                                         </button>
                                     ))}
@@ -378,7 +380,7 @@ export function FacilityFieldCategory({
 
                         {/* Multi Select */}
                         {field.type === 'multi' && (
-                            <div className="bg-white/10 border border-white/10 rounded-lg p-3 space-y-3">
+                            <div className="bg-white/10 rounded-lg p-3 space-y-3">
                                 <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => {
@@ -398,17 +400,17 @@ export function FacilityFieldCategory({
                                                     }));
                                                     setIsDirty(true);
                                                 }}
-                                                className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                    ? `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} border-transparent text-white`
-                                                    : `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} border-transparent ${lighterCheckboxes ? 'hover:bg-white/15' : 'hover:bg-black/40'} text-zinc-400`
+                                                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                                    ? `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} text-white`
+                                                    : `${lighterCheckboxes ? 'bg-white/10' : 'bg-black/20'} ${lighterCheckboxes ? 'hover:bg-white/15' : 'hover:bg-black/40'} text-zinc-400`
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
-                                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected
-                                                    ? "border-accent bg-accent text-white"
-                                                    : "border-zinc-600 bg-transparent"
+                                                <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
+                                                    ? "border border-accent bg-accent text-white"
+                                                    : "bg-black/80"
                                                     }`}>
-                                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                                    {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-zinc-500" />}
                                                 </div>
                                             </button>
                                         );

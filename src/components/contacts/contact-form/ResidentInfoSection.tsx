@@ -127,37 +127,37 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   placeholder="City"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">State</label>
-                <input
-                  type="text"
-                  list="states-list-resident"
-                  value={formData?.state || ""}
-                  onChange={(e) => {
-                    const val = e.target.value.toUpperCase();
-                    if (val.length <= 2) updateField('state', val);
-                    else updateField('state', e.target.value);
-                  }}
-                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
-                  maxLength={20}
-                  placeholder="State"
-                />
-                <datalist id="states-list-resident">
-                  {stateOptions.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </datalist>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all flex-1">
+                  <label className="text-sm font-medium text-white/80 whitespace-nowrap">State</label>
+                  <input
+                    type="text"
+                    list="states-list-resident"
+                    value={formData?.state || ""}
+                    onChange={(e) => {
+                      updateField('state', e.target.value);
+                    }}
+                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-32 h-8 rounded-md px-3"
+                    placeholder="State"
+                  />
+                  <datalist id="states-list-resident">
+                    {stateOptions.map((s) => (
+                      <option key={s} value={s} />
+                    ))}
+                  </datalist>
+                </div>
+                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+                  <label className="text-sm font-medium text-white/80 whitespace-nowrap">Zip</label>
+                  <input
+                    type="text"
+                    value={formData?.zip_code || ""}
+                    onChange={(e) => updateField('zip_code', e.target.value)}
+                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-20 h-8 rounded-md px-3"
+                    placeholder="Zip"
+                  />
+                </div>
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Zip</label>
-                <input
-                  type="text"
-                  value={formData?.zip_code || ""}
-                  onChange={(e) => updateField('zip_code', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
-                  placeholder="Zip code"
-                />
-              </div>
+
             </div>
           </div>
         </div>

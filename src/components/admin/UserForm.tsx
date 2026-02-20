@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { SlidePanel } from "./SlidePanel";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ImageCropModal } from "./ImageCropModal";
 import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search, Loader2 } from 'lucide-react';
 import { createClientComponentClient } from "@/lib/supabase";
@@ -99,6 +100,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const [selectedImageUrl, setSelectedImageUrl] = useState<string>('');
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isDirty, setIsDirty] = useState(false);
+    const [showCloseWarning, setShowCloseWarning] = useState(false);
 
     // Form state
     const [email, setEmail] = useState('');
@@ -243,11 +246,46 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
     const isEditing = !!user;
 
+    // Reset dirty when form opens/closes
+    useEffect(() => {
+        if (!isOpen) setIsDirty(false);
+    }, [isOpen]);
+
+    // Mark dirty whenever any field changes after initial population
+    const populatedRef = useRef(false);
+    useEffect(() => {
+        if (isFormPopulated) {
+            if (populatedRef.current) {
+                setIsDirty(true);
+            } else {
+                populatedRef.current = true;
+            }
+        } else {
+            populatedRef.current = false;
+        }
+    }, [email, password, editPassword, fullName, nickname, phone, role, street, city, state, zip, managerId, locationIds, photoUrl, isFormPopulated]);
+
+    // Close guard
+    const handleCloseInternal = () => {
+        if (isDirty) {
+            setShowCloseWarning(true);
+        } else {
+            onClose();
+        }
+    };
+
+    const handleDiscardChanges = () => {
+        setShowCloseWarning(false);
+        setIsDirty(false);
+        onClose();
+    };
+
     // Reset or populate form
     useEffect(() => {
         if (isOpen) {
             setError(null);
             setIsFormPopulated(false);
+            setIsDirty(false);
 
             if (user) {
                 setEmail(user.email);
@@ -418,484 +456,497 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const selectedRole = availableRoles.find(r => r.value === role);
 
     return (
-        <SlidePanel
-            isOpen={isOpen}
-            onClose={onClose}
-            title={isEditing ? 'Edit User' : 'Add New User'}
-            width={900}
-            actions={
-                <button
-                    type="submit"
-                    form="user-form"
-                    disabled={isSubmitting || isLoading || !isFormPopulated}
-                    className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 transition-colors shadow-lg shadow-black/20"
-                >
-                    {isSubmitting ? 'Saving...' : (isEditing ? 'Update User' : 'Create User')}
-                </button>
-            }
-        >
-            {isLoading || !isFormPopulated ? (
-                <div className="flex h-full items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-accent" />
-                </div>
-            ) : (
-                <form id="user-form" onSubmit={handleSubmit} className="flex flex-col h-full">
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                            {error}
-                        </div>
-                    )}
+        <>
+            <SlidePanel
+                isOpen={isOpen}
+                onClose={handleCloseInternal}
+                title={isEditing ? 'Edit User' : 'Add New User'}
+                width={900}
+                actions={
+                    <button
+                        type="submit"
+                        form="user-form"
+                        disabled={isSubmitting || isLoading || !isFormPopulated}
+                        className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 transition-colors shadow-lg shadow-black/20"
+                    >
+                        {isSubmitting ? 'Saving...' : (isEditing ? 'Update User' : 'Create User')}
+                    </button>
+                }
+            >
+                {isLoading || !isFormPopulated ? (
+                    <div className="flex h-full items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                    </div>
+                ) : (
+                    <form id="user-form" onSubmit={handleSubmit} className="flex flex-col h-full">
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+                                {error}
+                            </div>
+                        )}
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-6">
-                            <div className="bg-white/5 rounded-lg p-4">
-                                <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
-                                    <User className="h-4 w-4 text-accent" />
-                                    Account Information
-                                </h3>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-6">
+                                <div className="bg-white/5 rounded-lg p-4">
+                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                        <User className="h-4 w-4 text-accent" />
+                                        Account Information
+                                    </h3>
 
-                                <div className="flex gap-4 mb-3">
-                                    <div className="flex-1 space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1">
-                                                Full Name
-                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={fullName}
-                                                onChange={(e) => setFullName(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                placeholder="John Doe"
-                                                autoComplete="off"
-                                                required
-                                            />
-                                        </div>
+                                    <div className="flex gap-4 mb-3">
+                                        <div className="flex-1 space-y-3">
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                                    Full Name
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={fullName}
+                                                    onChange={(e) => setFullName(e.target.value)}
+                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="John Doe"
+                                                    autoComplete="off"
+                                                    required
+                                                />
+                                            </div>
 
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">Nickname</label>
-                                            <input
-                                                type="text"
-                                                value={nickname}
-                                                onChange={(e) => setNickname(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                placeholder="Optional nickname"
-                                                autoComplete="off"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex-shrink-0">
-                                        <label className="text-sm font-medium text-white/80 block mb-1">Photo</label>
-                                        <div className="relative w-24 h-24">
-                                            <input
-                                                ref={fileInputRef}
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handlePhotoChange}
-                                                className="hidden"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={handlePhotoClick}
-                                                className="w-full h-full rounded-full overflow-hidden bg-black/30 hover:bg-black/40 transition-colors group"
-                                            >
-                                                {photoUrl ? (
-                                                    <img
-                                                        src={photoUrl}
-                                                        alt="Profile"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-white/40">
-                                                        <User className="h-10 w-10" />
-                                                    </div>
-                                                )}
-                                            </button>
-                                            <div className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5 border-2 border-[rgb(13,17,21)] shadow-lg hover:bg-accent-light transition-colors cursor-pointer z-10" onClick={handlePhotoClick}>
-                                                <Upload className="h-3 w-3 text-white" />
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80">Nickname</label>
+                                                <input
+                                                    type="text"
+                                                    value={nickname}
+                                                    onChange={(e) => setNickname(e.target.value)}
+                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="Optional nickname"
+                                                    autoComplete="off"
+                                                />
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80 flex items-center gap-1">
-                                            Email
-                                            <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                        </label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                disabled={isEditing}
-                                                className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                placeholder="user@example.com"
-                                                autoComplete="off"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {!isEditing && (
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1">
-                                                Password
-                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                            </label>
-                                            <div className="relative">
+                                        <div className="flex-shrink-0">
+                                            <label className="text-sm font-medium text-white/80 block mb-1">Photo</label>
+                                            <div className="relative w-24 h-24">
                                                 <input
-                                                    type={showPassword ? "text" : "password"}
-                                                    value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
-                                                    className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                    placeholder="Min. 8 characters"
-                                                    autoComplete="new-password"
-                                                    required
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handlePhotoChange}
+                                                    className="hidden"
                                                 />
                                                 <button
                                                     type="button"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                                    onClick={handlePhotoClick}
+                                                    className="w-full h-full rounded-full overflow-hidden bg-black/30 hover:bg-black/40 transition-colors group"
                                                 >
-                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                    {photoUrl ? (
+                                                        <img
+                                                            src={photoUrl}
+                                                            alt="Profile"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-white/40">
+                                                            <User className="h-10 w-10" />
+                                                        </div>
+                                                    )}
                                                 </button>
+                                                <div className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5 border-2 border-[rgb(13,17,21)] shadow-lg hover:bg-accent-light transition-colors cursor-pointer z-10" onClick={handlePhotoClick}>
+                                                    <Upload className="h-3 w-3 text-white" />
+                                                </div>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
 
-                                    {isEditing && (isSuperAdmin || isSystemAdmin || (currentUser?.id === user?.id)) && (
+                                    <div className="space-y-3">
                                         <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">
-                                                Password (optional - leave blank to keep current)
+                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                                Email
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                                             </label>
-                                            <div className="flex items-center gap-2">
-                                                <div className="relative flex-1">
+                                            <div className="relative">
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    disabled={isEditing}
+                                                    className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="user@example.com"
+                                                    autoComplete="off"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {!isEditing && (
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                                    Password
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                </label>
+                                                <div className="relative">
                                                     <input
-                                                        type={showEditPassword ? "text" : "password"}
-                                                        value={editPassword}
-                                                        onChange={(e) => setEditPassword(e.target.value)}
+                                                        type={showPassword ? "text" : "password"}
+                                                        value={password}
+                                                        onChange={(e) => setPassword(e.target.value)}
                                                         className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                        placeholder="Enter new password to change"
+                                                        placeholder="Min. 8 characters"
                                                         autoComplete="new-password"
+                                                        required
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={() => setShowEditPassword(!showEditPassword)}
+                                                        onClick={() => setShowPassword(!showPassword)}
                                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
                                                     >
-                                                        {showEditPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                     </button>
                                                 </div>
-                                                <Tooltip content="Send password reset email">
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleResetPassword}
-                                                        disabled={isResettingPassword}
-                                                        className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 h-[38px]"
-                                                    >
-                                                        <RotateCw className={`h-3.5 w-3.5 ${isResettingPassword ? 'animate-spin' : ''}`} />
-                                                        Reset
-                                                    </button>
-                                                </Tooltip>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
-                                            Role
-                                            <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                            <Tooltip content={<div className="space-y-2">
-                                                {ROLE_OPTIONS.map(opt => {
-                                                    const Icon = getRoleIcon(opt.value);
-                                                    return (
-                                                        <div key={opt.value} className="flex items-start gap-2">
-                                                            <Icon className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" />
-                                                            <div>
-                                                                <div className="font-medium text-xs">{opt.label}</div>
-                                                                <div className="text-[10px] text-white/60">{opt.description}</div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>}>
-                                                <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
-                                            </Tooltip>
-                                        </label>
-                                        <EnhancedSelect
-                                            value={role}
-                                            onChange={(value) => setRole(value as UserRole)}
-                                            options={availableRoles.map(opt => ({
-                                                value: opt.value,
-                                                label: opt.label,
-                                                description: opt.description,
-                                                icon: getRoleIcon(opt.value)
-                                            }))}
-                                            leftIcon={Shield}
-                                        />
-                                    </div>
+                                        {isEditing && (isSuperAdmin || isSystemAdmin || (currentUser?.id === user?.id)) && (
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80">
+                                                    Password (optional - leave blank to keep current)
+                                                </label>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            type={showEditPassword ? "text" : "password"}
+                                                            value={editPassword}
+                                                            onChange={(e) => setEditPassword(e.target.value)}
+                                                            className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                            placeholder="Enter new password to change"
+                                                            autoComplete="new-password"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowEditPassword(!showEditPassword)}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                                        >
+                                                            {showEditPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        </button>
+                                                    </div>
+                                                    <Tooltip content="Send password reset email">
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleResetPassword}
+                                                            disabled={isResettingPassword}
+                                                            className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 h-[38px]"
+                                                        >
+                                                            <RotateCw className={`h-3.5 w-3.5 ${isResettingPassword ? 'animate-spin' : ''}`} />
+                                                            Reset
+                                                        </button>
+                                                    </Tooltip>
+                                                </div>
+                                            </div>
+                                        )}
 
-                                    {/* Reports To (Manager) - Only for Admins creating Local Users */}
-                                    {(isSuperAdmin || isSystemAdmin) && role === 'local_user' && (
                                         <div className="space-y-1">
                                             <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
-                                                Reports To
-                                                <Tooltip content="Assign a Regional Manager to this user.">
+                                                Role
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                <Tooltip content={<div className="space-y-2">
+                                                    {ROLE_OPTIONS.map(opt => {
+                                                        const Icon = getRoleIcon(opt.value);
+                                                        return (
+                                                            <div key={opt.value} className="flex items-start gap-2">
+                                                                <Icon className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" />
+                                                                <div>
+                                                                    <div className="font-medium text-xs">{opt.label}</div>
+                                                                    <div className="text-[10px] text-white/60">{opt.description}</div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>}>
                                                     <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
                                                 </Tooltip>
                                             </label>
                                             <EnhancedSelect
-                                                value={managerId}
-                                                onChange={(value) => setManagerId(value)}
-                                                options={[
-                                                    { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
-                                                    ...managers.map(m => ({
-                                                        value: m.id,
-                                                        label: m.name,
-                                                        description: 'Regional Manager',
-                                                        icon: Users
-                                                    }))
-                                                ]}
-                                                placeholder="Select Regional Manager"
-                                                leftIcon={Users}
+                                                value={role}
+                                                onChange={(value) => setRole(value as UserRole)}
+                                                options={availableRoles.map(opt => ({
+                                                    value: opt.value,
+                                                    label: opt.label,
+                                                    description: opt.description,
+                                                    icon: getRoleIcon(opt.value)
+                                                }))}
+                                                leftIcon={Shield}
                                             />
                                         </div>
-                                    )}
 
-                                    {/* Location Assignments - shown for RM and Local User */}
-                                    {showLocationSelector && (
-                                        <div className="mt-4 pt-4 border-t border-white/5">
-                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1.5 mb-2">
-                                                <Globe className="h-3.5 w-3.5 text-accent" />
-                                                Location Assignments
-                                                <span className="text-xs text-zinc-500 font-normal ml-1">
-                                                    ({role === 'regional_manager' ? 'States' : 'States & Cities'})
-                                                </span>
-                                            </label>
+                                        {/* Reports To (Manager) - Only for Admins creating Local Users */}
+                                        {(isSuperAdmin || isSystemAdmin) && role === 'local_user' && (
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
+                                                    Reports To
+                                                    <Tooltip content="Assign a Regional Manager to this user.">
+                                                        <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
+                                                    </Tooltip>
+                                                </label>
+                                                <EnhancedSelect
+                                                    value={managerId}
+                                                    onChange={(value) => setManagerId(value)}
+                                                    options={[
+                                                        { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
+                                                        ...managers.map(m => ({
+                                                            value: m.id,
+                                                            label: m.name,
+                                                            description: 'Regional Manager',
+                                                            icon: Users
+                                                        }))
+                                                    ]}
+                                                    placeholder="Select Regional Manager"
+                                                    leftIcon={Users}
+                                                />
+                                            </div>
+                                        )}
 
-                                            {/* Selected locations as chips */}
-                                            {locationIds.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 mb-2">
-                                                    {locationIds.map(lid => {
-                                                        const entry = taxonomyEntries.find(e => e.id === lid);
-                                                        const parent = entry?.parent_id ? taxonomyEntries.find(e => e.id === entry.parent_id) : null;
-                                                        return (
-                                                            <span
-                                                                key={lid}
-                                                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-xs font-medium"
-                                                            >
-                                                                {parent ? `${parent.name} › ${entry?.name}` : entry?.name || lid}
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setLocationIds(prev => prev.filter(id => id !== lid))}
-                                                                    className="hover:text-white transition-colors"
+                                        {/* Location Assignments - shown for RM and Local User */}
+                                        {showLocationSelector && (
+                                            <div className="mt-4 pt-4 border-t border-white/5">
+                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1.5 mb-2">
+                                                    <Globe className="h-3.5 w-3.5 text-accent" />
+                                                    Location Assignments
+                                                    <span className="text-xs text-zinc-500 font-normal ml-1">
+                                                        ({role === 'regional_manager' ? 'States' : 'States & Cities'})
+                                                    </span>
+                                                </label>
+
+                                                {/* Selected locations as chips */}
+                                                {locationIds.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mb-2">
+                                                        {locationIds.map(lid => {
+                                                            const entry = taxonomyEntries.find(e => e.id === lid);
+                                                            const parent = entry?.parent_id ? taxonomyEntries.find(e => e.id === entry.parent_id) : null;
+                                                            return (
+                                                                <span
+                                                                    key={lid}
+                                                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-xs font-medium"
                                                                 >
-                                                                    <X className="h-3 w-3" />
-                                                                </button>
-                                                            </span>
+                                                                    {parent ? `${parent.name} › ${entry?.name}` : entry?.name || lid}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setLocationIds(prev => prev.filter(id => id !== lid))}
+                                                                        className="hover:text-white transition-colors"
+                                                                    >
+                                                                        <X className="h-3 w-3" />
+                                                                    </button>
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+
+                                                {/* Location dropdown */}
+                                                <div className="relative" ref={locationDropdownRef}>
+                                                    <div className="relative">
+                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+                                                        <input
+                                                            type="text"
+                                                            value={locationSearch}
+                                                            onChange={(e) => {
+                                                                setLocationSearch(e.target.value);
+                                                                setIsLocationDropdownOpen(true);
+                                                            }}
+                                                            onFocus={() => setIsLocationDropdownOpen(true)}
+                                                            className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                            placeholder="Search locations..."
+                                                            autoComplete="off"
+                                                        />
+                                                    </div>
+
+                                                    {isLocationDropdownOpen && (() => {
+                                                        const availableLocations = getAvailableLocations();
+                                                        const searchLower = locationSearch.toLowerCase();
+
+                                                        return (
+                                                            <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl border border-white/10 max-h-48 overflow-y-auto p-1">
+                                                                {availableLocations.length === 0 ? (
+                                                                    <div className="px-3 py-2 text-xs text-zinc-500">No locations available</div>
+                                                                ) : (
+                                                                    availableLocations.map(loc => {
+                                                                        const isStateSelected = locationIds.includes(loc.id);
+                                                                        const matchesSearch = !searchLower || loc.name.toLowerCase().includes(searchLower);
+                                                                        const childrenMatchSearch = loc.children?.some((c: { name: string }) => c.name.toLowerCase().includes(searchLower));
+
+                                                                        if (!matchesSearch && !childrenMatchSearch) return null;
+
+                                                                        return (
+                                                                            <div key={loc.id}>
+                                                                                {/* State entry */}
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => {
+                                                                                        if (isStateSelected) {
+                                                                                            setLocationIds(prev => prev.filter(id => id !== loc.id));
+                                                                                        } else {
+                                                                                            setLocationIds(prev => [...prev, loc.id]);
+                                                                                        }
+                                                                                    }}
+                                                                                    className={`w-full text-left px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${isStateSelected
+                                                                                        ? 'bg-white/10 text-white'
+                                                                                        : 'text-zinc-300 hover:bg-white/5 hover:text-white'
+                                                                                        }`}
+                                                                                >
+                                                                                    <span className="font-medium">{loc.name}</span>
+                                                                                    {isStateSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
+                                                                                </button>
+
+                                                                                {/* City children (only for local_user role) */}
+                                                                                {role === 'local_user' && loc.children && loc.children.length > 0 && (
+                                                                                    <div className="ml-4">
+                                                                                        {loc.children
+                                                                                            .filter((c: { name: string }) => !searchLower || c.name.toLowerCase().includes(searchLower) || matchesSearch)
+                                                                                            .map((child: { id: string; name: string }) => {
+                                                                                                const isCitySelected = locationIds.includes(child.id);
+                                                                                                return (
+                                                                                                    <button
+                                                                                                        key={child.id}
+                                                                                                        type="button"
+                                                                                                        onClick={() => {
+                                                                                                            if (isCitySelected) {
+                                                                                                                setLocationIds(prev => prev.filter(id => id !== child.id));
+                                                                                                            } else {
+                                                                                                                setLocationIds(prev => [...prev, child.id]);
+                                                                                                            }
+                                                                                                        }}
+                                                                                                        className={`w-full text-left px-3 py-1.5 rounded text-xs flex items-center gap-2 transition-colors ${isCitySelected
+                                                                                                            ? 'bg-white/10 text-white'
+                                                                                                            : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                                                                                                            }`}
+                                                                                                    >
+                                                                                                        <span>{child.name}</span>
+                                                                                                        {isCitySelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
+                                                                                                    </button>
+                                                                                                );
+                                                                                            })}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    })
+                                                                )}
+                                                            </div>
                                                         );
-                                                    })}
+                                                    })()}
                                                 </div>
-                                            )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
 
-                                            {/* Location dropdown */}
-                                            <div className="relative" ref={locationDropdownRef}>
-                                                <div className="relative">
-                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
-                                                    <input
-                                                        type="text"
-                                                        value={locationSearch}
-                                                        onChange={(e) => {
-                                                            setLocationSearch(e.target.value);
-                                                            setIsLocationDropdownOpen(true);
-                                                        }}
-                                                        onFocus={() => setIsLocationDropdownOpen(true)}
-                                                        className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                        placeholder="Search locations..."
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
+                            <div className="space-y-6">
+                                <div className="bg-white/5 rounded-lg p-4">
+                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                        <Phone className="h-4 w-4 text-accent" />
+                                        Contact Information
+                                    </h3>
 
-                                                {isLocationDropdownOpen && (() => {
-                                                    const availableLocations = getAvailableLocations();
-                                                    const searchLower = locationSearch.toLowerCase();
-
-                                                    return (
-                                                        <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl border border-white/10 max-h-48 overflow-y-auto p-1">
-                                                            {availableLocations.length === 0 ? (
-                                                                <div className="px-3 py-2 text-xs text-zinc-500">No locations available</div>
-                                                            ) : (
-                                                                availableLocations.map(loc => {
-                                                                    const isStateSelected = locationIds.includes(loc.id);
-                                                                    const matchesSearch = !searchLower || loc.name.toLowerCase().includes(searchLower);
-                                                                    const childrenMatchSearch = loc.children?.some((c: { name: string }) => c.name.toLowerCase().includes(searchLower));
-
-                                                                    if (!matchesSearch && !childrenMatchSearch) return null;
-
-                                                                    return (
-                                                                        <div key={loc.id}>
-                                                                            {/* State entry */}
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => {
-                                                                                    if (isStateSelected) {
-                                                                                        setLocationIds(prev => prev.filter(id => id !== loc.id));
-                                                                                    } else {
-                                                                                        setLocationIds(prev => [...prev, loc.id]);
-                                                                                    }
-                                                                                }}
-                                                                                className={`w-full text-left px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${isStateSelected
-                                                                                    ? 'bg-accent/10 text-accent'
-                                                                                    : 'text-zinc-300 hover:bg-white/5 hover:text-white'
-                                                                                    }`}
-                                                                            >
-                                                                                <span className="font-medium">{loc.name}</span>
-                                                                                {isStateSelected && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
-                                                                            </button>
-
-                                                                            {/* City children (only for local_user role) */}
-                                                                            {role === 'local_user' && loc.children && loc.children.length > 0 && (
-                                                                                <div className="ml-4">
-                                                                                    {loc.children
-                                                                                        .filter((c: { name: string }) => !searchLower || c.name.toLowerCase().includes(searchLower) || matchesSearch)
-                                                                                        .map((child: { id: string; name: string }) => {
-                                                                                            const isCitySelected = locationIds.includes(child.id);
-                                                                                            return (
-                                                                                                <button
-                                                                                                    key={child.id}
-                                                                                                    type="button"
-                                                                                                    onClick={() => {
-                                                                                                        if (isCitySelected) {
-                                                                                                            setLocationIds(prev => prev.filter(id => id !== child.id));
-                                                                                                        } else {
-                                                                                                            setLocationIds(prev => [...prev, child.id]);
-                                                                                                        }
-                                                                                                    }}
-                                                                                                    className={`w-full text-left px-3 py-1.5 rounded text-xs flex items-center gap-2 transition-colors ${isCitySelected
-                                                                                                        ? 'bg-accent/10 text-accent'
-                                                                                                        : 'text-zinc-400 hover:bg-white/5 hover:text-white'
-                                                                                                        }`}
-                                                                                                >
-                                                                                                    <span>{child.name}</span>
-                                                                                                    {isCitySelected && <Check className="h-3 w-3 ml-auto text-accent" />}
-                                                                                                </button>
-                                                                                            );
-                                                                                        })}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    );
-                                                                })
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })()}
+                                    <div className="space-y-3">
+                                        <div className="space-y-1">
+                                            <label className="text-sm font-medium text-white/80">Phone</label>
+                                            <div className="relative">
+                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type="tel"
+                                                    value={phone}
+                                                    onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                                                    className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="(555) 555-5555"
+                                                    autoComplete="off"
+                                                />
                                             </div>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="bg-white/5 rounded-lg p-4">
-                                <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
-                                    <Phone className="h-4 w-4 text-accent" />
-                                    Contact Information
-                                </h3>
-
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80">Phone</label>
-                                        <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                                            <input
-                                                type="tel"
-                                                value={phone}
-                                                onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-                                                className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                placeholder="(555) 555-5555"
-                                                autoComplete="off"
-                                            />
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="bg-white/5 rounded-lg p-4">
-                                <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-accent" />
-                                    Address
-                                </h3>
+                                <div className="bg-white/5 rounded-lg p-4">
+                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                        <MapPin className="h-4 w-4 text-accent" />
+                                        Address
+                                    </h3>
 
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80">Street</label>
-                                        <input
-                                            type="text"
-                                            value={street}
-                                            onChange={(e) => setStreet(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                            placeholder="123 Main St"
-                                            autoComplete="off"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-white/80">City</label>
-                                        <input
-                                            type="text"
-                                            value={city}
-                                            onChange={(e) => setCity(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                            placeholder="Honolulu"
-                                            autoComplete="off"
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-3">
                                         <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">State</label>
-                                            <SimpleSelect
-                                                value={state}
-                                                onChange={(val) => setState(val)}
-                                                options={US_STATES.map(s => s.name)}
-                                                placeholder="Select State..."
-                                                className="w-full"
-                                                textSize="text-sm"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">ZIP Code</label>
+                                            <label className="text-sm font-medium text-white/80">Street</label>
                                             <input
                                                 type="text"
-                                                value={zip}
-                                                onChange={(e) => setZip(e.target.value)}
+                                                value={street}
+                                                onChange={(e) => setStreet(e.target.value)}
                                                 className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                placeholder="96801"
-                                                maxLength={10}
+                                                placeholder="123 Main St"
                                                 autoComplete="off"
                                             />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="text-sm font-medium text-white/80">City</label>
+                                            <input
+                                                type="text"
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
+                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                placeholder="Honolulu"
+                                                autoComplete="off"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80">State</label>
+                                                <SimpleSelect
+                                                    value={state}
+                                                    onChange={(val) => setState(val)}
+                                                    options={US_STATES.map(s => s.name)}
+                                                    placeholder="Select State..."
+                                                    className="w-full"
+                                                    textSize="text-sm"
+                                                />
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="text-sm font-medium text-white/80">ZIP Code</label>
+                                                <input
+                                                    type="text"
+                                                    value={zip}
+                                                    onChange={(e) => setZip(e.target.value)}
+                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    placeholder="96801"
+                                                    maxLength={10}
+                                                    autoComplete="off"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            )}
+                    </form>
+                )}
 
-            <ImageCropModal
-                isOpen={isCropModalOpen}
-                imageUrl={selectedImageUrl}
-                onClose={handleCropCancel}
-                onSave={handleCropSave}
+                <ImageCropModal
+                    isOpen={isCropModalOpen}
+                    imageUrl={selectedImageUrl}
+                    onClose={handleCropCancel}
+                    onSave={handleCropSave}
+                />
+            </SlidePanel>
+
+            <ConfirmationModal
+                isOpen={showCloseWarning}
+                onClose={() => setShowCloseWarning(false)}
+                onConfirm={handleDiscardChanges}
+                title="Unsaved Changes"
+                message="You have unsaved changes. Are you sure you want to close? Your changes will be lost."
+                confirmLabel="Discard Changes"
+                cancelLabel="Keep Editing"
+                isDangerous={true}
             />
-        </SlidePanel>
+        </>
     );
 }

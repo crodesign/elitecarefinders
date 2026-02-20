@@ -26,6 +26,8 @@ interface SlidePanelProps {
     actions?: React.ReactNode;
     /** Optional className override for the content area (default: "flex-1 overflow-y-auto p-6") */
     contentClassName?: string;
+    /** Z-index stack level for nested panels. 0 = z-54/55 (default), 1 = z-58/59, 2 = z-62/63 */
+    stackLevel?: number;
 }
 
 export function SlidePanel({
@@ -42,9 +44,13 @@ export function SlidePanel({
     headerChildren,
     actions,
     contentClassName,
+    stackLevel = 0,
 }: SlidePanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const { collapsed: sidebarCollapsed } = useSidebar();
+
+    const backdropZ = 54 + stackLevel * 4;
+    const panelZ = 55 + stackLevel * 4;
 
     // Handle escape key
     useEffect(() => {
@@ -80,16 +86,19 @@ export function SlidePanel({
             {/* Backdrop - Always full screen and independent of panel positioning */}
             {showOverlay && isOpen && (
                 <div
-                    className={`fixed inset-0 z-[54] bg-black/40 backdrop-blur-sm transition-opacity ${closeOnOverlayClick ? 'cursor-pointer' : 'cursor-default'}`}
+                    className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${closeOnOverlayClick ? 'cursor-pointer' : 'cursor-default'}`}
+                    style={{ zIndex: backdropZ }}
                     onClick={closeOnOverlayClick ? onClose : undefined}
                 />
             )}
 
             {/* Panel Wrapper */}
-            <div className={`fixed bottom-0 z-[55] transition-all duration-300 pointer-events-none ${shouldOffset
-                ? `top-14 md:top-0 right-0 left-0 ${sidebarLeftClass}`
-                : "top-14 md:top-0 inset-x-0"
-                }`}
+            <div
+                className={`fixed bottom-0 transition-all duration-300 pointer-events-none ${shouldOffset
+                    ? `top-14 md:top-0 right-0 left-0 ${sidebarLeftClass}`
+                    : "top-14 md:top-0 inset-x-0"
+                    }`}
+                style={{ zIndex: panelZ }}
             >
                 {/* Panel - full width on mobile, fixed width on md+ */}
                 <div
@@ -130,7 +139,7 @@ export function SlidePanel({
 
                     {/* Sticky Header Content */}
                     {headerChildren && (
-                        <div className="flex-none relative z-20 w-full shrink-0 border-b border-white/5 bg-[#0b1115] pt-[15px]">
+                        <div className="flex-none relative z-20 w-full shrink-0 overflow-hidden">
                             {headerChildren}
                         </div>
                     )}

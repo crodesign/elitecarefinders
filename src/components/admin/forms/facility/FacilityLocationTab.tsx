@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type { RoomDetails, RoomFieldCategory, RoomFieldDefinition, RoomFixedFieldOption } from "@/types";
 import { FacilityFieldCategory } from "./FacilityFieldCategory";
@@ -79,17 +79,17 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                ? "bg-white/10 border-transparent text-white"
-                                                : "bg-white/10 border-transparent hover:bg-white/15 text-zinc-400"
+                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                                ? "bg-white/10 text-white"
+                                                : "bg-white/10 hover:bg-white/15 text-zinc-400"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected
-                                                ? "border-accent bg-accent text-white"
-                                                : "border-zinc-600 bg-transparent"
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
+                                                ? "border border-accent bg-accent text-white"
+                                                : "bg-black/80"
                                                 }`}>
-                                                {isSelected && <Check className="h-3 w-3 text-white" />}
+                                                {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-zinc-500" />}
                                             </div>
                                         </button>
                                     );
@@ -130,17 +130,17 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
-                                                ? "bg-white/10 border-transparent text-white"
-                                                : "bg-white/10 border-transparent hover:bg-white/15 text-zinc-400"
+                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                                ? "bg-white/10 text-white"
+                                                : "bg-white/10 hover:bg-white/15 text-zinc-400"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected
-                                                ? "border-accent bg-accent text-white"
-                                                : "border-zinc-600 bg-transparent"
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
+                                                ? "border border-accent bg-accent text-white"
+                                                : "bg-black/80"
                                                 }`}>
-                                                {isSelected && <Check className="h-3 w-3 text-white" />}
+                                                {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-zinc-500" />}
                                             </div>
                                         </button>
                                     );

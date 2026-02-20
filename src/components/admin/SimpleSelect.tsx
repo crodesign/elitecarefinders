@@ -53,7 +53,7 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
                         >
                             <Ban className="h-3.5 w-3.5" />
                             <span>None</span>
-                            {value === "" && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                            {value === "" && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                         </button>
 
                         {options.map((opt) => (
@@ -64,11 +64,11 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
                                     onChange(opt);
                                     setIsOpen(false);
                                 }}
-                                className={`w-full text-left px-2 py-1.5 rounded ${textSize} flex items-center group transition-colors ${value === opt ? "bg-accent/10 text-accent" : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                                className={`w-full text-left px-2 py-1.5 rounded ${textSize} flex items-center group transition-colors ${value === opt ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5 hover:text-white"
                                     }`}
                             >
                                 <span>{opt}</span>
-                                {value === opt && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                                {value === opt && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                             </button>
                         ))}
                     </div>

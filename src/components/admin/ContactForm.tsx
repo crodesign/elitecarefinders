@@ -38,7 +38,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
-    const [activeTab, setActiveTab] = useState<TabId>("contact-info");
+    const [activeTab, setActiveTab] = useState<TabId>(contact ? "notes" : "contact-info");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseWarning, setShowCloseWarning] = useState(false);
 
@@ -61,6 +61,11 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         params.set('tab', id);
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
+
+    // Reset active tab when contact changes (edit vs new)
+    useEffect(() => {
+        setActiveTab(contact ? "notes" : "contact-info");
+    }, [contact?.id]);
 
     // Initialize form data from contact
     useEffect(() => {
@@ -338,19 +343,29 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         onClose();
     };
 
-    const tabs = [
-        { id: "contact-info", label: "Contact Info", icon: Users },
-        { id: "resident-info", label: "Resident Info", icon: User },
-        { id: "housing", label: "Housing", icon: Home },
-        { id: "care", label: "Care Needs", icon: Heart },
-        { id: "notes", label: "Notes", icon: FileText },
-    ];
+    // Notes first when editing an existing contact, last when creating new
+    const isNew = !contact;
+    const baseTabs = isNew
+        ? [
+            { id: "contact-info", label: "Contact Info", icon: Users },
+            { id: "resident-info", label: "Resident Info", icon: User },
+            { id: "housing", label: "Housing", icon: Home },
+            { id: "care", label: "Care Needs", icon: Heart },
+            { id: "notes", label: "Notes", icon: FileText },
+        ]
+        : [
+            { id: "notes", label: "Notes", icon: FileText },
+            { id: "contact-info", label: "Contact Info", icon: Users },
+            { id: "resident-info", label: "Resident Info", icon: User },
+            { id: "housing", label: "Housing", icon: Home },
+            { id: "care", label: "Care Needs", icon: Heart },
+        ];
 
-    // Add Checklist tab if status warrants it
+    const tabs = [...baseTabs];
+
+    // Add Checklist tab if status warrants it (after Care, before Notes in new mode; after Care in edit mode)
     if (contact && (contact.status === 'Won' || contact.status === 'Closed' || formData.leadClassification === 'won')) {
-        // Insert before Notes or at end? ContactEditor logic:
-        // if ((formData as any)?.leadClassification === "won" ...
-        tabs.splice(tabs.length - 1, 0, { id: "checklist", label: "Checklist", icon: CheckSquare });
+        tabs.push({ id: "checklist", label: "Checklist", icon: CheckSquare });
     }
 
     return (
@@ -363,50 +378,107 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 fullScreen
                 contentClassName={activeTab === "notes" ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
                 headerChildren={
-                    <div className="flex items-center justify-between px-6 border-b border-white/5">
-                        <div className="flex overflow-x-auto overflow-y-hidden">
-                            {tabs.map((tab) => {
-                                const Icon = tab.icon;
-                                const isActive = activeTab === tab.id;
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        type="button"
-                                        onClick={() => handleTabChange(tab.id as TabId)}
-                                        className={`
-                                        flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
-                                        ${isActive
-                                                ? "border-accent text-white"
-                                                : "border-transparent text-zinc-400 hover:text-white hover:border-white/10"
-                                            }
-                                    `}
-                                    >
-                                        <Icon className={`h-4 w-4 ${isActive ? "text-accent" : ""}`} />
-                                        {tab.label}
-                                    </button>
-                                );
-                            })}
+                    <div className="flex flex-col w-full">
+                        {/* Top Row: Tabs + Save Button */}
+                        <div className="flex items-center justify-between pl-4 pr-6 pt-[15px]">
+                            {/* Tabs Container */}
+                            <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
+                                {tabs.map((tab) => {
+                                    const Icon = tab.icon;
+                                    const isActive = activeTab === tab.id;
+                                    // Tab color matches the progress bar background exactly
+                                    const tabColor = 'rgba(255,255,255,0.2)';
+
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            type="button"
+                                            onClick={() => handleTabChange(tab.id as TabId)}
+                                            className={`
+                                                relative flex items-center gap-2 px-4 text-sm font-medium
+                                                rounded-tl-lg rounded-tr-lg whitespace-nowrap
+                                                transition-all duration-150 select-none
+                                                ${isActive
+                                                    ? 'pt-[10px] pb-[11px] text-white z-10'
+                                                    : 'pt-2 pb-2 bg-transparent text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                                }
+                                            `}
+                                            style={isActive ? { backgroundColor: tabColor } : undefined}
+                                        >
+                                            {/* Left concave corner notch (active only) */}
+                                            {isActive && (
+                                                <span className="absolute bottom-0 left-[-8px] w-2 h-2 pointer-events-none">
+                                                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M8 0 L8 8 L0 8 A 8 8 0 0 0 8 0 Z" fill={tabColor} />
+                                                    </svg>
+                                                </span>
+                                            )}
+                                            <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                                            {tab.label}
+                                            {/* Right concave corner notch (active only) */}
+                                            {isActive && (
+                                                <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
+                                                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M0 0 L0 8 L8 8 A 8 8 0 0 1 0 0 Z" fill={tabColor} />
+                                                    </svg>
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Save Button Container */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="submit"
+                                    form="contact-form"
+                                    disabled={!isDirty || isSubmitting}
+                                    className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                                >
+                                    {isSubmitting ? "Saving..." : (
+                                        <>
+                                            <span className="hidden md:inline">{contact ? "Update Contact" : "Create Contact"}</span>
+                                            <Save className="h-7 w-7 md:hidden" />
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="submit"
-                                form="contact-form"
-                                disabled={!isDirty || isSubmitting}
-                                className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
-                            >
-                                {isSubmitting ? "Saving..." : (
-                                    <>
-                                        <span className="hidden md:inline">{contact ? "Update Contact" : "Create Contact"}</span>
-                                        <Save className="h-7 w-7 md:hidden" />
-                                    </>
-                                )}
-                            </button>
+
+                        {/* Progress Bar Strip (Bottom Row) */}
+                        <div className="w-full h-[32px] flex items-center justify-center relative" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                            <div className="inline-flex items-center gap-6 bg-black/90 rounded-full px-4 py-1">
+                                {[
+                                    { value: "new", label: "New", colorVar: "--lead-new" },
+                                    { value: "prospects", label: "Prospect", colorVar: "--lead-prospects" },
+                                    { value: "connected", label: "Connected", colorVar: "--lead-connected" },
+                                    { value: "won", label: "Won", colorVar: "--lead-won" },
+                                    { value: "closed", label: "Closed", colorVar: "--lead-closed" }
+                                ].map((status) => {
+                                    const isActive = (formData.leadClassification || "new") === status.value;
+                                    return (
+                                        <div key={status.value} className="flex items-center gap-1.5 relative">
+                                            <div
+                                                className={`rounded-full border-2 border-white transition-all duration-300 ${isActive ? 'w-4 h-4 shadow-lg scale-110' : 'w-2.5 h-2.5'}`}
+                                                style={{ backgroundColor: `hsl(var(${status.colorVar}))` }}
+                                            />
+                                            {isActive && (
+                                                <span className="text-xs font-medium text-white whitespace-nowrap">
+                                                    {status.label}
+                                                </span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
+
                     </div>
                 }
             >
-                <form id="contact-form" onSubmit={handleSave} className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "h-full flex flex-col"}>
-                    <div className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "w-full pb-20"}>
+                <form id="contact-form" onSubmit={handleSave} className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : "flex flex-col"}>
+                    <div className={activeTab === "notes" ? "flex-1 min-h-0 flex flex-col" : ""}>
                         {activeTab === "contact-info" && (
                             <ContactInfoSection
                                 formData={formData}
@@ -453,7 +525,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                         )}
                     </div>
                 </form>
-            </SlidePanel>
+            </SlidePanel >
 
             <ConfirmationModal
                 isOpen={showCloseWarning}

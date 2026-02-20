@@ -736,23 +736,48 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
                 headerChildren={
-                    <div className="flex items-center justify-between px-6 border-b border-white/5">
-                        <div className="flex overflow-x-auto overflow-y-hidden">
+                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
+                        <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
+                                // Tab color matches the border color exactly
+                                const tabColor = 'rgba(255,255,255,0.2)';
+
                                 return (
                                     <button
                                         key={tab.id}
                                         type="button"
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors ${isActive
-                                            ? "text-accent border-accent"
-                                            : "text-zinc-400 border-transparent hover:text-white hover:border-white/20"
-                                            }`}
+                                        className={`
+                                            relative flex items-center gap-2 px-4 text-sm font-medium
+                                            rounded-tl-lg rounded-tr-lg whitespace-nowrap
+                                            transition-all duration-150 select-none
+                                            ${isActive
+                                                ? 'pt-[10px] pb-[11px] text-white z-10'
+                                                : 'pt-2 pb-2 bg-transparent text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                            }
+                                        `}
+                                        style={isActive ? { backgroundColor: tabColor } : undefined}
                                     >
-                                        <Icon className="h-6 w-6 md:h-4 md:w-4" />
-                                        <span className="hidden sm:inline">{tab.label}</span>
+                                        {/* Left concave corner notch (active only) */}
+                                        {isActive && (
+                                            <span className="absolute bottom-0 left-[-8px] w-2 h-2 pointer-events-none">
+                                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M8 0 L8 8 L0 8 A 8 8 0 0 0 8 0 Z" fill={tabColor} />
+                                                </svg>
+                                            </span>
+                                        )}
+                                        <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                                        {tab.label}
+                                        {/* Right concave corner notch (active only) */}
+                                        {isActive && (
+                                            <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
+                                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M0 0 L0 8 L8 8 A 8 8 0 0 1 0 0 Z" fill={tabColor} />
+                                                </svg>
+                                            </span>
+                                        )}
                                     </button>
                                 );
                             })}
@@ -800,7 +825,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 }}
                 title={managingTaxonomy?.pluralName || "Manage List"}
                 subtitle={`Manage ${managingTaxonomy?.pluralName?.toLowerCase() || "items"} for this taxonomy`}
-                showOverlay={false}
+                showOverlay={true}
+                stackLevel={1}
             >
                 <EntryTree
                     entries={taxonomyEntries}

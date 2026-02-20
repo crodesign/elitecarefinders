@@ -12,6 +12,8 @@ interface TaxonomySelectorProps {
     taxonomy: Taxonomy & { entries: TaxonomyEntry[] };
     value: string;
     onChange: (value: string) => void;
+    showLabel?: boolean;
+    className?: string;
 }
 
 interface FlatEntry {
@@ -22,7 +24,7 @@ interface FlatEntry {
     fullPath: string;  // Full hierarchical path like "Hawaii - Oahu - Honolulu"
 }
 
-export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelectorProps) {
+export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false, className = "" }: TaxonomySelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -145,7 +147,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                             setIsOpen(false);
                         }
                     }}
-                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-accent/10 text-accent" :
+                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-white/10 text-white" :
                         hasChildren ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-300 font-medium" :
                             "text-zinc-300 hover:bg-white/5 hover:text-white"
                         }`}
@@ -167,7 +169,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                         <span className="w-5 flex-shrink-0" />
                     )}
                     <span>{entry.name}</span>
-                    {isSelected && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                    {isSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                 </button>
 
                 {/* Children (only show when expanded) */}
@@ -181,34 +183,36 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
     };
 
     return (
-        <div className="relative" ref={containerRef}>
-            <label className="text-sm font-medium text-white/80 block mb-1">
-                {taxonomy?.singularName || 'Select'}
-            </label>
+        <div className={`relative ${className}`} ref={containerRef}>
+            {showLabel && (
+                <label className="text-sm font-medium text-white/80 block mb-1">
+                    {taxonomy?.singularName || 'Select'}
+                </label>
+            )}
 
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between rounded-md py-1.5 px-3 text-sm focus:outline-none transition-colors ${selectedEntry
+                className={`w-full flex items-center justify-between rounded-md px-2 py-1 text-sm focus:outline-none transition-colors min-h-[28px] ${selectedEntry
                     ? `bg-black/30 text-white ${isOpen ? "bg-black/50" : "hover:bg-black/50"}`
                     : `text-white ${isOpen ? "bg-black/50" : "bg-black/30 hover:bg-black/50"}`
                     }`}
             >
-                <span className={selectedEntry ? "text-white" : "text-zinc-500"}>
-                    {selectedEntry ? selectedEntry.fullPath : `Select ${taxonomy?.singularName || 'option'}...`}
+                <span className={`truncate mr-2 ${selectedEntry ? "text-white" : "text-zinc-500"}`}>
+                    {selectedEntry ? selectedEntry.fullPath : "Select..."}
                 </span>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${selectedEntry ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${selectedEntry ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
-                    <div className="p-2 border-b border-white/10 relative">
+                <div className="absolute z-50 right-0 min-w-full w-max max-w-xs mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
+                    <div className="p-2 relative bg-white/5">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-black/30 border border-transparent rounded text-xs py-1.5 pl-8 pr-2 text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+                            className="w-full bg-black/30 border border-transparent rounded text-xs py-1.5 pl-8 pr-2 text-white placeholder-zinc-500 focus:outline-none focus:border-transparent"
                             placeholder="Search..."
                             autoFocus
                         />
@@ -225,7 +229,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                         >
                             <Ban className="h-3.5 w-3.5" />
                             <span>None</span>
-                            {value === "" && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                            {value === "" && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                         </button>
 
                         {/* Show filtered tree when searching, full tree when not */}
@@ -297,7 +301,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                                                         setSearchQuery("");
                                                     }
                                                 }}
-                                                className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-accent/10 text-accent" :
+                                                className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-white/10 text-white" :
                                                     hasChildren ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-300 font-medium" :
                                                         "text-zinc-300 hover:bg-white/5 hover:text-white"
                                                     }`}
@@ -315,7 +319,7 @@ export function TaxonomySelector({ taxonomy, value, onChange }: TaxonomySelector
                                                     <span className="w-5 flex-shrink-0" />
                                                 )}
                                                 <span>{entry.name}</span>
-                                                {isSelected && <Check className="h-3.5 w-3.5 ml-auto text-accent" />}
+                                                {isSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                                             </button>
                                             {hasChildren && isExpanded && (
                                                 <div>
