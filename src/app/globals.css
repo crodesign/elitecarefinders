@@ -48,6 +48,10 @@
   --accent: #239ddb;
   --accent-light: #4bb3e8;
   --accent-dark: #1a7fb3;
+  /* Switch */
+  --switch-thumb-off: rgba(0, 0, 0, 0.8);
+  /* Table row hover — subtler than full surface-hover */
+  --surface-row-hover: rgba(255, 255, 255, 0.06);
   /* Legacy aliases kept for backward-compat */
   --bg-primary: var(--surface-primary);
   --bg-secondary: var(--surface-secondary);
@@ -77,6 +81,10 @@
   --content-muted: #717179;
   /* Glass overlays — white tint for light mode */
   --glass-overlay: rgba(255, 255, 255, 0.5);
+  /* Switch */
+  --switch-thumb-off: #ffffff;
+  /* Table row hover — subtler than full surface-hover */
+  --surface-row-hover: rgba(0, 0, 0, 0.05);
   /* --accent, --accent-light, --accent-dark carry over from :root */
 }
 
@@ -298,7 +306,11 @@ button.form-input:focus {
   }
 
   .table-row {
-    @apply border-b border-ui-border hover:bg-surface-hover transition-colors;
+    @apply border-b border-ui-border transition-colors;
+  }
+
+  .table-row:hover {
+    background-color: var(--surface-row-hover);
   }
 
   .badge {

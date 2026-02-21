@@ -5,23 +5,30 @@ import { SimpleSelect } from "../../admin/SimpleSelect";
 interface HousingPreferencesSectionProps {
   formData?: any;
   setFormData?: (data: any) => void;
+  handleChange?: (data: any) => void;
   readOnly?: boolean;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
-const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: HousingPreferencesSectionProps) => {
+const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOnly = false }: HousingPreferencesSectionProps) => {
   const updateField = (field: string, value: any) => {
-    if (setFormData) {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
-    }
+    const updater = (prev: any) => ({ ...prev, [field]: value });
+    // Always update UI state directly for instant feedback
+    if (setFormData) setFormData(updater);
+    // Also notify auto-save wrapper (if both provided, it fires after direct update)
+    if (handleChange) handleChange(updater);
   };
 
   const toggleArrayItem = (field: string, item: string) => {
-    if (readOnly || !setFormData) return;
-    setFormData((prev: any) => {
+    if (readOnly) return;
+    const updater = (prev: any) => {
       const arr: string[] = prev[field] || [];
       const next = arr.includes(item) ? arr.filter((i: string) => i !== item) : [...arr, item];
       return { ...prev, [field]: next };
-    });
+    };
+    if (setFormData) setFormData(updater);
+    if (handleChange) handleChange(updater);
   };
 
   // Reusable clickable checkbox row matching HomeFieldCategory multi pattern

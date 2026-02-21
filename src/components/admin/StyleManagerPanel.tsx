@@ -29,21 +29,6 @@ const COLOR_PALETTE = [
     { name: 'Rose', hex: '#f43f5e' },
 ];
 
-import type { ThemeGrey } from '@/contexts/ThemeContext';
-
-const GREYS: { name: string; id: ThemeGrey; hex: string }[] = [
-    { name: 'Zinc', id: 'zinc', hex: '#18181b' },
-    { name: 'Slate', id: 'slate', hex: '#0f172a' },
-    { name: 'Stone', id: 'stone', hex: '#1c1917' },
-    { name: 'Gray', id: 'gray', hex: '#111827' },
-    { name: 'Neutral', id: 'neutral', hex: '#171717' },
-];
-
-const SEMANTIC = [
-    { name: 'Destructive', hex: '#ef4444', badge: 'text-red-400 bg-red-500/15' },
-    { name: 'Success', hex: '#10b981', badge: 'text-emerald-400 bg-emerald-500/15' },
-    { name: 'Warning', hex: '#f59e0b', badge: 'text-amber-400 bg-amber-500/15' },
-];
 
 /* ─────────────────────────────────────────────
    SUB-COMPONENTS
@@ -72,17 +57,15 @@ function Swatch({
             onClick={() => onSelect?.(hex)}
             className={`
                 group flex flex-col items-center gap-1.5 focus:outline-none w-full
-                rounded-xl p-1.5 transition-all duration-150
-                ${isSelected
-                    ? 'ring-2 ring-accent bg-surface-hover'
-                    : 'hover:bg-surface-hover'}
+                rounded-xl p-1 transition-all duration-150
+                ${isSelected ? 'ring-2 ring-accent' : ''}
             `}
         >
             <div
-                className="w-full h-10 rounded-lg transition-transform duration-150 flex items-center justify-center group-hover:scale-[1.03]"
+                className="w-full aspect-square rounded-lg transition-transform duration-150 flex items-center justify-center group-hover:scale-[1.03]"
                 style={{ backgroundColor: hex }}
             >
-                {isSelected && <Check className="h-3.5 w-3.5 text-white drop-shadow" />}
+                {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
             </div>
             <span className={`text-[11px] leading-none transition-colors truncate w-full text-center ${isSelected ? 'text-content-primary' : 'text-content-muted group-hover:text-content-secondary'}`}>
                 {name}
@@ -152,40 +135,6 @@ export function StyleManagerPanel({ isOpen, onClose }: StyleManagerPanelProps) {
                 </div>
             </div>
 
-            {/* ── Grey Scale ── */}
-            <div className="space-y-3">
-                <Divider label="Grey Scale" />
-                <div className="grid grid-cols-5 gap-2">
-                    {GREYS.map((g) => (
-                        <Swatch
-                            key={g.id}
-                            name={g.name}
-                            hex={g.hex}
-                            isSelected={grey === g.id}
-                            onSelect={() => setGrey(g.id)}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* ── Semantic ── */}
-            <div className="space-y-3">
-                <Divider label="Semantic" />
-                <div className="space-y-2">
-                    {SEMANTIC.map((s) => (
-                        <div key={s.name} className="flex items-center gap-3">
-                            <div
-                                className="w-4 h-4 rounded-md ring-1 ring-white/10 flex-shrink-0"
-                                style={{ backgroundColor: s.hex }}
-                            />
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.badge}`}>
-                                {s.name}
-                            </span>
-                            <span className="ml-auto text-[10px] font-mono text-content-secondary">{s.hex}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
         </SlidePanel>
     );
 

@@ -6,28 +6,29 @@ import { HeartPulse, Thermometer, Footprints, Brain, Pill, StickyNote } from "lu
 interface CombinedCareSectionProps {
   formData?: any;
   setFormData?: (data: any) => void;
+  handleChange?: (data: any) => void;
   readOnly?: boolean;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
-const CombinedCareSection = ({ formData, setFormData, readOnly = false }: CombinedCareSectionProps) => {
+const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = false }: CombinedCareSectionProps) => {
   const updateField = (field: string, value: any) => {
-    if (setFormData) {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
-    }
+    const updater = (prev: any) => ({ ...prev, [field]: value });
+    if (setFormData) setFormData(updater);
+    if (handleChange) handleChange(updater);
   };
 
   const updateArrayField = (field: string, item: string, checked: boolean) => {
-    console.log('updateArrayField called:', { field, item, checked });
-    if (setFormData) {
-      setFormData((prev: any) => {
-        const currentArray = prev[field] || [];
-        const newArray = checked
-          ? [...currentArray, item]
-          : currentArray.filter((i: string) => i !== item);
-        console.log(`Updated ${field}:`, { before: currentArray, after: newArray });
-        return { ...prev, [field]: newArray };
-      });
-    }
+    const updater = (prev: any) => {
+      const currentArray = prev[field] || [];
+      const newArray = checked
+        ? [...currentArray, item]
+        : currentArray.filter((i: string) => i !== item);
+      return { ...prev, [field]: newArray };
+    };
+    if (setFormData) setFormData(updater);
+    if (handleChange) handleChange(updater);
   };
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -11,10 +11,14 @@ import { SimpleSelect } from "../../admin/SimpleSelect";
 interface ResidentInfoSectionProps {
   formData?: any;
   setFormData?: (data: any) => void;
+  handleChange?: (data: any) => void;
   readOnly?: boolean;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
-const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: ResidentInfoSectionProps) => {
+const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChangeProp, readOnly = false }: ResidentInfoSectionProps) => {
+  const onChange = handleChangeProp ?? setFormData;
   const [pcpEmailError, setPcpEmailError] = useState<string | null>(null);
 
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -27,8 +31,8 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
   const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => (currentYear - i).toString());
 
   const updateField = (field: string, value: any) => {
-    if (setFormData) {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
+    if (onChange) {
+      onChange((prev: any) => ({ ...prev, [field]: value }));
     }
   };
 

@@ -23,14 +23,18 @@ import jsPDF from 'jspdf';
 interface ContactInfoSectionProps {
   formData?: any;
   setFormData?: (data: any) => void;
+  handleChange?: (data: any) => void;
   onDelete?: () => void;
   readOnly?: boolean;
   onSave?: (autoSave?: boolean) => Promise<void>;
   onSaveWaiver?: (waiverData: { signatureData: string; signatureDate: string; waiverText: string; signatureName: string }) => Promise<void>;
   hideProgressAndStatus?: boolean;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
-const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false, onSave, onSaveWaiver, hideProgressAndStatus = false }: ContactInfoSectionProps) => {
+const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeProp, onDelete, readOnly = false, onSave, onSaveWaiver, hideProgressAndStatus = false }: ContactInfoSectionProps) => {
+  const onChange = handleChangeProp ?? setFormData;
   const [emailError, setEmailError] = useState<string | null>(null);
   const [secondaryEmailError, setSecondaryEmailError] = useState<string | null>(null);
   const [showStatusConfirmation, setShowStatusConfirmation] = useState(false);
@@ -57,8 +61,8 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
   const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => (currentYear - i).toString());
 
   const updateField = (field: string, value: any) => {
-    if (setFormData) {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
+    if (onChange) {
+      onChange((prev: any) => ({ ...prev, [field]: value }));
     }
 
     // Validate email fields on change
@@ -96,7 +100,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
 
   // Initialize signature date to today if not set
   React.useEffect(() => {
-    if (!localSignatureDate && setFormData) {
+    if (!localSignatureDate && onChange) {
       const todayFormatted = formatDateForHawaii(new Date());
       setLocalSignatureDate(todayFormatted);
     }

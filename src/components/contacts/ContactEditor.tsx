@@ -697,6 +697,7 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                     {activeTab === "housing" && !isInvoiceEditMode && (
                         <HousingPreferencesSection
                             formData={formData}
+                            setFormData={setFormData}
                             handleChange={handleFormDataChange}
                             onNext={handleNext}
                             onPrevious={handlePrevious}
@@ -706,6 +707,7 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                     {activeTab === "care" && !isInvoiceEditMode && (
                         <CombinedCareSection
                             formData={formData}
+                            setFormData={setFormData}
                             handleChange={handleFormDataChange}
                             onNext={handleNext}
                             onPrevious={handlePrevious}
