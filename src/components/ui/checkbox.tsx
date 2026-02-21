@@ -17,7 +17,7 @@ const Checkbox = React.forwardRef<
     {...props}
   >
     {/* Grey X shown when unchecked */}
-    <X className="h-3 w-3 text-zinc-500 group-data-[state=checked]:hidden" />
+    <X className="h-3 w-3 text-content-muted group-data-[state=checked]:hidden" />
     <CheckboxPrimitive.Indicator
       className={cn("flex items-center justify-center text-current")}
     >

@@ -8,6 +8,7 @@ export interface Contact {
   id: string;
   user_id: string;
   status?: string;
+  leadClassification?: string;
   first_name: string;
   last_name: string;
   resident_full_name?: string;
@@ -132,6 +133,113 @@ export function useContacts() {
     }
 
     return data || [];
+  }, [user]);
+
+  const fetchContactsFiltered = useCallback(async (opts: {
+    search?: string;
+    progressFilter?: string;
+    sortByRecent?: boolean;
+    sortAsc?: boolean;
+  }): Promise<Contact[]> => {
+    if (!user) return [];
+
+    const searchTerm = opts.search?.trim() || '';
+    let results: Contact[] = [];
+
+    if (searchTerm) {
+      let rpcFailed = false;
+
+      // Try RPC first — it can search JSONB array fields too
+      try {
+        const { data, error } = await supabase
+          .rpc('search_contacts', { search_term: searchTerm });
+
+        if (error) {
+          console.error('[search_contacts RPC error]', error.message, error.details, error.hint);
+          rpcFailed = true;
+        } else {
+          results = data || [];
+        }
+      } catch (e) {
+        console.error('[search_contacts RPC exception]', e);
+        rpcFailed = true;
+      }
+
+      // Fallback: text-field only search via .or() — always reliable
+      if (rpcFailed) {
+        const q = `%${searchTerm}%`;
+        const { data, error } = await supabase
+          .from('contacts')
+          .select('*')
+          .or([
+            `first_name.ilike.${q}`,
+            `last_name.ilike.${q}`,
+            `resident_full_name.ilike.${q}`,
+            `email.ilike.${q}`,
+            `phone.ilike.${q}`,
+            `secondary_contact_name.ilike.${q}`,
+            `street_address.ilike.${q}`,
+            `city.ilike.${q}`,
+            `state.ilike.${q}`,
+            `zip_code.ilike.${q}`,
+            `referral_name.ilike.${q}`,
+            `pcp_name.ilike.${q}`,
+            `diagnoses.ilike.${q}`,
+            `additional_notes.ilike.${q}`,
+            `primary_insurance.ilike.${q}`,
+            `emergency_contact_name.ilike.${q}`,
+            `looking_for.ilike.${q}`,
+          ].join(','));
+
+        if (error) {
+          console.error('Error fetching contacts (text fallback):', error);
+          throw error;
+        }
+        results = data || [];
+      }
+
+      // Apply progress filter
+      if (opts.progressFilter) {
+        results = results.filter(c => (c.care_level || '') === opts.progressFilter);
+      }
+
+      // Sort client-side
+      if (opts.sortByRecent !== false) {
+        results = results.sort((a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+      } else {
+        results = results.sort((a, b) => {
+          const nameA = (a.resident_full_name || `${a.first_name} ${a.last_name}`).toLowerCase();
+          const nameB = (b.resident_full_name || `${b.first_name} ${b.last_name}`).toLowerCase();
+          return (opts.sortAsc !== false) ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        });
+      }
+    } else {
+      // No search term — use direct table query with DB-level sort
+      let query = supabase.from('contacts').select('*');
+
+      if (opts.progressFilter) {
+        query = query.eq('care_level', opts.progressFilter);
+      }
+
+      if (opts.sortByRecent !== false) {
+        query = query.order('updated_at', { ascending: false });
+      } else {
+        query = query.order('resident_full_name', { ascending: opts.sortAsc !== false, nullsFirst: false });
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching contacts (filtered):', error);
+        throw error;
+      }
+
+      results = data || [];
+    }
+
+    return results;
   }, [user]);
 
   const fetchContact = useCallback(async (id: string): Promise<Contact | null> => {
@@ -274,6 +382,7 @@ export function useContacts() {
 
   return {
     fetchContacts,
+    fetchContactsFiltered,
     fetchContact,
     createContact,
     updateContact,

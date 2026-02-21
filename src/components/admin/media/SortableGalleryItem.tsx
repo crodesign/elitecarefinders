@@ -31,7 +31,7 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
             style={style}
             {...attributes}
             {...listeners}
-            className="relative group flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-white/10 bg-black/20 cursor-grab active:cursor-grabbing touch-none"
+            className="relative group flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-ui-border bg-surface-input cursor-grab active:cursor-grabbing touch-none"
         >
             <img
                 src={url}
@@ -46,7 +46,7 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
                     e.stopPropagation();
                     onRemove(url);
                 }}
-                className="absolute top-1 right-1 p-1 bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-md hover:bg-red-500 cursor-pointer"
+                className="absolute top-1 right-1 p-1 bg-surface-secondary/80 text-content-primary opacity-0 group-hover:opacity-100 transition-opacity rounded-md hover:bg-red-500 cursor-pointer"
                 title="Remove"
             >
                 <X className="h-3 w-3" />
@@ -54,3 +54,4 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
         </div>
     );
 }
+

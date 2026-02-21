@@ -31,6 +31,7 @@ import {
     bulkUploadMedia,
     seedDefaultFolders,
     getAllUsedImageUrls,
+    getAllFeaturedImageUrls,
 } from "@/lib/services/mediaService";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 
@@ -39,6 +40,7 @@ export default function MediaPage() {
     const [folders, setFolders] = useState<MediaFolder[]>([]);
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [usedImageUrls, setUsedImageUrls] = useState<Set<string>>(new Set());
+    const [featuredImageUrls, setFeaturedImageUrls] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMedia, setIsLoadingMedia] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -147,9 +149,10 @@ export default function MediaPage() {
     const loadMediaItems = useCallback(async () => {
         setIsLoadingMedia(true);
         try {
-            const [items, usedUrls] = await Promise.all([
+            const [items, usedUrls, featuredUrls] = await Promise.all([
                 getMediaItems(selectedFolder?.id),
-                getAllUsedImageUrls()
+                getAllUsedImageUrls(),
+                getAllFeaturedImageUrls()
             ]);
             console.log("MediaPage loaded items:", items.length);
             console.log("MediaPage usedUrls count:", usedUrls.size);
@@ -160,6 +163,7 @@ export default function MediaPage() {
             // Only update media items after successfully loading
             setMediaItems(items);
             setUsedImageUrls(usedUrls);
+            setFeaturedImageUrls(featuredUrls);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to load media");
             // On error, clear the items
@@ -175,9 +179,10 @@ export default function MediaPage() {
             setIsLoading(true);
 
             // Load folders and used URLs first
-            let [folderData, usedUrls] = await Promise.all([
+            let [folderData, usedUrls, featuredUrls] = await Promise.all([
                 getFolders(),
-                getAllUsedImageUrls()
+                getAllUsedImageUrls(),
+                getAllFeaturedImageUrls()
             ]);
 
             if (folderData.length === 0) {
@@ -186,6 +191,7 @@ export default function MediaPage() {
             }
             setFolders(folderData);
             setUsedImageUrls(usedUrls);
+            setFeaturedImageUrls(featuredUrls);
 
             // Load states from location taxonomy
             try {
@@ -575,8 +581,8 @@ export default function MediaPage() {
                             <Menu className="h-5 w-5" />
                         </button>
                         <div>
-                            <h1 className="text-xl md:text-2xl font-bold text-white">Media Library</h1>
-                            <p className="text-xs md:text-sm text-zinc-400 mt-1">
+                            <h1 className="text-xl md:text-2xl font-bold text-content-primary">Media Library</h1>
+                            <p className="text-xs md:text-sm text-content-secondary mt-1">
                                 {selectedFolder ? (
                                     <>
                                         {/* Breadcrumb from path */}
@@ -588,13 +594,13 @@ export default function MediaPage() {
 
                                             return (
                                                 <span key={index}>
-                                                    {index > 0 && <span className="mx-1 text-zinc-500">&gt;</span>}
+                                                    {index > 0 && <span className="mx-1 text-content-muted">&gt;</span>}
                                                     {isLast ? (
-                                                        <span className="text-white">{segment}</span>
+                                                        <span className="text-content-primary">{segment}</span>
                                                     ) : folderForSegment ? (
                                                         <button
                                                             onClick={() => handleSelectFolder(folderForSegment)}
-                                                            className="hover:text-white transition-colors"
+                                                            className="hover:text-content-primary transition-colors"
                                                         >
                                                             {segment}
                                                         </button>
@@ -604,7 +610,7 @@ export default function MediaPage() {
                                                 </span>
                                             );
                                         })}
-                                        <span className="hidden md:inline ml-2 text-zinc-500">• {mediaItems.length} items</span>
+                                        <span className="hidden md:inline ml-2 text-content-muted">• {mediaItems.length} items</span>
                                     </>
                                 ) : (
                                     <>Add Media</>
@@ -629,7 +635,7 @@ export default function MediaPage() {
                                                 if (e.key === "Enter" && renameValue.trim() && renameValue !== selectedFolder?.name) handleRenameFolder();
                                                 if (e.key === "Escape") setIsRenaming(false);
                                             }}
-                                            className="px-3 py-1.5 pr-16 text-sm bg-black/30 border border-white/10 rounded-lg text-white focus:outline-none focus:border-accent/50 min-w-[200px]"
+                                            className="px-3 py-1.5 pr-16 text-sm bg-surface-input border border-ui-border rounded-lg text-content-primary focus:outline-none focus:border-accent/50 min-w-[200px]"
                                             autoFocus
                                             disabled={isActionLoading}
                                         />
@@ -647,14 +653,14 @@ export default function MediaPage() {
                                     <button
                                         onClick={() => setIsRenaming(false)}
                                         disabled={isActionLoading}
-                                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-colors"
+                                        className="p-1.5 text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded transition-colors"
                                     >
                                         <X className="h-4 w-4" />
                                     </button>
                                 </div>
 
                                 {/* Mobile dropdown - attached to bottom of page header */}
-                                <div className="md:hidden fixed left-0 right-0 top-[56px] bg-[#1a2128] border-b border-white/20 shadow-2xl z-[100] px-4 py-3">
+                                <div className="md:hidden fixed left-0 right-0 top-[56px] bg-surface-secondary border-b border-ui-border shadow-2xl z-[100] px-4 py-3">
                                     <div className="flex items-center gap-2">
                                         <div className="relative flex-1 flex items-center">
                                             <input
@@ -665,7 +671,7 @@ export default function MediaPage() {
                                                     if (e.key === "Enter" && renameValue.trim() && renameValue !== selectedFolder?.name) handleRenameFolder();
                                                     if (e.key === "Escape") setIsRenaming(false);
                                                 }}
-                                                className="w-full px-3 py-2 pr-14 text-sm bg-black/30 border border-white/10 rounded-lg text-white focus:outline-none focus:border-accent/50"
+                                                className="w-full px-3 py-2 pr-14 text-sm bg-surface-input border border-ui-border rounded-lg text-content-primary focus:outline-none focus:border-accent/50"
                                                 autoFocus
                                                 disabled={isActionLoading}
                                                 placeholder="Folder name..."
@@ -683,7 +689,7 @@ export default function MediaPage() {
                                         </div>
                                         <button
                                             onClick={() => setIsRenaming(false)}
-                                            className="p-2 text-zinc-400 hover:text-white transition-colors"
+                                            className="p-2 text-content-secondary hover:text-content-primary transition-colors"
                                         >
                                             <X className="h-5 w-5" />
                                         </button>
@@ -715,17 +721,17 @@ export default function MediaPage() {
                             <div className="relative" ref={folderMenuRef}>
                                 <button
                                     onClick={() => setIsFolderMenuOpen(!isFolderMenuOpen)}
-                                    className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                    className="p-2 text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
                                 >
                                     <MoreVertical className="h-5 w-5" />
                                 </button>
 
                                 {/* Dropdown Menu */}
                                 {isFolderMenuOpen && (
-                                    <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a2128] border border-white/20 rounded-lg shadow-2xl z-50 overflow-hidden">
+                                    <div className="absolute right-0 top-full mt-1 w-40 bg-surface-secondary border border-ui-border rounded-lg shadow-2xl z-50 overflow-hidden">
                                         <button
                                             onClick={handleStartRename}
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+                                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-content-secondary hover:bg-surface-hover hover:text-content-primary transition-colors"
                                         >
                                             <Pencil className="h-4 w-4" />
                                             Rename
@@ -733,7 +739,7 @@ export default function MediaPage() {
                                         {mediaItems.length > 0 && (
                                             <button
                                                 onClick={handleEnterBulkSelect}
-                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+                                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-content-secondary hover:bg-surface-hover hover:text-content-primary transition-colors"
                                             >
                                                 <CheckSquare className="h-4 w-4" />
                                                 Bulk Select
@@ -777,7 +783,7 @@ export default function MediaPage() {
                             >
                                 <CheckSquare className="h-5 w-5" />
                             </button>
-                            <span className="text-xs md:text-sm text-white">
+                            <span className="text-xs md:text-sm text-content-primary">
                                 {selectedItems.size === 0
                                     ? <span className="hidden md:inline">Select images to delete</span>
                                     : `${selectedItems.size} selected`}
@@ -794,7 +800,7 @@ export default function MediaPage() {
                             </button>
                             <button
                                 onClick={handleExitBulkSelect}
-                                className="p-2 md:px-3 md:py-1.5 text-sm text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 md:px-3 md:py-1.5 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
                             >
                                 <X className="h-4 w-4 md:hidden" />
                                 <span className="hidden md:inline">Cancel</span>
@@ -809,7 +815,7 @@ export default function MediaPage() {
                 <div className="h-full flex gap-6">
                     {/* Folder Tree Sidebar - Desktop */}
                     <div className="hidden md:block w-[296px] flex-shrink-0">
-                        <div className="card h-full">
+                        <div className="bg-surface-primary rounded-xl h-full">
                             <FolderTree
                                 folders={folders}
                                 selectedFolderId={selectedFolder?.id}
@@ -832,12 +838,12 @@ export default function MediaPage() {
                                 className="absolute inset-0 bg-black/60"
                                 onClick={() => setIsMobileFolderOpen(false)}
                             />
-                            <div className="absolute left-0 top-14 bottom-0 w-72 bg-[#0b1115] shadow-2xl">
-                                <div className="flex items-center justify-between p-4 border-b border-white/5">
-                                    <span className="text-white font-medium">Folders</span>
+                            <div className="absolute left-0 top-14 bottom-0 w-72 bg-surface-secondary shadow-2xl">
+                                <div className="flex items-center justify-between p-4 border-b border-ui-border">
+                                    <span className="text-content-primary font-medium">Folders</span>
                                     <button
                                         onClick={() => setIsMobileFolderOpen(false)}
-                                        className="p-2 text-zinc-400 hover:text-white"
+                                        className="p-2 text-content-secondary hover:text-content-primary"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
@@ -860,7 +866,7 @@ export default function MediaPage() {
 
                     {/* Media Grid or Add Media Landing */}
                     <div className="flex-1 min-w-0">
-                        <div className="card h-full flex flex-col">
+                        <div className="bg-surface-primary rounded-xl h-full flex flex-col">
                             {/* Uploader Zone - Animated slide down */}
                             <div
                                 className={`overflow-hidden transition-all duration-500 ease-out ${isUploaderOpen && selectedFolder && canUploadToSelectedFolder
@@ -885,8 +891,8 @@ export default function MediaPage() {
                                     /* Add Media Landing Page */
                                     <div className="flex flex-col items-center justify-start h-full text-center pt-[100px]">
                                         <ImageIcon className="h-20 w-20 text-accent/50 mb-6" />
-                                        <h2 className="text-2xl font-semibold text-white mb-3">Add Media to Your Library</h2>
-                                        <p className="text-zinc-400 max-w-md">
+                                        <h2 className="text-2xl font-semibold text-content-primary mb-3">Add Media to Your Library</h2>
+                                        <p className="text-content-secondary max-w-md">
                                             Select a folder from the sidebar to view and upload images. Each folder organizes media for different sections of your site.
                                         </p>
                                     </div>
@@ -902,10 +908,10 @@ export default function MediaPage() {
                                             /* Uploadable folder - show empty message */
                                             <div className="text-center max-w-md">
                                                 <ImageIcon className="h-16 w-16 text-accent/50 mx-auto mb-4" />
-                                                <h3 className="text-lg font-semibold text-white mb-2">
+                                                <h3 className="text-lg font-semibold text-content-primary mb-2">
                                                     No Images Yet
                                                 </h3>
-                                                <p className="text-sm text-zinc-400">
+                                                <p className="text-sm text-content-secondary">
                                                     This folder is empty. Click &quot;Add Media&quot; to upload images.
                                                 </p>
                                             </div>
@@ -913,10 +919,10 @@ export default function MediaPage() {
                                             /* Restricted folder - show message only */
                                             <div className="text-center max-w-md">
                                                 <Folder className="h-16 w-16 text-accent/50 mx-auto mb-4" />
-                                                <h3 className="text-lg font-semibold text-white mb-2">
+                                                <h3 className="text-lg font-semibold text-content-primary mb-2">
                                                     Select a Subfolder
                                                 </h3>
-                                                <p className="text-sm text-zinc-400">
+                                                <p className="text-sm text-content-secondary">
                                                     Images cannot be saved directly in &quot;{selectedFolder?.name}&quot;.
                                                     Please select or create a subfolder from the folder tree.
                                                 </p>
@@ -945,6 +951,8 @@ export default function MediaPage() {
                                                     isBulkSelected={selectedItems.has(item.id)}
                                                     onToggleBulkSelect={() => handleToggleSelectItem(item.id)}
                                                     isGalleryImage={usedImageUrls.has(item.url)}
+                                                    isFeaturedImage={featuredImageUrls.has(item.url)}
+                                                    captionClassName="bg-[#222222]"
                                                 />
                                             </div>
                                         ))}

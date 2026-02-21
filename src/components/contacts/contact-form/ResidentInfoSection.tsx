@@ -83,21 +83,21 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
       {/* Column 1: Resident Info */}
       <div className="space-y-3">
         {/* Resident Info container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <User className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <User className="h-4 w-4 text-accent" />
             Resident Info
           </h3>
 
           {/* Full Name */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
               <input
                 type="text"
                 value={formData?.resident_full_name || ""}
                 onChange={(e) => updateField('resident_full_name', e.target.value)}
-                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                 placeholder="Enter full name"
               />
             </div>
@@ -105,31 +105,31 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
 
           {/* Address */}
           <div className="space-y-2 pt-1">
-            <h4 className="text-sm font-medium text-white/80">Address</h4>
+            <h4 className="text-sm font-medium text-content-secondary">Address</h4>
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Street</label>
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Street</label>
                 <input
                   type="text"
                   value={formData?.street_address || ""}
                   onChange={(e) => updateField('street_address', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                   placeholder="Street address"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">City</label>
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">City</label>
                 <input
                   type="text"
                   value={formData?.city || ""}
                   onChange={(e) => updateField('city', e.target.value)}
-                  className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                  className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                   placeholder="City"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all flex-1">
-                  <label className="text-sm font-medium text-white/80 whitespace-nowrap">State</label>
+                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all flex-1">
+                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap">State</label>
                   <input
                     type="text"
                     list="states-list-resident"
@@ -137,7 +137,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     onChange={(e) => {
                       updateField('state', e.target.value);
                     }}
-                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-32 h-8 rounded-md px-3"
+                    className="form-input text-sm text-left w-32 h-8 rounded-md px-3"
                     placeholder="State"
                   />
                   <datalist id="states-list-resident">
@@ -146,13 +146,13 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     ))}
                   </datalist>
                 </div>
-                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                  <label className="text-sm font-medium text-white/80 whitespace-nowrap">Zip</label>
+                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Zip</label>
                   <input
                     type="text"
                     value={formData?.zip_code || ""}
                     onChange={(e) => updateField('zip_code', e.target.value)}
-                    className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-20 h-8 rounded-md px-3"
+                    className="form-input text-sm text-left w-20 h-8 rounded-md px-3"
                     placeholder="Zip"
                   />
                 </div>
@@ -163,25 +163,25 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
         </div>
 
         {/* Resident Details container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <UserCheck className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <UserCheck className="h-4 w-4 text-accent" />
             Resident Details
           </h3>
 
           {/* Date of Birth */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Date of Birth</label>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Date of Birth</label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
+                <button
+                  type="button"
                   className={cn(
-                    "w-full justify-between text-left font-normal rounded-md px-3 py-1.5 text-sm bg-black/30 border-transparent hover:bg-black/50 hover:text-white",
-                    formData?.date_of_birth ? "text-white" : "text-zinc-500"
+                    "form-input w-full flex items-center justify-start text-left font-normal px-3 py-1.5 text-sm h-8",
+                    formData?.date_of_birth ? "text-content-primary" : "text-content-muted"
                   )}
                 >
-                  <span className="flex items-center">
+                  <span className="flex items-center flex-1">
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formData?.date_of_birth
                       ? (parseHawaiiDate(formData.date_of_birth)
@@ -190,14 +190,14 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                       : "Pick a date"}
                   </span>
                   {formData?.date_of_birth && parseHawaiiDate(formData.date_of_birth) && (
-                    <span className="text-sm text-zinc-400">
+                    <span className="text-sm text-content-muted">
                       Age: {calculateAge(parseHawaiiDate(formData.date_of_birth) || undefined)}
                     </span>
                   )}
-                </Button>
+                </button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 bg-zinc-900 border-white/10 text-white [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-zinc-500"
+                className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
                 align="start"
               >
                 {/* Custom header: close button + month/year nav */}
@@ -207,7 +207,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     <button
                       type="button"
                       onClick={() => setCalendarOpen(false)}
-                      className="p-1 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                      className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -221,7 +221,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                         prev.setMonth(prev.getMonth() - 1);
                         setCalendarMonth(prev);
                       }}
-                      className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-white/10 text-white"
+                      className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
@@ -261,7 +261,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                         next.setMonth(next.getMonth() + 1);
                         setCalendarMonth(next);
                       }}
-                      className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-white/10 text-white"
+                      className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
                     >
                       <ChevronRight className="h-4 w-4" />
                     </button>
@@ -287,11 +287,11 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     dropdown_year: "!hidden",
                     nav: "!hidden",
                     day_selected: "bg-accent text-white hover:bg-accent focus:bg-accent focus:text-white",
-                    day_today: "bg-white/10 text-white",
-                    day_outside: "text-zinc-600 opacity-50",
-                    day_disabled: "text-zinc-700 opacity-50",
-                    day: cn("h-9 w-9 p-0 font-normal text-zinc-300 aria-selected:opacity-100 hover:bg-white/10 hover:text-white rounded-md transition-colors"),
-                    head_cell: "text-zinc-500 rounded-md w-9 font-normal text-[0.8rem]",
+                    day_today: "bg-surface-hover text-white",
+                    day_outside: "text-content-muted opacity-50",
+                    day_disabled: "text-content-secondary opacity-50",
+                    day: cn("h-9 w-9 p-0 font-normal text-content-secondary aria-selected:opacity-100 hover:bg-surface-hover hover:text-content-primary rounded-md transition-colors"),
+                    head_cell: "text-content-muted rounded-md w-9 font-normal text-[0.8rem] text-center",
                   }}
                 />
               </PopoverContent>
@@ -299,8 +299,8 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Gender */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <span className="font-medium text-sm text-white/80">Gender</span>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <span className="font-medium text-sm text-content-secondary">Gender</span>
             <SimpleSelect
               value={formData?.gender || ""}
               onChange={(val) => updateField('gender', val)}
@@ -311,8 +311,8 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Ethnicity */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <span className="font-medium text-sm text-white/80">Ethnicity</span>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <span className="font-medium text-sm text-content-secondary">Ethnicity</span>
             <SimpleSelect
               value={formData?.ethnicity || ""}
               onChange={(val) => updateField('ethnicity', val)}
@@ -323,9 +323,9 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Height & Weight */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
             <div className="flex items-center gap-1.5">
-              <label className="text-sm font-medium text-white/80">Height</label>
+              <label className="text-sm font-medium text-content-secondary">Height</label>
               <div className="relative w-14">
                 <input
                   type="number"
@@ -333,10 +333,10 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   max="8"
                   value={formData?.height_feet || ""}
                   onChange={(e) => updateField('height_feet', parseInt(e.target.value) || 0)}
-                  className="w-full rounded-md px-2 pr-6 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                  className="form-input w-full px-2 pr-6 py-1 text-sm text-left [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="0"
                 />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">ft</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-content-muted">ft</span>
               </div>
               <div className="relative w-14">
                 <input
@@ -345,14 +345,14 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   max="11"
                   value={formData?.height_inches || ""}
                   onChange={(e) => updateField('height_inches', parseInt(e.target.value) || 0)}
-                  className="w-full rounded-md px-2 pr-6 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                  className="form-input w-full px-2 pr-6 py-1 text-sm text-left [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="0"
                 />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">in</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-content-muted">in</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <label className="text-sm font-medium text-white/80">Weight</label>
+              <label className="text-sm font-medium text-content-secondary">Weight</label>
               <div className="relative w-20">
                 <input
                   type="number"
@@ -360,10 +360,10 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   max="1000"
                   value={formData?.weight || ""}
                   onChange={(e) => updateField('weight', parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md px-2 pl-3 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                  className="form-input w-full px-2 pl-3 pr-8 py-1 text-sm text-left [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="0"
                 />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">lbs</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-content-muted">lbs</span>
               </div>
             </div>
           </div>
@@ -373,14 +373,14 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
       {/* Column 2: Preferred Location + Primary Care Physician */}
       <div className="space-y-3">
         {/* Preferred Location container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <Compass className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <Compass className="h-4 w-4 text-accent" />
             Preferred Location
           </h3>
           {/* Island - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <span className="font-medium text-sm text-white/80">Island</span>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <span className="font-medium text-sm text-content-secondary">Island</span>
             <SimpleSelect
               value={formData?.preferred_island || ""}
               onChange={(val) => {
@@ -394,8 +394,8 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Neighborhood - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <span className="font-medium text-sm text-white/80">Neighborhood</span>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <span className="font-medium text-sm text-content-secondary">Neighborhood</span>
             <SimpleSelect
               value={formData?.preferred_neighborhood || ""}
               onChange={(val) => updateField('preferred_neighborhood', val)}
@@ -406,17 +406,17 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Min Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <label className="text-sm font-medium text-white/80">Min Budget</label>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary">Min Budget</label>
             <div className="relative w-32">
-              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.minimum_budget ? "text-white/80" : "text-zinc-500"}`}>$</span>
+              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.minimum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
               <input
                 type="number"
                 step="100"
                 min="0"
                 value={formData?.minimum_budget || ""}
                 onChange={(e) => updateField('minimum_budget', parseFloat(e.target.value) || 0)}
-                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                className="form-input w-full px-2 pl-6 pr-8 py-1 text-sm text-left [&::-webkit-inner-spin-button]:appearance-none"
                 placeholder="0"
               />
               <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -426,7 +426,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     const current = parseFloat(formData?.minimum_budget) || 0;
                     updateField('minimum_budget', current + 100);
                   }}
-                  className="p-0.5 hover:bg-white/10 rounded text-white/50 hover:text-white transition-colors"
+                  className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
                 >
                   <ChevronUp className="h-2 w-2" />
                 </button>
@@ -436,7 +436,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     const current = parseFloat(formData?.minimum_budget) || 0;
                     updateField('minimum_budget', Math.max(0, current - 100));
                   }}
-                  className="p-0.5 hover:bg-white/10 rounded text-white/50 hover:text-white transition-colors"
+                  className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
                 >
                   <ChevronDown className="h-2 w-2" />
                 </button>
@@ -445,17 +445,17 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
           </div>
 
           {/* Max Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <label className="text-sm font-medium text-white/80">Max Budget</label>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary">Max Budget</label>
             <div className="relative w-32">
-              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.maximum_budget ? "text-white/80" : "text-zinc-500"}`}>$</span>
+              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.maximum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
               <input
                 type="number"
                 step="100"
                 min="0"
                 value={formData?.maximum_budget || ""}
                 onChange={(e) => updateField('maximum_budget', parseFloat(e.target.value) || 0)}
-                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                className="form-input w-full px-2 pl-6 pr-8 py-1 text-sm text-left [&::-webkit-inner-spin-button]:appearance-none"
                 placeholder="0"
               />
               <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -465,7 +465,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     const current = parseFloat(formData?.maximum_budget) || 0;
                     updateField('maximum_budget', current + 100);
                   }}
-                  className="p-0.5 hover:bg-white/10 rounded text-white/50 hover:text-white transition-colors"
+                  className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
                 >
                   <ChevronUp className="h-2 w-2" />
                 </button>
@@ -475,7 +475,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                     const current = parseFloat(formData?.maximum_budget) || 0;
                     updateField('maximum_budget', Math.max(0, current - 100));
                   }}
-                  className="p-0.5 hover:bg-white/10 rounded text-white/50 hover:text-white transition-colors"
+                  className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
                 >
                   <ChevronDown className="h-2 w-2" />
                 </button>
@@ -485,28 +485,28 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
         </div>
 
         {/* Primary Care Physician container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <Stethoscope className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <Stethoscope className="h-4 w-4 text-accent" />
             Primary Care Physician
           </h3>
 
           <div className="space-y-2">
             {/* PCP Name */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Name</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Name</label>
               <input
                 type="text"
                 value={formData?.pcp_name || ""}
                 onChange={(e) => updateField('pcp_name', e.target.value)}
-                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                 placeholder="Physician name"
               />
             </div>
 
             {/* PCP Phone */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
               <input
                 type="tel"
                 value={formData?.pcp_phone || ""}
@@ -514,14 +514,14 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                   const formatted = formatPhoneNumber(e.target.value);
                   updateField('pcp_phone', formatted);
                 }}
-                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                 placeholder="(123) 456-7890"
               />
             </div>
 
             {/* PCP Email */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
               <div className="flex flex-col items-end">
                 <input
                   type="email"
@@ -535,7 +535,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
                       setPcpEmailError(null);
                     }
                   }}
-                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${pcpEmailError ? 'border-red-500/50' : ''}`}
+                  className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${pcpEmailError ? 'border-red-500/50' : ''}`}
                   placeholder="name@example.com"
                 />
                 {pcpEmailError && (
@@ -550,33 +550,33 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
       {/* Column 3: Insurance + Diagnoses */}
       <div className="space-y-3">
         {/* Insurance Information container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <ShieldCheck className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <ShieldCheck className="h-4 w-4 text-accent" />
             Insurance Information
           </h3>
 
           <div className="space-y-2">
             {/* Primary Insurance */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Primary</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Primary</label>
               <input
                 type="text"
                 value={formData?.primary_insurance || ""}
                 onChange={(e) => updateField('primary_insurance', e.target.value)}
-                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                 placeholder="Primary insurance"
               />
             </div>
 
             {/* Secondary Insurance */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Secondary</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Secondary</label>
               <input
                 type="text"
                 value={formData?.secondary_insurance || ""}
                 onChange={(e) => updateField('secondary_insurance', e.target.value)}
-                className="bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                 placeholder="Secondary insurance"
               />
             </div>
@@ -584,9 +584,9 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
         </div>
 
         {/* Diagnoses container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <Activity className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <Activity className="h-4 w-4 text-accent" />
             Diagnoses
           </h3>
 
@@ -594,7 +594,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.diagnoses || ""}
               onChange={(e) => updateField('diagnoses', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted min-h-[100px] resize-y"
               placeholder="Medical diagnoses and relevant health conditions..."
               disabled={readOnly}
             />
@@ -605,9 +605,9 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
       {/* Column 4: Additional Information */}
       <div className="space-y-3">
         {/* Additional Information container */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <Info className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <Info className="h-4 w-4 text-accent" />
             Additional Information
           </h3>
 
@@ -616,7 +616,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.diet_restrictions || ""}
               onChange={(e) => updateField('diet_restrictions', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted min-h-[100px] resize-y"
               placeholder="Diet Restrictions/Preferences"
             />
           </div>
@@ -626,7 +626,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
             <textarea
               value={formData?.supplements || ""}
               onChange={(e) => updateField('supplements', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted min-h-[100px] resize-y"
               placeholder="Supplements"
             />
           </div>
@@ -637,7 +637,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
               type="text"
               value={formData?.dentition || ""}
               onChange={(e) => updateField('dentition', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted"
               placeholder="Dentition"
             />
           </div>
@@ -648,7 +648,7 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
               type="text"
               value={formData?.vision || ""}
               onChange={(e) => updateField('vision', e.target.value)}
-              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15"
+              className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted"
               placeholder="Vision"
             />
           </div>
@@ -659,3 +659,9 @@ const ResidentInfoSection = ({ formData, setFormData, readOnly = false }: Reside
 };
 
 export default ResidentInfoSection;
+
+
+
+
+
+

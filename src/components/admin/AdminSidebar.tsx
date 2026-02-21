@@ -22,10 +22,12 @@ import {
     X,
     Bed,
     Plus,
+    Palette,
 } from "lucide-react";
 import { Logo, LogoIcon } from "@/components/icons/Logo";
 import { getTaxonomies, updateTaxonomy } from "@/lib/services/taxonomyService";
 import { TaxonomyForm } from "./TaxonomyForm";
+import { StyleManagerPanel } from "./StyleManagerPanel";
 import type { Taxonomy } from "@/types";
 
 const navigation = [
@@ -50,6 +52,7 @@ interface AdminSidebarProps {
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 // ... (existing imports)
 
@@ -57,7 +60,10 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { mode } = useTheme();
+    const isLight = mode === 'light';
     const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+    const [showStyleManager, setShowStyleManager] = useState(false);
     const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
     const { handleNavigation } = useUnsavedChanges();
     const { user, signOut, canAccessSettings, canManageUsers, isSystemAdmin } = useAuth();
@@ -112,7 +118,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
     return (
         <aside
-            className={`h-screen bg-[#0b1115] border-r border-white/5 transition-all duration-300 flex flex-col relative overflow-hidden ${collapsed ? "w-20" : "w-64"
+            className={`h-screen bg-surface-secondary transition-all duration-300 flex flex-col relative overflow-hidden ${collapsed ? "w-20" : "w-64"
                 }`}
         >
             {/* Hibiscus Background Decoration */}
@@ -121,19 +127,29 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                     className="absolute bottom-20 left-0 right-0 pointer-events-none opacity-10"
                     style={{ height: '300px' }}
                 >
+                    {/* Dark mode hibiscus */}
                     <Image
                         src="/images/hibiscus-bg.svg"
                         alt=""
                         width={300}
                         height={300}
-                        className="absolute -bottom-10 -left-10 w-[280px] h-auto"
+                        className="logo-dark absolute -bottom-10 -left-10 w-[280px] h-auto"
+                        style={{ transform: 'rotate(-15deg)' }}
+                    />
+                    {/* Light mode hibiscus */}
+                    <Image
+                        src="/images/hibiscus-bg-b.svg"
+                        alt=""
+                        width={300}
+                        height={300}
+                        className="logo-light absolute -bottom-10 -left-10 w-[280px] h-auto"
                         style={{ transform: 'rotate(-15deg)' }}
                     />
                 </div>
             )}
 
             {/* Logo / Branding Header */}
-            <div className="flex-none h-16 flex items-center px-4 border-b border-white/5 relative z-10">
+            <div className="flex-none h-16 flex items-center px-4 bg-surface-card relative z-10">
                 {!collapsed ? (
                     <Logo className="h-8 w-auto" />
                 ) : (
@@ -144,14 +160,10 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             {/* Collapse Button - hidden on mobile */}
             <button
                 onClick={onToggle}
-                className="hidden md:flex absolute top-6 right-0 z-[100] h-6 w-6 items-center justify-center text-zinc-400 hover:text-accent hover:bg-accent/10 transition-colors shadow-lg"
+                className="hidden md:flex absolute top-6 right-0 z-[100] h-6 w-6 items-center justify-center text-content-muted hover:text-accent hover:bg-accent/10 transition-colors shadow-lg"
                 style={{
-                    backgroundColor: '#0b1115',
+                    backgroundColor: 'var(--surface-primary)',
                     borderRadius: '6px 0 0 6px',
-                    borderTop: '1px solid rgb(63 63 70)',
-                    borderBottom: '1px solid rgb(63 63 70)',
-                    borderLeft: '1px solid rgb(63 63 70)',
-                    borderRight: 'none'
                 }}
             >
                 {collapsed ? (
@@ -162,58 +174,68 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             </button>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto space-y-1 px-3 py-4 relative z-10">
-                {navItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+            <div className="relative flex-1 overflow-hidden">
+                {/* Glass overlay when settings menu is open */}
+                {showSettingsMenu && (
+                    <div
+                        className="absolute inset-0 z-10 cursor-default backdrop-blur-sm"
+                        onClick={() => setShowSettingsMenu(false)}
+                        style={{ backgroundColor: 'var(--glass-overlay)' }}
+                    />
+                )}
+                <nav className="h-full overflow-y-auto space-y-1 px-3 py-4 relative z-0">
+                    {navItems.map((item) => {
+                        const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
 
-                    return (
-                        <div key={item.name}>
-                            <div className={`relative flex items-center rounded-lg transition-all duration-200 group ${isActive
-                                ? "bg-accent/10 text-accent shadow-[0_0_20px_rgba(35,157,219,0.15)]"
-                                : "text-zinc-400 hover:bg-white/5 hover:text-white"
-                                }`}>
-                                <Link
-                                    href={item.href}
-                                    onClick={(e) => handleNavClick(e, item.href)}
-                                    className={`flex items-center px-3 py-2.5 text-sm font-medium flex-1`}
-                                >
-                                    <item.icon
-                                        className={`h-5 w-5 flex-shrink-0 ${isActive ? "text-accent" : "text-zinc-500 group-hover:text-white"
-                                            }`}
-                                    />
-                                    {!collapsed && (
-                                        <span className="ml-3 truncate flex-1">{item.name}</span>
-                                    )}
-                                </Link>
-                                {/* Add Button */}
-                                {item.hasAddButton && !collapsed && (
+                        return (
+                            <div key={item.name}>
+                                <div className={`relative flex items-center rounded-lg transition-all duration-200 group ${isActive
+                                    ? "bg-surface-hover text-content-primary"
+                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    }`}>
                                     <Link
-                                        href={`${item.href}?action=create`}
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Stop propagation to parent link
-                                            handleNavClick(e, `${item.href}?action=create`);
-                                        }}
-                                        className={`mr-2 p-1 rounded-md transition-colors ${isActive
-                                            ? "text-accent hover:bg-accent/20"
-                                            : "text-zinc-500 hover:text-white hover:bg-white/10"
-                                            }`}
+                                        href={item.href}
+                                        onClick={(e) => handleNavClick(e, item.href)}
+                                        className={`flex items-center px-3 py-2.5 text-sm font-medium flex-1`}
                                     >
-                                        <Plus className="h-4 w-4" />
+                                        <item.icon
+                                            className={`h-5 w-5 flex-shrink-0 ${isActive ? "text-accent" : "text-content-muted group-hover:text-content-primary"
+                                                }`}
+                                        />
+                                        {!collapsed && (
+                                            <span className="ml-3 truncate flex-1">{item.name}</span>
+                                        )}
                                     </Link>
-                                )}
+                                    {/* Add Button */}
+                                    {item.hasAddButton && !collapsed && (
+                                        <Link
+                                            href={`${item.href}?action=create`}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Stop propagation to parent link
+                                                handleNavClick(e, `${item.href}?action=create`);
+                                            }}
+                                            className={`mr-2 p-1 rounded-md transition-colors ${isActive
+                                                ? "text-content-muted hover:text-content-primary hover:bg-surface-hover"
+                                                : `text-content-muted hover:text-content-primary ${isLight ? 'hover:bg-white' : 'hover:bg-surface-hover'}`
+                                                }`}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Link>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </nav>
+                        );
+                    })}
+                </nav>
+            </div>
 
             {/* Profile Section */}
-            <div className="flex-none border-t border-white/5 p-4 relative z-10">
+            <div className="flex-none bg-surface-card p-4 relative z-30">
                 <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
                     <Link
                         href="/admin/profile"
                         onClick={(e) => handleNavClick(e, "/admin/profile")}
-                        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg transition-colors hover:bg-white/5 ${collapsed ? "justify-center p-1" : "p-1 -m-1"}`}
+                        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg transition-colors hover:bg-surface-hover ${collapsed ? "justify-center p-1" : "p-1 -m-1"}`}
                     >
                         {user?.profile?.photo_url ? (
                             <Image
@@ -225,17 +247,17 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             />
                         ) : (
                             <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                                <User className="h-5 w-5 text-white" />
+                                <User className="h-5 w-5 text-content-primary" />
                             </div>
                         )}
                         {!collapsed && (
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-white truncate">
+                                <p className="text-sm font-medium text-content-primary truncate">
                                     {user?.profile?.nickname || user?.profile?.full_name?.split(' ')[0] || user?.email || 'User'}
                                 </p>
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-2 w-2 rounded-full bg-green-400"></span>
-                                    <span className="text-xs text-zinc-500">
+                                    <span className="text-xs text-content-muted">
                                         {user?.role?.role === 'super_admin' ? 'Super Admin' :
                                             user?.role?.role === 'system_admin' ? 'System Admin' :
                                                 user?.role?.role === 'regional_manager' ? 'Regional Manager' :
@@ -252,7 +274,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                     onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                                     className={`p-2 rounded-lg transition-colors ${showSettingsMenu
                                         ? "text-accent bg-accent/10"
-                                        : "text-zinc-400 hover:text-accent hover:bg-accent/10"
+                                        : "text-content-secondary hover:text-accent hover:bg-accent/10"
                                         }`}
                                 >
                                     <Settings className="h-5 w-5" />
@@ -261,7 +283,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             {!canAccessSettings && (
                                 <button
                                     onClick={handleLogout}
-                                    className="p-2 rounded-lg transition-colors text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
+                                    className="p-2 rounded-lg transition-colors text-content-secondary hover:text-red-400 hover:bg-red-400/10"
                                     title="Logout"
                                 >
                                     <LogOut className="h-5 w-5" />
@@ -275,29 +297,34 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             {/* Settings Menu - Slides up from bottom */}
             {!collapsed && (
                 <div
-                    className={`absolute inset-x-0 bg-[#0b1115] border-t border-white/10 shadow-2xl transition-all duration-300 transform origin-bottom z-20 overflow-hidden ${showSettingsMenu
-                        ? "bottom-[73px] opacity-100 scale-100 translate-y-0"
-                        : "bottom-[73px] opacity-0 scale-95 translate-y-4 pointer-events-none"
-                        }`}
+                    className={`absolute inset-x-0 bottom-0 shadow-2xl z-20 overflow-hidden rounded-t-xl border-t border-ui-border
+                        transition-transform duration-300 ease-out
+                        ${showSettingsMenu ? 'translate-y-0' : 'translate-y-full pointer-events-none'}`}
+                    style={{
+                        paddingBottom: '73px',
+                        backgroundColor: 'color-mix(in srgb, var(--surface-secondary) 75%, transparent)',
+                        backdropFilter: 'blur(16px)',
+                        WebkitBackdropFilter: 'blur(16px)',
+                    }}
                 >
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
-                        <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                    <div className="flex items-center justify-between px-4 py-3 bg-black/[0.04]">
+                        <h3 className="text-xs font-semibold text-content-secondary uppercase tracking-wider">
                             Settings
                         </h3>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center">
                             <button
                                 onClick={() => {
                                     handleLogout();
                                     setShowSettingsMenu(false);
                                 }}
-                                className="text-zinc-400 hover:text-red-400 transition-colors"
+                                className="p-1 rounded-md text-content-muted hover:text-red-400 hover:bg-surface-hover transition-colors"
                                 title="Logout"
                             >
                                 <LogOut className="h-4 w-4" />
                             </button>
                             <button
                                 onClick={() => setShowSettingsMenu(false)}
-                                className="text-zinc-400 hover:text-white transition-colors"
+                                className="p-1 rounded-md text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors"
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -308,49 +335,65 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             href="/admin/taxonomies"
                             onClick={(e) => handleNavClick(e, "/admin/taxonomies")}
                             className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/taxonomies")
-                                ? "bg-accent/10 text-accent shadow-[0_0_20px_rgba(35,157,219,0.15)]"
-                                : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                                 }`}
                         >
-                            <Tags className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/taxonomies") ? "text-accent" : "text-zinc-500 group-hover:text-white"}`} />
+                            <Tags className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/taxonomies") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Taxonomies
                         </Link>
                         <Link
                             href="/admin/setup/room-fields"
                             onClick={(e) => handleNavClick(e, "/admin/setup/room-fields")}
                             className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/setup/room-fields")
-                                ? "bg-accent/10 text-accent shadow-[0_0_20px_rgba(35,157,219,0.15)]"
-                                : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                                 }`}
                         >
-                            <Bed className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/setup/room-fields") ? "text-accent" : "text-zinc-500 group-hover:text-white"}`} />
+                            <Bed className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/setup/room-fields") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Detail Fields
                         </Link>
                         <Link
                             href="/admin/settings"
                             onClick={(e) => handleNavClick(e, "/admin/settings")}
                             className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname === "/admin/settings"
-                                ? "bg-accent/10 text-accent shadow-[0_0_20px_rgba(35,157,219,0.15)]"
-                                : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                                 }`}
                         >
-                            <Settings className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname === "/admin/settings" ? "text-accent" : "text-zinc-500 group-hover:text-white"}`} />
+                            <Settings className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname === "/admin/settings" ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             General
                         </Link>
                         <Link
                             href="/admin/settings/users"
                             onClick={(e) => handleNavClick(e, "/admin/settings/users")}
                             className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/users")
-                                ? "bg-accent/10 text-accent shadow-[0_0_20px_rgba(35,157,219,0.15)]"
-                                : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                                 }`}
                         >
-                            <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-zinc-500 group-hover:text-white"}`} />
+                            <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Users
                         </Link>
+                        <button
+                            onClick={() => {
+                                setShowStyleManager(true);
+                                setShowSettingsMenu(false);
+                            }}
+                            className={`group flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-content-secondary hover:bg-surface-hover hover:text-content-primary`}
+                        >
+                            <Palette className="h-5 w-5 mr-3 flex-shrink-0 text-content-muted group-hover:text-content-primary" />
+                            Style Manager
+                        </button>
                     </div>
                 </div>
             )}
+
+            {/* Style Manager Overlay */}
+            <StyleManagerPanel
+                isOpen={showStyleManager}
+                onClose={() => setShowStyleManager(false)}
+            />
 
             {/* Global Taxonomy Manager Overlay */}
             {managingTaxonomy && (

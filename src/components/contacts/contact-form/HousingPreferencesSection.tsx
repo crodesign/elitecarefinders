@@ -1,9 +1,6 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarClock, Home, BedDouble, Bath, ShowerHead, Heart, StickyNote } from "lucide-react";
+import { CalendarClock, Home, BedDouble, Bath, ShowerHead, Heart, StickyNote, Check, X } from "lucide-react";
+import { SimpleSelect } from "../../admin/SimpleSelect";
 
 interface HousingPreferencesSectionProps {
   formData?: any;
@@ -18,179 +15,111 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
     }
   };
 
-  const updateArrayField = (field: string, item: string, checked: boolean) => {
-    if (setFormData) {
-      setFormData((prev: any) => {
-        const currentArray = prev[field] || [];
-        const newArray = checked
-          ? [...currentArray, item]
-          : currentArray.filter((i: string) => i !== item);
-        return { ...prev, [field]: newArray };
-      });
-    }
+  const toggleArrayItem = (field: string, item: string) => {
+    if (readOnly || !setFormData) return;
+    setFormData((prev: any) => {
+      const arr: string[] = prev[field] || [];
+      const next = arr.includes(item) ? arr.filter((i: string) => i !== item) : [...arr, item];
+      return { ...prev, [field]: next };
+    });
   };
+
+  // Reusable clickable checkbox row matching HomeFieldCategory multi pattern
+  const CheckRow = ({ field, option }: { field: string; option: string }) => {
+    const isSelected = (formData?.[field] || []).includes(option);
+    return (
+      <button
+        type="button"
+        onClick={() => toggleArrayItem(field, option)}
+        disabled={readOnly}
+        className={`w-full flex items-center justify-between p-3 rounded-lg border border-transparent transition-all ${isSelected ? "bg-surface-hover" : "bg-surface-hover hover:bg-black/20"
+          }`}
+      >
+        <span className={`text-sm font-medium ${isSelected ? "text-content-primary" : "text-content-secondary"}`}>{option}</span>
+        <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${isSelected ? "border border-accent bg-accent" : "bg-surface-secondary"
+          }`}>
+          {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+        </div>
+      </button>
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
       {/* Column 1: Move-in Dates + Housing Type */}
       <div className="space-y-6">
-        {/* Move-in Dates */}
-        <div className="bg-white/5 rounded-lg p-3 space-y-4">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2">
-            <CalendarClock className="h-4 w-4 text-primary" />
-            Projected Move-in Date
-          </h3>
-          <div className="space-y-2">
-            <Select value={formData?.timeToMove || ""} onValueChange={(value) => updateField('timeToMove', value)}>
-              <SelectTrigger className="bg-white/10 border-transparent text-white placeholder-zinc-500 hover:bg-white/15 focus:ring-0">
-                <SelectValue placeholder="1-3 months" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#0b1115] border-white/10 text-white">
-                <SelectItem value="immediate">Immediately</SelectItem>
-                <SelectItem value="1-3-months">1-3 months</SelectItem>
-                <SelectItem value="3-6-months">3-6 months</SelectItem>
-                <SelectItem value="3-plus-months">3+ months</SelectItem>
-                <SelectItem value="6-plus-months">6+ months</SelectItem>
-                <SelectItem value="not-sure">Not sure</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Move-in Timeframe */}
+        <div className="bg-surface-hover rounded-lg">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5">
+            <span className="font-medium text-sm text-content-secondary whitespace-nowrap flex items-center gap-2">
+              <CalendarClock className="h-4 w-4 text-accent" />
+              Move-in Date
+            </span>
+            <SimpleSelect
+              value={formData?.timeToMove || ""}
+              onChange={(val) => updateField('timeToMove', val)}
+              options={["Immediately", "1-3 months", "3-6 months", "3+ months", "6+ months", "Not sure"]}
+              placeholder="Select..."
+              className="w-40 text-sm text-left"
+            />
           </div>
         </div>
 
         {/* Housing Type */}
-        <div className="bg-white/5 rounded-lg p-3 space-y-4">
-          <label className="text-sm font-medium text-white/80 flex items-center gap-2"><Home className="h-4 w-4 text-primary" />Housing Type</label>
+        <div className="bg-surface-hover rounded-lg p-3 space-y-4">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+            <Home className="h-4 w-4 text-accent" />Housing Type
+          </label>
 
-          {/* Care Homes & Adult Foster Homes */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-zinc-300 block">Care Homes & Adult Foster Homes</span>
-            {[
-              "Adult Foster Homes", "Adult Residential Care Homes",
-              "Expanded - Adult Residential Care Homes"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.housingType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.housingType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('housingType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
-            ))}
+            <span className="text-xs font-medium text-content-muted block px-1">Care Homes & Adult Foster Homes</span>
+            <div className="space-y-2">
+              {["Adult Foster Homes", "Adult Residential Care Homes", "Expanded - Adult Residential Care Homes"].map(opt => (
+                <CheckRow key={opt} field="housingType" option={opt} />
+              ))}
+            </div>
           </div>
 
-          {/* Senior Living Communities */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-zinc-300 block">Senior Living Communities</span>
-            {[
-              "Assisted Living", "Independent Living",
-              "Skilled Nursing Facility", "Intermediate Care Facility"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.housingType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.housingType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('housingType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
-            ))}
+            <span className="text-xs font-medium text-content-muted block px-1">Senior Living Communities</span>
+            <div className="space-y-2">
+              {["Assisted Living", "Independent Living", "Skilled Nursing Facility", "Intermediate Care Facility"].map(opt => (
+                <CheckRow key={opt} field="housingType" option={opt} />
+              ))}
+            </div>
           </div>
 
-          {/* Memory Care */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-zinc-300 block">Memory Care</span>
-            {[
-              "Memory Care"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`ht-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.housingType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.housingType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('housingType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
-            ))}
+            <span className="text-xs font-medium text-content-muted block px-1">Memory Care</span>
+            <div className="space-y-2">
+              {["Memory Care"].map(opt => (
+                <CheckRow key={opt} field="housingType" option={opt} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Column 2: Room Type + Bathroom Type */}
       <div className="space-y-6">
-        <div className="bg-white/5 rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-white/80 flex items-center gap-2"><BedDouble className="h-4 w-4 text-primary" />Room Type</label>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-            {[
-              "Shared Suite", "Private Suite", "Studio",
-              "1 Bedroom", "2 Bedroom", "Other"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`rt-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.roomType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.roomType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('roomType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+            <BedDouble className="h-4 w-4 text-accent" />Room Type
+          </label>
+          <div className="space-y-2">
+            {["Shared Suite", "Private Suite", "Studio", "1 Bedroom", "2 Bedroom", "Other"].map(opt => (
+              <CheckRow key={opt} field="roomType" option={opt} />
             ))}
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-white/80 flex items-center gap-2"><Bath className="h-4 w-4 text-primary" />Bathroom Type</label>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-            {[
-              "Private full bath", "Private Half Bath", "Full Shared",
-              "Half Shared", "Separate Full Bath", "Separate Half Bath", "Jack & Jill"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`bt-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.bathroomType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.bathroomType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('bathroomType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+            <Bath className="h-4 w-4 text-accent" />Bathroom Type
+          </label>
+          <div className="space-y-2">
+            {["Private full bath", "Private Half Bath", "Full Shared", "Half Shared", "Separate Full Bath", "Separate Half Bath", "Jack & Jill"].map(opt => (
+              <CheckRow key={opt} field="bathroomType" option={opt} />
             ))}
           </div>
         </div>
@@ -198,50 +127,28 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
 
       {/* Column 3: Shower Type + Interests */}
       <div className="space-y-6">
-        <div className="bg-white/5 rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-white/80 flex items-center gap-2"><ShowerHead className="h-4 w-4 text-primary" />Shower Type</label>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-            {[
-              "Step-In Shower", "Wheel-in Shower", "Bathtub"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`st-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.showerType?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes = formData?.showerType || [];
-                    const newTypes = checked
-                      ? [...currentTypes, option]
-                      : currentTypes.filter((type: string) => type !== option);
-                    updateField('showerType', newTypes);
-                  }}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+            <ShowerHead className="h-4 w-4 text-accent" />Shower Type
+          </label>
+          <div className="space-y-2">
+            {["Step-In Shower", "Wheel-in Shower", "Bathtub"].map(opt => (
+              <CheckRow key={opt} field="showerType" option={opt} />
             ))}
           </div>
         </div>
 
-        <div className="bg-white/5 rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-white/80 flex items-center gap-2"><Heart className="h-4 w-4 text-primary" />Interests</label>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+            <Heart className="h-4 w-4 text-accent" />Interests
+          </label>
+          <div className="space-y-2">
             {[
               "Talking to Family and Friends", "Spiritual/Faith Based Activity",
               "Walk or Physical Activity", "Being Outdoors",
               "A Good Meal", "TV, Movies or Music"
-            ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-white/10 border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-zinc-400">{option}</span>
-                <Checkbox
-                  id={`int-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.interests?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('interests', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-zinc-600 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+            ].map(opt => (
+              <CheckRow key={opt} field="interests" option={opt} />
             ))}
           </div>
         </div>
@@ -249,9 +156,9 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
 
       {/* Column 4: Additional Notes */}
       <div className="space-y-6">
-        <div className="bg-white/5 rounded-lg p-4 space-y-4">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2">
-            <StickyNote className="h-4 w-4 text-primary" />
+        <div className="bg-surface-hover rounded-lg p-4 space-y-4">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
+            <StickyNote className="h-4 w-4 text-accent" />
             Additional Notes
           </h3>
           <textarea
@@ -260,7 +167,7 @@ const HousingPreferencesSection = ({ formData, setFormData, readOnly = false }: 
             value={formData?.housingAdditionalNotes || ''}
             onChange={(e) => updateField('housingAdditionalNotes', e.target.value)}
             disabled={readOnly}
-            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[100px] resize-y"
+            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors form-input placeholder-content-muted min-h-[100px] resize-y"
           />
         </div>
       </div>

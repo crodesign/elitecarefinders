@@ -51,14 +51,14 @@ export function Toast({ id, title, subtitle, duration = 3000, onDismiss }: Toast
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white">{title}</p>
                 {subtitle && (
-                    <p className="text-xs text-zinc-400 mt-0.5 truncate">{subtitle}</p>
+                    <p className="text-xs text-content-muted mt-0.5 truncate">{subtitle}</p>
                 )}
             </div>
 
             {/* Dismiss Button */}
             <button
                 onClick={handleDismiss}
-                className="flex-shrink-0 p-1 text-zinc-500 hover:text-white transition-colors"
+                className="flex-shrink-0 p-1 text-content-muted hover:text-white transition-colors"
             >
                 <X className="h-4 w-4" />
             </button>

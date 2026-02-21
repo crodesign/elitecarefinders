@@ -61,11 +61,11 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 autoComplete="username"
-                                className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-zinc-600 hover:bg-black/90 focus:bg-black/90"
+                                className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-content-muted hover:bg-black/90 focus:bg-black/90"
                                 placeholder="you@example.com or nickname"
                                 disabled={loading}
                             />
-                            <p className="text-xs text-zinc-500 italic">
+                            <p className="text-xs text-content-muted italic">
                                 You can sign in with either your email address or nickname
                             </p>
                         </div>
@@ -82,14 +82,14 @@ export default function LoginPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     autoComplete="current-password"
-                                    className="w-full rounded-md px-3 py-2 pr-10 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-zinc-600 hover:bg-black/90 focus:bg-black/90"
+                                    className="w-full rounded-md px-3 py-2 pr-10 text-left text-sm focus:outline-none transition-colors bg-black/80 text-white placeholder-content-muted hover:bg-black/90 focus:bg-black/90"
                                     placeholder="••••••••"
                                     disabled={loading}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-white transition-colors rounded hover:bg-white/10"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-content-muted hover:text-white transition-colors rounded hover:bg-white/10"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? (

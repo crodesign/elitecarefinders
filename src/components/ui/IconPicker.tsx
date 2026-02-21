@@ -171,7 +171,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
                 onClick={() => { setIsOpen(!isOpen); setSearch(""); }}
                 className={`p-1.5 rounded transition-colors ${value
                     ? "text-accent bg-transparent hover:bg-white/5"
-                    : "text-zinc-500 hover:text-white bg-black/20 hover:bg-black/40"
+                    : "text-content-muted hover:text-white bg-black/20 hover:bg-black/40"
                     }`}
                 title={value ? `Icon: ${value}` : "Choose icon"}
             >
@@ -185,24 +185,24 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
             {isOpen && (
                 <div
                     ref={popupRef}
-                    className="absolute left-0 top-full mt-2 z-[1000] w-[320px] bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                    className="absolute left-0 top-full mt-2 z-[1000] w-[320px] bg-surface-secondary border border-white/10 rounded-xl shadow-2xl overflow-hidden"
                 >
                     {/* Search bar */}
                     <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
-                        <Search className="h-4 w-4 text-zinc-500 shrink-0" />
+                        <Search className="h-4 w-4 text-content-muted shrink-0" />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search icons..."
-                            className="flex-1 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                            className="flex-1 bg-transparent text-sm text-white placeholder-content-muted focus:outline-none"
                             autoFocus
                         />
                         {value && (
                             <button
                                 type="button"
                                 onClick={() => { onChange(undefined); setIsOpen(false); }}
-                                className="text-zinc-500 hover:text-red-400 text-xs shrink-0"
+                                className="text-content-muted hover:text-red-400 text-xs shrink-0"
                                 title="Remove icon"
                             >
                                 <X className="h-3.5 w-3.5" />
@@ -222,7 +222,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
                                         onClick={() => { onChange(entry.name); setIsOpen(false); }}
                                         className={`p-2 rounded transition-colors flex items-center justify-center ${isSelected
                                             ? "bg-accent/20 text-accent"
-                                            : "text-zinc-400 hover:text-white hover:bg-white/10"
+                                            : "text-content-muted hover:text-white hover:bg-white/10"
                                             }`}
                                     >
                                         <IconComp className="h-4 w-4" />
@@ -231,7 +231,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
                             );
                         })}
                         {filtered.length === 0 && (
-                            <div className="col-span-8 text-center text-zinc-500 text-xs py-4">
+                            <div className="col-span-8 text-center text-content-muted text-xs py-4">
                                 No icons match "{search}"
                             </div>
                         )}

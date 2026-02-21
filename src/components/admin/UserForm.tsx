@@ -11,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Tooltip } from "@/components/ui/tooltip";
 import { EnhancedSelect } from "./EnhancedSelect";
 import { SimpleSelect } from "./SimpleSelect";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 
 // Get icon based on role type
 const getRoleIcon = (roleValue: UserRole) => {
@@ -93,6 +95,8 @@ interface UserFormProps {
 
 export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const { canCreateRole, isSuperAdmin, isSystemAdmin, user: currentUser } = useAuth();
+    const { mode } = useTheme();
+    const isLight = mode === 'light';
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isResettingPassword, setIsResettingPassword] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -487,45 +491,44 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-6">
-                                <div className="bg-white/5 rounded-lg p-4">
-                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
                                         <User className="h-4 w-4 text-accent" />
                                         Account Information
                                     </h3>
 
                                     <div className="flex gap-4 mb-3">
-                                        <div className="flex-1 space-y-3">
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                        <div className="flex-1 space-y-2">
+                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
                                                     Full Name
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                                 </label>
                                                 <input
                                                     type="text"
                                                     value={fullName}
                                                     onChange={(e) => setFullName(e.target.value)}
-                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
                                                     placeholder="John Doe"
                                                     autoComplete="off"
                                                     required
                                                 />
                                             </div>
 
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80">Nickname</label>
+                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Nickname</label>
                                                 <input
                                                     type="text"
                                                     value={nickname}
                                                     onChange={(e) => setNickname(e.target.value)}
-                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                    placeholder="Optional nickname"
+                                                    className="form-input text-sm text-left w-48 h-8 rounded-md px-3"
+                                                    placeholder="Optional"
                                                     autoComplete="off"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="flex-shrink-0">
-                                            <label className="text-sm font-medium text-white/80 block mb-1">Photo</label>
                                             <div className="relative w-24 h-24">
                                                 <input
                                                     ref={fileInputRef}
@@ -537,7 +540,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                 <button
                                                     type="button"
                                                     onClick={handlePhotoClick}
-                                                    className="w-full h-full rounded-full overflow-hidden bg-black/30 hover:bg-black/40 transition-colors group"
+                                                    className="w-full h-full rounded-full overflow-hidden bg-surface-primary transition-colors group"
                                                 >
                                                     {photoUrl ? (
                                                         <img
@@ -546,32 +549,32 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                             className="w-full h-full object-cover"
                                                         />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-white/40">
+                                                        <div className="w-full h-full flex items-center justify-center text-content-muted">
                                                             <User className="h-10 w-10" />
                                                         </div>
                                                     )}
                                                 </button>
-                                                <div className="absolute bottom-0 right-0 bg-accent rounded-full p-1.5 border-2 border-[rgb(13,17,21)] shadow-lg hover:bg-accent-light transition-colors cursor-pointer z-10" onClick={handlePhotoClick}>
+                                                <div className={cn("absolute bottom-0 right-0 bg-accent rounded-full p-1.5 border-2 shadow-lg hover:bg-accent-light transition-colors cursor-pointer z-10", isLight ? "border-white" : "border-[rgb(13,17,21)]")} onClick={handlePhotoClick}>
                                                     <Upload className="h-3 w-3 text-white" />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
                                                 Email
-                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                             </label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                                            <div className="relative flex-shrink-0">
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                                 <input
                                                     type="email"
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     disabled={isEditing}
-                                                    className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    className="form-input text-sm text-left w-56 h-8 rounded-md pl-9 pr-3"
                                                     placeholder="user@example.com"
                                                     autoComplete="off"
                                                     required
@@ -580,17 +583,17 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         </div>
 
                                         {!isEditing && (
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1">
+                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
                                                     Password
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                                 </label>
-                                                <div className="relative">
+                                                <div className="relative flex-shrink-0">
                                                     <input
                                                         type={showPassword ? "text" : "password"}
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
-                                                        className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                        className="form-input text-sm text-left w-56 h-8 rounded-md px-3 pr-9"
                                                         placeholder="Min. 8 characters"
                                                         autoComplete="new-password"
                                                         required
@@ -598,9 +601,13 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowPassword(!showPassword)}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-primary z-10"
                                                     >
-                                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                        {showPassword ? (
+                                                            <EyeOff className="h-4 w-4" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4" />
+                                                        )}
                                                     </button>
                                                 </div>
                                             </div>
@@ -608,7 +615,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                                         {isEditing && (isSuperAdmin || isSystemAdmin || (currentUser?.id === user?.id)) && (
                                             <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80">
+                                                <label className="text-sm font-medium text-content-secondary">
                                                     Password (optional - leave blank to keep current)
                                                 </label>
                                                 <div className="flex items-center gap-2">
@@ -617,14 +624,14 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                             type={showEditPassword ? "text" : "password"}
                                                             value={editPassword}
                                                             onChange={(e) => setEditPassword(e.target.value)}
-                                                            className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                            className="form-input w-full py-2 px-3 pr-10 text-sm"
                                                             placeholder="Enter new password to change"
                                                             autoComplete="new-password"
                                                         />
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowEditPassword(!showEditPassword)}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-secondary transition-colors"
                                                         >
                                                             {showEditPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                         </button>
@@ -634,7 +641,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                             type="button"
                                                             onClick={handleResetPassword}
                                                             disabled={isResettingPassword}
-                                                            className="px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 h-[38px]"
+                                                            className="px-3 py-1.5 rounded-md bg-surface-input hover:bg-surface-hover text-content-primary text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50 h-[38px]"
                                                         >
                                                             <RotateCw className={`h-3.5 w-3.5 ${isResettingPassword ? 'animate-spin' : ''}`} />
                                                             Reset
@@ -644,8 +651,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             </div>
                                         )}
 
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap">
                                                 Role
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                                                 <Tooltip content={<div className="space-y-2">
@@ -656,62 +663,66 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                                 <Icon className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" />
                                                                 <div>
                                                                     <div className="font-medium text-xs">{opt.label}</div>
-                                                                    <div className="text-[10px] text-white/60">{opt.description}</div>
+                                                                    <div className="text-[10px] text-content-muted">{opt.description}</div>
                                                                 </div>
                                                             </div>
                                                         );
                                                     })}
                                                 </div>}>
-                                                    <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
+                                                    <Info className="h-3.5 w-3.5 text-content-muted hover:text-content-secondary cursor-help" />
                                                 </Tooltip>
                                             </label>
-                                            <EnhancedSelect
-                                                value={role}
-                                                onChange={(value) => setRole(value as UserRole)}
-                                                options={availableRoles.map(opt => ({
-                                                    value: opt.value,
-                                                    label: opt.label,
-                                                    description: opt.description,
-                                                    icon: getRoleIcon(opt.value)
-                                                }))}
-                                                leftIcon={Shield}
-                                            />
+                                            <div className="w-56">
+                                                <EnhancedSelect
+                                                    value={role}
+                                                    onChange={(value) => setRole(value as UserRole)}
+                                                    options={availableRoles.map(opt => ({
+                                                        value: opt.value,
+                                                        label: opt.label,
+                                                        description: opt.description,
+                                                        icon: getRoleIcon(opt.value)
+                                                    }))}
+                                                    leftIcon={Shield}
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* Reports To (Manager) - Only for Admins creating Local Users */}
                                         {(isSuperAdmin || isSystemAdmin) && role === 'local_user' && (
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1.5">
+                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap">
                                                     Reports To
                                                     <Tooltip content="Assign a Regional Manager to this user.">
-                                                        <Info className="h-3.5 w-3.5 text-white/40 hover:text-white/60 cursor-help" />
+                                                        <Info className="h-3.5 w-3.5 text-content-muted hover:text-content-secondary cursor-help" />
                                                     </Tooltip>
                                                 </label>
-                                                <EnhancedSelect
-                                                    value={managerId}
-                                                    onChange={(value) => setManagerId(value)}
-                                                    options={[
-                                                        { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
-                                                        ...managers.map(m => ({
-                                                            value: m.id,
-                                                            label: m.name,
-                                                            description: 'Regional Manager',
-                                                            icon: Users
-                                                        }))
-                                                    ]}
-                                                    placeholder="Select Regional Manager"
-                                                    leftIcon={Users}
-                                                />
+                                                <div className="w-56">
+                                                    <EnhancedSelect
+                                                        value={managerId}
+                                                        onChange={(value) => setManagerId(value)}
+                                                        options={[
+                                                            { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
+                                                            ...managers.map(m => ({
+                                                                value: m.id,
+                                                                label: m.name,
+                                                                description: 'Regional Manager',
+                                                                icon: Users
+                                                            }))
+                                                        ]}
+                                                        placeholder="Select Manager"
+                                                        leftIcon={Users}
+                                                    />
+                                                </div>
                                             </div>
                                         )}
 
                                         {/* Location Assignments - shown for RM and Local User */}
                                         {showLocationSelector && (
-                                            <div className="mt-4 pt-4 border-t border-white/5">
-                                                <label className="text-sm font-medium text-white/80 flex items-center gap-1.5 mb-2">
+                                            <div className="bg-surface-hover rounded-lg p-3 space-y-3 transition-all">
+                                                <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 w-full">
                                                     <Globe className="h-3.5 w-3.5 text-accent" />
                                                     Location Assignments
-                                                    <span className="text-xs text-zinc-500 font-normal ml-1">
+                                                    <span className="text-xs text-content-muted font-normal ml-1">
                                                         ({role === 'regional_manager' ? 'States' : 'States & Cities'})
                                                     </span>
                                                 </label>
@@ -744,7 +755,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                 {/* Location dropdown */}
                                                 <div className="relative" ref={locationDropdownRef}>
                                                     <div className="relative">
-                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                                                         <input
                                                             type="text"
                                                             value={locationSearch}
@@ -753,7 +764,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                                 setIsLocationDropdownOpen(true);
                                                             }}
                                                             onFocus={() => setIsLocationDropdownOpen(true)}
-                                                            className="w-full rounded-md py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                            className="form-input text-sm text-left w-full h-8 rounded-md pl-9 pr-3"
                                                             placeholder="Search locations..."
                                                             autoComplete="off"
                                                         />
@@ -764,9 +775,9 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                         const searchLower = locationSearch.toLowerCase();
 
                                                         return (
-                                                            <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl border border-white/10 max-h-48 overflow-y-auto p-1">
+                                                            <div className="dropdown-menu absolute z-50 w-full mt-1 max-h-48 overflow-y-auto p-1">
                                                                 {availableLocations.length === 0 ? (
-                                                                    <div className="px-3 py-2 text-xs text-zinc-500">No locations available</div>
+                                                                    <div className="px-3 py-2 text-xs text-content-muted">No locations available</div>
                                                                 ) : (
                                                                     availableLocations.map(loc => {
                                                                         const isStateSelected = locationIds.includes(loc.id);
@@ -788,8 +799,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                                                         }
                                                                                     }}
                                                                                     className={`w-full text-left px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${isStateSelected
-                                                                                        ? 'bg-white/10 text-white'
-                                                                                        : 'text-zinc-300 hover:bg-white/5 hover:text-white'
+                                                                                        ? 'bg-surface-hover text-content-primary'
+                                                                                        : 'text-content-secondary hover:bg-surface-hover hover:text-content-primary'
                                                                                         }`}
                                                                                 >
                                                                                     <span className="font-medium">{loc.name}</span>
@@ -815,8 +826,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                                                                             }
                                                                                                         }}
                                                                                                         className={`w-full text-left px-3 py-1.5 rounded text-xs flex items-center gap-2 transition-colors ${isCitySelected
-                                                                                                            ? 'bg-white/10 text-white'
-                                                                                                            : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                                                                                                            ? 'bg-surface-hover text-content-primary'
+                                                                                                            : 'text-content-muted hover:bg-surface-hover hover:text-content-primary'
                                                                                                             }`}
                                                                                                     >
                                                                                                         <span>{child.name}</span>
@@ -841,22 +852,22 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                             </div>
 
                             <div className="space-y-6">
-                                <div className="bg-white/5 rounded-lg p-4">
-                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
                                         <Phone className="h-4 w-4 text-accent" />
                                         Contact Information
                                     </h3>
 
-                                    <div className="space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">Phone</label>
-                                            <div className="relative">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+                                            <div className="relative flex-shrink-0">
+                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                                 <input
                                                     type="tel"
                                                     value={phone}
                                                     onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
-                                                    className="w-full rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    className="form-input text-sm text-left w-56 h-8 rounded-md pl-9 pr-3"
                                                     placeholder="(555) 555-5555"
                                                     autoComplete="off"
                                                 />
@@ -865,59 +876,53 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
                                 </div>
 
-                                <div className="bg-white/5 rounded-lg p-4">
-                                    <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
                                         <MapPin className="h-4 w-4 text-accent" />
                                         Address
                                     </h3>
 
-                                    <div className="space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">Street</label>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Street</label>
                                             <input
                                                 type="text"
                                                 value={street}
                                                 onChange={(e) => setStreet(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="form-input text-sm text-left w-56 h-8 rounded-md px-3"
                                                 placeholder="123 Main St"
                                                 autoComplete="off"
                                             />
                                         </div>
 
-                                        <div className="space-y-1">
-                                            <label className="text-sm font-medium text-white/80">City</label>
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">City</label>
                                             <input
                                                 type="text"
                                                 value={city}
                                                 onChange={(e) => setCity(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="form-input text-sm text-left w-56 h-8 rounded-md px-3"
                                                 placeholder="Honolulu"
                                                 autoComplete="off"
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80">State</label>
+                                        <div className="flex items-center gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex-shrink-0">State / Zip</label>
+                                            <div className="flex gap-2 ml-auto">
                                                 <SimpleSelect
                                                     value={state}
                                                     onChange={(val) => setState(val)}
                                                     options={US_STATES.map(s => s.name)}
-                                                    placeholder="Select State..."
-                                                    className="w-full"
-                                                    textSize="text-sm"
+                                                    placeholder="State..."
+                                                    className="w-32 h-8 flex items-center justify-between px-2 text-sm text-left"
                                                 />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <label className="text-sm font-medium text-white/80">ZIP Code</label>
                                                 <input
                                                     type="text"
                                                     value={zip}
                                                     onChange={(e) => setZip(e.target.value)}
-                                                    className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
-                                                    placeholder="96801"
-                                                    maxLength={10}
+                                                    className="form-input text-sm text-left w-20 h-8 rounded-md px-3"
+                                                    placeholder="96814"
                                                     autoComplete="off"
                                                 />
                                             </div>
@@ -950,3 +955,6 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
         </>
     );
 }
+
+
+

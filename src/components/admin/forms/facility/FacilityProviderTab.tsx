@@ -30,7 +30,7 @@ export function FacilityProviderTab({
 
     if (!hasProviderFields) {
         return (
-            <div className="p-8 text-center text-zinc-500">
+            <div className="p-8 text-center text-content-muted">
                 No provider specific detail fields have been configured yet.
                 <br />
                 <span className="text-sm">Add fields in Setup → Room Fields with section &quot;Provider Details&quot;.</span>

@@ -69,9 +69,9 @@ export function ImageCropModal({ isOpen, imageUrl, onClose, onSave }: ImageCropM
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="relative w-96 mx-4 bg-[rgb(13,17,21)] rounded-lg border border-white/10 overflow-hidden">
+            <div className="relative w-96 mx-4 bg-[rgb(13,17,21)] rounded-lg overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <div className="flex items-center justify-between p-4">
                     <h2 className="text-lg font-semibold text-white">Crop Profile Picture</h2>
                     <button
                         onClick={onClose}
@@ -97,7 +97,7 @@ export function ImageCropModal({ isOpen, imageUrl, onClose, onSave }: ImageCropM
                 </div>
 
                 {/* Zoom Controls */}
-                <div className="p-4 border-t border-white/10">
+                <div className="p-4">
                     <div className="flex items-center gap-3">
                         <ZoomOut className="h-4 w-4 text-white/60" />
                         <input
@@ -114,7 +114,7 @@ export function ImageCropModal({ isOpen, imageUrl, onClose, onSave }: ImageCropM
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
+                <div className="flex items-center justify-end gap-3 p-4">
                     <button
                         onClick={onClose}
                         className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors"

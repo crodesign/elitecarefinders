@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
@@ -692,6 +692,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         images={images}
                         setImages={setImages}
                         setIsDirty={setIsDirty}
+                        isDirty={isDirty}
                     />
                 );
             case "provider":
@@ -727,6 +728,15 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         onClose();
     };
 
+    // Compute whether all required fields are filled (for new records only)
+    const findEntryInTree = (entries: any[], id: string): boolean =>
+        entries.some(e => e.id === id || (e.children && findEntryInTree(e.children, id)));
+    const facilityTypeTaxonomy = availableTaxonomies.find(t => t.singularName === 'Facility Type' || t.name === 'Facility Type');
+    const locationTaxonomy = availableTaxonomies.find(t => t.singularName === 'Location' || t.name === 'Location' || t.slug === 'location');
+    const hasFacilityType = facilityTypeTaxonomy ? taxonomyIds.some(id => findEntryInTree(facilityTypeTaxonomy.entries ?? [], id)) : true;
+    const hasLocation = locationTaxonomy ? taxonomyIds.some(id => findEntryInTree(locationTaxonomy.entries ?? [], id)) : true;
+    const canCreate = !!title.trim() && hasFacilityType && hasLocation;
+
     return (
         <>
             <SlidePanel
@@ -735,14 +745,15 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 title={isEditing ? "Editing Facility" : "Add New Facility"}
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
+                contentClassName={activeTab === 'gallery' ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 headerChildren={
-                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
+                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
                                 // Tab color matches the border color exactly
-                                const tabColor = 'rgba(255,255,255,0.2)';
+                                const tabColor = 'var(--surface-tab)';
 
                                 return (
                                     <button
@@ -754,8 +765,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                             rounded-tl-lg rounded-tr-lg whitespace-nowrap
                                             transition-all duration-150 select-none
                                             ${isActive
-                                                ? 'pt-[10px] pb-[11px] text-white z-10'
-                                                : 'pt-2 pb-2 bg-transparent text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                                ? 'pt-[10px] pb-[11px] text-content-primary z-10'
+                                                : 'pt-2 pb-2 bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-hover'
                                             }
                                         `}
                                         style={isActive ? { backgroundColor: tabColor } : undefined}
@@ -786,7 +797,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             <button
                                 type="submit"
                                 form="facility-form"
-                                disabled={!isDirty || isSubmitting}
+                                disabled={isEditing ? (!isDirty || isSubmitting) : (!canCreate || isSubmitting)}
                                 className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
                             >
                                 {isSubmitting ? (
@@ -810,7 +821,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 {/* Tab Content */}
                 <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1" onChange={handleFormChange}>
-                    <div className="flex-1 min-h-[300px]">
+                    <div className={activeTab === 'gallery' ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
                         {renderTabContent()}
                     </div>
                 </form>
@@ -851,3 +862,4 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         </>
     );
 }
+

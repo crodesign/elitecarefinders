@@ -110,14 +110,14 @@ function SortableFieldItem({
                         value={editFieldName}
                         onChange={(e) => setEditFieldName(e.target.value)}
                         placeholder="Field name..."
-                        className="flex-1 bg-black/30 rounded px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent"
+                        className="form-input flex-1 rounded px-3 py-2 text-sm focus:border-accent"
                         autoFocus
                     />
-                    <div className="flex bg-black/30 rounded p-1 gap-1">
+                    <div className="flex bg-surface-input rounded p-1 gap-1">
                         <Tooltip content="Yes/No (Boolean)">
                             <button
                                 onClick={() => setEditFieldType("boolean")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "boolean" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <ToggleLeft className="h-4 w-4" />
                             </button>
@@ -125,7 +125,7 @@ function SortableFieldItem({
                         <Tooltip content="Single Choice">
                             <button
                                 onClick={() => setEditFieldType("single")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "single" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <CircleDot className="h-4 w-4" />
                             </button>
@@ -133,7 +133,7 @@ function SortableFieldItem({
                         <Tooltip content="Multiple Choice">
                             <button
                                 onClick={() => setEditFieldType("multi")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "multi" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <CheckSquare className="h-4 w-4" />
                             </button>
@@ -144,18 +144,18 @@ function SortableFieldItem({
                         <Tooltip content="Dropdown">
                             <button
                                 onClick={() => setEditFieldType("dropdown")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "dropdown" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <List className="h-4 w-4" />
                             </button>
                         </Tooltip>
                     </div>
 
-                    <div className="flex bg-black/30 rounded p-1 gap-1">
+                    <div className="flex bg-surface-input rounded p-1 gap-1">
                         <Tooltip content="Home Only">
                             <button
                                 onClick={() => setEditFieldTarget('home')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'home' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <Home className="h-4 w-4" />
                             </button>
@@ -163,7 +163,7 @@ function SortableFieldItem({
                         <Tooltip content="Facility Only">
                             <button
                                 onClick={() => setEditFieldTarget('facility')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'facility' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <Building2 className="h-4 w-4" />
                             </button>
@@ -171,7 +171,7 @@ function SortableFieldItem({
                         <Tooltip content="Both Home & Facility">
                             <button
                                 onClick={() => setEditFieldTarget('both')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'both' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                             >
                                 <Layers className="h-4 w-4" />
                             </button>
@@ -187,7 +187,7 @@ function SortableFieldItem({
                     </button>
                     <button
                         onClick={cancelEditField}
-                        className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded hover:bg-white/10"
+                        className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
                     >
                         <X className="h-4 w-4" />
                     </button>
@@ -195,12 +195,12 @@ function SortableFieldItem({
 
                 {["single", "multi", "dropdown"].includes(editFieldType) && (
                     <div className="space-y-2">
-                        <label className="text-xs text-zinc-400">Options (one per line)</label>
+                        <label className="text-xs text-content-muted">Options (one per line)</label>
                         <textarea
                             value={editFieldOptions.join("\n")}
                             onChange={(e) => setEditFieldOptions(e.target.value.split("\n"))}
                             placeholder="Option 1&#10;Option 2&#10;Option 3"
-                            className="w-full bg-black/30 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent resize-none"
+                            className="form-input w-full rounded px-3 py-2 text-sm focus:border-accent resize-none"
                             rows={3}
                         />
                     </div>
@@ -211,7 +211,7 @@ function SortableFieldItem({
 
     return (
         <div ref={setNodeRef} style={style} className="flex items-center gap-3 py-2 px-3 bg-black/20 rounded group">
-            <div {...attributes} {...listeners} className="cursor-grab hover:text-white text-zinc-600">
+            <div {...attributes} {...listeners} className="cursor-grab hover:text-content-primary text-content-muted">
                 <GripVertical className="h-4 w-4" />
             </div>
             {field.type === "boolean" && <ToggleLeft className="h-4 w-4 text-white" />}
@@ -224,9 +224,9 @@ function SortableFieldItem({
             {field.type === "email" && <Mail className="h-4 w-4 text-white" />}
             {field.type === "currency" && <DollarSign className="h-4 w-4 text-white" />}
             {field.type === "dropdown" && <List className="h-4 w-4 text-white" />}
-            <span className="flex-1 text-sm text-zinc-300">{field.name}</span>
+            <span className="flex-1 text-sm text-content-secondary">{field.name}</span>
 
-            <span className="px-2 py-0.5 rounded text-xs flex items-center gap-1 bg-zinc-500/20 text-zinc-400">
+            <span className="px-2 py-0.5 rounded text-xs flex items-center gap-1 bg-zinc-500/20 text-content-muted">
                 {field.targetType === 'home' && <Home className="h-3 w-3" />}
                 {field.targetType === 'facility' && <Building2 className="h-3 w-3" />}
                 {field.targetType === 'both' && <Layers className="h-3 w-3" />}
@@ -234,13 +234,13 @@ function SortableFieldItem({
             </span>
             <button
                 onClick={() => startEditingField(field)}
-                className="p-1 text-zinc-500 hover:text-white transition-opacity"
+                className="p-1 text-content-muted hover:text-content-primary transition-opacity"
             >
                 <Pencil className="h-4 w-4" />
             </button>
             <button
                 onClick={() => handleDeleteField(field.id)}
-                className="p-1 text-zinc-500 hover:text-red-400 transition-opacity"
+                className="p-1 text-content-muted hover:text-red-400 transition-opacity"
             >
                 <Trash2 className="h-4 w-4" />
             </button>
@@ -295,7 +295,7 @@ function SortableFixedOptionItem({
                         if (e.key === "Enter") saveEditing();
                         if (e.key === "Escape") cancelEditing();
                     }}
-                    className="flex-1 bg-black/30 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-accent"
+                    className="form-input flex-1 rounded px-2 py-1 text-sm focus:border-accent"
                     autoFocus
                 />
                 <button
@@ -307,7 +307,7 @@ function SortableFixedOptionItem({
                 </button>
                 <button
                     onClick={cancelEditing}
-                    className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded hover:bg-white/10"
+                    className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
                 >
                     <X className="h-4 w-4" />
                 </button>
@@ -316,20 +316,20 @@ function SortableFixedOptionItem({
     }
 
     return (
-        <div ref={setNodeRef} style={style} className="flex items-center gap-3 py-2 px-3 bg-black/20 rounded group border border-white/5 hover:border-white/10 transition-colors mb-2 last:mb-0">
-            <div {...attributes} {...listeners} className="cursor-grab hover:text-white text-zinc-600">
+        <div ref={setNodeRef} style={style} className="flex items-center gap-3 py-2 px-3 bg-black/20 rounded group border border-ui-border hover:border-ui-border transition-colors mb-2 last:mb-0">
+            <div {...attributes} {...listeners} className="cursor-grab hover:text-content-primary text-content-muted">
                 <GripVertical className="h-4 w-4" />
             </div>
-            <span className="flex-1 text-sm text-zinc-300">{option.value}</span>
+            <span className="flex-1 text-sm text-content-secondary">{option.value}</span>
             <button
                 onClick={() => startEditing(option.id, option.value)}
-                className="p-1 text-zinc-500 hover:text-white transition-opacity"
+                className="p-1 text-content-muted hover:text-content-primary transition-opacity"
             >
                 <Pencil className="h-3 w-3" />
             </button>
             <button
                 onClick={() => deleteOption(option.id)}
-                className="p-1 text-zinc-500 hover:text-red-400 transition-opacity"
+                className="p-1 text-content-muted hover:text-red-400 transition-opacity"
             >
                 <Trash2 className="h-3 w-3" />
             </button>
@@ -396,15 +396,15 @@ function SortableCategoryItem({
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="bg-white/5 rounded-lg mb-3">
+        <div ref={setNodeRef} style={style} className="bg-surface-input rounded-lg mb-3">
             {/* Category Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-t-lg">
-                <div {...attributes} {...listeners} className="cursor-grab hover:text-white text-zinc-600">
+            <div className="flex items-center gap-3 px-4 py-3 bg-surface-input rounded-t-lg">
+                <div {...attributes} {...listeners} className="cursor-grab hover:text-content-primary text-content-muted">
                     <GripVertical className="h-4 w-4" />
                 </div>
                 <button
                     onClick={() => toggleCategory(category.id)}
-                    className="p-1 text-zinc-400 hover:text-white"
+                    className="p-1 text-content-muted hover:text-content-primary"
                 >
                     {isExpanded ? (
                         <ChevronDown className="h-4 w-4" />
@@ -424,14 +424,14 @@ function SortableCategoryItem({
                                 if (e.key === "Enter") handleUpdateCategory(category.id);
                                 if (e.key === "Escape") setEditingCategory(null);
                             }}
-                            className="flex-1 bg-black/30 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-accent"
+                            className="form-input flex-1 rounded px-2 py-1 text-sm focus:border-accent"
                             autoFocus
                         />
-                        <div className="flex bg-black/30 rounded p-1 gap-1">
+                        <div className="flex bg-surface-input rounded p-1 gap-1">
                             <Tooltip content="Room Details">
                                 <button
                                     onClick={() => setEditCategorySection('room_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'room_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                 >
                                     Room
                                 </button>
@@ -439,7 +439,7 @@ function SortableCategoryItem({
                             <Tooltip content="Location Details">
                                 <button
                                     onClick={() => setEditCategorySection('location_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'location_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                 >
                                     Location
                                 </button>
@@ -447,18 +447,18 @@ function SortableCategoryItem({
                             <Tooltip content="Care Provider Details">
                                 <button
                                     onClick={() => setEditCategorySection('care_provider_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                 >
                                     Provider
                                 </button>
                             </Tooltip>
                         </div>
-                        <div className="flex bg-black/30 rounded p-1 gap-1">
+                        <div className="flex bg-surface-input rounded p-1 gap-1">
                             {[1, 2, 3, 4].map((col) => (
                                 <Tooltip key={col} content={`Column ${col}`}>
                                     <button
                                         onClick={() => setEditCategoryColumn(col)}
-                                        className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryColumn === col ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                        className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryColumn === col ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                     >
                                         {col}
                                     </button>
@@ -473,7 +473,7 @@ function SortableCategoryItem({
                         </button>
                         <button
                             onClick={() => setEditingCategory(null)}
-                            className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded hover:bg-white/10"
+                            className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
                         >
                             <X className="h-4 w-4" />
                         </button>
@@ -481,14 +481,14 @@ function SortableCategoryItem({
                 ) : (
                     <>
                         {category.icon && ICON_MAP[category.icon] && (() => { const CatIcon = ICON_MAP[category.icon!]; return <CatIcon className="h-4 w-4 text-accent shrink-0" />; })()}
-                        <span className="flex-1 font-medium text-white">{category.name}</span>
+                        <span className="flex-1 font-medium text-content-primary">{category.name}</span>
                         {category.section && (
-                            <span className="px-2 py-0.5 rounded text-[10px] bg-zinc-700/50 text-zinc-400 uppercase tracking-wider">
+                            <span className="px-2 py-0.5 rounded text-[10px] bg-surface-hover/50 text-content-muted uppercase tracking-wider">
                                 {category.section.replace('_', ' ')}
                             </span>
                         )}
                         {category.columnNumber && (
-                            <span className="px-2 py-0.5 rounded text-[10px] bg-zinc-700/50 text-zinc-400 uppercase tracking-wider">
+                            <span className="px-2 py-0.5 rounded text-[10px] bg-surface-hover/50 text-content-muted uppercase tracking-wider">
                                 Col {category.columnNumber}
                             </span>
                         )}
@@ -500,13 +500,13 @@ function SortableCategoryItem({
                                 setEditCategoryColumn(category.columnNumber);
                                 setEditCategoryIcon(category.icon);
                             }}
-                            className="p-1 text-zinc-500 hover:text-white"
+                            className="p-1 text-content-muted hover:text-white"
                         >
                             <Pencil className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => handleDeleteCategory(category.id)}
-                            className="p-1 text-zinc-500 hover:text-red-400"
+                            className="p-1 text-content-muted hover:text-red-400"
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
@@ -573,7 +573,7 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
                 <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
-                    className={`flex items-center justify-center p-1.5 rounded transition-colors ${isActive ? "bg-accent text-white" : "text-zinc-400 hover:text-white"
+                    className={`flex items-center justify-center p-1.5 rounded transition-colors ${isActive ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"
                         }`}
                 >
                     <Icon className="h-4 w-4" />
@@ -581,7 +581,7 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
             </Tooltip>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50 p-1 min-w-[32px]">
+                <div className="absolute top-full left-0 mt-1 bg-[#111111] border border-ui-border rounded-lg shadow-xl overflow-hidden z-50 p-1 min-w-[32px]">
                     {options.map((opt) => (
                         <Tooltip key={opt.id} content={opt.label}>
                             <button
@@ -592,7 +592,7 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
                                 }}
                                 className={`w-full flex items-center justify-center p-1.5 mb-1 last:mb-0 rounded transition-colors ${value === opt.id
                                     ? "bg-accent text-white"
-                                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                                    : "text-content-muted hover:bg-surface-input hover:text-white"
                                     }`}
                             >
                                 <opt.icon className="h-4 w-4" />
@@ -1024,7 +1024,7 @@ export default function RoomFieldsPage() {
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white">Detail Fields</h1>
-                        <p className="text-zinc-400 mt-1 text-sm md:text-base">
+                        <p className="text-content-muted mt-1 text-sm md:text-base">
                             Configure detail options and custom fields
                         </p>
                     </div>
@@ -1055,34 +1055,34 @@ export default function RoomFieldsPage() {
                         {/* Custom Field Categories Section */}
                         <div className="card p-6">
                             <h2 className="text-lg font-semibold text-white mb-1">Custom Field Categories</h2>
-                            <p className="text-sm text-zinc-400 mb-4">
+                            <p className="text-sm text-content-muted mb-4">
                                 Create categories to organize custom Yes/No or choice fields
                             </p>
 
                             {/* Section Filter */}
                             <div className="flex items-center justify-between gap-2 mb-6">
-                                <div className="flex bg-black/30 rounded p-1 gap-1">
+                                <div className="flex bg-surface-input rounded p-1 gap-1">
                                     <button
                                         onClick={() => setSectionFilter('all')}
-                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'all' ? "bg-accent text-white" : "text-zinc-400 hover:text-white hover:bg-white/10"}`}
+                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'all' ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-surface-hover"}`}
                                     >
                                         All
                                     </button>
                                     <button
                                         onClick={() => setSectionFilter('room_details')}
-                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'room_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white hover:bg-white/10"}`}
+                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-surface-hover"}`}
                                     >
                                         Room Details
                                     </button>
                                     <button
                                         onClick={() => setSectionFilter('location_details')}
-                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'location_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white hover:bg-white/10"}`}
+                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-surface-hover"}`}
                                     >
                                         Location Details
                                     </button>
                                     <button
                                         onClick={() => setSectionFilter('care_provider_details')}
-                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'care_provider_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white hover:bg-white/10"}`}
+                                        className={`px-3 py-1.5 rounded text-xs transition-colors ${sectionFilter === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-surface-hover"}`}
                                     >
                                         Care Provider Details
                                     </button>
@@ -1095,7 +1095,7 @@ export default function RoomFieldsPage() {
                                             setExpandedCategories(new Set(categories.map(c => c.id)));
                                         }
                                     }}
-                                    className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors border border-white/10"
+                                    className="p-2 text-content-muted hover:text-white hover:bg-surface-hover rounded-lg transition-colors border border-ui-border"
                                     title={expandedCategories.size > 0 ? "Collapse All" : "Expand All"}
                                 >
                                     {expandedCategories.size > 0 ? (
@@ -1108,7 +1108,7 @@ export default function RoomFieldsPage() {
 
                             {/* Add Category Form */}
                             {addingCategory && (
-                                <div className="mb-4 p-4 bg-white/5 rounded-lg">
+                                <div className="mb-4 p-4 bg-surface-input rounded-lg">
                                     <div className="flex items-center gap-3">
                                         <IconPicker value={newCategoryIcon} onChange={setNewCategoryIcon} />
                                         <input
@@ -1123,14 +1123,14 @@ export default function RoomFieldsPage() {
                                                 }
                                             }}
                                             placeholder="Category name..."
-                                            className="flex-1 bg-black/30 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent"
+                                            className="flex-1 bg-surface-input rounded-lg px-3 py-2 text-sm text-white placeholder-content-muted focus:outline-none focus:border-accent"
                                             autoFocus
                                         />
-                                        <div className="flex bg-black/30 rounded p-1 gap-1">
+                                        <div className="flex bg-surface-input rounded p-1 gap-1">
                                             <Tooltip content="Room Details">
                                                 <button
                                                     onClick={() => setNewCategorySection('room_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'room_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                 >
                                                     Room
                                                 </button>
@@ -1138,7 +1138,7 @@ export default function RoomFieldsPage() {
                                             <Tooltip content="Location Details">
                                                 <button
                                                     onClick={() => setNewCategorySection('location_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'location_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                 >
                                                     Location
                                                 </button>
@@ -1146,7 +1146,7 @@ export default function RoomFieldsPage() {
                                             <Tooltip content="Care Provider Details">
                                                 <button
                                                     onClick={() => setNewCategorySection('care_provider_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                 >
                                                     Provider
                                                 </button>
@@ -1164,7 +1164,7 @@ export default function RoomFieldsPage() {
                                                 setAddingCategory(false);
                                                 setNewCategoryName("");
                                             }}
-                                            className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded-lg hover:bg-white/10"
+                                            className="p-1.5 text-content-muted hover:text-white bg-surface-input rounded-lg hover:bg-surface-hover"
                                         >
                                             <X className="h-4 w-4" />
                                         </button>
@@ -1216,7 +1216,7 @@ export default function RoomFieldsPage() {
                                                             setExpandedCategories={setExpandedCategories}
                                                         >
                                                             {catFields.length === 0 && !addingFieldToCategory ? (
-                                                                <p className="text-sm text-zinc-500 italic">No fields yet</p>
+                                                                <p className="text-sm text-content-muted italic">No fields yet</p>
                                                             ) : (
                                                                 <DndContext
                                                                     sensors={sensors}
@@ -1251,21 +1251,21 @@ export default function RoomFieldsPage() {
 
                                                                             {/* Add Field Form */}
                                                                             {addingFieldToCategory === cat.id && (
-                                                                                <div className="mt-2 p-3 bg-white/5 rounded-lg space-y-3">
+                                                                                <div className="mt-2 p-3 bg-surface-input rounded-lg space-y-3">
                                                                                     <div className="flex items-center gap-3">
                                                                                         <input
                                                                                             type="text"
                                                                                             value={newFieldName}
                                                                                             onChange={(e) => setNewFieldName(e.target.value)}
                                                                                             placeholder="Field name..."
-                                                                                            className="flex-1 bg-black/30 rounded px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent"
+                                                                                            className="form-input flex-1 rounded px-3 py-2 text-sm focus:border-accent"
                                                                                             autoFocus
                                                                                         />
-                                                                                        <div className="flex bg-black/30 rounded p-1 gap-1">
+                                                                                        <div className="flex bg-surface-input rounded p-1 gap-1">
                                                                                             <Tooltip content="Yes/No (Boolean)">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldType("boolean")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "boolean" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <ToggleLeft className="h-4 w-4" />
                                                                                                 </button>
@@ -1273,7 +1273,7 @@ export default function RoomFieldsPage() {
                                                                                             <Tooltip content="Single Choice">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldType("single")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "single" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <CircleDot className="h-4 w-4" />
                                                                                                 </button>
@@ -1281,7 +1281,7 @@ export default function RoomFieldsPage() {
                                                                                             <Tooltip content="Multiple Choice">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldType("multi")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "multi" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <CheckSquare className="h-4 w-4" />
                                                                                                 </button>
@@ -1292,18 +1292,18 @@ export default function RoomFieldsPage() {
                                                                                             <Tooltip content="Dropdown">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldType("dropdown")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "dropdown" ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <List className="h-4 w-4" />
                                                                                                 </button>
                                                                                             </Tooltip>
                                                                                         </div>
 
-                                                                                        <div className="flex bg-black/30 rounded p-1 gap-1">
+                                                                                        <div className="flex bg-surface-input rounded p-1 gap-1">
                                                                                             <Tooltip content="Home Only">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldTarget('home')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'home' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <Home className="h-4 w-4" />
                                                                                                 </button>
@@ -1311,7 +1311,7 @@ export default function RoomFieldsPage() {
                                                                                             <Tooltip content="Facility Only">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldTarget('facility')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'facility' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <Building2 className="h-4 w-4" />
                                                                                                 </button>
@@ -1319,7 +1319,7 @@ export default function RoomFieldsPage() {
                                                                                             <Tooltip content="Both Home & Facility">
                                                                                                 <button
                                                                                                     onClick={() => setNewFieldTarget('both')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'both' ? "bg-accent text-white" : "text-zinc-400 hover:text-white"}`}
+                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
                                                                                                 >
                                                                                                     <Layers className="h-4 w-4" />
                                                                                                 </button>
@@ -1338,7 +1338,7 @@ export default function RoomFieldsPage() {
                                                                                         <Tooltip content="Cancel">
                                                                                             <button
                                                                                                 onClick={() => setAddingFieldToCategory(null)}
-                                                                                                className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded hover:bg-white/10"
+                                                                                                className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
                                                                                             >
                                                                                                 <X className="h-4 w-4" />
                                                                                             </button>
@@ -1347,12 +1347,12 @@ export default function RoomFieldsPage() {
 
                                                                                     {["single", "multi", "dropdown"].includes(newFieldType) && (
                                                                                         <div className="space-y-2">
-                                                                                            <label className="text-xs text-zinc-400">Options (one per line)</label>
+                                                                                            <label className="text-xs text-content-muted">Options (one per line)</label>
                                                                                             <textarea
                                                                                                 value={newFieldOptions.join("\n")}
                                                                                                 onChange={(e) => setNewFieldOptions(e.target.value.split("\n"))}
                                                                                                 placeholder="Option 1&#10;Option 2&#10;Option 3"
-                                                                                                className="w-full bg-black/30 border border-white/10 rounded px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent resize-none"
+                                                                                                className="form-input w-full rounded px-3 py-2 text-sm focus:border-accent resize-none"
                                                                                                 rows={3}
                                                                                             />
                                                                                         </div>
@@ -1378,7 +1378,7 @@ export default function RoomFieldsPage() {
                         <h2 className="text-lg font-semibold text-white mb-1">
                             Fixed Field Options
                         </h2>
-                        <p className="text-sm text-zinc-400 mb-4">
+                        <p className="text-sm text-content-muted mb-4">
                             Manage dropdown options for standard detail fields
                         </p>
 
@@ -1390,7 +1390,7 @@ export default function RoomFieldsPage() {
 
                                 return (
                                     <div key={type} className="space-y-2">
-                                        <div className="bg-white/5 rounded-lg p-3 space-y-2">
+                                        <div className="bg-surface-input rounded-lg p-3 space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <IconPicker
@@ -1442,7 +1442,7 @@ export default function RoomFieldsPage() {
                                             </DndContext>
 
                                             {addingToFixedField === type && (
-                                                <div className="flex items-center gap-2 mb-2 p-3 bg-white/5 rounded-lg border border-dashed border-white/20">
+                                                <div className="flex items-center gap-2 mb-2 p-3 bg-surface-input rounded-lg border border-dashed border-white/20">
                                                     <IconPicker value={newFixedIcon} onChange={setNewFixedIcon} />
                                                     <input
                                                         type="text"
@@ -1453,7 +1453,7 @@ export default function RoomFieldsPage() {
                                                             if (e.key === "Escape") setAddingToFixedField(null);
                                                         }}
                                                         placeholder="New option..."
-                                                        className="flex-1 bg-black/30 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-accent"
+                                                        className="form-input flex-1 rounded px-2 py-1 text-sm focus:border-accent"
                                                         autoFocus
                                                     />
                                                     <button
@@ -1465,7 +1465,7 @@ export default function RoomFieldsPage() {
                                                     </button>
                                                     <button
                                                         onClick={() => setAddingToFixedField(null)}
-                                                        className="p-1.5 text-zinc-400 hover:text-white bg-white/5 rounded hover:bg-white/10"
+                                                        className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </button>
@@ -1500,4 +1500,6 @@ export default function RoomFieldsPage() {
         </div>
     );
 }
+
+
 

@@ -232,14 +232,14 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
 
                     <form id="taxonomy-form" onSubmit={handleSubmit} className="flex-none space-y-6">
                         <div className="space-y-4">
-                            <div className="bg-white/5 rounded-lg p-4">
-                                <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+                            <div className="bg-surface-input rounded-lg p-4">
+                                <h3 className="text-base font-medium text-content-primary mb-4 flex items-center gap-2">
                                     <Tag className="h-4 w-4 text-accent" />
                                     General Information
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="singularName" className="block text-sm font-medium text-white/80 mb-2">
+                                        <label htmlFor="singularName" className="block text-sm font-medium text-content-secondary mb-2">
                                             <span className="flex items-center gap-1">
                                                 Singular Name
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
@@ -254,17 +254,17 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                                                 setIsDirty(true);
                                             }}
                                             required
-                                            className="w-full bg-black/30 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors hover:bg-black/50 focus:bg-black/50"
+                                            className="form-input w-full rounded-lg px-3 py-2 text-sm"
                                             placeholder="e.g., State"
                                         />
-                                        <p className="mt-1.5 text-xs text-zinc-500 font-mono flex items-center gap-1">
-                                            <span className="text-zinc-600">slug:</span>
+                                        <p className="mt-1.5 text-xs text-content-muted font-mono flex items-center gap-1">
+                                            <span className="text-content-muted">slug:</span>
                                             {slug || "..."}
                                         </p>
                                     </div>
 
                                     <div>
-                                        <label htmlFor="pluralName" className="block text-sm font-medium text-white/80 mb-2">
+                                        <label htmlFor="pluralName" className="block text-sm font-medium text-content-secondary mb-2">
                                             <span className="flex items-center gap-1">
                                                 Plural Name
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
@@ -279,7 +279,7 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                                                 setIsDirty(true);
                                             }}
                                             required
-                                            className="w-full bg-black/30 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors hover:bg-black/50 focus:bg-black/50"
+                                            className="form-input w-full rounded-lg px-3 py-2 text-sm"
                                             placeholder="e.g., States"
                                         />
                                     </div>
@@ -287,7 +287,7 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-white/80 mb-2">
+                                <label className="block text-sm font-medium text-content-secondary mb-2">
                                     Associated Content Types
                                 </label>
                                 <div className="grid grid-cols-2 gap-3">
@@ -306,8 +306,8 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                                                     setIsDirty(true);
                                                 }}
                                                 className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${isSelected
-                                                    ? "bg-white/10 text-white"
-                                                    : "bg-transparent hover:bg-white/5 text-zinc-400"
+                                                    ? "bg-surface-hover text-content-primary"
+                                                    : "bg-transparent hover:bg-surface-input text-content-muted"
                                                     }`}
                                             >
                                                 <div className={`p-1 rounded-full ${isSelected ? "bg-accent/20" : "bg-red-500/10"}`}>
@@ -322,7 +322,7 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                                         );
                                     })}
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-2">
+                                <p className="text-xs text-content-muted mt-2">
                                     Select one or more sections where this taxonomy will be used.
                                 </p>
                             </div>
@@ -337,8 +337,8 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                     {/* Entries Section - Only show when editing */}
                     {/* Entries Section - Only show when editing */}
                     {isEditing && (
-                        <div className="flex-1 min-h-0 flex flex-col bg-white/5 rounded-lg p-4">
-                            <h3 className="flex-none text-base font-medium text-white mb-4 flex items-center gap-2">
+                        <div className="flex-1 min-h-0 flex flex-col bg-surface-input rounded-lg p-4">
+                            <h3 className="flex-none text-base font-medium text-content-primary mb-4 flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-accent" />
                                 {taxonomy?.pluralName || "Entries"}
                             </h3>

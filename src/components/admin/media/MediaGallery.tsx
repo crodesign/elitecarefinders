@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Plus, Loader2, RefreshCw, X } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Plus, Loader2, RefreshCw, X, FolderOpen } from "lucide-react";
 import { MediaItem, MediaFolder } from "@/types";
 import { getMediaItems, deleteMediaItem, updateMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
+import { supabase } from "@/lib/supabase";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 import { SortableGalleryItem } from "@/components/admin/media/SortableGalleryItem";
@@ -33,15 +34,51 @@ interface MediaGalleryProps {
     folders?: MediaFolder[];
     selectedUrls?: string[];
     onSelectionChange?: (urls: string[]) => void;
+    isDirty?: boolean;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], selectedUrls, onSelectionChange }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], selectedUrls, onSelectionChange, isDirty = false }: MediaGalleryProps) {
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploaderOpen, setIsUploaderOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const [folderPath, setFolderPath] = useState<string | null>(null);
     const { showNotification } = useNotification();
+
+    // Fetch the folder path to build the media library deep-link
+    useEffect(() => {
+        if (!folderId) { setFolderPath(null); return; }
+        supabase
+            .from('media_folders')
+            .select('path')
+            .eq('id', folderId)
+            .single()
+            .then(({ data }: { data: { path: string } | null }) => setFolderPath(data?.path ?? null));
+    }, [folderId]);
+
+    // Build deep-link URL using same pathToSlug logic as media page.tsx
+    // Splits on '/', lowercases+hyphenates each segment without stripping the
+    // leading empty string, so the resulting slug keeps its leading slash:
+    //   "/Hawaii/Oahu/Home Images" → "/hawaii/oahu/home-images"
+    const mediaLibraryUrl = useMemo(() => {
+        if (!folderPath) return '/admin/media';
+        const slug = folderPath
+            .split('/')
+            .map(s => s.toLowerCase().replace(/\s+/g, '-'))
+            .join('/');
+        return `/admin/media?folder=${slug}`;
+    }, [folderPath]);
+
+    const handleManageImages = () => {
+        if (isDirty) {
+            const confirmed = window.confirm(
+                'You have unsaved changes. If you navigate away, your changes will be lost.\n\nContinue to Media Library?'
+            );
+            if (!confirmed) return;
+        }
+        window.location.href = mediaLibraryUrl;
+    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -146,8 +183,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
     if (!folderId) {
         return (
-            <div className={`p-8 text-center border border-dashed border-white/10 rounded-xl ${className}`}>
-                <p className="text-zinc-500">No folder selected. Save the location details first.</p>
+            <div className={`p-8 text-center border border-dashed border-ui-border rounded-xl ${className}`}>
+                <p className="text-content-muted">No folder selected. Save the location details first.</p>
             </div>
         );
     }
@@ -171,7 +208,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     };
 
     return (
-        <div className={`space-y-4 ${className}`}>
+        <div className={`flex flex-col gap-4 ${className}`}>
             {/* Broken Images Modal */}
             <ConfirmationModal
                 isOpen={brokenImageUrls.length > 0}
@@ -191,8 +228,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
             {/* Selected Images Container */}
             {selectedUrls && selectedUrls.length > 0 && (
-                <div className="bg-[#151b23] border border-white/5 rounded-lg p-4 overflow-x-auto">
-                    <h4 className="text-xs font-medium text-zinc-400 mb-3 uppercase tracking-wider flex items-center justify-between">
+                <div className="bg-surface-well rounded-lg p-4 overflow-x-auto">
+                    <h4 className="text-xs font-medium text-content-muted mb-3 uppercase tracking-wider flex items-center justify-between">
                         <span>Selected Images ({selectedUrls.length})</span>
                         <button
                             type="button"
@@ -226,12 +263,12 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             )}
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-white">{title}</h3>
+                <h3 className="text-lg font-medium text-content-primary">{title}</h3>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
                         onClick={loadMedia}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
                         title="Refresh"
                     >
                         <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
@@ -246,6 +283,15 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                             Add Images
                         </button>
                     )}
+                    {/* Manage Images — deep-links to the media library folder */}
+                    <button
+                        type="button"
+                        onClick={handleManageImages}
+                        title="Manage Images in Media Library"
+                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
+                    >
+                        <FolderOpen className="h-4 w-4" />
+                    </button>
                 </div>
             </div>
 
@@ -272,31 +318,36 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         onUpload={handleUpload}
                         folderName="this property"
                     />
-                    <p className="text-center text-sm text-zinc-500">
+                    <p className="text-center text-sm text-content-muted">
                         Drop images above or click to browse
                     </p>
                 </div>
             ) : (
-                <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
-                    {mediaItems.map((item) => (
-                        <div key={item.id}>
-                            <MediaTile
-                                item={item}
-                                isSelected={(selectedUrls?.includes(item.url)) || selectedItemId === item.id}
-                                folders={folders}
-                                onClick={() => setSelectedItemId(item.id)}
-                                onUpdate={handleUpdateItem}
-                                onDelete={handleDeleteItem}
-                                onClose={() => setSelectedItemId(null)}
-                                showUrlField={false}
-                                showFolderMove={false}
-                                showDimensions={false}
-                                onMediaSelect={onSelectionChange ? () => handleToggleSelection(item.url) : onMediaSelect}
-                            />
-                        </div>
-                    ))}
+                <div className="bg-surface-well rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+                        {mediaItems.map((item) => (
+                            <div key={item.id}>
+                                <MediaTile
+                                    item={item}
+                                    isSelected={(selectedUrls?.includes(item.url)) || selectedItemId === item.id}
+                                    folders={folders}
+                                    onClick={() => setSelectedItemId(item.id)}
+                                    onUpdate={handleUpdateItem}
+                                    onDelete={handleDeleteItem}
+                                    onClose={() => setSelectedItemId(null)}
+                                    showUrlField={false}
+                                    showFolderMove={false}
+                                    showDimensions={false}
+                                    isFeaturedImage={!!(selectedUrls && selectedUrls.length > 0 && selectedUrls[0] === item.url)}
+                                    onMediaSelect={onSelectionChange ? () => handleToggleSelection(item.url) : onMediaSelect}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
     );
 }
+
+

@@ -75,14 +75,14 @@ export default function ReviewsPage() {
             header: "Author",
             render: (review) => (
                 <div className="flex items-center">
-                    <div className="h-8 w-8 rounded-full bg-zinc-700 flex items-center justify-center hidden md:flex">
+                    <div className="h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center hidden md:flex">
                         <span className="text-sm font-medium text-white">
                             {review.authorName.charAt(0)}
                         </span>
                     </div>
                     <div className="md:ml-3">
                         <div className="font-medium text-white">{review.authorName}</div>
-                        <div className="text-xs text-zinc-500">
+                        <div className="text-xs text-content-muted">
                             {new Date(review.createdAt).toLocaleDateString()}
                         </div>
                     </div>
@@ -99,7 +99,7 @@ export default function ReviewsPage() {
                             key={i}
                             className={`h-4 w-4 ${i < review.rating
                                 ? "text-yellow-400 fill-current"
-                                : "text-zinc-600"
+                                : "text-content-muted
                                 }`}
                         />
                     ))}
@@ -111,7 +111,7 @@ export default function ReviewsPage() {
             header: "Content",
             hideOnMobile: true,
             render: (review) => (
-                <div className="max-w-xs text-sm text-zinc-400 truncate">
+                <div className="max-w-xs text-sm text-content-muted truncate">
                     {review.content}
                 </div>
             ),
@@ -149,25 +149,25 @@ export default function ReviewsPage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl md:text-2xl font-bold text-white">Reviews</h1>
-                        <p className="text-xs md:text-sm text-zinc-400 mt-1">Moderate and manage customer reviews</p>
+                        <p className="text-xs md:text-sm text-content-muted mt-1">Moderate and manage customer reviews</p>
                     </div>
                 </div>
 
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                <div className="relative w-56">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                     <input
                         type="text"
                         placeholder="Search reviews..."
                         value={searchQuery}
                         onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                        className="input-field pl-10"
+                        className="search-field pl-8"
                     />
                 </div>
             </div>
 
             {/* Scrollable Table Section */}
             <div className="flex-1 min-h-0 overflow-hidden px-4 md:px-8 pb-4 md:pb-8">
-                <div className="card h-full flex flex-col">
+                <div className="bg-surface-card rounded-xl h-full flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 overflow-auto">
                         <DataTable
                             columns={columns}

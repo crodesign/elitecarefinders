@@ -699,7 +699,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                 ? "bg-accent text-white shadow-lg shadow-accent/20"
                                                 : roomDetails.customFields[field.id] === false
                                                     ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
-                                                    : "bg-black/20 text-zinc-500 hover:bg-black/40"
+                                                    : "bg-black/20 text-content-muted hover:bg-black/40"
                                                 }`}
                                         >
                                             <span className="text-xs font-medium uppercase">
@@ -743,13 +743,13 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     })}
                                                     className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${roomDetails.customFields[field.id] === opt
                                                         ? "bg-black/20 border-transparent text-white"
-                                                        : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                        : "bg-black/20 border-transparent hover:bg-black/40 text-content-muted"
                                                         }`}
                                                 >
                                                     <span className="text-sm font-medium">{opt}</span>
                                                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${roomDetails.customFields[field.id] === opt
                                                         ? "border-accent bg-accent text-white"
-                                                        : "border-zinc-600 bg-transparent"
+                                                        : "border-ui-borderbg-transparent"
                                                         }`}>
                                                         {roomDetails.customFields[field.id] === opt && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                                                     </div>
@@ -792,7 +792,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     customFields: { ...prev.customFields, [field.id]: e.target.value }
                                                 }));
                                             }}
-                                            className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                             placeholder={`Enter ${field.name.toLowerCase()}...`}
                                         />
                                     </div>
@@ -811,7 +811,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     customFields: { ...prev.customFields, [field.id]: e.target.value }
                                                 }));
                                             }}
-                                            className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50 min-h-[100px] resize-y"
+                                            className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50 min-h-[100px] resize-y"
                                             placeholder={`Enter ${field.name.toLowerCase()}...`}
                                         />
                                     </div>
@@ -832,7 +832,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                         customFields: { ...prev.customFields, [field.id]: e.target.value }
                                                     }));
                                                 }}
-                                                className="w-full rounded-md px-2 pl-3 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md px-2 pl-3 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="0"
                                             />
                                             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -874,7 +874,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     <div className="bg-white/5 rounded-lg p-3 transition-all space-y-2">
                                         <label className="text-sm font-medium text-white/80 block">{field.name}</label>
                                         <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                             <input
                                                 type="tel"
                                                 value={roomDetails.customFields[field.id] as string || ""}
@@ -885,7 +885,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                         customFields: { ...prev.customFields, [field.id]: formatted }
                                                     }));
                                                 }}
-                                                className="w-full rounded-md pl-9 pr-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md pl-9 pr-3 py-2 text-left text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="(555) 555-5555"
                                             />
                                         </div>
@@ -902,7 +902,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             )}
                                         </div>
                                         <div className="relative">
-                                            <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${invalidEmailFields.has(field.id) ? 'text-red-400' : 'text-zinc-500'}`} />
+                                            <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${invalidEmailFields.has(field.id) ? 'text-red-400' : 'text-content-muted'}`} />
                                             <input
                                                 type="email"
                                                 value={roomDetails.customFields[field.id] as string || ""}
@@ -926,7 +926,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                 }}
                                                 className={`w-full rounded-md pl-9 pr-3 py-2 text-left text-sm focus:outline-none transition-colors ${invalidEmailFields.has(field.id)
                                                     ? "bg-red-500/10 text-white placeholder-red-300/50 focus:bg-red-500/20"
-                                                    : "bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                    : "bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                     }`}
                                                 placeholder="example@email.com"
                                             />
@@ -939,7 +939,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/5 rounded-lg transition-all">
                                         <label className="text-sm font-medium text-white/80">{field.name}</label>
                                         <div className="relative w-32">
-                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.customFields[field.id] ? "text-white/80" : "text-zinc-500"}`}>$</span>
+                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.customFields[field.id] ? "text-white/80" : "text-content-muted"}`}>$</span>
                                             <input
                                                 type="number"
                                                 step="0.01"
@@ -948,7 +948,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     ...prev,
                                                     customFields: { ...prev.customFields, [field.id]: e.target.value }
                                                 }))}
-                                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="0.00"
                                             />
                                             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -1006,13 +1006,13 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                         }}
                                                         className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
                                                             ? "bg-black/20 border-transparent text-white"
-                                                            : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                            : "bg-black/20 border-transparent hover:bg-black/40 text-content-muted"
                                                             }`}
                                                     >
                                                         <span className="text-sm font-medium">{opt}</span>
                                                         <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected
                                                             ? "border-accent bg-accent text-white"
-                                                            : "border-zinc-600 bg-transparent"
+                                                            : "border-ui-borderbg-transparent"
                                                             }`}>
                                                             {isSelected && <Check className="h-3 w-3 text-white" />}
                                                         </div>
@@ -1050,7 +1050,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             onClick={() => setDisplayReferenceNumber(true)}
                                             className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber
                                                 ? "bg-accent text-white shadow-sm"
-                                                : "text-zinc-500 hover:text-zinc-300"
+                                                : "text-content-muted hover:text-zinc-300"
                                                 }`}
                                         >
                                             No.
@@ -1060,7 +1060,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             onClick={() => setDisplayReferenceNumber(false)}
                                             className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber
                                                 ? "bg-accent text-white shadow-sm"
-                                                : "text-zinc-500 hover:text-zinc-300"
+                                                : "text-content-muted hover:text-zinc-300"
                                                 }`}
                                         >
                                             Name
@@ -1070,9 +1070,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
                                 <div className="relative">
                                     {displayReferenceNumber ? (
-                                        <Hash className="absolute left-3 top-4 h-5 w-5 text-zinc-500" />
+                                        <Hash className="absolute left-3 top-4 h-5 w-5 text-content-muted" />
                                     ) : (
-                                        <Home className="absolute left-3 top-4 h-5 w-5 text-zinc-500" />
+                                        <Home className="absolute left-3 top-4 h-5 w-5 text-content-muted" />
                                     )}
                                     <input
                                         type="text"
@@ -1084,15 +1084,15 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             // Always update slug when title changes
                                             setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                         }}
-                                        className="w-full rounded-lg py-3 pl-10 pr-4 text-lg text-white focus:outline-none transition-colors bg-black/30 placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                        className="w-full rounded-lg py-3 pl-10 pr-4 text-lg text-white focus:outline-none transition-colors bg-black/30 placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                         placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
                                         title=""
                                     />
                                 </div>
                                 {/* Slug Display */}
                                 <div className="px-1">
-                                    <p className="text-[10px] text-zinc-500 font-mono flex items-center gap-1">
-                                        <span className="text-zinc-600">slug:</span>
+                                    <p className="text-[10px] text-content-muted font-mono flex items-center gap-1">
+                                        <span className="text-content-muted>slug:</span>
                                         {slug || "..."}
                                     </p>
                                 </div>
@@ -1138,7 +1138,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                         }}
                                         className={`w-full flex items-center gap-3 p-3 transition-all duration-200 ${isFeatured
                                             ? "bg-white/5 text-white rounded-t-lg"
-                                            : "bg-white/5 text-zinc-400 hover:bg-white/10 rounded-lg"
+                                            : "bg-white/5 text-content-muted hover:bg-white/10 rounded-lg"
                                             }`}
                                     >
                                         <div className={`p-1 rounded-full ${isFeatured ? "bg-accent/20" : "bg-red-500/10"}`}>
@@ -1154,8 +1154,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     {/* Featured Label Selector */}
                                     {isFeatured && (
                                         <div className="p-3 bg-white/5 rounded-b-lg -mt-[5px] animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <label className="text-xs font-medium text-zinc-400 mb-2 block">
-                                                Label <span className="text-zinc-500 font-normal">(card tag)</span>
+                                            <label className="text-xs font-medium text-content-muted mb-2 block">
+                                                Label <span className="text-content-muted font-normal">(card tag)</span>
                                             </label>
                                             <div className="flex items-center gap-2">
                                                 {isCustomLabelMode ? (
@@ -1177,7 +1177,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                                         setIsCustomLabelMode(false);
                                                                     }
                                                                 }}
-                                                                className="w-full px-3 py-1.5 pr-14 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+                                                                className="w-full px-3 py-1.5 pr-14 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-content-muted focus:outline-none focus:border-ui-border
                                                                 placeholder="Custom label..."
                                                                 autoFocus
                                                             />
@@ -1199,7 +1199,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                                 setFeaturedLabel("");
                                                                 setIsCustomLabelMode(false);
                                                             }}
-                                                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-colors"
+                                                            className="p-1.5 text-content-muted hover:text-white hover:bg-white/5 rounded transition-colors"
                                                         >
                                                             <X className="h-4 w-4" />
                                                         </button>
@@ -1229,9 +1229,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                                     }
                                                                 }}
                                                                 placeholder="Search or select..."
-                                                                className="w-full pl-3 pr-8 py-1.5 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600"
+                                                                className="w-full pl-3 pr-8 py-1.5 text-xs bg-black/30 border border-transparent rounded-lg text-white placeholder-content-muted focus:outline-none focus:border-ui-border
                                                             />
-                                                            <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
+                                                            <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
                                                             {showLabelDropdown && (
                                                                 <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] rounded-lg shadow-lg max-h-40 overflow-auto z-50">
                                                                     <button
@@ -1243,7 +1243,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                                             setShowLabelDropdown(false);
                                                                             setLabelSearch("");
                                                                         }}
-                                                                        className="w-full text-left px-3 py-1.5 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
+                                                                        className="w-full text-left px-3 py-1.5 text-xs text-content-muted hover:bg-white/10 hover:text-white"
                                                                     >
                                                                         None
                                                                     </button>
@@ -1285,7 +1285,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                         <button
                                                             type="button"
                                                             onClick={() => setIsCustomLabelMode(true)}
-                                                            className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-content-muted hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                                                         >
                                                             <Plus className="h-4 w-4" />
                                                         </button>
@@ -1305,7 +1305,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     }}
                                     className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${hasFeaturedVideo
                                         ? "bg-white/5 text-white"
-                                        : "bg-white/5 text-zinc-400 hover:bg-white/10"
+                                        : "bg-white/5 text-content-muted hover:bg-white/10"
                                         }`}
                                 >
                                     <div className={`p-1 rounded-full ${hasFeaturedVideo ? "bg-accent/20" : "bg-red-500/10"}`}>
@@ -1328,7 +1328,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                         }}
                                         className={`w-full flex items-center gap-3 p-3 transition-all duration-200 ${isHomeOfMonth
                                             ? "bg-white/5 text-white rounded-t-lg"
-                                            : "bg-white/5 text-zinc-400 hover:bg-white/10 rounded-lg"
+                                            : "bg-white/5 text-content-muted hover:bg-white/10 rounded-lg"
                                             }`}
                                     >
                                         <div className={`p-1 rounded-full ${isHomeOfMonth ? "bg-accent/20" : "bg-red-500/10"}`}>
@@ -1344,8 +1344,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     {/* Home of Month Description */}
                                     {isHomeOfMonth && (
                                         <div className="p-3 bg-white/5 rounded-b-lg -mt-[5px] animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <label className="text-xs font-medium text-zinc-400 mb-2 block">
-                                                Description <span className="text-zinc-500 font-normal">(optional)</span>
+                                            <label className="text-xs font-medium text-content-muted mb-2 block">
+                                                Description <span className="text-content-muted font-normal">(optional)</span>
                                             </label>
                                             <textarea
                                                 ref={(el) => {
@@ -1366,7 +1366,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                 }}
                                                 placeholder="Why this home is featured..."
                                                 rows={2}
-                                                className="w-full bg-black/30 rounded-lg py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none resize-none overflow-hidden hover:bg-black/50 focus:bg-black/50 transition-colors"
+                                                className="w-full bg-black/30 rounded-lg py-2 px-3 text-sm text-white placeholder-content-muted focus:outline-none resize-none overflow-hidden hover:bg-black/50 focus:bg-black/50 transition-colors"
                                             />
                                         </div>
                                     )}
@@ -1393,7 +1393,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             }}
                                             className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!showAddress
                                                 ? "bg-accent text-white shadow-sm"
-                                                : "text-zinc-500 hover:text-zinc-300"
+                                                : "text-content-muted hover:text-zinc-300"
                                                 }`}
                                         >
                                             Private
@@ -1406,7 +1406,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             }}
                                             className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${showAddress
                                                 ? "bg-accent text-white shadow-sm"
-                                                : "text-zinc-500 hover:text-zinc-300"
+                                                : "text-content-muted hover:text-zinc-300"
                                                 }`}
                                         >
                                             Public
@@ -1421,7 +1421,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             type="text"
                                             value={street}
                                             onChange={(e) => setStreet(e.target.value)}
-                                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                             placeholder="Street"
                                         />
                                     </div>
@@ -1430,7 +1430,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             type="text"
                                             value={city}
                                             onChange={(e) => setCity(e.target.value)}
-                                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                             placeholder="City"
                                         />
                                     </div>
@@ -1445,7 +1445,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     if (val.length <= 2) setState(val);
                                                     else setState(e.target.value);
                                                 }}
-                                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 maxLength={20}
                                                 placeholder="State"
                                             />
@@ -1460,7 +1460,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                 type="text"
                                                 value={zip}
                                                 onChange={(e) => setZip(e.target.value)}
-                                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="Zip"
                                             />
                                         </div>
@@ -1489,7 +1489,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             }
                                             setPhone(formatted);
                                         }}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                        className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                         placeholder="(555) 123-4567"
                                         maxLength={14}
                                     />
@@ -1500,7 +1500,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50"
+                                        className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                         placeholder="contact@example.com"
                                     />
                                 </div>
@@ -1525,7 +1525,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                         }}
                                         className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'published'
                                             ? "bg-emerald-600 text-white shadow-sm"
-                                            : "text-zinc-500 hover:text-zinc-300"
+                                            : "text-content-muted hover:text-zinc-300"
                                             }`}
                                     >
                                         Published
@@ -1537,8 +1537,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                             setIsDirty(true);
                                         }}
                                         className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'draft'
-                                            ? "bg-zinc-600 text-white shadow-sm"
-                                            : "text-zinc-500 hover:text-zinc-300"
+                                            ? "bg-surface-hover text-white shadow-sm"
+                                            : "text-content-muted hover:text-zinc-300"
                                             }`}
                                     >
                                         Draft
@@ -1590,7 +1590,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                     <button
                                                         type="button"
                                                         onClick={() => setManagingTaxonomy(taxonomy)}
-                                                        className="w-fit py-1.5 text-xs text-left px-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+                                                        className="w-fit py-1.5 text-xs text-left px-3 text-content-muted hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
                                                     >
                                                         Manage {taxonomy.name}
                                                         <Layers className="h-3 w-3" />
@@ -1628,12 +1628,12 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     <div className="min-h-[40px] flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-white/5">
                                         <label className="text-sm font-medium text-white/80">Room Price</label>
                                         <div className="relative w-32">
-                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-white/80" : "text-zinc-500"}`}>$</span>
+                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-white/80" : "text-content-muted"}`}>$</span>
                                             <input
                                                 type="number"
                                                 value={roomDetails.roomPrice || ""}
                                                 onChange={(e) => setRoomDetails((prev: RoomDetails) => ({ ...prev, roomPrice: parseFloat(e.target.value) || undefined }))}
-                                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="0.00"
                                             />
                                             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -1726,13 +1726,13 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                                         }}
                                                         className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-all ${isSelected
                                                             ? "bg-black/20 border-transparent text-white"
-                                                            : "bg-black/20 border-transparent hover:bg-black/40 text-zinc-400"
+                                                            : "bg-black/20 border-transparent hover:bg-black/40 text-content-muted"
                                                             }`}
                                                     >
                                                         <span className="text-sm font-medium">{opt.value}</span>
                                                         <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected
                                                             ? "border-accent bg-accent text-white"
-                                                            : "border-zinc-600 bg-transparent"
+                                                            : "border-ui-borderbg-transparent"
                                                             }`}>
                                                             {isSelected && <Check className="h-3 w-3 text-white" />}
                                                         </div>
@@ -1778,8 +1778,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         <div className="bg-[#0b1115] border border-white/5 rounded-lg p-6">
                             {!galleryFolderId || !title ? (
                                 <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
-                                    <p className="text-zinc-400 mb-2">Location Classification and Name Required</p>
-                                    <p className="text-sm text-zinc-500">Please select a Location Classification (Taxonomy) and enter the Home Name to access the gallery.</p>
+                                    <p className="text-content-muted mb-2">Location Classification and Name Required</p>
+                                    <p className="text-sm text-content-muted">Please select a Location Classification (Taxonomy) and enter the Home Name to access the gallery.</p>
                                 </div>
                             ) : (
                                 <MediaGallery
@@ -1833,7 +1833,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
                 if (!hasLocationFields) {
                     return (
-                        <div className="p-8 text-center text-zinc-500">
+                        <div className="p-8 text-center text-content-muted">
                             No location details fields configured.
                         </div>
                     );
@@ -1907,7 +1907,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                         flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
                                         ${isActive
                                             ? "border-accent text-white"
-                                            : "border-transparent text-zinc-400 hover:text-white hover:border-white/10"
+                                            : "border-transparent text-content-muted hover:text-white hover:border-white/10"
                                         }
                                     `}
                                 >

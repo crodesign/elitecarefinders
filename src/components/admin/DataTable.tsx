@@ -4,7 +4,8 @@ import { ReactNode } from "react";
 
 export interface ColumnDef<T> {
     key: string;
-    header: string;
+    header: string | ReactNode;
+    headerLabel?: string; // plain text label for mobile card rows
     render: (item: T) => ReactNode;
     hideOnMobile?: boolean;
 }
@@ -32,7 +33,7 @@ export function DataTable<T>({
 
     if (data.length === 0) {
         return (
-            <div className="px-6 py-12 text-center text-zinc-500">
+            <div className="px-6 py-12 text-center text-content-muted">
                 {emptyMessage}
             </div>
         );
@@ -59,12 +60,12 @@ export function DataTable<T>({
                         {data.map((item) => (
                             <tr key={String(item[keyField])} className="table-row">
                                 {columns.map((col) => (
-                                    <td key={col.key} className="px-6 py-4">
+                                    <td key={col.key} className="px-6 py-2">
                                         {col.render(item)}
                                     </td>
                                 ))}
                                 {actions && (
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-2">
                                         <div className="flex justify-end gap-1">
                                             {actions(item)}
                                         </div>
@@ -81,19 +82,19 @@ export function DataTable<T>({
                 {data.map((item) => (
                     <div
                         key={String(item[keyField])}
-                        className="bg-[#0f1318] border border-white/10 rounded-lg overflow-hidden"
+                        className="bg-surface-card border border-ui-border rounded-lg overflow-hidden"
                     >
                         {/* Card Header */}
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-ui-border">
                             <div className="flex-1 min-w-0">
                                 {primaryColumnDef && (
-                                    <div className="text-white font-semibold text-lg truncate">
+                                    <div className="text-content-primary font-semibold text-lg truncate">
                                         {primaryColumnDef.render(item)}
                                     </div>
                                 )}
                             </div>
                             {actions && (
-                                <div className="flex gap-3 ml-3 text-zinc-400">
+                                <div className="flex gap-3 ml-3 text-content-secondary">
                                     {actions(item)}
                                 </div>
                             )}
@@ -108,8 +109,8 @@ export function DataTable<T>({
                                         key={col.key}
                                         className="flex items-start"
                                     >
-                                        <span className="text-zinc-500 text-sm w-24 flex-shrink-0">{col.header}</span>
-                                        <span className="text-white text-sm flex-1">
+                                        <span className="text-content-muted text-sm w-24 flex-shrink-0">{col.headerLabel ?? (typeof col.header === 'string' ? col.header : '')}</span>
+                                        <span className="text-content-primary text-sm flex-1">
                                             {col.render(item)}
                                         </span>
                                     </div>

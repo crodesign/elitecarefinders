@@ -117,7 +117,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
                                 <button
                                     type="button"
                                     onClick={handleDiscard}
-                                    className="px-4 py-2 rounded-lg text-sm font-medium bg-zinc-700 text-white hover:bg-zinc-600 transition-colors shadow-lg shadow-black/20"
+                                    className="px-4 py-2 rounded-lg text-sm font-medium bg-surface-hover text-white hover:bg-surface-hover transition-colors shadow-lg shadow-black/20"
                                 >
                                     Discard & Proceed
                                 </button>
@@ -140,7 +140,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="text-sm font-medium text-zinc-400 hover:text-white transition-colors px-2 py-1"
+                                className="text-sm font-medium text-content-muted hover:text-white transition-colors px-2 py-1"
                             >
                                 Stay on Page
                             </button>

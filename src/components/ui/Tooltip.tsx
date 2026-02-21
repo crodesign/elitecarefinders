@@ -23,12 +23,12 @@ export function Tooltip({ children, content, side = "top", delayDuration = 300 }
                 </TooltipPrimitive.Trigger>
                 <TooltipPrimitive.Portal>
                     <TooltipPrimitive.Content
-                        className="px-3 py-2 text-xs text-white bg-zinc-800 border border-zinc-600 rounded-md z-[9999] max-w-sm"
+                        className="px-3 py-2 text-xs text-white bg-surface-secondary border border-ui-borderrounded-md z-[9999] max-w-sm"
                         sideOffset={5}
                         side={side}
                     >
                         {content}
-                        <TooltipPrimitive.Arrow className="fill-zinc-800" />
+                        <TooltipPrimitive.Arrow className="fill-surface-secondary" />
                     </TooltipPrimitive.Content>
                 </TooltipPrimitive.Portal>
             </TooltipPrimitive.Root>

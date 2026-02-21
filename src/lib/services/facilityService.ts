@@ -19,6 +19,7 @@ export async function getFacilities(): Promise<Facility[]> {
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
         roomDetails: facility.room_details || { customFields: {} },
+        updatedAt: facility.updated_at,
     }));
 }
 
@@ -41,6 +42,7 @@ export async function getFacility(id: string): Promise<Facility | null> {
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 
@@ -81,6 +83,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 
@@ -117,6 +120,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 

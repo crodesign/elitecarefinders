@@ -380,14 +380,14 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 headerChildren={
                     <div className="flex flex-col w-full">
                         {/* Top Row: Tabs + Save Button */}
-                        <div className="flex items-center justify-between pl-4 pr-6 pt-[15px]">
+                        <div className="flex items-center justify-between pl-4 pr-6">
                             {/* Tabs Container */}
-                            <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
+                            <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
                                 {tabs.map((tab) => {
                                     const Icon = tab.icon;
                                     const isActive = activeTab === tab.id;
-                                    // Tab color matches the progress bar background exactly
-                                    const tabColor = 'rgba(255,255,255,0.2)';
+                                    // Tab color uses the theme-aware surface-tab variable
+                                    const tabColor = 'var(--surface-tab)';
 
                                     return (
                                         <button
@@ -396,11 +396,11 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                                             onClick={() => handleTabChange(tab.id as TabId)}
                                             className={`
                                                 relative flex items-center gap-2 px-4 text-sm font-medium
-                                                rounded-tl-lg rounded-tr-lg whitespace-nowrap
-                                                transition-all duration-150 select-none
+                                                whitespace-nowrap
+                                                transition-colors duration-150 select-none
                                                 ${isActive
-                                                    ? 'pt-[10px] pb-[11px] text-white z-10'
-                                                    : 'pt-2 pb-2 bg-transparent text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                                    ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
+                                                    : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
                                                 }
                                             `}
                                             style={isActive ? { backgroundColor: tabColor } : undefined}
@@ -447,8 +447,8 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                         </div>
 
                         {/* Progress Bar Strip (Bottom Row) */}
-                        <div className="w-full h-[32px] flex items-center justify-center relative" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-                            <div className="inline-flex items-center gap-6 bg-black/90 rounded-full px-4 py-1">
+                        <div className="w-full h-[32px] flex items-center justify-center relative" style={{ backgroundColor: 'var(--surface-tab)' }}>
+                            <div className="inline-flex items-center gap-6 rounded-full px-4 py-1 shadow-sm" style={{ backgroundColor: 'var(--surface-secondary)' }}>
                                 {[
                                     { value: "new", label: "New", colorVar: "--lead-new" },
                                     { value: "prospects", label: "Prospect", colorVar: "--lead-prospects" },
@@ -460,11 +460,11 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                                     return (
                                         <div key={status.value} className="flex items-center gap-1.5 relative">
                                             <div
-                                                className={`rounded-full border-2 border-white transition-all duration-300 ${isActive ? 'w-4 h-4 shadow-lg scale-110' : 'w-2.5 h-2.5'}`}
-                                                style={{ backgroundColor: `hsl(var(${status.colorVar}))` }}
+                                                className={`rounded-full border-2 transition-all duration-300 ${isActive ? 'w-4 h-4 shadow-lg scale-110' : 'w-2.5 h-2.5'}`}
+                                                style={{ backgroundColor: `hsl(var(${status.colorVar}))`, borderColor: 'var(--surface-secondary)' }}
                                             />
                                             {isActive && (
-                                                <span className="text-xs font-medium text-white whitespace-nowrap">
+                                                <span className="text-xs font-medium text-content-primary whitespace-nowrap">
                                                     {status.label}
                                                 </span>
                                             )}

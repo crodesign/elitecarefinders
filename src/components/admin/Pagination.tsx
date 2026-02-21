@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ChevronDown, Check } from "lucide-react";
 
 interface PaginationProps {
     currentPage: number;
@@ -10,6 +11,8 @@ interface PaginationProps {
     onPageChange: (page: number) => void;
     onItemsPerPageChange?: (itemsPerPage: number) => void;
 }
+
+const PER_PAGE_OPTIONS = [10, 25, 50, 100];
 
 export function Pagination({
     currentPage,
@@ -22,37 +25,68 @@ export function Pagination({
     const startItem = (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-white/5 bg-[#0b1115]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-ui-border bg-surface-card">
             <div className="flex items-center gap-4">
                 {/* Desktop: Full description */}
-                <span className="hidden md:inline text-sm text-zinc-400">
-                    Showing <span className="text-white font-medium">{startItem}</span> to{" "}
-                    <span className="text-white font-medium">{endItem}</span> of{" "}
-                    <span className="text-white font-medium">{totalItems}</span> entries
+                <span className="hidden md:inline text-sm text-content-secondary">
+                    Showing <span className="text-content-primary font-medium">{startItem}</span> to{" "}
+                    <span className="text-content-primary font-medium">{endItem}</span> of{" "}
+                    <span className="text-content-primary font-medium">{totalItems}</span> entries
                 </span>
                 {/* Mobile: Just total count */}
-                <span className="md:hidden text-sm text-zinc-400">
-                    <span className="text-white font-medium">{totalItems}</span> items
+                <span className="md:hidden text-sm text-content-secondary">
+                    <span className="text-content-primary font-medium">{totalItems}</span> items
                 </span>
 
                 {/* Items per page - hidden on mobile */}
                 {onItemsPerPageChange && (
-                    <select
-                        value={itemsPerPage}
-                        onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-                        className="hidden md:block appearance-none cursor-pointer text-xs text-zinc-300 hover:text-white bg-[#1a1f2e] border border-white/10 rounded-md px-3 py-1.5 pr-7 focus:outline-none focus:border-accent/50 transition-colors"
-                        style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-                            backgroundRepeat: 'no-repeat',
-                            backgroundPosition: 'right 8px center',
-                        }}
-                    >
-                        <option value={10} className="bg-[#1a1f2e]">10 per page</option>
-                        <option value={25} className="bg-[#1a1f2e]">25 per page</option>
-                        <option value={50} className="bg-[#1a1f2e]">50 per page</option>
-                        <option value={100} className="bg-[#1a1f2e]">100 per page</option>
-                    </select>
+                    <div className="relative hidden md:block" ref={dropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="form-input flex items-center gap-2 px-3 py-1.5 text-xs h-8 min-w-[110px]"
+                        >
+                            <span className="flex-1 text-left text-content-primary">{itemsPerPage} per page</span>
+                            <ChevronDown className={`h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 text-content-muted ${dropdownOpen ? "rotate-180" : ""}`} />
+                        </button>
+
+                        {dropdownOpen && (
+                            <div className="dropdown-menu absolute left-0 bottom-full mb-1 w-full min-w-[110px] z-50 p-1">
+                                {PER_PAGE_OPTIONS.map((opt) => (
+                                    <button
+                                        key={opt}
+                                        type="button"
+                                        onClick={() => {
+                                            onItemsPerPageChange(opt);
+                                            setDropdownOpen(false);
+                                        }}
+                                        className={`dropdown-item w-full rounded text-xs ${itemsPerPage === opt ? "active" : ""}`}
+                                    >
+                                        <span className="flex-1">{opt} per page</span>
+                                        {itemsPerPage === opt && (
+                                            <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                <Check className="h-2.5 w-2.5 text-white" />
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
 
@@ -61,7 +95,7 @@ export function Pagination({
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-white border border-white/10 rounded hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-content-primary border border-ui-border rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     <ChevronLeft className="h-4 w-4" />
                     <span className="hidden md:inline">Previous</span>
@@ -87,7 +121,7 @@ export function Pagination({
                                 onClick={() => onPageChange(pageNum)}
                                 className={`px-3 py-1.5 text-sm rounded transition-colors ${currentPage === pageNum
                                     ? "bg-accent text-white font-medium"
-                                    : "text-white border border-white/10 hover:bg-white/5"
+                                    : "text-content-primary border border-ui-border hover:bg-surface-hover"
                                     }`}
                             >
                                 {pageNum}
@@ -97,7 +131,7 @@ export function Pagination({
                 </div>
 
                 {/* Mobile: Current page indicator */}
-                <span className="md:hidden text-sm text-zinc-400 px-2">
+                <span className="md:hidden text-sm text-content-secondary px-2">
                     {currentPage} / {totalPages}
                 </span>
 
@@ -105,7 +139,7 @@ export function Pagination({
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-white border border-white/10 rounded hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-content-primary border border-ui-border rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     <span className="hidden md:inline">Next</span>
                     <ChevronRight className="h-4 w-4" />

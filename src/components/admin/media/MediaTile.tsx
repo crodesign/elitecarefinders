@@ -31,6 +31,8 @@ interface MediaTileProps {
     showDimensions?: boolean;
     onMediaSelect?: (item: MediaItem) => void;
     isGalleryImage?: boolean;
+    isFeaturedImage?: boolean;
+    captionClassName?: string;
 }
 
 export function MediaTile({
@@ -49,6 +51,8 @@ export function MediaTile({
     showDimensions = true,
     onMediaSelect,
     isGalleryImage = false,
+    isFeaturedImage = false,
+    captionClassName = 'bg-surface-caption',
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
@@ -193,7 +197,7 @@ export function MediaTile({
     return (
         <div className={`flex flex-col rounded-xl transition-all ${isSelected && !onMediaSelect ? "ring-2 ring-accent overflow-visible" : "overflow-hidden"}`}>
             {/* Image container */}
-            <div className="relative w-full aspect-square bg-black/30 rounded-t-xl overflow-hidden">
+            <div className="relative w-full aspect-square bg-surface-input rounded-t-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
                     <img
                         src={item.url}
@@ -201,28 +205,34 @@ export function MediaTile({
                         className={`w-full h-full object-cover transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                    <div className="w-full h-full flex items-center justify-center text-content-muted">
                         <span className="text-sm">{item.mimeType.split("/")[1]}</span>
                     </div>
                 )}
 
                 {/* Image info overlay in top left */}
-                {showDimensions && (
-                    <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
-                        <div className="px-1.5 py-0.5 rounded-lg bg-black/60 text-white/70 text-[10px] flex items-center gap-1.5 backdrop-blur-sm">
+                <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                    {showDimensions && (
+                        <div className="px-1.5 py-0.5 rounded-lg bg-surface-secondary/80 text-content-secondary text-[10px] flex items-center gap-1.5 backdrop-blur-sm">
                             {item.width && item.height && (
                                 <span>{item.width}×{item.height}</span>
                             )}
                             <span className="uppercase">{item.mimeType.split("/")[1]}</span>
                         </div>
-                        {isGalleryImage && (
-                            <div className="px-1.5 py-0.5 rounded-lg bg-emerald-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
-                                <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
-                                In Gallery
-                            </div>
-                        )}
-                    </div>
-                )}
+                    )}
+                    {isFeaturedImage && (
+                        <div className="px-1.5 py-0.5 rounded-lg bg-[#239ddb] text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                            <span className="w-1 h-1 rounded-full bg-white"></span>
+                            Featured Image
+                        </div>
+                    )}
+                    {isGalleryImage && !isFeaturedImage && (
+                        <div className="px-1.5 py-0.5 rounded-lg bg-emerald-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
+                            In Gallery
+                        </div>
+                    )}
+                </div>
 
                 {/* Edit/Close button in upper right - or checkbox in bulk/selection mode */}
                 {(isBulkSelectMode || onMediaSelect) ? (
@@ -238,7 +248,7 @@ export function MediaTile({
                         }}
                         className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected || isBulkSelected
                             ? "bg-accent text-white"
-                            : "bg-black/60 text-white/70 hover:bg-black/80 hover:text-white"
+                            : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
                             }`}
                     >
                         {(isSelected || isBulkSelected) ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
@@ -249,7 +259,7 @@ export function MediaTile({
                         onClick={handleTileClick}
                         className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected
                             ? "bg-accent text-white"
-                            : "bg-black/60 text-white/70 hover:bg-black/80 hover:text-white"
+                            : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
                             }`}
                     >
                         {isSelected ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
@@ -258,11 +268,11 @@ export function MediaTile({
             </div>
 
             {/* Caption and edit fields container */}
-            <div className={`p-3 bg-[#151b23] border-t border-white/10 ${isSelected && !onMediaSelect ? "space-y-2 rounded-b-xl" : ""}`}>
+            <div className={`p-3 ${captionClassName} ${isSelected && !onMediaSelect ? "space-y-2 rounded-b-xl" : ""}`}>
                 {/* Caption row */}
                 <div className="flex items-center gap-2">
                     {isSelected && !onMediaSelect && (
-                        <label className="text-xs text-zinc-400 flex-shrink-0 w-12">Caption</label>
+                        <label className="text-xs text-content-muted flex-shrink-0 w-12">Caption</label>
                     )}
                     <input
                         type="text"
@@ -270,8 +280,8 @@ export function MediaTile({
                         onChange={(e) => setCaption(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Add caption..."
-                        className={`flex-1 min-w-0 text-sm text-white placeholder-zinc-500 focus:outline-none ${isSelected && !onMediaSelect
-                            ? "bg-black/20 rounded px-2 py-1.5"
+                        className={`flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted focus:outline-none ${isSelected && !onMediaSelect
+                            ? "bg-surface-input rounded px-2 py-1.5"
                             : "bg-transparent"
                             }`}
                     />
@@ -295,19 +305,19 @@ export function MediaTile({
                         {/* URL row */}
                         {showUrlField && (
                             <div className="flex items-center gap-2">
-                                <label className="text-xs text-zinc-400 flex-shrink-0 w-12">URL</label>
+                                <label className="text-xs text-content-muted flex-shrink-0 w-12">URL</label>
                                 <input
                                     type="text"
                                     value={item.url}
                                     readOnly
-                                    className="flex-1 min-w-0 bg-black/20 rounded px-2 py-1.5 text-xs text-zinc-400 truncate"
+                                    className="flex-1 min-w-0 bg-surface-input rounded px-2 py-1.5 text-xs text-content-muted truncate"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => {
                                         navigator.clipboard.writeText(item.url);
                                     }}
-                                    className="flex-shrink-0 px-2 py-1.5 bg-white/5 border border-white/10 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                                    className="flex-shrink-0 px-2 py-1.5 bg-surface-input border border-ui-border rounded text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors"
                                     title="Copy URL"
                                 >
                                     <Copy className="h-3 w-3" />
@@ -318,7 +328,7 @@ export function MediaTile({
                         {/* Folder row - searchable dropdown */}
                         {showFolderMove && (
                             <div className="flex items-center gap-2">
-                                <label className="text-xs text-zinc-400 flex-shrink-0 w-12">Folder</label>
+                                <label className="text-xs text-content-muted flex-shrink-0 w-12">Folder</label>
                                 <div className="flex-1 min-w-0 relative">
                                     <input
                                         type="text"
@@ -337,10 +347,10 @@ export function MediaTile({
                                             setTimeout(() => setShowFolderDropdown(false), 150);
                                         }}
                                         placeholder="Search folders..."
-                                        className="w-full bg-black/20 rounded px-2 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                                        className="w-full rounded px-2 py-1.5 text-xs focus:outline-none bg-surface-input text-content-primary"
                                     />
                                     {showFolderDropdown && (
-                                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded shadow-lg max-h-40 overflow-auto z-50">
+                                        <div className="absolute top-full left-0 right-0 mt-1 bg-surface-secondary rounded shadow-lg max-h-40 overflow-auto z-50">
                                             <button
                                                 type="button"
                                                 // Use onMouseDown to prevent blur from closing dropdown before click registers
@@ -350,7 +360,7 @@ export function MediaTile({
                                                     setShowFolderDropdown(false);
                                                     setFolderSearch("");
                                                 }}
-                                                className="w-full text-left px-2 py-1.5 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
+                                                className="w-full text-left px-2 py-1.5 text-xs text-content-muted hover:bg-surface-hover hover:text-content-primary"
                                             >
                                                 No folder
                                             </button>
@@ -370,13 +380,13 @@ export function MediaTile({
                                                             setFolderSearch("");
                                                         }}
                                                         className={`w-full text-left px-2 py-1.5 text-xs flex items-center justify-between group ${isRestricted
-                                                            ? "text-zinc-600 cursor-not-allowed"
-                                                            : "text-white hover:bg-white/10"
+                                                            ? "text-content-muted opacity-50 cursor-not-allowed"
+                                                            : "text-content-primary hover:bg-surface-hover"
                                                             }`}
                                                     >
                                                         <span>{"—".repeat(depth)} {folder.name}</span>
                                                         {isRestricted && (
-                                                            <span className="text-[10px] text-zinc-600 group-hover:text-zinc-500">(Restricted)</span>
+                                                            <span className="text-[10px] text-content-muted group-hover:text-content-secondary">(Restricted)</span>
                                                         )}
                                                     </button>
                                                 );
@@ -388,7 +398,7 @@ export function MediaTile({
                         )}
 
                         {/* Actions row */}
-                        <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                        <div className="flex items-center justify-between pt-2 border-t border-ui-border">
                             <button
                                 type="button"
                                 onClick={() => onDelete(item.id)}
@@ -400,7 +410,7 @@ export function MediaTile({
                                 <button
                                     type="button"
                                     onClick={onClose}
-                                    className="px-3 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors"
+                                    className="px-3 py-1.5 text-xs text-content-muted hover:text-content-primary transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -425,7 +435,7 @@ export function MediaTile({
                                 message={
                                     <div>
                                         <p>Are you sure you want to move this file to <strong>{currentFolderName || "the root folder"}</strong>?</p>
-                                        <p className="mt-2 text-zinc-500 text-xs">This will physically relocate the file on the server and update all database references.</p>
+                                        <p className="mt-2 text-content-muted text-xs">This will physically relocate the file on the server and update all database references.</p>
                                     </div>
                                 }
                                 confirmLabel="Move File"
@@ -438,3 +448,7 @@ export function MediaTile({
         </div>
     );
 }
+
+
+
+

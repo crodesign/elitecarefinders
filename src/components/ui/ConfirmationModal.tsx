@@ -52,17 +52,18 @@ export function ConfirmationModal({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 backdrop-blur-sm transition-opacity"
+                style={{ backgroundColor: 'var(--glass-overlay)' }}
                 onClick={isLoading ? undefined : onClose}
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-[#161b22] border border-white/10 rounded-xl shadow-2xl p-6 transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-md bg-surface-secondary rounded-xl shadow-2xl p-6 transform transition-all animate-in fade-in zoom-in-95 duration-200">
                 {/* Close button */}
                 <button
                     onClick={onClose}
                     disabled={isLoading}
-                    className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
+                    className="absolute top-4 right-4 text-content-secondary hover:text-content-primary transition-colors disabled:opacity-50"
                 >
                     <X className="h-5 w-5" />
                 </button>
@@ -75,8 +76,8 @@ export function ConfirmationModal({
 
                     {/* Content */}
                     <div className="flex-1 pt-1">
-                        <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-                        <div className="text-sm text-zinc-400">
+                        <h3 className="text-lg font-semibold text-content-primary mb-2">{title}</h3>
+                        <div className="text-sm text-content-secondary">
                             {message}
                         </div>
                     </div>
@@ -91,7 +92,7 @@ export function ConfirmationModal({
                             <button
                                 onClick={onClose}
                                 disabled={isLoading}
-                                className="px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
+                                className="px-4 py-2 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
                             >
                                 {cancelLabel}
                             </button>

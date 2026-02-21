@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronRight, ChevronDown, Folder, FolderOpen, Plus, ChevronsUpDown, MoreVertical, Pencil, Trash2, Check } from "lucide-react";
+import { ChevronRight, ChevronDown, Folder, FolderOpen, Plus, MoreVertical, Pencil, Trash2, Check } from "lucide-react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import type { MediaFolder } from "@/types";
 
@@ -50,7 +50,7 @@ function TruncatedText({ text, className }: { text: string; className?: string }
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                     <Tooltip.Content
-                        className="px-3 py-2 text-sm text-white bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-[9999] max-w-xs"
+                        className="px-3 py-2 text-sm text-white bg-surface-secondary border border-ui-border rounded-lg shadow-xl z-[9999] max-w-xs"
                         sideOffset={8}
                         side="right"
                     >
@@ -288,8 +288,8 @@ export function FolderTree({
             <div key={folder.id}>
                 <div
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors group ${isSelected
-                        ? "bg-accent/10 text-accent"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                        ? "bg-white/10 text-white"
+                        : "text-content-muted hover:bg-white/5 hover:text-white"
                         }`}
                     style={{ paddingLeft: `${12 + depth * 16}px` }}
                     onClick={() => {
@@ -339,7 +339,7 @@ export function FolderTree({
                                     if (e.key === "Escape") handleCancelEdit();
                                 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-zinc-500 focus:outline-none"
+                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-content-muted focus:outline-none"
                                 autoFocus
                             />
                             <button
@@ -358,7 +358,7 @@ export function FolderTree({
 
                     {/* Item count badge */}
                     {!isEditing && folder.itemCount !== undefined && folder.itemCount > 0 && (
-                        <span className="text-xs text-zinc-400 bg-white/5 px-1.5 py-0.5 rounded">
+                        <span className="text-xs text-content-muted bg-white/5 px-1.5 py-0.5 rounded">
                             {folder.itemCount}
                         </span>
                     )}
@@ -381,7 +381,7 @@ export function FolderTree({
                                     </Tooltip.Trigger>
                                     <Tooltip.Portal>
                                         <Tooltip.Content
-                                            className="px-3 py-2 text-sm text-white bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-[9999]"
+                                            className="px-3 py-2 text-sm text-white bg-surface-secondary border border-ui-border rounded-lg shadow-xl z-[9999]"
                                             sideOffset={8}
                                         >
                                             More options
@@ -393,7 +393,7 @@ export function FolderTree({
 
                             {/* Dropdown menu */}
                             {isMenuOpen && (
-                                <div className="absolute right-0 top-full mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-2xl z-50 min-w-[120px]">
+                                <div className="absolute right-0 top-full mt-1 bg-[#111111] border border-white/10 rounded-lg shadow-2xl z-50 min-w-[120px]">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -437,7 +437,7 @@ export function FolderTree({
                                 </Tooltip.Trigger>
                                 <Tooltip.Portal>
                                     <Tooltip.Content
-                                        className="px-3 py-2 text-sm text-white bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-[9999]"
+                                        className="px-3 py-2 text-sm text-white bg-surface-secondary border border-ui-border rounded-lg shadow-xl z-[9999]"
                                         sideOffset={8}
                                     >
                                         Add subfolder
@@ -455,7 +455,7 @@ export function FolderTree({
                         className="flex items-center gap-2 px-3 py-2"
                         style={{ paddingLeft: `${28 + (depth + 1) * 16}px` }}
                     >
-                        <Folder className="h-4 w-4 text-zinc-500" />
+                        <Folder className="h-4 w-4 text-content-muted" />
                         <div className="relative flex-1 min-w-0 folder-create-container">
                             <input
                                 type="text"
@@ -467,7 +467,7 @@ export function FolderTree({
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 placeholder="Folder name"
-                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-zinc-500 focus:outline-none"
+                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-content-muted focus:outline-none"
                                 autoFocus
                             />
                             <button
@@ -494,44 +494,51 @@ export function FolderTree({
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full px-2">
             {/* State Dropdown or Static Label */}
             <div className="flex-none px-3 py-3" ref={stateDropdownRef}>
                 <div className="relative">
                     {states.length === 1 ? (
                         /* Single location — show as static label, no dropdown */
-                        <div className="w-full flex items-center gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white">
+                        <div className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white">
                             <span className="truncate">{states[0].name}</span>
                         </div>
                     ) : (
                         <>
                             <button
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                                className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white hover:border-white/20 transition-colors"
+                                className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white hover:bg-white/[0.12] transition-colors text-left"
                             >
-                                <span className="truncate">
+                                <span className="truncate flex-1">
                                     {selectedState ? selectedState.name : "Select State..."}
                                 </span>
-                                <ChevronsUpDown className="h-4 w-4 text-zinc-400 flex-shrink-0" />
                             </button>
+                            <ChevronDown className={`absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none transition-transform duration-200 ${isStateDropdownOpen ? "rotate-180" : ""}`} />
 
                             {isStateDropdownOpen && (
-                                <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-auto z-[9999]">
-                                    {states.map((state) => (
-                                        <button
-                                            key={state.id}
-                                            onClick={() => {
-                                                onSelectState(state.id);
-                                                setIsStateDropdownOpen(false);
-                                            }}
-                                            className={`w-full text-left px-3 py-2 text-sm transition-colors ${state.id === selectedStateId
-                                                ? "bg-accent/10 text-accent"
-                                                : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                                                }`}
-                                        >
-                                            {state.name}
-                                        </button>
-                                    ))}
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-surface-secondary rounded-md shadow-xl max-h-60 overflow-hidden z-[9999] flex flex-col">
+                                    <div className="overflow-y-auto flex-1 p-1">
+                                        {states.map((state) => (
+                                            <button
+                                                key={state.id}
+                                                onClick={() => {
+                                                    onSelectState(state.id);
+                                                    setIsStateDropdownOpen(false);
+                                                }}
+                                                className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${state.id === selectedStateId
+                                                    ? "bg-white/10 text-white"
+                                                    : "text-content-secondary hover:bg-white/5 hover:text-white"
+                                                    }`}
+                                            >
+                                                <span className="flex-1">{state.name}</span>
+                                                {state.id === selectedStateId && (
+                                                    <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                        <Check className="h-2.5 w-2.5 text-white" />
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </>
@@ -545,31 +552,38 @@ export function FolderTree({
                     <div className="relative">
                         <button
                             onClick={() => setIsIslandDropdownOpen(!isIslandDropdownOpen)}
-                            className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm text-white hover:border-white/20 transition-colors"
+                            className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white hover:bg-white/[0.12] transition-colors text-left"
                         >
-                            <span className="truncate">
+                            <span className="truncate flex-1">
                                 {selectedIsland || "Select Island..."}
                             </span>
-                            <ChevronsUpDown className="h-4 w-4 text-zinc-400 flex-shrink-0" />
                         </button>
+                        <ChevronDown className={`absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted pointer-events-none transition-transform duration-200 ${isIslandDropdownOpen ? "rotate-180" : ""}`} />
 
                         {isIslandDropdownOpen && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-[#0b1115] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-auto z-[9999]">
-                                {HAWAIIAN_ISLANDS.map((island) => (
-                                    <button
-                                        key={island}
-                                        onClick={() => {
-                                            setSelectedIsland(island);
-                                            setIsIslandDropdownOpen(false);
-                                        }}
-                                        className={`w-full text-left px-3 py-2 text-sm transition-colors ${island === selectedIsland
-                                            ? "bg-accent/10 text-accent"
-                                            : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                                            }`}
-                                    >
-                                        {island}
-                                    </button>
-                                ))}
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-surface-secondary rounded-md shadow-xl max-h-60 overflow-hidden z-[9999] flex flex-col">
+                                <div className="overflow-y-auto flex-1 p-1">
+                                    {HAWAIIAN_ISLANDS.map((island) => (
+                                        <button
+                                            key={island}
+                                            onClick={() => {
+                                                setSelectedIsland(island);
+                                                setIsIslandDropdownOpen(false);
+                                            }}
+                                            className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${island === selectedIsland
+                                                ? "bg-white/10 text-white"
+                                                : "text-content-secondary hover:bg-white/5 hover:text-white"
+                                                }`}
+                                        >
+                                            <span className="flex-1">{island}</span>
+                                            {island === selectedIsland && (
+                                                <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                    <Check className="h-2.5 w-2.5 text-white" />
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>

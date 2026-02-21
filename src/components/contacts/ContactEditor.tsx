@@ -605,79 +605,53 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
 
                         {/* Desktop Tab Navigation - hidden in invoice edit mode */}
                         {!isInvoiceEditMode && (
-                            <div className="w-full flex justify-center border-b border-border mb-6">
-                                <div className="flex gap-8">
-                                    {/* Edit mode: Notes first */}
-                                    {!isNew && (
-                                        <button
-                                            onClick={() => setActiveTab("notes")}
-                                            className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "notes"
-                                                ? 'border-primary text-primary'
-                                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                                }`}
-                                        >
-                                            Notes
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => setActiveTab("contact-info")}
-                                        className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "contact-info"
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                            }`}
-                                    >
-                                        Contact Info
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("resident-info")}
-                                        className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "resident-info"
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                            }`}
-                                    >
-                                        Resident Info
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("housing")}
-                                        className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "housing"
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                            }`}
-                                    >
-                                        Housing Preferences
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("care")}
-                                        className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "care"
-                                            ? 'border-primary text-primary'
-                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                            }`}
-                                    >
-                                        Care Needs
-                                    </button>
-                                    {((formData as any)?.leadClassification === "won" || ((formData as any)?.leadClassification === "closed" && (formData as any)?.previouslyWon)) && (
-                                        <button
-                                            onClick={() => setActiveTab("checklist")}
-                                            className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "checklist"
-                                                ? 'border-primary text-primary'
-                                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                                }`}
-                                        >
-                                            Checklist
-                                        </button>
-                                    )}
-                                    {/* New contact mode: Notes last */}
-                                    {isNew && (
-                                        <button
-                                            onClick={() => setActiveTab("notes")}
-                                            className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "notes"
-                                                ? 'border-primary text-primary'
-                                                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-primary/50'
-                                                }`}
-                                        >
-                                            Notes
-                                        </button>
-                                    )}
+                            <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
+                                <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
+                                    {([
+                                        ...(!isNew ? [{ id: 'notes', label: 'Notes' }] : []),
+                                        { id: 'contact-info', label: 'Contact Info' },
+                                        { id: 'resident-info', label: 'Resident Info' },
+                                        { id: 'housing', label: 'Housing Preferences' },
+                                        { id: 'care', label: 'Care Needs' },
+                                        ...((((formData as any)?.leadClassification === 'won') || (((formData as any)?.leadClassification === 'closed') && (formData as any)?.previouslyWon)) ? [{ id: 'checklist', label: 'Checklist' }] : []),
+                                        ...(isNew ? [{ id: 'notes', label: 'Notes' }] : []),
+                                    ] as { id: string; label: string }[]).map((tab) => {
+                                        const isActive = activeTab === tab.id;
+                                        const tabColor = 'var(--surface-tab)';
+                                        return (
+                                            <button
+                                                key={tab.id}
+                                                type="button"
+                                                onClick={() => setActiveTab(tab.id)}
+                                                className={`
+                                                    relative flex items-center gap-2 px-4 text-sm font-medium
+                                                    whitespace-nowrap
+                                                    transition-colors duration-150 select-none
+                                                    ${isActive
+                                                        ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
+                                                        : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
+                                                    }
+                                                `}
+                                                style={isActive ? { backgroundColor: tabColor } : undefined}
+                                            >
+                                                {isActive && (
+                                                    <span className="absolute bottom-0 left-[-8px] w-2 h-2 pointer-events-none">
+                                                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M8 0 L8 8 L0 8 A 8 8 0 0 0 8 0 Z" fill={tabColor} />
+                                                        </svg>
+                                                    </span>
+                                                )}
+                                                {tab.label}
+                                                {isActive && (
+                                                    <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
+                                                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0 0 L0 8 L8 8 A 8 8 0 0 1 0 0 Z" fill={tabColor} />
+                                                        </svg>
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}

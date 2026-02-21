@@ -17,7 +17,7 @@ const ContactFormNotesSection = ({ contactId, formData, readOnly = false, onNext
 
   if (!id) {
     return (
-      <div className="p-4 text-center text-zinc-400 border border-white/10 rounded-md bg-white/5">
+      <div className="p-4 text-center text-content-muted border border-white/10 rounded-md bg-white/5">
         <p>Please save the contact to add or view notes.</p>
         {onNext && (
           <div className="flex justify-end mt-4">

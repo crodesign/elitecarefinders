@@ -24,9 +24,9 @@ export async function getHomes(): Promise<Home[]> {
         isHomeOfMonth: home.is_home_of_month,
         featuredLabel: home.featured_label,
         homeOfMonthDescription: home.home_of_month_description,
-        // Ensure other fields match expected types if needed
         images: home.images || [],
         roomDetails: home.room_details || { customFields: {} },
+        updatedAt: home.updated_at,
     }));
 }
 
@@ -55,6 +55,7 @@ export async function getHome(id: string): Promise<Home | null> {
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 
@@ -105,6 +106,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         homeOfMonthDescription: data.home_of_month_description,
         images: [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 
@@ -154,6 +156,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         roomDetails: data.room_details || { customFields: {} },
+        updatedAt: data.updated_at,
     };
 }
 

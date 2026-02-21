@@ -53,6 +53,7 @@ interface RichTextEditorProps {
     onChange: (value: string) => void;
     placeholder?: string;
     minHeight?: string;
+    className?: string;
 }
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
@@ -123,28 +124,28 @@ function LinkModal({
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
             {/* Modal */}
-            <div className="relative bg-zinc-900 border border-white/10 rounded-xl shadow-2xl p-5 w-full max-w-md mx-4 flex flex-col gap-4">
+            <div className="relative bg-surface-secondary border border-white/10 rounded-xl shadow-2xl p-5 w-full max-w-md mx-4 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                         <LinkIcon className="w-4 h-4 text-accent" />
                         Insert Link
                     </h3>
                     <button type="button" onClick={onClose}
-                        className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors">
+                        className="p-1 rounded hover:bg-white/10 text-content-muted hover:text-white transition-colors">
                         <X className="w-4 h-4" />
                     </button>
                 </div>
 
                 {/* URL Input */}
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-zinc-400 font-medium">URL</label>
+                    <label className="text-xs text-content-muted font-medium">URL</label>
                     <input
                         ref={inputRef}
                         type="url"
                         value={url}
                         onChange={e => setUrl(e.target.value)}
                         placeholder="https://example.com"
-                        className={`w-full bg-black/40 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none transition-colors font-mono border-2 ${showError
+                        className={`w-full bg-black/40 rounded-lg px-3 py-2 text-sm text-white placeholder-content-muted focus:outline-none transition-colors font-mono border-2 ${showError
                             ? "border-red-500"
                             : "border-transparent"
                             }`}
@@ -187,7 +188,7 @@ function LinkModal({
                     </button>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={onClose}
-                            className="px-3 py-1.5 text-xs text-zinc-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
+                            className="px-3 py-1.5 text-xs text-content-muted hover:text-white rounded-lg hover:bg-white/10 transition-colors">
                             Cancel
                         </button>
                         <button type="button" onClick={handleSave}
@@ -282,7 +283,7 @@ function Toolbar() {
     };
 
     const btn = (active: boolean) =>
-        `p-2 rounded transition-colors ${active ? "bg-accent text-white" : "text-zinc-400 hover:text-white hover:bg-white/10"}`;
+        `p-2 rounded transition-colors ${active ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-white/10"}`;
 
     const dropdownBtn = "flex items-center gap-2 w-full px-3 py-2 text-xs rounded hover:bg-white/10 text-left";
 
@@ -307,19 +308,19 @@ function Toolbar() {
             {/* Heading picker */}
             <div className="relative">
                 <button type="button"
-                    className="p-2 rounded hover:bg-white/10 text-zinc-400 hover:text-white flex items-center gap-1 transition-colors"
+                    className="p-2 rounded hover:bg-white/10 text-content-muted hover:text-white flex items-center gap-1 transition-colors"
                     onClick={() => { setShowHeadingMenu(v => !v); setShowAlignMenu(false); }}>
                     {headingIcon()}
                     <ChevronDown className="w-3 h-3" />
                 </button>
                 {showHeadingMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
+                    <div className="absolute top-full left-0 mt-1 bg-surface-secondary border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
                         {([["paragraph", <Type className="w-4 h-4" />, "Normal"],
                         ["h2", <Heading2 className="w-4 h-4" />, "Heading 2"],
                         ["h3", <Heading3 className="w-4 h-4" />, "Heading 3"],
                         ["h4", <Heading4 className="w-4 h-4" />, "Heading 4"]] as const).map(([tag, icon, label]) => (
                             <button key={tag} type="button"
-                                className={`${dropdownBtn} ${blockType === tag ? "text-accent" : "text-zinc-400"}`}
+                                className={`${dropdownBtn} ${blockType === tag ? "text-accent" : "text-content-muted"}`}
                                 onClick={() => formatHeading(tag as any)}>
                                 {icon}<span>{label}</span>
                             </button>
@@ -347,19 +348,19 @@ function Toolbar() {
             {/* Alignment */}
             <div className="relative">
                 <button type="button"
-                    className="p-2 rounded hover:bg-white/10 text-zinc-400 hover:text-white flex items-center gap-1 transition-colors"
+                    className="p-2 rounded hover:bg-white/10 text-content-muted hover:text-white flex items-center gap-1 transition-colors"
                     onClick={() => { setShowAlignMenu(v => !v); setShowHeadingMenu(false); }}>
                     <AlignLeft className="w-4 h-4" />
                     <ChevronDown className="w-3 h-3" />
                 </button>
                 {showAlignMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[120px]">
+                    <div className="absolute top-full left-0 mt-1 bg-surface-secondary border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[120px]">
                         {([["left", <AlignLeft className="w-4 h-4" />, "Left"],
                         ["center", <AlignCenter className="w-4 h-4" />, "Center"],
                         ["right", <AlignRight className="w-4 h-4" />, "Right"],
                         ["justify", <AlignJustify className="w-4 h-4" />, "Justify"]] as const).map(([align, icon, label]) => (
                             <button key={align} type="button"
-                                className={`${dropdownBtn} text-zinc-400`}
+                                className={`${dropdownBtn} text-content-muted`}
                                 onClick={() => {
                                     editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, align as any);
                                     setShowAlignMenu(false);
@@ -447,7 +448,7 @@ function HtmlPlugin({ value, onChange }: { value: string; onChange: (v: string) 
 
 function PlaceholderComponent({ text }: { text: string }) {
     return (
-        <div className="absolute top-0 left-0 p-4 text-sm text-zinc-500 pointer-events-none select-none">
+        <div className="absolute top-0 left-0 p-4 text-sm text-content-muted pointer-events-none select-none">
             {text}
         </div>
     );
@@ -460,6 +461,7 @@ export function RichTextEditor({
     onChange,
     placeholder = "Write something...",
     minHeight = "min-h-[200px]",
+    className = "",
 }: RichTextEditorProps) {
     const initialConfig = {
         namespace: "RichTextEditor",
@@ -470,13 +472,13 @@ export function RichTextEditor({
 
     return (
         <LexicalComposer initialConfig={initialConfig}>
-            <div className="w-full bg-black/30 rounded-lg overflow-hidden flex flex-col transition-colors hover:bg-black/50 focus-within:bg-black/50">
+            <div className={`w-full bg-black/30 rounded-lg overflow-hidden flex flex-col transition-colors hover:bg-black/50 focus-within:bg-black/50 ${className}`}>
                 <Toolbar />
-                <div className="relative">
+                <div className="relative flex-1 flex flex-col">
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable
-                                className={`prose prose-invert max-w-none focus:outline-none text-sm text-white ${minHeight} p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-semibold [&_h4]:text-base [&_h4]:font-semibold`}
+                                className={`prose prose-invert max-w-none focus:outline-none text-sm text-white ${minHeight} flex-1 p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-semibold [&_h4]:text-base [&_h4]:font-semibold`}
                             />
                         }
                         placeholder={<PlaceholderComponent text={placeholder} />}

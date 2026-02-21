@@ -147,9 +147,9 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
                             setIsOpen(false);
                         }
                     }}
-                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-white/10 text-white" :
-                        hasChildren ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-300 font-medium" :
-                            "text-zinc-300 hover:bg-white/5 hover:text-white"
+                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-surface-hover text-content-primary" :
+                        hasChildren ? "text-content-secondary hover:bg-surface-hover hover:text-content-primary font-medium" :
+                            "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                         }`}
                     style={{ paddingLeft: `${(depth * 12) + 8}px` }}
                 >
@@ -157,12 +157,12 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
                     {hasChildren ? (
                         <span
                             onClick={(e) => toggleExpand(entry.id, e)}
-                            className="p-0.5 mr-1 hover:bg-white/10 rounded flex-shrink-0"
+                            className="p-0.5 mr-1 hover:bg-surface-hover rounded flex-shrink-0"
                         >
                             {isExpanded ? (
-                                <ChevronDown className="h-3.5 w-3.5 text-zinc-400" />
+                                <ChevronDown className="h-3.5 w-3.5 text-content-muted" />
                             ) : (
-                                <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
+                                <ChevronRight className="h-3.5 w-3.5 text-content-muted" />
                             )}
                         </span>
                     ) : (
@@ -185,7 +185,7 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
     return (
         <div className={`relative ${className}`} ref={containerRef}>
             {showLabel && (
-                <label className="text-sm font-medium text-white/80 block mb-1">
+                <label className="text-sm font-medium text-content-secondary block mb-1">
                     {taxonomy?.singularName || 'Select'}
                 </label>
             )}
@@ -193,26 +193,23 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between rounded-md px-2 py-1 text-sm focus:outline-none transition-colors min-h-[28px] ${selectedEntry
-                    ? `bg-black/30 text-white ${isOpen ? "bg-black/50" : "hover:bg-black/50"}`
-                    : `text-white ${isOpen ? "bg-black/50" : "bg-black/30 hover:bg-black/50"}`
-                    }`}
+                className={`form-input w-full flex items-center justify-between px-2 py-1 text-sm min-h-[28px]`}
             >
-                <span className={`truncate mr-2 ${selectedEntry ? "text-white" : "text-zinc-500"}`}>
+                <span className={`truncate mr-2 ${selectedEntry ? "text-content-primary" : "text-content-muted"}`}>
                     {selectedEntry ? selectedEntry.fullPath : "Select..."}
                 </span>
-                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${selectedEntry ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 right-0 min-w-full w-max max-w-xs mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
-                    <div className="p-2 relative bg-white/5">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+                <div className="dropdown-menu absolute z-50 right-0 min-w-full w-max max-w-xs mt-1 max-h-60 flex flex-col">
+                    <div className="p-2 relative border-b border-ui-border">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-black/30 border border-transparent rounded text-xs py-1.5 pl-8 pr-2 text-white placeholder-zinc-500 focus:outline-none focus:border-transparent"
+                            className="form-input w-full text-xs py-1.5 pl-8 pr-2"
                             placeholder="Search..."
                             autoFocus
                         />
@@ -225,7 +222,7 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
                                 onChange("");
                                 setIsOpen(false);
                             }}
-                            className="w-full text-left px-2 py-1.5 rounded text-sm text-zinc-400 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                            className="dropdown-item w-full rounded text-sm"
                         >
                             <Ban className="h-3.5 w-3.5" />
                             <span>None</span>
@@ -269,7 +266,7 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
 
                                 if (filteredTree.length === 0) {
                                     return (
-                                        <div className="px-2 py-4 text-center text-xs text-zinc-500">
+                                        <div className="px-2 py-4 text-center text-xs text-content-muted">
                                             No matches found
                                         </div>
                                     );
@@ -301,18 +298,18 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
                                                         setSearchQuery("");
                                                     }
                                                 }}
-                                                className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-white/10 text-white" :
-                                                    hasChildren ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-300 font-medium" :
-                                                        "text-zinc-300 hover:bg-white/5 hover:text-white"
+                                                className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center group transition-colors ${isSelected ? "bg-surface-hover text-content-primary" :
+                                                    hasChildren ? "text-content-secondary hover:bg-surface-hover hover:text-content-primary font-medium" :
+                                                        "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
                                                     }`}
                                                 style={{ paddingLeft: `${(depth * 12) + 8}px` }}
                                             >
                                                 {hasChildren ? (
                                                     <span className="p-0.5 mr-1 hover:bg-white/10 rounded flex-shrink-0">
                                                         {isExpanded ? (
-                                                            <ChevronDown className="h-3.5 w-3.5 text-zinc-400" />
+                                                            <ChevronDown className="h-3.5 w-3.5 text-content-muted" />
                                                         ) : (
-                                                            <ChevronRight className="h-3.5 w-3.5 text-zinc-400" />
+                                                            <ChevronRight className="h-3.5 w-3.5 text-content-muted" />
                                                         )}
                                                     </span>
                                                 ) : (
@@ -334,7 +331,7 @@ export function TaxonomySelector({ taxonomy, value, onChange, showLabel = false,
                             })()
                         ) : (
                             (taxonomy?.entries || []).length === 0 ? (
-                                <div className="px-2 py-4 text-center text-xs text-zinc-500">
+                                <div className="px-2 py-4 text-center text-xs text-content-muted">
                                     No entries available
                                 </div>
                             ) : (

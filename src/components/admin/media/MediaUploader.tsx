@@ -103,7 +103,7 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
     if (!isOpen) return null;
 
     return (
-        <div className="border-b border-white/5 bg-[#0d1117]">
+        <div className="border-b border-ui-border bg-surface-secondary">
             <div className="p-4">
                 {/* Drop zone */}
                 <div
@@ -113,7 +113,7 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                     onClick={() => fileInputRef.current?.click()}
                     className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragging
                         ? "border-accent bg-accent/10"
-                        : "border-white/10 hover:border-accent/30 hover:bg-white/5"
+                        : "border-ui-border hover:border-accent/30 hover:bg-surface-input"
                         }`}
                 >
                     {/* Close button - inside drop zone top-right */}
@@ -124,7 +124,7 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                                 onClose();
                             }}
                             disabled={isUploading}
-                            className="absolute top-2 right-2 p-1.5 text-zinc-500 hover:text-white bg-black/20 hover:bg-black/40 rounded-full transition-all z-10"
+                            className="absolute top-2 right-2 p-1.5 text-content-muted hover:text-content-primary bg-surface-input hover:bg-surface-hover rounded-full transition-all z-10"
                             title="Close uploader"
                         >
                             <X className="h-4 w-4" />
@@ -140,18 +140,18 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                         className="hidden"
                     />
 
-                    <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragging ? "text-accent" : "text-zinc-500"}`} />
-                    <p className="text-white font-medium">
+                    <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragging ? "text-accent" : "text-content-muted"}`} />
+                    <p className="text-content-primary font-medium">
                         {isDragging ? "Drop images here" : `Drag & drop images for ${folderName || "this folder"} here`}
                     </p>
-                    <p className="text-sm text-zinc-500 mt-1">or click to browse</p>
+                    <p className="text-sm text-content-muted mt-1">or click to browse</p>
                 </div>
 
                 {/* Upload progress list */}
                 {uploads.length > 0 && (
                     <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-zinc-500">
+                            <span className="text-xs text-content-muted">
                                 {uploads.filter((u) => u.status === "complete").length} of {uploads.length} complete
                             </span>
                             {uploads.some((u) => u.status === "complete") && (
@@ -167,7 +167,7 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                         {uploads.map((upload, index) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-3 p-2 bg-white/5 rounded-lg"
+                                className="flex items-center gap-3 p-2 bg-surface-input rounded-lg"
                             >
                                 {/* Status icon */}
                                 {upload.status === "uploading" && (
@@ -180,13 +180,13 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                                     <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
                                 )}
                                 {upload.status === "pending" && (
-                                    <div className="h-4 w-4 rounded-full border-2 border-zinc-500 flex-shrink-0" />
+                                    <div className="h-4 w-4 rounded-full border-2 border-ui-border flex-shrink-0" />
                                 )}
 
                                 {/* File info */}
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-white truncate">{upload.file.name}</p>
-                                    <p className="text-xs text-zinc-500">
+                                    <p className="text-sm text-content-primary truncate">{upload.file.name}</p>
+                                    <p className="text-xs text-content-muted">
                                         {formatFileSize(upload.file.size)}
                                         {upload.error && (
                                             <span className="text-red-400 ml-2">{upload.error}</span>
@@ -201,3 +201,4 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
         </div>
     );
 }
+

@@ -6,6 +6,7 @@ import { Input } from './input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
 import { PenTool, Type, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SignaturePadEnhancedProps {
     value?: string;
@@ -22,6 +23,8 @@ export interface SignaturePadEnhancedRef {
 
 const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnhancedProps>(
     ({ value, onChange, disabled = false, height = 100 }, ref) => {
+        const { mode: themeMode } = useTheme();
+        const isLight = themeMode === 'light';
         const canvasRef = useRef<HTMLCanvasElement>(null);
         const [mode, setMode] = useState<'draw' | 'type'>('draw');
         const [typedName, setTypedName] = useState('');
@@ -64,12 +67,26 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
             const img = new Image();
             img.onload = () => {
                 const ctx = canvas.getContext('2d');
-                ctx?.clearRect(0, 0, canvas.width, canvas.height);
-                ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+                if (!ctx) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Force display color based on theme (white in dark mode, black in light mode), ignoring saved color
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const d = imageData.data;
+                const targetColor = isLight ? 0 : 255;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i + 3] > 0) {
+                        d[i] = targetColor;
+                        d[i + 1] = targetColor;
+                        d[i + 2] = targetColor;
+                    }
+                }
+                ctx.putImageData(imageData, 0, 0);
                 isEmptyRef.current = false;
             };
             img.src = value;
-        }, [value, mode]);
+        }, [value, mode, isLight]);
 
         // --- Pointer event handlers ---
         const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -100,7 +117,7 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
             const current = getPos(e);
-            ctx.strokeStyle = 'white';
+            ctx.strokeStyle = isLight ? 'black' : 'white';
             ctx.lineWidth = 2.5;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -118,7 +135,31 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
             isDrawing.current = false;
             lastPoint.current = null;
             const canvas = canvasRef.current;
-            if (canvas) onChange?.(canvas.toDataURL());
+            if (!canvas) return;
+
+            if (!isLight) {
+                // Dark mode display is white strokes, but we must save as black strokes
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const d = imageData.data;
+                    for (let i = 0; i < d.length; i += 4) {
+                        if (d[i + 3] > 0) {
+                            d[i] = 0;
+                            d[i + 1] = 0;
+                            d[i + 2] = 0;
+                        }
+                    }
+                    const offscreen = document.createElement('canvas');
+                    offscreen.width = canvas.width;
+                    offscreen.height = canvas.height;
+                    offscreen.getContext('2d')!.putImageData(imageData, 0, 0);
+                    onChange?.(offscreen.toDataURL());
+                }
+            } else {
+                // Light mode display is already black strokes, save directly
+                onChange?.(canvas.toDataURL());
+            }
         };
 
         const handleClear = () => {
@@ -146,7 +187,7 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
             const ctx = offscreen.getContext('2d');
             if (!ctx) return '';
             ctx.font = `italic ${Math.floor(h * 0.4)}px 'Dancing Script', cursive`;
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'black'; // Always save as black strokes
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(text, w / 2, h / 2);
@@ -179,23 +220,23 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
                 <Tabs value={mode} onValueChange={(v) => setMode(v as 'draw' | 'type')} className="w-full">
                     {/* Tab header */}
                     <div className="flex justify-between items-center mb-2">
-                        <TabsList className="inline-flex w-auto items-center rounded-lg bg-black/30 p-0.5 border-0">
+                        <TabsList className={cn("inline-flex w-auto items-center rounded-lg p-1 border-0", isLight ? "bg-white" : "bg-black/30")}>
                             <TabsTrigger
                                 value="draw"
-                                className="flex items-center gap-1 rounded-md border-0 bg-transparent px-3 py-1.5 text-[10px] font-medium text-zinc-500 shadow-none transition-all hover:text-zinc-300 data-[state=active]:bg-accent data-[state=active]:text-white data-[state=active]:shadow-sm"
+                                className="flex items-center gap-1 rounded-md border-0 bg-transparent px-3 py-1.5 text-[10px] font-medium text-content-muted shadow-none transition-all hover:text-content-secondary data-[state=active]:bg-accent data-[state=active]:text-white data-[state=active]:shadow-sm"
                             >
                                 <PenTool className="h-3 w-3" /> Draw
                             </TabsTrigger>
                             <TabsTrigger
                                 value="type"
-                                className="flex items-center gap-1 rounded-md border-0 bg-transparent px-3 py-1.5 text-[10px] font-medium text-zinc-500 shadow-none transition-all hover:text-zinc-300 data-[state=active]:bg-accent data-[state=active]:text-white data-[state=active]:shadow-sm"
+                                className="flex items-center gap-1 rounded-md border-0 bg-transparent px-3 py-1.5 text-[10px] font-medium text-content-muted shadow-none transition-all hover:text-content-secondary data-[state=active]:bg-accent data-[state=active]:text-white data-[state=active]:shadow-sm"
                             >
                                 <Type className="h-3 w-3" /> Type
                             </TabsTrigger>
                         </TabsList>
                         {!disabled && (
                             <Button type="button" variant="ghost" size="sm" onClick={handleClear}
-                                className="text-zinc-400 hover:text-white hover:bg-white/10">
+                                className="text-content-muted hover:text-white hover:bg-white/10">
                                 <RotateCcw className="h-4 w-4 mr-2" /> Clear
                             </Button>
                         )}
@@ -203,44 +244,54 @@ const SignaturePadEnhanced = forwardRef<SignaturePadEnhancedRef, SignaturePadEnh
 
                     {/* Draw tab — canvas always in DOM so ResizeObserver works */}
                     <div
-                        className="relative rounded-lg overflow-hidden bg-black/30"
+                        className={cn("relative rounded-lg overflow-hidden", isLight ? "bg-white" : "bg-black/30")}
                         style={{ height: `${height}px`, display: mode === 'draw' ? 'block' : 'none' }}
                     >
                         <canvas
                             ref={canvasRef}
-                            style={{ display: 'block', width: '100%', height: `${height}px`, cursor: disabled ? 'default' : 'crosshair' }}
+                            style={{
+                                display: 'block',
+                                width: '100%',
+                                height: `${height}px`,
+                                cursor: disabled ? 'default' : 'crosshair',
+                            }}
                             onPointerDown={onPointerDown}
                             onPointerMove={onPointerMove}
                             onPointerUp={onPointerUp}
                             onPointerLeave={onPointerUp}
                         />
-                        <div className="absolute left-4 right-4 bottom-8 border-b border-zinc-600/50 pointer-events-none" />
-                        <div className="absolute bottom-2 left-0 w-full text-center pointer-events-none text-zinc-600 text-[10px] select-none">
+                        <div className="absolute left-4 right-4 bottom-8 border-b border-ui-border/50 pointer-events-none" />
+                        <div className="absolute bottom-2 left-0 w-full text-center pointer-events-none text-content-mutedtext-[10px] select-none">
                             Sign along the line above
                         </div>
                     </div>
 
                     {/* Type tab */}
                     <div
-                        className="relative rounded-lg overflow-hidden bg-black/30 flex flex-col items-center justify-center"
+                        className={cn("relative rounded-lg overflow-hidden flex flex-col items-center justify-center", isLight ? "bg-white" : "bg-black/30")}
                         style={{ height: `${height}px`, display: mode === 'type' ? 'flex' : 'none' }}
                     >
                         <div className="w-full max-w-md px-4 space-y-3 text-center">
-                            <div className="border-b border-zinc-600 pb-2">
-                                <span className="text-4xl text-white sig-cursive leading-normal block min-h-[52px]">
-                                    {typedName || <span className="text-zinc-700 select-none">Your Name</span>}
+                            <div className="border-b border-ui-borderpb-2">
+                                <span className={cn("text-4xl sig-cursive leading-normal block min-h-[52px]", isLight ? "text-black" : "text-white")}>
+                                    {typedName || <span className="text-content-secondary select-none">Your Name</span>}
                                 </span>
                             </div>
                             <div>
-                                <Input
+                                <input
                                     type="text"
                                     placeholder="Type your full name"
                                     value={typedName}
                                     onChange={(e) => setTypedName(e.target.value)}
-                                    className="text-center bg-black/50 border-zinc-700 focus:border-white/20 text-white"
                                     maxLength={40}
+                                    className={cn(
+                                        "w-full text-center rounded-md px-3 py-2 text-sm border outline-none",
+                                        isLight
+                                            ? "bg-black/5 border-ui-border text-content-primary placeholder-content-muted"
+                                            : "bg-black/50 border-ui-border text-white placeholder-content-muted"
+                                    )}
                                 />
-                                <p className="text-[10px] text-zinc-500 mt-1">
+                                <p className="text-[10px] text-content-muted mt-1">
                                     By typing your name, you acknowledge this as your electronic signature.
                                 </p>
                             </div>

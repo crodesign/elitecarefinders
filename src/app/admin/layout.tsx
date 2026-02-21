@@ -6,31 +6,33 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Logo } from "@/components/icons/Logo";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed } = useSidebar();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { accent } = useTheme();
 
     return (
-        <div className="min-h-screen bg-[#09090b] relative">
+        <div className="min-h-screen bg-surface-primary relative">
             {/* Ambient Glow Background Effects */}
             <div
-                className="fixed inset-0 pointer-events-none z-0"
+                className="fixed inset-0 pointer-events-none z-0 transition-colors duration-500"
                 style={{
                     background: `
-                    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(35, 157, 219, 0.15), transparent 50%),
-                    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(35, 157, 219, 0.12), transparent 50%),
-                    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(35, 157, 219, 0.05), transparent 60%)
+                    radial-gradient(ellipse 80% 50% at 20% 20%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 50%),
+                    radial-gradient(ellipse 60% 40% at 80% 80%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 50%),
+                    radial-gradient(ellipse 50% 30% at 50% 50%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%)
                 `
                 }}
             />
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-[#0b1115]/90 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4">
+            <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-surface-secondary/90 backdrop-blur-xl border-b border-ui-border flex items-center justify-between px-4">
                 <Logo className="h-7 w-auto" />
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                    className="p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-hover transition-colors"
                 >
                     {mobileMenuOpen ? (
                         <X className="h-6 w-6" />
@@ -43,7 +45,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
                 <div
-                    className="md:hidden fixed inset-0 z-40 bg-black/60"
+                    className="md:hidden fixed inset-0 z-40"
+                    style={{ backgroundColor: 'var(--glass-overlay)', opacity: 0.75 }}
                     onClick={() => setMobileMenuOpen(false)}
                 />
             )}
@@ -76,6 +79,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 }
 
 import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+
 
 export default function AdminLayout({
     children,
@@ -83,13 +88,15 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <SidebarProvider>
-            <NotificationProvider>
-                <UnsavedChangesProvider>
-                    <AdminLayoutInner>{children}</AdminLayoutInner>
-                </UnsavedChangesProvider>
-            </NotificationProvider>
-        </SidebarProvider>
+        <ThemeProvider>
+            <SidebarProvider>
+                <NotificationProvider>
+                    <UnsavedChangesProvider>
+                        <AdminLayoutInner>{children}</AdminLayoutInner>
+                    </UnsavedChangesProvider>
+                </NotificationProvider>
+            </SidebarProvider>
+        </ThemeProvider>
     );
 }
 

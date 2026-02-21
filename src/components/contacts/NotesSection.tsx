@@ -122,9 +122,9 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
         {/* Column 1: Add New Note — fixed content, no scroll needed */}
         <div className="overflow-y-auto">
           {!readOnly && (
-            <Card className="bg-white/5 border-transparent">
+            <Card className="bg-surface-input border-transparent">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between text-white">
+                <CardTitle className="flex items-center justify-between text-content-primary">
                   <div className="flex items-center gap-2">
                     <Plus className="h-5 w-5" />
                     Add New Note
@@ -133,7 +133,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
                     size="sm"
                     onClick={handleDownloadNotes}
                     disabled={notes.length === 0}
-                    className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90"
+                    className="flex items-center gap-2 bg-accent text-white hover:bg-accent-light"
                   >
                     <Download className="h-4 w-4" />
                     <span className="hidden sm:inline">Download Notes</span>
@@ -142,16 +142,16 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="new-note" className="text-zinc-400">Note Content</Label>
+                  <Label htmlFor="new-note" className="text-content-muted">Note Content</Label>
                   <textarea
                     id="new-note"
                     placeholder="Enter your note here..."
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[200px] resize-y"
+                    className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-surface-input text-content-primary placeholder:text-content-muted hover:bg-surface-hover focus:bg-surface-hover min-h-[200px] resize-y"
                   />
                 </div>
-                <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                <Button onClick={handleAddNote} disabled={!newNote.trim()} className="bg-accent hover:bg-accent-light text-white">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Note
                 </Button>
@@ -161,15 +161,15 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
         </div>
 
         {/* Column 2: Notes History — fixed header, scrollable body only */}
-        <div className="flex flex-col min-h-0 border border-white/10 rounded-md">
-          <h3 className="flex-none text-lg font-semibold text-white py-3 px-6 border-b border-white/10 bg-white/5 rounded-t-md">Notes History</h3>
-          <div className="flex-1 min-h-0 overflow-y-auto pb-4">
+        <div className="flex flex-col min-h-0 border border-ui-border rounded-md">
+          <h3 className="flex-none text-lg font-semibold text-content-primary py-3 px-6 bg-surface-input rounded-t-md">Notes History</h3>
+          <div className="flex-1 min-h-0 overflow-y-auto pt-4 pb-4">
             {notes.length === 0 ? (
               <div className="px-6 py-4">
                 <p className="text-muted-foreground italic text-center">No notes added yet</p>
               </div>
             ) : (
-              <div className="divide-y-2 divide-white/10 px-6">
+              <div className="divide-y-2 divide-ui-border px-6">
                 {notes.map((note) => (
                   <NoteItem
                     key={note.id}
@@ -284,10 +284,10 @@ const NoteItem = ({
             ref={textareaRef}
             value={editContent}
             onChange={(e) => onEditContentChange(e.target.value)}
-            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-white/10 text-white placeholder-zinc-400 hover:bg-white/15 focus:bg-white/15 min-h-[200px] resize-y"
+            className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-surface-input text-content-primary placeholder:text-content-muted hover:bg-surface-hover focus:bg-surface-hover min-h-[200px] resize-y"
           />
           <div className="flex gap-2">
-            <Button size="sm" onClick={onSave}>
+            <Button size="sm" onClick={onSave} className="bg-accent hover:bg-accent-light text-white">
               <Check className="h-4 w-4 mr-1" />
               Save
             </Button>
@@ -301,7 +301,7 @@ const NoteItem = ({
         <div className="space-y-2">
           {/* First row: timestamp and buttons */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-zinc-400">
+            <div className="flex items-center gap-2 text-sm text-content-muted">
               <Calendar className="h-4 w-4" />
               <span>{formatDate(note.created_at)} at {formatTime(note.created_at)}</span>
             </div>
@@ -327,7 +327,7 @@ const NoteItem = ({
           <div className="space-y-4">
             {/* Original note content */}
             {sortedEdits.length > 0 && (
-              <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap text-content-primary">
                 {sortedEdits[0].content}
               </p>
             )}
@@ -344,11 +344,11 @@ const NoteItem = ({
 
                   return (
                     <div key={edit.id}>
-                      <div className="flex items-center gap-2 text-sm text-zinc-400 mb-2">
+                      <div className="flex items-center gap-2 text-sm text-content-muted mb-2">
                         {!isLastEdit && (
                           <button
                             onClick={() => toggleEdit(edit.id)}
-                            className="text-zinc-400 hover:text-white transition-colors"
+                            className="text-content-muted hover:text-content-primary transition-colors"
                             aria-label={isExpanded ? "Collapse edit" : "Expand edit"}
                           >
                             {isExpanded ? (
@@ -363,7 +363,7 @@ const NoteItem = ({
                       </div>
                       {(isLastEdit || isExpanded) && (
                         <div className="overflow-hidden animate-accordion-down">
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-content-primary">
                             {contentAfterEdit}
                           </p>
                         </div>
@@ -376,7 +376,7 @@ const NoteItem = ({
 
             {/* If no edits exist, show current content */}
             {sortedEdits.length === 0 && (
-              <p className="text-sm leading-relaxed whitespace-pre-wrap text-white">{note.content}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap text-content-primary">{note.content}</p>
             )}
           </div>
         </div>

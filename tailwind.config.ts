@@ -17,12 +17,29 @@ const config: Config = {
         },
         extend: {
             colors: {
-                // Existing EliteCareFinders accent
+                // Accent — now dynamic via CSS variable
                 accent: {
-                    DEFAULT: "#239ddb",
-                    light: "#4bb3e8",
-                    dark: "#1a7fb3",
-                    foreground: 'hsl(var(--accent-foreground))' // Added for compatibility
+                    DEFAULT: "var(--accent)",
+                    light: "var(--accent-light)",
+                    dark: "var(--accent-dark)",
+                    foreground: 'hsl(var(--accent-foreground))'
+                },
+                // Semantic surface tokens (admin theme system)
+                surface: {
+                    primary: 'var(--surface-primary)',
+                    secondary: 'var(--surface-secondary)',
+                    card: 'var(--surface-card)',
+                    input: 'var(--surface-input)',
+                    hover: 'var(--surface-hover)',
+                    well: 'var(--surface-well)',
+                    caption: 'var(--surface-caption)',
+                },
+                'ui-border': 'var(--ui-border)',
+                'ui-border-h': 'var(--ui-border-hover)',
+                content: {
+                    primary: 'var(--content-primary)',
+                    secondary: 'var(--content-secondary)',
+                    muted: 'var(--content-muted)',
                 },
                 // Lovable UI Colors
                 border: 'hsl(var(--border))',

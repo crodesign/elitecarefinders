@@ -86,8 +86,8 @@ export function SlidePanel({
             {/* Backdrop - Always full screen and independent of panel positioning */}
             {showOverlay && isOpen && (
                 <div
-                    className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${closeOnOverlayClick ? 'cursor-pointer' : 'cursor-default'}`}
-                    style={{ zIndex: backdropZ }}
+                    className={`fixed inset-0 backdrop-blur-sm transition-opacity ${closeOnOverlayClick ? 'cursor-pointer' : 'cursor-default'}`}
+                    style={{ zIndex: backdropZ, backgroundColor: 'var(--glass-overlay)' }}
                     onClick={closeOnOverlayClick ? onClose : undefined}
                 />
             )}
@@ -103,7 +103,7 @@ export function SlidePanel({
                 {/* Panel - full width on mobile, fixed width on md+ */}
                 <div
                     ref={panelRef}
-                    className="slide-panel absolute right-0 top-0 h-full w-full bg-[#0b1115] border-l border-white/5 shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto"
+                    className="slide-panel absolute right-0 top-0 h-full w-full bg-surface-secondary shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto"
                     style={{
                         animation: "slideInFromRight 0.3s ease-out",
                         "--panel-width": fullScreen ? "100%" : `${width}px`,
@@ -117,19 +117,19 @@ export function SlidePanel({
                     }
                 `}</style>
                     {/* Header */}
-                    <div className={`flex-none relative z-20 w-full shrink-0 px-6 pt-6 ${headerChildren ? 'pb-0' : 'pb-6 border-b border-white/5'}`}>
+                    <div className={`flex-none relative z-20 w-full shrink-0 px-6 pt-6 ${headerChildren ? 'pb-0' : 'pb-6'}`}>
                         <div className="flex items-start justify-between">
                             <div>
-                                <h2 className="text-xl font-bold text-white">{title}</h2>
+                                <h2 className="text-xl font-bold text-content-primary">{title}</h2>
                                 {subtitle && (
-                                    <p className="text-sm text-zinc-400 mt-1">{subtitle}</p>
+                                    <p className="text-sm text-content-secondary mt-1">{subtitle}</p>
                                 )}
                             </div>
                             <div className="flex items-center gap-2">
                                 {actions}
                                 <button
                                     onClick={onClose}
-                                    className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                                    className="p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-hover transition-colors"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>

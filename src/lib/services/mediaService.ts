@@ -241,6 +241,35 @@ export async function getAllUsedImageUrls(): Promise<Set<string>> {
     }
 }
 
+// Returns only the first image URL from each home/facility gallery (the "Featured Image")
+export async function getAllFeaturedImageUrls(): Promise<Set<string>> {
+    try {
+        const [homesResult, facilitiesResult] = await Promise.all([
+            supabase.from('homes').select('images'),
+            supabase.from('facilities').select('images')
+        ]);
+
+        const urls = new Set<string>();
+
+        (homesResult.data || []).forEach((home: any) => {
+            if (Array.isArray(home.images) && home.images.length > 0 && home.images[0]) {
+                urls.add(home.images[0]);
+            }
+        });
+
+        (facilitiesResult.data || []).forEach((facility: any) => {
+            if (Array.isArray(facility.images) && facility.images.length > 0 && facility.images[0]) {
+                urls.add(facility.images[0]);
+            }
+        });
+
+        return urls;
+    } catch (error) {
+        console.error("Error calculating featured image URLs:", error);
+        return new Set();
+    }
+}
+
 export async function getMediaItems(folderId?: string): Promise<MediaItem[]> {
     let query = supabase
         .from("media_items")

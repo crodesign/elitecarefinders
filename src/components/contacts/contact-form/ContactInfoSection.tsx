@@ -347,15 +347,15 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
       <div className="space-y-3">
         {/* Progress & Status - only show if not hidden */}
         {!hideProgressAndStatus && (
-          <div className="bg-white/5 rounded-lg p-4 space-y-3">
+          <div className="bg-surface-input rounded-lg p-4 space-y-3">
             {/* Progress */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Progress</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Progress</label>
               <div className="relative w-40" ref={progressRef}>
                 <button
                   type="button"
                   onClick={() => !readOnly && setProgressOpen(!progressOpen)}
-                  className={`w-full flex items-center justify-between rounded-md px-2 py-1 text-sm focus:outline-none transition-colors h-full min-h-[28px] bg-black/30 text-white ${progressOpen ? 'bg-black/50' : 'hover:bg-black/50'} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`form-input w-full flex items-center justify-between px-2 py-1 text-sm h-full min-h-[28px]`}
                 >
                   <span className="flex items-center gap-2 truncate mr-2">
                     {formData?.leadClassification === 'new' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--lead-new))] flex-shrink-0"></span>}
@@ -363,14 +363,14 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                     {formData?.leadClassification === 'connected' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--lead-connected))] flex-shrink-0"></span>}
                     {formData?.leadClassification === 'won' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--lead-won))] flex-shrink-0"></span>}
                     {formData?.leadClassification === 'closed' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--lead-closed))] flex-shrink-0"></span>}
-                    <span className={formData?.leadClassification ? 'text-white' : 'text-zinc-500'}>
+                    <span className={formData?.leadClassification ? 'text-content-primary' : 'text-content-muted'}>
                       {formData?.leadClassification ? formData.leadClassification.charAt(0).toUpperCase() + formData.leadClassification.slice(1) : 'Select...'}
                     </span>
                   </span>
-                  <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${formData?.leadClassification ? 'text-white/80' : 'text-zinc-500'} ${progressOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${progressOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {progressOpen && (
-                  <div className="absolute z-50 right-0 w-full min-w-[150px] mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
+                  <div className="dropdown-menu absolute z-50 right-0 w-full min-w-[150px] mt-1 max-h-60 flex flex-col">
                     <div className="overflow-y-auto flex-1 p-1">
                       {[
                         { value: 'new', label: 'New', color: 'bg-[hsl(var(--lead-new))]' },
@@ -383,7 +383,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                           key={opt.value}
                           type="button"
                           onClick={() => { updateField('leadClassification', opt.value); setProgressOpen(false); }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.leadClassification === opt.value ? 'bg-white/10 text-white' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
+                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.leadClassification === opt.value ? 'bg-surface-hover text-content-primary' : 'text-content-secondary hover:bg-surface-hover hover:text-content-primary'}`}
                         >
                           <span className={`h-2 w-2 rounded-full ${opt.color} flex-shrink-0`}></span>
                           <span>{opt.label}</span>
@@ -397,37 +397,37 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
             </div>
 
             {/* Status */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Status</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Status</label>
               <div className="relative w-40" ref={statusRef}>
                 <button
                   type="button"
                   onClick={() => !readOnly && setStatusOpen(!statusOpen)}
-                  className={`w-full flex items-center justify-between rounded-md px-2 py-1 text-sm focus:outline-none transition-colors h-full min-h-[28px] bg-black/30 text-white ${statusOpen ? 'bg-black/50' : 'hover:bg-black/50'} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`form-input w-full flex items-center justify-between px-2 py-1 text-sm h-full min-h-[28px]`}
                 >
                   <span className="flex items-center gap-2 truncate mr-2">
-                    {formData?.status === 'Active' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--status-active))] flex-shrink-0"></span>}
-                    {formData?.status === 'Paused' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--status-paused))] flex-shrink-0"></span>}
-                    {formData?.status === 'Disabled' && <span className="h-2 w-2 rounded-full bg-[hsl(var(--status-disabled))] flex-shrink-0"></span>}
-                    <span className={formData?.status ? 'text-white' : 'text-zinc-500'}>
+                    {formData?.status === 'Active' && <span className="h-2 w-2 rounded-full bg-green-400 flex-shrink-0"></span>}
+                    {formData?.status === 'Paused' && <span className="h-2 w-2 rounded-full bg-yellow-400 flex-shrink-0"></span>}
+                    {formData?.status === 'Disabled' && <span className="h-2 w-2 rounded-full bg-red-400 flex-shrink-0"></span>}
+                    <span className={formData?.status ? 'text-content-primary' : 'text-content-muted'}>
                       {formData?.status || 'Select...'}
                     </span>
                   </span>
-                  <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${formData?.status ? 'text-white/80' : 'text-zinc-500'} ${statusOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${statusOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {statusOpen && (
-                  <div className="absolute z-50 right-0 w-full min-w-[150px] mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
+                  <div className="dropdown-menu absolute z-50 right-0 w-full min-w-[150px] mt-1 max-h-60 flex flex-col">
                     <div className="overflow-y-auto flex-1 p-1">
                       {[
-                        { value: 'Active', label: 'Active', color: 'bg-[hsl(var(--status-active))]' },
-                        { value: 'Paused', label: 'Paused', color: 'bg-[hsl(var(--status-paused))]' },
-                        { value: 'Disabled', label: 'Disabled', color: 'bg-[hsl(var(--status-disabled))]' },
+                        { value: 'Active', label: 'Active', color: 'bg-green-400' },
+                        { value: 'Paused', label: 'Paused', color: 'bg-yellow-400' },
+                        { value: 'Disabled', label: 'Disabled', color: 'bg-red-400' },
                       ].map((opt) => (
                         <button
                           key={opt.value}
                           type="button"
                           onClick={() => { handleStatusChange(opt.value); setStatusOpen(false); }}
-                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.status === opt.value ? 'bg-white/10 text-white' : 'text-zinc-300 hover:bg-white/5 hover:text-white'}`}
+                          className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${formData?.status === opt.value ? 'bg-surface-hover text-content-primary' : 'text-content-secondary hover:bg-surface-hover hover:text-content-primary'}`}
                         >
                           <span className={`h-2 w-2 rounded-full ${opt.color} flex-shrink-0`}></span>
                           <span>{opt.label}</span>
@@ -450,15 +450,15 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                         Delete
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#0b1115] border-white/10 text-white">
+                    <AlertDialogContent className="bg-surface-secondary border-ui-border text-content-primary">
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Contact</AlertDialogTitle>
-                        <AlertDialogDescription className="text-zinc-400">
+                        <AlertDialogDescription className="text-content-muted">
                           Are you sure you want to delete this contact? This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-ui-border text-content-primary hover:bg-surface-hover">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={onDelete} className="bg-red-500 text-white hover:bg-red-600">
                           Delete Contact
                         </AlertDialogAction>
@@ -472,14 +472,14 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
         )}
 
         {/* Primary Contact */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <UserCircle className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <UserCircle className="h-4 w-4 text-accent" />
             Primary Contact
           </h3>
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
               <input
                 id="contact-name"
                 type="text"
@@ -487,11 +487,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.contactName || ""}
                 onChange={(e) => updateField('contactName', e.target.value)}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
               <input
                 id="contact-phone"
                 type="tel"
@@ -499,11 +499,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.contactPhone || ""}
                 onChange={(e) => handlePhoneInput(e.target.value, updateField, 'contactPhone')}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
               <div className="flex flex-col items-end">
                 <input
                   id="contact-email"
@@ -511,7 +511,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   placeholder="name@example.com"
                   value={formData?.contactEmail || ""}
                   onChange={(e) => updateField('contactEmail', e.target.value)}
-                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${emailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${emailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={readOnly}
                 />
                 {emailError && (
@@ -523,28 +523,28 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
         </div>
 
         {/* Secondary Contact */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-white flex items-center gap-2">
-              <UserPlus className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
+              <UserPlus className="h-4 w-4 text-accent" />
               Secondary Contact
             </h3>
             <div className="flex items-center gap-2">
-              <Label htmlFor="enable-secondary-contact" className="text-xs text-zinc-400">Enable</Label>
+              <Label htmlFor="enable-secondary-contact" className="text-xs text-content-muted">Enable</Label>
               <Switch
                 id="enable-secondary-contact"
                 checked={formData?.enableSecondaryContact || false}
                 onCheckedChange={(checked) => updateField('enableSecondaryContact', checked)}
                 disabled={readOnly}
-                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-white/10"
+                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-surface-hover"
               />
             </div>
           </div>
 
           {formData?.enableSecondaryContact && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Name</label>
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
                 <input
                   id="secondary-contact-name"
                   type="text"
@@ -552,11 +552,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   value={formData?.secondaryContactName || ""}
                   onChange={(e) => updateField('secondaryContactName', e.target.value)}
                   disabled={readOnly}
-                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Phone</label>
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
                 <input
                   id="secondary-contact-phone"
                   type="tel"
@@ -564,11 +564,11 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                   value={formData?.secondaryContactPhone || ""}
                   onChange={(e) => handlePhoneInput(e.target.value, updateField, 'secondaryContactPhone')}
                   disabled={readOnly}
-                  className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-                <label className="text-sm font-medium text-white/80 whitespace-nowrap">Email</label>
+              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
                 <div className="flex flex-col items-end">
                   <input
                     id="secondary-contact-email"
@@ -576,7 +576,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                     placeholder="name@example.com"
                     value={formData?.secondaryContactEmail || ""}
                     onChange={(e) => updateField('secondaryContactEmail', e.target.value)}
-                    className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${secondaryEmailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${secondaryEmailError ? 'border-red-500/50' : ''} ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={readOnly}
                   />
                   {secondaryEmailError && (
@@ -591,9 +591,9 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
 
       {/* Column 2: Looking For + Referral Details */}
       < div className="space-y-3" >
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <span className="font-medium text-sm text-white/80">Looking For</span>
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <span className="font-medium text-sm text-content-secondary">Looking For</span>
             <SimpleSelect
               value={formData?.lookingFor || ""}
               onChange={(val) => updateField('lookingFor', val)}
@@ -605,23 +605,23 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
         </div>
 
         {/* Referral Details */}
-        <div className="bg-white/5 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-            <Share2 className="h-4 w-4 text-primary" />
+        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+            <Share2 className="h-4 w-4 text-accent" />
             Referral Details
           </h3>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Date</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Date</label>
               <Popover open={referralCalendarOpen} onOpenChange={setReferralCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
+                  <button
+                    type="button"
                     disabled={readOnly}
                     className={cn(
-                      "justify-start text-left font-normal rounded-md px-3 py-1.5 text-sm bg-black/30 border-transparent hover:bg-black/50 hover:text-white w-48 h-8",
-                      formData?.referralDate ? "text-white" : "text-zinc-500",
+                      "form-input flex items-center justify-start text-left font-normal px-3 py-1.5 text-sm w-48 h-8",
+                      !formData?.referralDate && "text-content-muted",
                       readOnly && "opacity-50 cursor-not-allowed"
                     )}
                   >
@@ -631,10 +631,10 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                         ? format(parseHawaiiDate(formData.referralDate)!, "MMM d, yyyy")
                         : "Invalid date")
                       : "Pick a date"}
-                  </Button>
+                  </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0 bg-zinc-900 border-white/10 text-white [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-zinc-500"
+                  className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
                   align="start"
                 >
                   {/* Custom header: close button + month/year nav */}
@@ -644,7 +644,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                       <button
                         type="button"
                         onClick={() => setReferralCalendarOpen(false)}
-                        className="p-1 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -658,7 +658,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                           prev.setMonth(prev.getMonth() - 1);
                           setReferralCalendarMonth(prev);
                         }}
-                        className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-white/10 text-white"
+                        className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -698,7 +698,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                           next.setMonth(next.getMonth() + 1);
                           setReferralCalendarMonth(next);
                         }}
-                        className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-white/10 text-white"
+                        className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -723,19 +723,19 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                       dropdown_year: "!hidden",
                       nav: "!hidden",
                       day_selected: "bg-accent text-white hover:bg-accent focus:bg-accent focus:text-white",
-                      day_today: "bg-white/10 text-white",
-                      day_outside: "text-zinc-600 opacity-50",
-                      day_disabled: "text-zinc-700 opacity-50",
-                      day: cn("h-9 w-9 p-0 font-normal text-zinc-300 aria-selected:opacity-100 hover:bg-white/10 hover:text-white rounded-md transition-colors"),
-                      head_cell: "text-zinc-500 rounded-md w-9 font-normal text-[0.8rem]",
+                      day_today: "bg-surface-hover text-content-primary",
+                      day_outside: "text-content-muted opacity-50",
+                      day_disabled: "text-content-muted opacity-30",
+                      day: cn("h-9 w-9 p-0 font-normal text-content-secondary aria-selected:opacity-100 hover:bg-surface-hover hover:text-content-primary rounded-md transition-colors"),
+                      head_cell: "text-content-muted rounded-md w-9 font-normal text-[0.8rem] text-center",
                     }}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Name</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Name</label>
               <input
                 id="referral-name"
                 type="text"
@@ -743,12 +743,12 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.referralName || ""}
                 onChange={(e) => updateField('referralName', e.target.value)}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-              <label className="text-sm font-medium text-white/80 whitespace-nowrap">Referral Phone</label>
+            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Phone</label>
               <input
                 id="referral-phone"
                 type="tel"
@@ -756,7 +756,7 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
                 value={formData?.referralPhone || ""}
                 onChange={(e) => handlePhoneInput(e.target.value, updateField, 'referralPhone')}
                 disabled={readOnly}
-                className={`bg-black/30 border-transparent text-white text-sm text-left placeholder-zinc-500 hover:bg-black/50 focus:bg-black/50 focus:outline-none transition-colors w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
           </div>
@@ -764,9 +764,9 @@ const ContactInfoSection = ({ formData, setFormData, onDelete, readOnly = false,
       </div >
 
       {/* Columns 3-4: Waiver Section */}
-      < div className="lg:col-span-2 bg-white/5 rounded-lg p-4 space-y-4" >
-        <h3 className="text-sm font-medium text-white flex items-center gap-2 pb-1">
-          <FileSignature className="h-4 w-4 text-primary" />
+      < div className="lg:col-span-2 bg-surface-input rounded-lg p-4 space-y-4" >
+        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+          <FileSignature className="h-4 w-4 text-accent" />
           Acknowledgment and Waiver
         </h3>
         <div className="space-y-4">
@@ -783,7 +783,7 @@ In consideration of the opportunity to obtain the Services, I hereby RELEASE, WA
 
 This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by facsimile, email, or other electronic medium. Such signature shall be treated in all respects as having the same force and effect as original handwritten signatures.`}
             onChange={(e) => updateField('waiverText', e.target.value)}
-            className="h-[160px] text-xs leading-relaxed bg-white/10 border-0 text-zinc-300 resize-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
+            className="h-[160px] text-xs leading-relaxed bg-surface-hover border-0 text-content-secondary resize-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
             readOnly
           />
 
@@ -793,11 +793,11 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
               checked={formData?.waiverAgreed || false}
               onCheckedChange={(checked) => updateField('waiverAgreed', checked)}
               disabled={readOnly}
-              className="mt-0.5 border-zinc-500 data-[state=checked]:bg-accent data-[state=checked]:border-accent"
+              className="mt-0.5 border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
             />
             <Label
               htmlFor="waiver-agreed"
-              className="text-xs text-zinc-300 leading-tight cursor-pointer font-normal opacity-90"
+              className="text-xs text-content-secondary leading-tight cursor-pointer font-normal opacity-90"
             >
               I fully understand the above, have had the opportunity to ask questions before signing this document, and understand that I can ask additional questions at any time.
             </Label>
@@ -805,8 +805,8 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Full Legal Name</label>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Legal Name</label>
             <input
               id="signature-name"
               type="text"
@@ -814,23 +814,23 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
               value={formData?.contactName || ""}
               onChange={(e) => updateField('signatureName', e.target.value)}
               readOnly
-              className="bg-black/30 border-0 text-white/70 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
+              className="form-input border-0 text-sm text-right cursor-not-allowed opacity-60 w-48 h-8 rounded-md px-3 focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-white/10 rounded-lg transition-all">
-            <label className="text-sm font-medium text-white/80 whitespace-nowrap">Date</label>
+          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Date</label>
             <input
               type="text"
               value={localSignatureDate ? (parseHawaiiDate(localSignatureDate) ? format(parseHawaiiDate(localSignatureDate)!, "PPP") : "Invalid date") : format(new Date(), "PPP")}
               readOnly
-              className="bg-black/30 border-0 text-white/70 text-sm text-right cursor-not-allowed w-48 h-8 rounded-md px-3 focus:outline-none"
+              className="form-input border-0 text-sm text-right cursor-not-allowed opacity-60 w-48 h-8 rounded-md px-3 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-white/80">Digital Signature</label>
+          <label className="text-sm font-medium text-content-secondary">Digital Signature</label>
           <div className="mt-2">
             <SignaturePadEnhanced
               ref={signaturePadRef}
@@ -859,7 +859,7 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
             onClick={handleDownloadPDF}
             size="sm"
             disabled={!(localSignatureData || formData?.signatureData) || !formData?.waiverAgreed}
-            className={`gap-2 bg-primary text-white border-0 hover:bg-primary/90 transition-colors ${!(localSignatureData || formData?.signatureData) || !formData?.waiverAgreed ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+            className={`gap-2 bg-accent text-white border-0 hover:bg-accent-light transition-colors ${!(localSignatureData || formData?.signatureData) || !formData?.waiverAgreed ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           >
             <Download className="h-4 w-4" />
             Download PDF
@@ -893,10 +893,10 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
 
       {/* Status Change Confirmation Dialog */}
       < AlertDialog open={showStatusConfirmation} onOpenChange={setShowStatusConfirmation} >
-        <AlertDialogContent className="bg-[#0b1115] border-white/10 text-white">
+        <AlertDialogContent className="bg-surface-secondary border-ui-border text-content-primary">
           <AlertDialogHeader>
             <AlertDialogTitle>Change Contact Status</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-content-muted">
               Are you sure you want to change this contact's status to "{pendingStatus}"?
               {pendingStatus === "Active" && " This will reactivate the contact and make all form fields editable."}
               {pendingStatus === "Paused" && " This will make all form fields read-only until the status is changed back to Active."}
@@ -904,7 +904,7 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelStatusChange} className="bg-transparent border-white/10 text-white hover:bg-white/10">Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={cancelStatusChange} className="bg-transparent border-ui-border text-content-primary hover:bg-surface-hover">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmStatusChange} className="bg-accent text-white hover:bg-accent-light">
               Yes, Change to {pendingStatus}
             </AlertDialogAction>
@@ -916,3 +916,6 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
 };
 
 export default ContactInfoSection;
+
+
+

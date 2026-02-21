@@ -150,8 +150,8 @@ export default function TaxonomiesPage() {
             header: "Singular Name",
             render: (taxonomy) => (
                 <div className="flex items-center">
-                    <Tags className="mr-2 h-5 w-5 text-zinc-500 hidden md:block" />
-                    <span className="font-medium text-white">{taxonomy.singularName}</span>
+                    <Tags className="mr-2 h-5 w-5 text-content-muted hidden md:block" />
+                    <span className="font-medium text-content-primary">{taxonomy.singularName}</span>
                 </div>
             ),
         },
@@ -159,7 +159,7 @@ export default function TaxonomiesPage() {
             key: "pluralName",
             header: "Plural Name",
             render: (taxonomy) => (
-                <span className="text-white">{taxonomy.pluralName}</span>
+                <span className="text-content-primary">{taxonomy.pluralName}</span>
             ),
         },
         {
@@ -171,13 +171,13 @@ export default function TaxonomiesPage() {
                         taxonomy.contentTypes.map((type) => (
                             <span
                                 key={type}
-                                className="px-2 py-0.5 rounded text-xs bg-white/10 text-zinc-300 capitalize"
+                                className="px-2 py-0.5 rounded text-xs bg-surface-hover text-content-secondary capitalize"
                             >
                                 {type}
                             </span>
                         ))
                     ) : (
-                        <span className="text-zinc-600 text-xs">-</span>
+                        <span className="text-content-muted text-xs">-</span>
                     )}
                 </div>
             ),
@@ -186,7 +186,7 @@ export default function TaxonomiesPage() {
             key: "slug",
             header: "Slug",
             render: (taxonomy) => (
-                <span className="text-sm text-zinc-400">{taxonomy.slug}</span>
+                <span className="text-sm text-content-secondary">{taxonomy.slug}</span>
             ),
         },
     ];
@@ -225,7 +225,7 @@ export default function TaxonomiesPage() {
     // If in manage mode (ID in URL), hide the main list
     if (!isLoading && manageId) {
         return (
-            <div className="h-full bg-[#0b1115]">
+            <div className="h-full bg-surface-primary">
                 <TaxonomyForm
                     isOpen={isFormOpen}
                     onClose={handleCloseForm}
@@ -244,8 +244,8 @@ export default function TaxonomiesPage() {
                 {/* Page Header */}
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-white">Taxonomies</h1>
-                        <p className="text-zinc-400 mt-1 text-sm md:text-base">
+                        <h1 className="text-2xl md:text-3xl font-bold text-content-primary">Taxonomies</h1>
+                        <p className="text-content-secondary mt-1 text-sm md:text-base">
                             Manage categories for filtering and URL structure
                         </p>
                     </div>
@@ -262,14 +262,14 @@ export default function TaxonomiesPage() {
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                <div className="relative w-56">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                     <input
                         type="text"
                         placeholder="Search taxonomies..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input-field pl-10"
+                        className="search-field pl-8"
                     />
                 </div>
 
@@ -282,7 +282,7 @@ export default function TaxonomiesPage() {
 
             {/* Scrollable Table/Card Section */}
             <div className="flex-1 min-h-0 overflow-hidden px-4 md:px-8 pb-4 md:pb-8">
-                <div className="card h-full flex flex-col">
+                <div className="bg-surface-card rounded-xl h-full flex flex-col overflow-hidden">
                     {/* Table/Cards Container */}
                     <div className="flex-1 min-h-0 overflow-auto">
                         <DataTable

@@ -41,9 +41,12 @@ const ContactProgressBar: React.FC<ContactProgressBarProps> = ({
   const isClosedStatus = currentProgress === 'closed';
 
   return (
-    <div className={cn("w-full bg-white border-b-2 border-input p-[3px]", className)}>
+    <div className={cn("w-full py-1.5 flex items-center justify-center", className)}>
       <div className="flex items-center justify-center">
-        <div className="inline-flex items-center justify-between relative bg-black/90 rounded-full px-4 py-1.5 gap-x-3">
+        <div
+          className="inline-flex items-center justify-between relative rounded-full px-4 py-1.5 gap-x-3"
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+        >
           {/* Individual progress segments */}
           {progressStages.map((stage, index) => {
             if (index === 0) return null; // Skip first blank dot for segments
@@ -57,24 +60,28 @@ const ContactProgressBar: React.FC<ContactProgressBarProps> = ({
               // Last segment for closed status - stop at center of last dot
               segmentWidth = `calc(${100 / (progressStages.length - 1)}% - ${24 / (progressStages.length - 1)}px - 6px)`;
               segmentLeft = `calc(${((index - 1) / (progressStages.length - 1)) * 100}% + 6px)`;
-            } else {
-              segmentWidth = `calc(${100 / (progressStages.length - 1)}% - ${24 / (progressStages.length - 1)}px)`;
-              segmentLeft = `calc(${((index - 1) / (progressStages.length - 1)) * 100}% + 6px)`;
-            }
 
-            return (
-              <div
-                key={`segment-${index}`}
-                className={cn(
-                  "absolute top-1/2 h-0.5 -translate-y-1/2 z-0 transition-all duration-500 ease-out",
-                  segmentColor
-                )}
-                style={{
-                  left: segmentLeft,
-                  width: segmentWidth
-                }}
-              />
-            );
+              return (
+                <div
+                  key={`segment-${index}`}
+                  className={cn(
+                    "absolute h-0.5 z-0 transition-all duration-500 ease-out",
+                    segmentColor
+                  )}
+                  style={{ width: segmentWidth, left: segmentLeft, top: "50%", transform: "translateY(-50%)" }}
+                />
+              );
+            } else {
+              return (
+                <div
+                  key={`segment-${index}`}
+                  className={cn(
+                    "flex-1 h-0.5 z-0 transition-all duration-500 ease-out min-w-[32px] mx-2",
+                    segmentColor
+                  )}
+                />
+              );
+            }
           })}
 
           {progressStages.map((stage, index) => {
@@ -83,11 +90,11 @@ const ContactProgressBar: React.FC<ContactProgressBarProps> = ({
             const isBlankDot = stage.key === '';
 
             return (
-              <div key={`${stage.key}-${index}`} className="flex flex-col items-center relative z-10 group">
+              <div key={`${stage.key}-${index}`} className="flex flex-row items-center relative z-10 group">
                 {/* Dot */}
                 <div
                   className={cn(
-                    "w-3 h-3 rounded-full border-2 border-white transition-all duration-300",
+                    "w-3 h-3 rounded-full border-2 border-surface-primary transition-all duration-300",
                     // Blank starting dot styling
                     isBlankDot && !isClosedStatus && "bg-white",
                     isBlankDot && isClosedStatus && "bg-gray-300",
@@ -99,12 +106,12 @@ const ContactProgressBar: React.FC<ContactProgressBarProps> = ({
                   }}
                 />
 
-                {/* Label - Hidden on mobile/tablet, show on desktop hover only */}
+                {/* Label - Inline on desktop, hidden on mobile */}
                 {!isBlankDot && (
                   <span className={cn(
-                    "text-xs mt-2 font-medium transition-all duration-300 absolute top-6 whitespace-nowrap",
-                    // Hide on mobile/tablet, show on desktop hover
-                    "hidden lg:opacity-0 lg:group-hover:opacity-100 lg:block",
+                    "text-xs font-medium ml-2 whitespace-nowrap",
+                    // Hide on mobile/tablet, show inline on desktop
+                    "hidden lg:block",
                     {
                       "text-primary": isCompleted || isCurrent,
                       "text-muted-foreground": !isCompleted && !isCurrent
@@ -123,3 +130,5 @@ const ContactProgressBar: React.FC<ContactProgressBarProps> = ({
 };
 
 export default ContactProgressBar;
+
+

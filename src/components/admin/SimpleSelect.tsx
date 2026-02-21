@@ -29,27 +29,24 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between rounded-md px-2 py-1 ${textSize} focus:outline-none transition-colors h-full min-h-[28px] ${value
-                    ? `bg-black/30 text-white ${isOpen ? "bg-black/50" : "hover:bg-black/50"}`
-                    : `text-white ${isOpen ? "bg-black/50" : "bg-black/30 hover:bg-black/50 focus:bg-black/50"}`
-                    }`}
+                className={`form-input w-full flex items-center justify-between px-2 py-1 ${textSize} h-full min-h-[28px]`}
             >
-                <span className={`truncate mr-2 ${value ? "text-white" : "text-zinc-500"}`}>
+                <span className={`truncate mr-2 ${value ? "text-content-primary" : "text-content-muted"}`}>
                     {value || placeholder}
                 </span>
-                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${value ? "text-white/80" : "text-zinc-500"} ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 right-0 w-full min-w-[150px] mt-1 bg-zinc-900 rounded-md shadow-xl max-h-60 flex flex-col overflow-hidden">
-                    <div className="overflow-y-auto flex-1 p-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className="dropdown-menu absolute z-50 right-0 w-full min-w-[150px] mt-1 max-h-60 flex flex-col">
+                    <div className="overflow-y-auto flex-1 p-1">
                         <button
                             type="button"
                             onClick={() => {
                                 onChange("");
                                 setIsOpen(false);
                             }}
-                            className={`w-full text-left px-2 py-1.5 rounded ${textSize} text-zinc-400 hover:bg-white/5 hover:text-white flex items-center gap-2`}
+                            className={`dropdown-item w-full rounded ${textSize}`}
                         >
                             <Ban className="h-3.5 w-3.5" />
                             <span>None</span>
@@ -64,8 +61,7 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
                                     onChange(opt);
                                     setIsOpen(false);
                                 }}
-                                className={`w-full text-left px-2 py-1.5 rounded ${textSize} flex items-center group transition-colors ${value === opt ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                                    }`}
+                                className={`dropdown-item w-full rounded ${textSize} ${value === opt ? "active" : ""}`}
                             >
                                 <span>{opt}</span>
                                 {value === opt && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}

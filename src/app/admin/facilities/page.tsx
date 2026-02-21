@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag } from "lucide-react";
+import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock } from "lucide-react";
 import type { Facility, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
@@ -15,6 +15,22 @@ import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyE
 
 const ITEMS_PER_PAGE = 10;
 
+function timeAgo(dateStr: string | null | undefined): string {
+    if (!dateStr) return '—';
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    const days = Math.floor(diff / 86400);
+    if (days === 1) return '1 day ago';
+    if (days < 30) return `${days} days ago`;
+    const months = Math.floor(days / 30);
+    if (months === 1) return '1 month ago';
+    if (months < 12) return `${months} months ago`;
+    const years = Math.floor(months / 12);
+    return years === 1 ? '1 year ago' : `${years} years ago`;
+}
+
 export default function FacilitiesPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -26,6 +42,10 @@ export default function FacilitiesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
     const [taxonomyEntries, setTaxonomyEntries] = useState<Record<string, TaxonomyEntry>>({});
+
+    // Sort state
+    const [sortAsc, setSortAsc] = useState(true);
+    const [sortByRecent, setSortByRecent] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -111,18 +131,27 @@ export default function FacilitiesPage() {
     }, [searchParams, router, facilities]);
 
 
-    // Search Filtering
+    // Search + sort Filtering
     useEffect(() => {
         const query = searchQuery.toLowerCase();
-        const filtered = facilities.filter((f) =>
+        let filtered = facilities.filter((f) =>
             f.title.toLowerCase().includes(query) ||
             f.slug.toLowerCase().includes(query) ||
             (f.address?.city || "").toLowerCase().includes(query) ||
             (f.licenseNumber || "").toLowerCase().includes(query)
         );
+        if (sortByRecent) {
+            filtered = filtered.sort((a, b) =>
+                new Date(b.updatedAt || b.slug).getTime() - new Date(a.updatedAt || a.slug).getTime()
+            );
+        } else {
+            filtered = filtered.sort((a, b) =>
+                sortAsc ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+            );
+        }
         setFilteredFacilities(filtered);
         setCurrentPage(1);
-    }, [searchQuery, facilities]);
+    }, [searchQuery, facilities, sortAsc, sortByRecent]);
 
     const handleOpenCreate = () => {
         setEditingFacility(null);
@@ -216,10 +245,22 @@ export default function FacilitiesPage() {
                     onClick={() => handleOpenEdit(facility)}
                     className="flex items-center text-left hover:opacity-80 transition-opacity"
                 >
-                    <Building2 className={`mr-2 h-5 w-5 hidden md:block ${facility.status === 'published' ? 'text-emerald-500' : 'text-zinc-500'}`} />
+                    <span className="mr-2 hidden md:block flex-shrink-0">
+                        {facility.images && facility.images.length > 0 ? (
+                            <img
+                                src={facility.images[0]}
+                                alt={facility.title}
+                                className="h-[60px] w-[60px] rounded object-cover"
+                            />
+                        ) : (
+                            <div className="h-[60px] w-[60px] rounded border-2 border-ui-border flex items-center justify-center">
+                                <Building2 className={`h-5 w-5 ${facility.status === 'published' ? 'text-emerald-500' : 'text-content-muted'}`} />
+                            </div>
+                        )}
+                    </span>
                     <div>
-                        <div className="font-medium text-white hover:text-accent transition-colors">{facility.title}</div>
-                        <div className="text-xs text-zinc-500 hidden md:block">{facility.slug}</div>
+                        <div className="font-medium text-content-primary hover:text-accent transition-colors">{facility.title}</div>
+                        <div className="text-xs text-content-muted hidden md:block">{facility.slug}</div>
                     </div>
                 </button>
             ),
@@ -252,7 +293,7 @@ export default function FacilitiesPage() {
                 };
 
                 return (
-                    <div className="flex items-center text-sm text-zinc-400">
+                    <div className="flex items-center text-sm text-content-secondary">
                         <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
                         {buildPath(locationEntry)}
                     </div>
@@ -268,12 +309,19 @@ export default function FacilitiesPage() {
                 );
                 const typeEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
                 return (
-                    <div className="flex items-center text-sm text-zinc-400">
+                    <div className="flex items-center text-sm text-content-secondary">
                         <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
                         {typeEntry ? typeEntry.name : "—"}
                     </div>
                 );
             },
+        },
+        {
+            key: "updated_at",
+            header: "Last Modified",
+            render: (facility) => (
+                <span className="text-sm text-content-muted">{timeAgo(facility.updatedAt)}</span>
+            ),
         },
     ];
 
@@ -310,8 +358,8 @@ export default function FacilitiesPage() {
             <div className="flex-none p-4 md:p-8 pb-4 md:pb-6 space-y-4 md:space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-white">Facilities</h1>
-                        <p className="text-xs md:text-sm text-zinc-400 mt-1">Manage care facility listings</p>
+                        <h1 className="text-xl md:text-2xl font-bold text-content-primary">Facilities</h1>
+                        <p className="text-xs md:text-sm text-content-secondary mt-1">Manage care facility listings</p>
                     </div>
                     <button
                         onClick={handleOpenCreate}
@@ -325,21 +373,49 @@ export default function FacilitiesPage() {
                     </button>
                 </div>
 
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
-                    <input
-                        type="text"
-                        placeholder="Search facilities..."
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                        className="input-field pl-10"
-                    />
+                <div className="flex items-center gap-2">
+                    <div className="relative w-56">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
+                        <input
+                            type="text"
+                            placeholder="Search facilities..."
+                            value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                            className="search-field pl-8"
+                        />
+                    </div>
+                    {/* Sort: A-Z / Z-A toggle */}
+                    <button
+                        type="button"
+                        onClick={() => { setSortByRecent(false); setSortAsc(prev => sortByRecent ? true : !prev); }}
+                        title={sortByRecent ? "Sort A–Z" : (sortAsc ? "Sort Z–A" : "Sort A–Z")}
+                        className={`p-1.5 rounded-lg transition-colors ${!sortByRecent
+                            ? "bg-accent text-white"
+                            : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                            }`}
+                    >
+                        {(!sortByRecent && !sortAsc)
+                            ? <ArrowDownAZ className="h-4 w-4" />
+                            : <ArrowUpAZ className="h-4 w-4" />}
+                    </button>
+                    {/* Sort: Most Recent */}
+                    <button
+                        type="button"
+                        onClick={() => setSortByRecent(true)}
+                        title="Sort by most recent"
+                        className={`p-1.5 rounded-lg transition-colors ${sortByRecent
+                            ? "bg-accent text-white"
+                            : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                            }`}
+                    >
+                        <Clock className="h-4 w-4" />
+                    </button>
                 </div>
             </div>
 
             {/* Scrollable Table Section */}
             <div className="flex-1 min-h-0 overflow-hidden px-4 md:px-8 pb-4 md:pb-8">
-                <div className="card h-full flex flex-col">
+                <div className="bg-surface-card rounded-xl h-full flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 overflow-auto">
                         <DataTable
                             columns={columns}

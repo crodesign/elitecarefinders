@@ -56,12 +56,12 @@ export function CustomDropdown({
                 className={`w-full rounded-md py-2 ${LeftIcon ? 'pl-10' : 'pl-3'} pr-10 text-sm text-left focus:outline-none transition-colors bg-black/30 text-white hover:bg-black/50 focus:bg-black/50 ${className}`}
             >
                 {LeftIcon && (
-                    <LeftIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                    <LeftIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                 )}
-                <span className={!selectedOption ? 'text-zinc-600' : ''}>
+                <span className={!selectedOption ? 'text-content-muted : ''}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
-                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (

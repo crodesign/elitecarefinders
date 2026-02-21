@@ -49,20 +49,20 @@ export function EnhancedSelect({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between rounded-md ${LeftIcon ? 'pl-10' : 'pl-3'} pr-10 py-2 ${textSize} focus:outline-none transition-colors bg-black/30 text-white hover:bg-black/50 focus:bg-black/50`}
+                className={`form-input w-full flex items-center justify-between ${LeftIcon ? 'pl-10' : 'pl-3'} pr-10 py-2 ${textSize}`}
             >
                 {LeftIcon && (
-                    <LeftIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                    <LeftIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                 )}
-                <span className={`truncate ${!selectedOption ? 'text-zinc-600' : 'text-white'}`}>
+                <span className={`truncate ${!selectedOption ? 'text-content-muted' : 'text-content-primary'}`}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
-                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-zinc-900 rounded-md shadow-xl border border-white/10 max-h-60 flex flex-col overflow-hidden">
-                    <div className="overflow-y-auto flex-1 p-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className="dropdown-menu absolute z-50 w-full mt-1 max-h-60 flex flex-col">
+                    <div className="overflow-y-auto flex-1 p-1">
                         {allowNone && (
                             <button
                                 type="button"
@@ -70,7 +70,7 @@ export function EnhancedSelect({
                                     onChange("");
                                     setIsOpen(false);
                                 }}
-                                className={`w-full text-left px-3 py-2 rounded ${textSize} text-zinc-400 hover:bg-white/5 hover:text-white flex items-center gap-2`}
+                                className={`dropdown-item w-full rounded ${textSize}`}
                             >
                                 <Ban className="h-3.5 w-3.5" />
                                 <span>None</span>
@@ -90,11 +90,10 @@ export function EnhancedSelect({
                                         onChange(opt.value);
                                         setIsOpen(false);
                                     }}
-                                    className={`w-full text-left px-3 py-2 rounded ${textSize} flex items-start gap-2.5 group transition-colors ${isSelected ? "bg-white/10 text-white" : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                                        }`}
+                                    className={`dropdown-item w-full rounded ${textSize} ${isSelected ? "active" : ""}`}
                                 >
                                     {OptionIcon && (
-                                        <OptionIcon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isSelected ? 'text-accent' : 'text-zinc-500 group-hover:text-white'}`} />
+                                        <OptionIcon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isSelected ? 'text-accent' : 'text-content-muted'}`} />
                                     )}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
@@ -102,7 +101,7 @@ export function EnhancedSelect({
                                             {isSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                                         </div>
                                         {opt.description && (
-                                            <p className="text-xs text-white/60 mt-0.5">{opt.description}</p>
+                                            <p className="text-xs text-content-muted mt-0.5">{opt.description}</p>
                                         )}
                                     </div>
                                 </button>

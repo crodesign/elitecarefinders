@@ -36,7 +36,7 @@ export default function DebugEnvPage() {
     return (
         <div className="p-8 text-white bg-black min-h-screen font-mono">
             <h1 className="text-xl font-bold mb-4">Environment Debug</h1>
-            <pre className="bg-zinc-900 p-4 rounded mb-4">
+            <pre className="bg-surface-secondary p-4 rounded mb-4">
                 {JSON.stringify(envStatus, null, 2)}
             </pre>
             {error && (

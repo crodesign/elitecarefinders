@@ -92,18 +92,18 @@ export function MediaDetailPanel({
         <div className="fixed top-14 md:top-0 inset-x-0 bottom-0 z-[55]">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 transition-opacity"
+                className="absolute inset-0 bg-surface-hover transition-opacity"
                 onClick={onClose}
             />
 
             {/* Panel */}
-            <div className="absolute right-0 top-0 h-full w-full md:w-[520px] bg-[#0b1115] border-l border-white/5 shadow-2xl flex flex-col">
+            <div className="absolute right-0 top-0 h-full w-full md:w-[520px] bg-surface-secondary border-l border-ui-border shadow-2xl flex flex-col">
                 {/* Header */}
-                <div className="flex-none flex items-center justify-between p-4 border-b border-white/5">
-                    <h2 className="text-lg font-semibold text-white">Media Details</h2>
+                <div className="flex-none flex items-center justify-between p-4 border-b border-ui-border">
+                    <h2 className="text-lg font-semibold text-content-primary">Media Details</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-input rounded-lg transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -112,7 +112,7 @@ export function MediaDetailPanel({
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {/* Preview */}
-                    <div className="bg-black/30 rounded-xl overflow-hidden">
+                    <div className="bg-surface-input rounded-xl overflow-hidden">
                         {isImage ? (
                             <img
                                 src={item.url}
@@ -120,47 +120,47 @@ export function MediaDetailPanel({
                                 className="w-full max-h-64 object-contain"
                             />
                         ) : (
-                            <div className="w-full h-40 flex items-center justify-center text-zinc-500">
+                            <div className="w-full h-40 flex items-center justify-center text-content-muted">
                                 <span className="text-lg">{item.mimeType}</span>
                             </div>
                         )}
                     </div>
 
                     {/* File info */}
-                    <div className="bg-white/5 rounded-lg p-3 space-y-1 text-sm">
+                    <div className="bg-surface-input rounded-lg p-3 space-y-1 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-zinc-500">Filename</span>
-                            <span className="text-white">{item.originalFilename}</span>
+                            <span className="text-content-muted">Filename</span>
+                            <span className="text-content-primary">{item.originalFilename}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-zinc-500">Size</span>
-                            <span className="text-white">{formatFileSize(item.fileSize)}</span>
+                            <span className="text-content-muted">Size</span>
+                            <span className="text-content-primary">{formatFileSize(item.fileSize)}</span>
                         </div>
                         {item.width && item.height && (
                             <div className="flex justify-between">
-                                <span className="text-zinc-500">Dimensions</span>
-                                <span className="text-white">{item.width} × {item.height}</span>
+                                <span className="text-content-muted">Dimensions</span>
+                                <span className="text-content-primary">{item.width} × {item.height}</span>
                             </div>
                         )}
                         <div className="flex justify-between">
-                            <span className="text-zinc-500">Type</span>
-                            <span className="text-white">{item.mimeType}</span>
+                            <span className="text-content-muted">Type</span>
+                            <span className="text-content-primary">{item.mimeType}</span>
                         </div>
                     </div>
 
                     {/* URL */}
                     <div>
-                        <label className="block text-sm text-zinc-400 mb-2">URL</label>
+                        <label className="block text-sm text-content-muted mb-2">URL</label>
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={item.url}
                                 readOnly
-                                className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-400"
+                                className="flex-1 bg-surface-hover rounded-lg px-3 py-2 text-sm text-content-muted"
                             />
                             <button
                                 onClick={handleCopyUrl}
-                                className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                                className="px-3 py-2 bg-surface-input rounded-lg text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors"
                             >
                                 {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                             </button>
@@ -169,27 +169,27 @@ export function MediaDetailPanel({
 
                     {/* Alt Text (used as caption/title on display) */}
                     <div>
-                        <label className="block text-sm text-zinc-400 mb-2">Alt Text / Caption</label>
+                        <label className="block text-sm text-content-muted mb-2">Alt Text / Caption</label>
                         <input
                             type="text"
                             value={altText}
                             onChange={(e) => setAltText(e.target.value)}
                             placeholder="Describe the image (used for accessibility and captions)"
-                            className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-accent/50"
+                            className="w-full bg-surface-hover rounded-lg px-4 py-3 text-content-primary placeholder-content-muted focus:outline-none focus:border-accent/50"
                         />
                     </div>
 
                     {/* Folder */}
                     <div>
-                        <label className="block text-sm text-zinc-400 mb-2">Folder</label>
+                        <label className="block text-sm text-content-muted mb-2">Folder</label>
                         <select
                             value={folderId || ""}
                             onChange={(e) => setFolderId(e.target.value || undefined)}
-                            className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent/50"
+                            className="w-full bg-surface-hover rounded-lg px-4 py-3 text-content-primary focus:outline-none focus:border-accent/50"
                         >
-                            <option value="" className="bg-[#0b1115]">No folder</option>
+                            <option value="" className="bg-surface-secondary">No folder</option>
                             {flatFolders.map(({ folder, depth }) => (
-                                <option key={folder.id} value={folder.id} className="bg-[#0b1115]">
+                                <option key={folder.id} value={folder.id} className="bg-surface-secondary">
                                     {"—".repeat(depth)} {folder.name}
                                 </option>
                             ))}
@@ -198,7 +198,7 @@ export function MediaDetailPanel({
                 </div>
 
                 {/* Footer actions */}
-                <div className="flex-none flex items-center justify-between p-4 border-t border-white/5">
+                <div className="flex-none flex items-center justify-between p-4 border-t border-ui-border">
                     <button
                         onClick={handleDelete}
                         disabled={isDeleting}
@@ -210,7 +210,7 @@ export function MediaDetailPanel({
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="flex items-center gap-2 px-6 py-2 bg-accent text-white font-medium rounded-lg hover:bg-accent-light transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-2 bg-accent text-content-primary font-medium rounded-lg hover:bg-accent-light transition-colors disabled:opacity-50"
                     >
                         {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                         Save Changes
@@ -220,3 +220,5 @@ export function MediaDetailPanel({
         </div>
     );
 }
+
+

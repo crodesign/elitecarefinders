@@ -32,7 +32,7 @@ function SortableEntry({ entry, children }: { entry: TaxonomyEntry; children: Re
             <div
                 {...attributes}
                 {...listeners}
-                className="absolute left-1 top-1/2 -translate-y-1/2 p-1 cursor-grab active:cursor-grabbing text-zinc-500 hover:text-white z-10"
+                className="absolute left-1 top-1/2 -translate-y-1/2 p-1 cursor-grab active:cursor-grabbing text-content-muted hover:text-content-primary z-10"
             >
                 <GripVertical className="h-4 w-4" />
             </div>
@@ -217,22 +217,22 @@ export function EntryTree({
         return (
             <div
                 key={entry.id}
-                className={`mx-1.5 rounded-lg transition-colors ${depth === 0 && isExpanded && hasChildren ? "bg-white/5" : ""}`}
+                className={`mx-1.5 rounded-lg transition-colors ${depth === 0 && isExpanded && hasChildren ? "bg-surface-input" : ""}`}
             >
                 <div
-                    className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                    className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-input transition-colors"
                     style={{ paddingLeft: `${12 + depth * 20}px` }}
                 >
                     {/* Expand/Collapse toggle */}
                     {hasChildren ? (
                         <button
                             onClick={() => toggleExpand(entry.id)}
-                            className="p-0.5 hover:bg-white/10 rounded flex-shrink-0"
+                            className="p-0.5 hover:bg-surface-hover rounded flex-shrink-0"
                         >
                             {isExpanded ? (
-                                <ChevronDown className="h-4 w-4 text-zinc-400" />
+                                <ChevronDown className="h-4 w-4 text-content-muted" />
                             ) : (
-                                <ChevronRight className="h-4 w-4 text-zinc-400" />
+                                <ChevronRight className="h-4 w-4 text-content-muted" />
                             )}
                         </button>
                     ) : (
@@ -250,7 +250,7 @@ export function EntryTree({
                                     if (e.key === "Enter") handleEditSubmit();
                                     if (e.key === "Escape") handleEditCancel();
                                 }}
-                                className={`w-full bg-black/30 border border-transparent rounded px-2 py-1 text-sm text-white focus:outline-none transition-colors hover:bg-black/50 focus:bg-black/50 ${editingName.trim() ? "pr-16" : "pr-8"
+                                className={`w-full bg-surface-input border border-transparent rounded px-2 py-1 text-sm text-content-primary focus:outline-none transition-colors hover:bg-surface-hover focus:bg-surface-hover ${editingName.trim() ? "pr-16" : "pr-8"
                                     }`}
                                 autoFocus
                                 disabled={isSubmitting}
@@ -267,7 +267,7 @@ export function EntryTree({
                                 )}
                                 <button
                                     onClick={handleEditCancel}
-                                    className="p-1 text-zinc-400 hover:text-white hover:bg-white/10 rounded"
+                                    className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded"
                                 >
                                     <X className="h-3.5 w-3.5" />
                                 </button>
@@ -275,28 +275,28 @@ export function EntryTree({
                         </div>
                     ) : (
                         <>
-                            <span className="flex-1 text-sm text-white truncate">{entry.name}</span>
+                            <span className="flex-1 text-sm text-content-primary truncate">{entry.name}</span>
 
                             {/* Action buttons - visible on hover */}
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {canAddChild && (
                                     <button
                                         onClick={() => handleAddStart(entry.id)}
-                                        className="p-1 text-zinc-400 hover:text-accent hover:bg-accent/10 rounded"
+                                        className="p-1 text-content-muted hover:text-accent hover:bg-accent/10 rounded"
                                     >
                                         <Plus className="h-3.5 w-3.5" />
                                     </button>
                                 )}
                                 <button
                                     onClick={() => handleEditStart(entry)}
-                                    className="p-1 text-zinc-400 hover:text-white hover:bg-white/10 rounded"
+                                    className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded"
                                 >
                                     <Pencil className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(entry.id)}
                                     disabled={isDeleting}
-                                    className="p-1 text-zinc-400 hover:text-red-400 hover:bg-red-400/10 rounded disabled:opacity-50"
+                                    className="p-1 text-content-muted hover:text-red-400 hover:bg-red-400/10 rounded disabled:opacity-50"
                                 >
                                     {isDeleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                 </button>
@@ -320,7 +320,7 @@ export function EntryTree({
                                 if (e.key === "Escape") handleAddCancel();
                             }}
                             placeholder={`New ${singularName.toLowerCase()}...`}
-                            className={`w-full bg-black/30 border border-transparent rounded px-3 py-1.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors hover:bg-black/50 focus:bg-black/50 ${newEntryName.trim() ? "pr-16" : "pr-8"
+                            className={`w-full bg-surface-input border border-transparent rounded px-3 py-1.5 text-sm text-content-primary placeholder-content-muted focus:outline-none transition-colors hover:bg-surface-hover focus:bg-surface-hover ${newEntryName.trim() ? "pr-16" : "pr-8"
                                 }`}
                             autoFocus
                             disabled={isSubmitting}
@@ -337,7 +337,7 @@ export function EntryTree({
                             )}
                             <button
                                 onClick={handleAddCancel}
-                                className="p-1 text-zinc-400 hover:text-white hover:bg-white/10 rounded"
+                                className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded"
                             >
                                 <X className="h-3.5 w-3.5" />
                             </button>
@@ -357,7 +357,7 @@ export function EntryTree({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-4 text-zinc-500">
+            <div className="flex items-center justify-center py-4 text-content-muted">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 Loading...
             </div>
@@ -378,7 +378,7 @@ export function EntryTree({
                         }}
                         onFocus={() => setAddingParentId(null)}
                         placeholder={`Add new ${singularName.toLowerCase()}...`}
-                        className={`w-full bg-black/30 border border-transparent rounded-lg pl-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors hover:bg-black/50 focus:bg-black/50 ${addingParentId === null && newEntryName.trim() ? "pr-20" : "pr-12"
+                        className={`w-full bg-surface-input border border-transparent rounded-lg pl-4 py-2 text-sm text-content-primary placeholder-content-muted focus:outline-none transition-colors hover:bg-surface-hover focus:bg-surface-hover ${addingParentId === null && newEntryName.trim() ? "pr-20" : "pr-12"
                             }`}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && addingParentId === null) handleAddSubmit();
@@ -398,7 +398,7 @@ export function EntryTree({
                         <button
                             type="button"
                             onClick={() => setNewEntryName("")}
-                            className={`p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-md transition-colors ${newEntryName ? "visible" : "invisible"
+                            className={`p-1.5 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-md transition-colors ${newEntryName ? "visible" : "invisible"
                                 }`}
                         >
                             <X className="h-4 w-4" />
@@ -411,8 +411,8 @@ export function EntryTree({
                     onClick={handleSort}
                     disabled={isManualSortMode}
                     className={`flex-none p-2 rounded-lg transition-colors ${isManualSortMode
-                            ? 'bg-black/30 text-zinc-600 cursor-not-allowed'
-                            : 'bg-accent text-white'
+                        ? 'bg-surface-input text-content-muted cursor-not-allowed'
+                        : 'bg-accent text-white'
                         }`}
                 >
                     {sortDirection === 'asc' ? (
@@ -425,8 +425,8 @@ export function EntryTree({
                     type="button"
                     onClick={() => setIsManualSortMode(!isManualSortMode)}
                     className={`flex-none p-2 rounded-lg transition-colors ${isManualSortMode
-                            ? 'bg-accent text-white'
-                            : 'bg-black/30 text-zinc-400 hover:text-white hover:bg-black/50'
+                        ? 'bg-accent text-white'
+                        : 'bg-surface-input text-content-muted hover:text-content-primary hover:bg-surface-hover'
                         }`}
                 >
                     <GripVertical className="h-5 w-5" />
@@ -434,9 +434,9 @@ export function EntryTree({
             </div>
 
             {/* Entry tree - fills remaining height */}
-            <div className="flex-1 min-h-0 overflow-y-auto rounded-lg bg-black/30">
+            <div className="flex-1 min-h-0 overflow-y-auto rounded-lg bg-surface-input">
                 {entries.length === 0 ? (
-                    <div className="text-center py-4 text-zinc-500 text-sm">
+                    <div className="text-center py-4 text-content-muted text-sm">
                         No {singularName.toLowerCase()}s yet
                     </div>
                 ) : isManualSortMode ? (

@@ -294,13 +294,13 @@ export default function MyProfilePage() {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={() => router.back()}
-                                className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                                className="p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-hover transition-colors"
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
                             <div>
-                                <h1 className="text-xl md:text-2xl font-bold text-white">My Profile</h1>
-                                <p className="text-xs md:text-sm text-zinc-400 mt-1">
+                                <h1 className="text-xl md:text-2xl font-bold text-content-primary">My Profile</h1>
+                                <p className="text-xs md:text-sm text-content-secondary mt-1">
                                     Manage your personal information
                                 </p>
                             </div>
@@ -368,18 +368,18 @@ export default function MyProfilePage() {
 
                                     {/* Name & Role */}
                                     <div className="flex-1 text-center sm:text-left">
-                                        <h2 className="text-lg font-semibold text-white">
+                                        <h2 className="text-lg font-semibold text-content-primary">
                                             {fullName || "Your Name"}
                                         </h2>
-                                        <p className="text-sm text-zinc-400 mt-0.5">{user?.email}</p>
+                                        <p className="text-sm text-content-secondary mt-0.5">{user?.email}</p>
 
                                         {/* Dynamic Role Badge */}
                                         <div className="flex flex-col gap-2 mt-3 w-full">
                                             {/* Managed By Display */}
                                             {managerName && (
-                                                <div className="flex items-center gap-1.5 text-xs text-zinc-500 bg-white/5 px-2.5 py-1.5 rounded-md border border-white/5 inline-flex self-start">
-                                                    <Users className="h-3 w-3 text-zinc-400" />
-                                                    <span>Managed by <span className="text-zinc-300 font-medium">{managerName}</span></span>
+                                                <div className="flex items-center gap-1.5 text-xs text-content-muted bg-surface-hover px-2.5 py-1.5 rounded-md border border-ui-border inline-flex self-start">
+                                                    <Users className="h-3 w-3 text-content-secondary" />
+                                                    <span>Managed by <span className="text-content-secondary font-medium">{managerName}</span></span>
                                                 </div>
                                             )}
                                         </div>
@@ -393,7 +393,7 @@ export default function MyProfilePage() {
                                         Assigned Locations
                                     </h3>
                                     {assignedLocations.length === 0 ? (
-                                        <p className="text-sm text-zinc-500 italic">No locations assigned</p>
+                                        <p className="text-sm text-content-muted italic">No locations assigned</p>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                                             {/* Distribute states into 3 columns for stable layout */}
@@ -420,14 +420,14 @@ export default function MyProfilePage() {
                                                                         className={`flex items-center gap-1.5 text-sm w-full text-left group ${hasChildren ? "cursor-pointer hover:bg-white/5 rounded px-2 py-1.5 -ml-2 transition-colors" : "cursor-default py-1.5"}`}
                                                                     >
                                                                         {hasChildren ? (
-                                                                            <ChevronRight className={`h-3.5 w-3.5 text-zinc-500 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+                                                                            <ChevronRight className={`h-3.5 w-3.5 text-content-muted transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
                                                                         ) : (
                                                                             <span className="w-3.5" />
                                                                         )}
                                                                         <MapPin className="h-3.5 w-3.5 text-accent/60" />
                                                                         <span className="text-white/90 font-medium">{state.name}</span>
                                                                         {hasChildren && (
-                                                                            <span className="text-xs text-zinc-500 ml-1.5 bg-white/5 px-1.5 py-0.5 rounded">
+                                                                            <span className="text-xs text-content-muted ml-1.5 bg-white/5 px-1.5 py-0.5 rounded">
                                                                                 {children.length}
                                                                             </span>
                                                                         )}
@@ -438,8 +438,8 @@ export default function MyProfilePage() {
                                                                             {hasChildren && (
                                                                                 <div className={`ml-7 mt-1 pb-1 ${children.length > 1 ? "grid grid-cols-2 gap-x-4 gap-y-1" : "space-y-1"}`}>
                                                                                     {children.map(child => (
-                                                                                        <div key={child.id} className="flex items-start gap-1.5 text-sm text-zinc-400 py-0.5">
-                                                                                            <span className="w-1 h-1 rounded-full bg-zinc-600 shrink-0 mt-1.5"></span>
+                                                                                        <div key={child.id} className="flex items-start gap-1.5 text-sm text-content-muted py-0.5">
+                                                                                            <span className="w-1 h-1 rounded-full bg-surface-hover shrink-0 mt-1.5"></span>
                                                                                             <span>{child.name}</span>
                                                                                         </div>
                                                                                     ))}
@@ -467,7 +467,7 @@ export default function MyProfilePage() {
                                     <User className="h-4 w-4 text-accent" />
                                     Personal Information
                                 </h3>
-                                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2">
                                     <MapPin className="h-4 w-4 text-accent" />
                                     Address
                                 </h3>
@@ -485,7 +485,7 @@ export default function MyProfilePage() {
                                             type="text"
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             placeholder="Your full name"
                                         />
                                     </div>
@@ -497,7 +497,7 @@ export default function MyProfilePage() {
                                             type="text"
                                             value={nickname}
                                             onChange={(e) => setNickname(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             placeholder="Optional nickname"
                                         />
                                     </div>
@@ -512,9 +512,9 @@ export default function MyProfilePage() {
                                             type="email"
                                             value={user?.email || ""}
                                             disabled
-                                            className="w-full rounded-md py-2 px-3 text-sm bg-black/20 text-zinc-500 cursor-not-allowed"
+                                            className="w-full rounded-md py-2 px-3 text-sm bg-surface-input text-content-muted cursor-not-allowed"
                                         />
-                                        <p className="text-xs text-zinc-600 mt-1">Contact an admin to change your email</p>
+
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-white/80 mb-1.5">
@@ -527,7 +527,7 @@ export default function MyProfilePage() {
                                             type="tel"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             placeholder="(555) 555-5555"
                                         />
                                     </div>
@@ -547,13 +547,13 @@ export default function MyProfilePage() {
                                                 type={showCurrentPassword ? "text" : "password"}
                                                 value={currentPassword}
                                                 onChange={(e) => setCurrentPassword(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="Current password"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-secondary"
                                             >
                                                 {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
@@ -563,13 +563,13 @@ export default function MyProfilePage() {
                                                 type={showNewPassword ? "text" : "password"}
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-content-muted hover:bg-black/50 focus:bg-black/50"
                                                 placeholder="New password (min 8 characters)"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowNewPassword(!showNewPassword)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-secondary"
                                             >
                                                 {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
@@ -579,7 +579,7 @@ export default function MyProfilePage() {
                                                 type={showConfirmPassword ? "text" : "password"}
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className={`w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors text-white placeholder-zinc-600 ${confirmPassword && confirmPassword !== newPassword
+                                                className={`w-full rounded-md py-2 px-3 pr-10 text-sm focus:outline-none transition-colors text-white placeholder-content-muted ${confirmPassword && confirmPassword !== newPassword
                                                     ? "bg-red-500/10 ring-1 ring-red-500/30"
                                                     : "bg-black/30 hover:bg-black/50 focus:bg-black/50"
                                                     }`}
@@ -588,7 +588,7 @@ export default function MyProfilePage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-secondary"
                                             >
                                                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                             </button>
@@ -627,7 +627,7 @@ export default function MyProfilePage() {
                                             type="text"
                                             value={street}
                                             onChange={(e) => setStreet(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             placeholder="123 Main St"
                                         />
                                     </div>
@@ -639,7 +639,7 @@ export default function MyProfilePage() {
                                             type="text"
                                             value={city}
                                             onChange={(e) => setCity(e.target.value)}
-                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                            className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             placeholder="City"
                                         />
                                     </div>
@@ -652,7 +652,7 @@ export default function MyProfilePage() {
                                                 type="text"
                                                 value={state}
                                                 onChange={(e) => setState(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                                 placeholder="State"
                                             />
                                         </div>
@@ -664,7 +664,7 @@ export default function MyProfilePage() {
                                                 type="text"
                                                 value={zip}
                                                 onChange={(e) => setZip(e.target.value)}
-                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-black/30 text-white placeholder-zinc-600 hover:bg-black/50 focus:bg-black/50"
+                                                className="w-full rounded-md py-2 px-3 text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                                 placeholder="96801"
                                             />
                                         </div>
