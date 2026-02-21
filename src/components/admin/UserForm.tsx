@@ -35,6 +35,14 @@ const ROLE_OPTIONS: { value: UserRole; label: string; description: string }[] = 
     { value: 'local_user', label: 'Local User', description: 'Can only manage their own content' }
 ];
 
+const ROLE_COLORS: Record<UserRole, string> = {
+    super_admin: 'text-red-500',
+    system_admin: 'text-orange-500',
+    regional_manager: 'text-blue-500',
+    local_user: 'text-green-500',
+    invoice_manager: 'text-purple-500',
+};
+
 const US_STATES = [
     { name: 'Alabama', code: 'AL' }, { name: 'Alaska', code: 'AK' }, { name: 'Arizona', code: 'AZ' },
     { name: 'Arkansas', code: 'AR' }, { name: 'California', code: 'CA' }, { name: 'Colorado', code: 'CO' },
@@ -680,7 +688,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                         value: opt.value,
                                                         label: opt.label,
                                                         description: opt.description,
-                                                        icon: getRoleIcon(opt.value)
+                                                        icon: getRoleIcon(opt.value),
+                                                        iconColor: ROLE_COLORS[opt.value],
                                                     }))}
                                                     leftIcon={Shield}
                                                 />

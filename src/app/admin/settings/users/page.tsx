@@ -182,17 +182,17 @@ export default function SettingsUsersPage() {
 
     const getRoleBadge = (role: string) => {
         const badges = {
-            super_admin: { bg: 'bg-accent/10', text: 'text-accent', label: 'Super Admin' },
-            system_admin: { bg: 'bg-blue-500/10', text: 'text-blue-400', label: 'System Admin' },
-            regional_manager: { bg: 'bg-purple-500/10', text: 'text-purple-400', label: 'Regional Manager' },
-            local_user: { bg: 'bg-green-500/10', text: 'text-green-400', label: 'Local User' }
+            super_admin: { bg: 'bg-red-500', label: 'Super Admin' },
+            system_admin: { bg: 'bg-orange-500', label: 'System Admin' },
+            regional_manager: { bg: 'bg-blue-500', label: 'Regional Manager' },
+            local_user: { bg: 'bg-green-500', label: 'Local User' }
         };
 
         const badge = badges[role as keyof typeof badges] || badges.local_user;
         const RoleIcon = getRoleIcon(role);
 
         return (
-            <span className={`inline-flex items-center gap-1.5 ${badge.bg} rounded-full px-2.5 py-1 text-xs font-medium ${badge.text}`}>
+            <span className={`inline-flex items-center gap-1.5 ${badge.bg} rounded-full px-2.5 py-1 text-xs font-medium text-white`}>
                 <RoleIcon className="h-3.5 w-3.5" />
                 {badge.label}
             </span>
@@ -216,7 +216,7 @@ export default function SettingsUsersPage() {
                     onClick={() => handleEdit(user)}
                     className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
                 >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-black/30 border-2 border-white/10">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-surface-input border-2 border-ui-border">
                         {user.profile?.photo_url ? (
                             <img
                                 src={user.profile.photo_url}
@@ -224,7 +224,7 @@ export default function SettingsUsersPage() {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-white/40">
+                            <div className="w-full h-full flex items-center justify-center text-content-muted">
                                 <User className="h-5 w-5" />
                             </div>
                         )}

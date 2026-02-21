@@ -6,6 +6,7 @@ interface OptionType {
     label: string;
     description?: string;
     icon?: LucideIcon;
+    iconColor?: string;
 }
 
 interface EnhancedSelectProps {
@@ -93,7 +94,7 @@ export function EnhancedSelect({
                                     className={`dropdown-item w-full rounded ${textSize} ${isSelected ? "active" : ""}`}
                                 >
                                     {OptionIcon && (
-                                        <OptionIcon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${isSelected ? 'text-accent' : 'text-content-muted'}`} />
+                                        <OptionIcon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${opt.iconColor ?? (isSelected ? 'text-accent' : 'text-content-muted')}`} />
                                     )}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
