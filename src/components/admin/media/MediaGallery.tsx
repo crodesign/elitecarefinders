@@ -328,12 +328,12 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             )}
             <div className="flex items-center justify-between mt-2">
-                <h3 className="text-lg font-medium text-content-primary">Images for {title.replace(' Gallery', '')}</h3>
+                <h3 className="text-lg font-medium text-content-primary">{title}</h3>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
                         onClick={loadMedia}
-                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
+                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors shrink-0"
                         title="Refresh"
                     >
                         <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
@@ -342,10 +342,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         <button
                             type="button"
                             onClick={() => setIsUploaderOpen(true)}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-light transition-colors"
+                            className="flex items-center gap-2 px-3 py-1.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-light transition-colors shrink-0"
                         >
                             <Plus className="h-4 w-4" />
-                            Add Images
+                            Add
                         </button>
                     )}
                     {/* Manage Images — deep-links to the media library folder */}
@@ -353,10 +353,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         type="button"
                         onClick={handleManageImages}
                         title="Manage Images in Media Library"
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap bg-[var(--media-gallery-bg)] text-content-secondary hover:bg-accent hover:text-white"
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap bg-[var(--media-gallery-bg)] text-content-secondary hover:bg-accent hover:text-white shrink-0"
                     >
                         <FolderOpen className="h-4 w-4" />
-                        Manage Media
+                        Manage
                     </button>
                 </div>
             </div>

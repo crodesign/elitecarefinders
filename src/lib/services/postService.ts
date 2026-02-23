@@ -18,6 +18,7 @@ export async function getPosts(): Promise<Post[]> {
         ...post,
         images: post.images || [],
         featuredImageUrl: post.images && post.images.length > 0 ? post.images[0] : null,
+        videoUrl: post.video_url || null,
         authorId: post.author_id,
         postType: post.post_type as PostType,
         publishedAt: post.published_at,
@@ -42,6 +43,7 @@ export async function getPost(id: string): Promise<Post | null> {
         ...data,
         images: data.images || [],
         featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
+        videoUrl: data.video_url || null,
         authorId: data.author_id,
         postType: data.post_type as PostType,
         publishedAt: data.published_at,
@@ -60,6 +62,7 @@ export async function createPost(post: CreatePostInput): Promise<Post> {
         slug: post.slug,
         content: post.content,
         excerpt: post.excerpt,
+        video_url: post.videoUrl,
         images: post.images || [],
         author_id: user?.id,
         post_type: post.postType,
@@ -83,6 +86,7 @@ export async function createPost(post: CreatePostInput): Promise<Post> {
         ...data,
         images: data.images || [],
         featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
+        videoUrl: data.video_url || null,
         authorId: data.author_id,
         postType: data.post_type as PostType,
         publishedAt: data.published_at,
@@ -97,6 +101,7 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
     if (updates.slug !== undefined) dbUpdates.slug = updates.slug;
     if (updates.content !== undefined) dbUpdates.content = updates.content;
     if (updates.excerpt !== undefined) dbUpdates.excerpt = updates.excerpt;
+    if (updates.videoUrl !== undefined) dbUpdates.video_url = updates.videoUrl;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.authorId !== undefined) dbUpdates.author_id = updates.authorId;
     if (updates.postType !== undefined) dbUpdates.post_type = updates.postType;
@@ -125,6 +130,7 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
         ...data,
         images: data.images || [],
         featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
+        videoUrl: data.video_url || null,
         authorId: data.author_id,
         postType: data.post_type as PostType,
         publishedAt: data.published_at,

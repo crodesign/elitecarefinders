@@ -78,12 +78,17 @@ export interface NewsLink {
     url: string;
 }
 
+export interface RecipeIngredient {
+    amount: string;
+    name: string;
+}
+
 export interface PostMetadata {
     // Shared or general metadata
     // For News & Events
     links?: NewsLink[];
     // For Recipes
-    ingredients?: string[];
+    ingredients?: (string | RecipeIngredient)[];
     instructions?: string[];
     prepTime?: number;
     cookTime?: number;
@@ -95,6 +100,7 @@ export interface Post extends BaseEntity {
     excerpt?: string;
     featuredImageId?: string;
     featuredImageUrl?: string | null;
+    videoUrl?: string | null;
     authorId?: string;
     postType: PostType;
     status: 'draft' | 'published' | 'archived';
