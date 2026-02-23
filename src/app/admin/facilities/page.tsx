@@ -245,7 +245,7 @@ export default function FacilitiesPage() {
                 <button
                     type="button"
                     onClick={() => handleOpenEdit(facility)}
-                    className="flex items-center text-left hover:opacity-80 transition-opacity"
+                    className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
                 >
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         {facility.images && facility.images.length > 0 ? (
@@ -261,7 +261,7 @@ export default function FacilitiesPage() {
                         )}
                     </span>
                     <div>
-                        <div className="font-medium text-content-primary hover:text-accent transition-colors">{facility.title}</div>
+                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors">{facility.title}</div>
                         <div className="text-xs text-content-muted hidden md:block">{facility.slug}</div>
                     </div>
                 </button>

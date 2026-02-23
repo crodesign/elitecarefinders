@@ -69,13 +69,24 @@ export default function ContactsPage() {
             setIsFormOpen(true);
             router.replace('/admin/contacts', { scroll: false });
         } else if (editId && contacts.length > 0) {
-            const contact = contacts.find(c => c.id === editId);
+            // Find by slug first, fallback to ID if we are using old links
+            const contact = contacts.find(c => c.slug === editId || c.id === editId);
             if (contact) {
                 setEditingContact(contact);
                 setIsFormOpen(true);
+            } else {
+                router.replace('/admin/contacts', { scroll: false });
             }
         }
     }, [searchParams, contacts, router]);
+
+    const handleOpenEdit = (contact: Contact) => {
+        setEditingContact(contact);
+        setIsFormOpen(true);
+        // Use slug if available, otherwise ID
+        const identifier = contact.slug || contact.id;
+        router.push(`/admin/contacts?edit=${identifier}`, { scroll: false });
+    };
 
 
     // Sort + filter state
@@ -133,7 +144,8 @@ export default function ContactsPage() {
 
             const currentParams = new URLSearchParams(searchParams.toString());
             currentParams.delete('action');
-            currentParams.set('edit', savedContact.id);
+            // Prefer slug for the URL
+            currentParams.set('edit', savedContact.slug || savedContact.id);
             router.replace(`/admin/contacts?${currentParams.toString()}`, { scroll: false });
         } catch (error) {
             console.error("Save failed", error);
@@ -193,10 +205,10 @@ export default function ContactsPage() {
                 const dotColor = dotStyle[status];
                 return (
                     <button
-                        onClick={() => { setEditingContact(contact); setIsFormOpen(true); }}
-                        className="flex flex-col items-start hover:opacity-80 transition-opacity text-left"
+                        onClick={() => handleOpenEdit(contact)}
+                        className="flex flex-col items-start hover:opacity-80 transition-opacity text-left w-full group"
                     >
-                        <span className="flex items-center gap-1.5 font-medium text-content-primary hover:text-accent transition-colors">
+                        <span className="flex items-center gap-1.5 font-medium text-content-primary group-hover:text-accent transition-colors">
                             {contact.resident_full_name || `${contact.first_name} ${contact.last_name}`}
                             {dotColor && <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${dotColor}`} />}
                         </span>
@@ -330,7 +342,7 @@ export default function ContactsPage() {
         <>
             <button
                 className="btn-ghost"
-                onClick={() => { setEditingContact(contact); setIsFormOpen(true); }}
+                onClick={() => handleOpenEdit(contact)}
             >
                 <Pencil className="h-4 w-4" />
             </button>
@@ -451,7 +463,6 @@ export default function ContactsPage() {
                 </div>
             </div>
 
-            {/* Slide Panel Form */}
             <ContactForm
                 isOpen={isFormOpen}
                 onClose={() => {

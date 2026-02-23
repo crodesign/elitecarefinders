@@ -332,7 +332,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                             <button
                                                 type="button"
                                                 onClick={() => setIsPostTypeDropdownOpen(!isPostTypeDropdownOpen)}
-                                                className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md bg-surface-primary border-border hover:bg-surface-hover"
+                                                className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md bg-transparent border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:ring-1 focus:ring-accent"
                                             >
                                                 <span className="truncate mr-2 font-medium">
                                                     {postType ? POST_TYPES.find(t => t.value === postType)?.label : "Select Post Type"}
@@ -341,7 +341,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                             </button>
 
                                             {isPostTypeDropdownOpen && (
-                                                <div className="dropdown-menu absolute z-50 left-0 w-full mt-1 max-h-60 flex flex-col p-1 border border-border bg-surface-primary rounded-md shadow-lg">
+                                                <div className="dropdown-menu absolute z-50 left-0 w-full mt-1 max-h-60 flex flex-col p-1 border-none bg-surface-primary rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/5">
                                                     {POST_TYPES.map((type) => (
                                                         <button
                                                             key={type.value}

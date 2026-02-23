@@ -247,7 +247,7 @@ export default function HomesPage() {
                 <button
                     type="button"
                     onClick={() => handleOpenEdit(home)}
-                    className="flex items-center text-left hover:opacity-80 transition-opacity"
+                    className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
                 >
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         {home.images && home.images.length > 0 ? (
@@ -263,7 +263,7 @@ export default function HomesPage() {
                         )}
                     </span>
                     <div>
-                        <div className="font-medium text-content-primary hover:text-accent transition-colors">
+                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors">
                             {home.displayReferenceNumber ? "Ref: " : ""}{home.title}
                         </div>
                         <div className="text-xs text-content-muted hidden md:block">{home.slug}</div>

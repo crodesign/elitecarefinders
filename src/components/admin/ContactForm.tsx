@@ -31,7 +31,7 @@ interface ContactFormProps {
     contact?: Contact | null;
 }
 
-type TabId = "contact-info" | "resident-info" | "housing" | "care" | "checklist" | "notes";
+type TabId = "contact-info" | "resident-info" | "housing" | "care-needs" | "checklist" | "notes";
 
 export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormProps) {
     const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
@@ -51,7 +51,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
     // Sync activeTab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ["contact-info", "resident-info", "housing", "care", "checklist", "notes"].includes(tab)) {
+        if (tab && ["contact-info", "resident-info", "housing", "care-needs", "checklist", "notes"].includes(tab)) {
             setActiveTab(tab as TabId);
         }
     }, [searchParams]);
@@ -63,10 +63,12 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    // Reset active tab when contact changes (edit vs new)
+    // Reset active tab when contact changes (edit vs new), only if no URL parameter specifies it
     useEffect(() => {
-        setActiveTab(contact ? "notes" : "contact-info");
-    }, [contact?.id]);
+        if (!searchParams.get('tab')) {
+            setActiveTab(contact ? "notes" : "contact-info");
+        }
+    }, [contact?.id, searchParams]);
 
     // Initialize form data from contact
     useEffect(() => {
@@ -198,7 +200,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
             { id: "contact-info", label: "Contact Info", icon: Users },
             { id: "resident-info", label: "Resident Info", icon: User },
             { id: "housing", label: "Housing", icon: Home },
-            { id: "care", label: "Care Needs", icon: Heart },
+            { id: "care-needs", label: "Care Needs", icon: Heart },
             { id: "notes", label: "Notes", icon: FileText },
         ]
         : [
@@ -206,7 +208,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
             { id: "contact-info", label: "Contact Info", icon: Users },
             { id: "resident-info", label: "Resident Info", icon: User },
             { id: "housing", label: "Housing", icon: Home },
-            { id: "care", label: "Care Needs", icon: Heart },
+            { id: "care-needs", label: "Care Needs", icon: Heart },
         ];
 
     const tabs = [...baseTabs];
@@ -360,7 +362,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                             />
                         )}
 
-                        {activeTab === "care" && (
+                        {activeTab === "care-needs" && (
                             <CombinedCareSection
                                 formData={formData}
                                 setFormData={handleFormDataChange}

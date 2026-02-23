@@ -179,7 +179,11 @@ export default function PostsPage() {
             key: "title",
             header: "Post",
             render: (post) => (
-                <div className="flex items-center text-left">
+                <button
+                    type="button"
+                    onClick={() => handleOpenEdit(post)}
+                    className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
+                >
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         <div className="h-[60px] w-[60px] rounded border-2 border-ui-border flex items-center justify-center overflow-hidden">
                             {post.featuredImageUrl ? (
@@ -194,10 +198,10 @@ export default function PostsPage() {
                         </div>
                     </span>
                     <div>
-                        <div className="font-medium text-content-primary">{post.title}</div>
+                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors">{post.title}</div>
                         <div className="text-xs text-content-muted hidden md:block max-w-sm truncate" title={post.excerpt}>{post.excerpt || '—'}</div>
                     </div>
-                </div>
+                </button>
             ),
         },
         {

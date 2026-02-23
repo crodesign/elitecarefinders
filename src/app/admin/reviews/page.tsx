@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon } from "lucide-react";
 import type { Review } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
@@ -13,6 +14,10 @@ export default function ReviewsPage() {
     const supabase = createClient();
     const { showNotification } = useNotification();
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+
     const [reviews, setReviews] = useState<Review[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -23,13 +28,18 @@ export default function ReviewsPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
+    const generateSlug = (review: Review) => {
+        const nameSlug = (review.authorName || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return `${nameSlug}-${review.id.slice(0, 6)}`;
+    };
+
     useEffect(() => {
         fetchReviews();
 
         // Handle OAuth success/error callbacks
-        const searchParams = new URLSearchParams(window.location.search);
-        const successParam = searchParams.get('success');
-        const errorParam = searchParams.get('error');
+        const searchParamsLocal = new URLSearchParams(window.location.search);
+        const successParam = searchParamsLocal.get('success');
+        const errorParam = searchParamsLocal.get('error');
 
         if (successParam) {
             showNotification('Success', successParam);
@@ -40,6 +50,34 @@ export default function ReviewsPage() {
             window.history.replaceState(null, '', window.location.pathname);
         }
     }, [showNotification]);
+
+    // Handle URL query for edit
+    useEffect(() => {
+        if (reviews.length === 0) return;
+
+        const editId = searchParams.get('edit');
+        const action = searchParams.get('action');
+
+        if (action === 'create') {
+            setEditingReview({ status: 'pending', rating: 5, content: '', authorName: '' });
+            setIsCreating(true);
+            router.replace('/admin/reviews', { scroll: false });
+        } else if (editId) {
+            const review = reviews.find(r => r.id === editId || generateSlug(r) === editId);
+            if (review) {
+                setEditingReview({ ...review });
+                setIsCreating(false);
+            } else {
+                router.replace('/admin/reviews', { scroll: false });
+            }
+        }
+    }, [searchParams, reviews, router]);
+
+    const handleOpenEdit = (review: Review) => {
+        setEditingReview({ ...review });
+        setIsCreating(false);
+        router.push(`/admin/reviews?edit=${generateSlug(review)}`, { scroll: false });
+    };
 
     const fetchReviews = async () => {
         try {
@@ -96,12 +134,35 @@ export default function ReviewsPage() {
             };
 
             if (isCreating) {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('reviews')
-                    .insert([reviewData]);
+                    .insert([reviewData])
+                    .select()
+                    .single();
 
                 if (error) throw error;
                 showNotification("Success", "Review added successfully");
+
+                if (data) {
+                    const mappedNewReview: Review = {
+                        id: data.id,
+                        authorName: data.author_name,
+                        rating: data.rating,
+                        content: data.content,
+                        entityId: data.entity_id,
+                        status: data.status,
+                        createdAt: data.created_at,
+                        source: data.source,
+                        sourceLink: data.source_link,
+                        authorPhotoUrl: data.author_photo_url,
+                        externalId: data.external_id
+                    };
+                    const currentParams = new URLSearchParams(searchParams.toString());
+                    currentParams.delete('action');
+                    currentParams.set('edit', generateSlug(mappedNewReview));
+                    router.replace(`/admin/reviews?${currentParams.toString()}`, { scroll: false });
+                }
+
             } else {
                 const { error } = await supabase
                     .from('reviews')
@@ -110,9 +171,14 @@ export default function ReviewsPage() {
 
                 if (error) throw error;
                 showNotification("Success", "Review updated successfully");
+
+                const currentParams = new URLSearchParams(searchParams.toString());
+                currentParams.set('edit', generateSlug(editingReview as Review));
+                router.replace(`/admin/reviews?${currentParams.toString()}`, { scroll: false });
             }
 
-            setEditingReview(null);
+            // Let fetchReviews reload the state but also close the current dirty form handling
+            // Do not null out editingReview here so the drawer stays open on save like other forms
             fetchReviews();
         } catch (error: any) {
             console.error('Error saving review:', error);
@@ -196,24 +262,28 @@ export default function ReviewsPage() {
             key: "author",
             header: "Author",
             render: (review) => (
-                <div className="flex items-center">
+                <button
+                    type="button"
+                    onClick={() => handleOpenEdit(review)}
+                    className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
+                >
                     {review.authorPhotoUrl ? (
                         <img
                             src={review.authorPhotoUrl}
                             alt={review.authorName}
-                            className="h-8 w-8 rounded-full object-cover hidden md:block"
+                            className="h-8 w-8 rounded-full object-cover hidden md:block flex-shrink-0"
                             referrerPolicy="no-referrer"
                         />
                     ) : (
-                        <div className="h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center hidden md:flex">
+                        <div className="h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center hidden md:flex flex-shrink-0">
                             <span className="text-sm font-medium text-content-primary">
                                 {review.authorName.charAt(0)}
                             </span>
                         </div>
                     )}
-                    <div className="md:ml-3 flex flex-col items-start">
-                        <div className="font-medium text-content-primary flex items-center gap-2">
-                            {review.authorName}
+                    <div className="md:ml-3 flex flex-col items-start w-full min-w-0">
+                        <div className="font-medium text-content-primary flex items-center gap-2 group-hover:text-accent transition-colors truncate w-full">
+                            <span className="truncate">{review.authorName}</span>
                             {review.source === 'google' && (
                                 <svg className="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -227,7 +297,7 @@ export default function ReviewsPage() {
                             {new Date(review.createdAt).toLocaleDateString()}
                         </div>
                     </div>
-                </div>
+                </button>
             ),
         },
         {
@@ -272,10 +342,7 @@ export default function ReviewsPage() {
         <>
             <button
                 className="btn-ghost"
-                onClick={() => {
-                    setEditingReview({ ...review });
-                    setIsCreating(false);
-                }}
+                onClick={() => handleOpenEdit(review)}
                 title="Edit Review"
             >
                 <Pencil className="h-4 w-4" />
@@ -388,7 +455,10 @@ export default function ReviewsPage() {
             {/* Edit/Create Review Slide Panel */}
             <SlidePanel
                 isOpen={!!editingReview}
-                onClose={() => setEditingReview(null)}
+                onClose={() => {
+                    setEditingReview(null);
+                    router.push('/admin/reviews', { scroll: false });
+                }}
                 title={isCreating ? "Add Review" : "Edit Review"}
                 subtitle={editingReview?.authorName ? `By ${editingReview.authorName}` : ""}
                 headerChildren={
