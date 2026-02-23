@@ -83,13 +83,18 @@ export interface RecipeIngredient {
     name: string;
 }
 
+export interface RecipeInstruction {
+    text: string;
+    image?: string;
+}
+
 export interface PostMetadata {
     // Shared or general metadata
     // For News & Events
     links?: NewsLink[];
     // For Recipes
     ingredients?: (string | RecipeIngredient)[];
-    instructions?: string[];
+    instructions?: (string | RecipeInstruction)[];
     prepTime?: number;
     cookTime?: number;
     yield?: string;

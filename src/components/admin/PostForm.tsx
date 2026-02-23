@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown } from "lucide-react";
+import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
-import type { Post, PostType, PostMetadata, RecipeIngredient } from "@/types";
+import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction } from "@/types";
 import { MediaGallery } from "@/components/admin/media/MediaGallery";
 import { getFolders, createFolder } from "@/lib/services/mediaService";
 import { ensurePostFolder } from "@/lib/services/mediaFolderService";
@@ -52,7 +52,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
     // Metadata fields
     const [links, setLinks] = useState<{ text: string; url: string }[]>([]);
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
-    const [instructions, setInstructions] = useState<string[]>([]);
+    const [instructions, setInstructions] = useState<RecipeInstruction[]>([]);
     const [prepTime, setPrepTime] = useState<string>("");
     const [cookTime, setCookTime] = useState<string>("");
     const [recipeYield, setRecipeYield] = useState<string>("");
@@ -88,8 +88,8 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 const loadedIngredients = (meta.ingredients || []).map(ing => typeof ing === 'string' ? { amount: '', name: ing } : ing)
                 setIngredients(loadedIngredients.length > 0 ? loadedIngredients : [{ amount: '', name: '' }]);
 
-                const loadedInstructions = meta.instructions || [];
-                setInstructions(loadedInstructions.length > 0 ? loadedInstructions : [""]);
+                const loadedInstructions = (meta.instructions || []).map(inst => typeof inst === 'string' ? { text: inst } : inst);
+                setInstructions(loadedInstructions.length > 0 ? loadedInstructions : [{ text: "" }]);
                 setPrepTime(meta.prepTime?.toString() || "");
                 setCookTime(meta.cookTime?.toString() || "");
                 setRecipeYield(meta.yield || "");
@@ -104,7 +104,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
                 setLinks([]);
                 setIngredients([{ amount: '', name: '' }]);
-                setInstructions([""]);
+                setInstructions([{ text: "" }]);
                 setPrepTime("");
                 setCookTime("");
                 setRecipeYield("");
@@ -228,7 +228,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 metadata.links = links.filter(l => l.text.trim() || l.url.trim());
             } else if (postType === 'recipes') {
                 metadata.ingredients = ingredients.filter(i => i.amount.trim() || i.name.trim());
-                metadata.instructions = instructions.filter(i => i.trim());
+                metadata.instructions = instructions.filter(i => i.text.trim());
                 metadata.prepTime = prepTime ? parseInt(prepTime) : undefined;
                 metadata.cookTime = cookTime ? parseInt(cookTime) : undefined;
                 metadata.yield = recipeYield;
@@ -444,13 +444,63 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                 <div className="bg-surface-input rounded-lg p-4">
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Prep (m)</label>
-                                            <input type="number" value={prepTime} onChange={(e) => setPrepTime(e.target.value)} className="form-input text-sm w-16 h-8 rounded-md px-2 text-center" placeholder="15" />
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Prep Time</label>
+                                            <div className="relative w-28 shrink-0">
+                                                <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                                <input
+                                                    type="number"
+                                                    value={prepTime}
+                                                    onChange={(e) => setPrepTime(e.target.value)}
+                                                    className="w-full rounded-md pl-7 pr-7 py-1 h-8 text-sm text-left focus:outline-none transition-colors overflow-hidden [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                                    placeholder="15"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPrepTime(String((parseInt(prepTime) || 0) + 1))}
+                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
+                                                    >
+                                                        <ChevronUp className="h-2 w-2" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPrepTime(String(Math.max(0, (parseInt(prepTime) || 0) - 1)))}
+                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
+                                                    >
+                                                        <ChevronDown className="h-2 w-2" />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Cook (m)</label>
-                                            <input type="number" value={cookTime} onChange={(e) => setCookTime(e.target.value)} className="form-input text-sm w-16 h-8 rounded-md px-2 text-center" placeholder="45" />
+                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Cook Time</label>
+                                            <div className="relative w-28 shrink-0">
+                                                <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                                <input
+                                                    type="number"
+                                                    value={cookTime}
+                                                    onChange={(e) => setCookTime(e.target.value)}
+                                                    className="w-full rounded-md pl-7 pr-7 py-1 h-8 text-sm text-left focus:outline-none transition-colors overflow-hidden [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                                    placeholder="45"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCookTime(String((parseInt(cookTime) || 0) + 1))}
+                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
+                                                    >
+                                                        <ChevronUp className="h-2 w-2" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setCookTime(String(Math.max(0, (parseInt(cookTime) || 0) - 1)))}
+                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
+                                                    >
+                                                        <ChevronDown className="h-2 w-2" />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg">
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Yield</label>
@@ -470,7 +520,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         <label className="text-sm font-medium text-content-secondary mb-2 block shrink-0">Ingredients</label>
                                         <div className="overflow-y-auto flex-1 pr-1">
                                             {ingredients.map((ing, idx) => (
-                                                <div key={idx} className="group flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-surface-input transition-colors">
+                                                <div key={idx} className="group flex items-center gap-2 px-2 py-1 rounded-lg bg-surface-input transition-colors mb-1">
                                                     <div className="flex-1 flex gap-2">
                                                         <input
                                                             type="text"
@@ -487,7 +537,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                                             placeholder="Ingredient (e.g. Olive Oil)"
                                                         />
                                                     </div>
-                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center gap-1 transition-opacity">
                                                         <button
                                                             type="button"
                                                             onClick={() => {
@@ -495,7 +545,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                                                 newIngredients.splice(idx + 1, 0, { amount: "", name: "" });
                                                                 setIngredients(newIngredients);
                                                             }}
-                                                            className="p-1 text-content-muted hover:text-accent hover:bg-accent/10 rounded flex-shrink-0"
+                                                            className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
                                                             title="Insert Ingredient Below"
                                                         >
                                                             <Plus className="w-4 h-4" />
@@ -525,32 +575,61 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         <label className="text-sm font-medium text-content-secondary mb-2 block shrink-0">Steps</label>
                                         <div className="space-y-3 overflow-y-auto flex-1 pr-1">
                                             {instructions.map((inst, idx) => (
-                                                <div key={idx} className="group flex items-start gap-2 px-3 py-2 rounded-lg hover:bg-surface-input transition-colors">
+                                                <div key={idx} className="group flex items-start gap-2 px-2 py-2 rounded-lg bg-surface-input transition-colors mb-2">
                                                     <div className="flex-1 flex gap-2">
                                                         <div className="w-6 h-8 flex items-center justify-center shrink-0">
                                                             <span className="text-sm font-medium text-content-muted">{idx + 1}.</span>
                                                         </div>
+                                                        <div className="flex flex-col gap-2 w-20 shrink-0">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const url = window.prompt("Enter image URL for this step (or leave blank to remove):", inst.image || "");
+                                                                    if (url !== null) {
+                                                                        const newInst = [...instructions];
+                                                                        newInst[idx] = { ...inst, image: url ? url : undefined };
+                                                                        setInstructions(newInst);
+                                                                    }
+                                                                }}
+                                                                className="h-20 w-full border border-dashed border-ui-border rounded-md flex flex-col items-center justify-center gap-1 hover:bg-surface-hover/50 hover:border-accent text-content-muted hover:text-accent transition-colors overflow-hidden group/img relative bg-surface-primary"
+                                                                title="Add step image"
+                                                            >
+                                                                {inst.image ? (
+                                                                    <>
+                                                                        <img src={inst.image} alt={`Step ${idx + 1}`} className="w-full h-full object-cover" />
+                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                                                                            <ImageIcon className="w-4 h-4 text-white" />
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <ImageIcon className="w-5 h-5" />
+                                                                        <span className="text-[10px] uppercase font-medium">Image</span>
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </div>
                                                         <textarea
-                                                            value={inst}
+                                                            value={inst.text}
                                                             onChange={(e) => {
                                                                 const newInst = [...instructions];
-                                                                newInst[idx] = e.target.value;
+                                                                newInst[idx] = { ...inst, text: e.target.value };
                                                                 setInstructions(newInst);
                                                             }}
-                                                            className="form-input text-sm w-full min-h-[32px] rounded-md px-3 py-1.5 resize-y"
-                                                            rows={2}
+                                                            className="form-input text-sm w-full min-h-[5rem] rounded-md px-3 py-2 resize-y"
+                                                            rows={3}
                                                             placeholder={`Step ${idx + 1} instructions...`}
                                                         />
                                                     </div>
-                                                    <div className="flex items-center gap-1 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                                    <div className="flex items-center gap-1 pt-0.5 transition-opacity whitespace-nowrap">
                                                         <button
                                                             type="button"
                                                             onClick={() => {
                                                                 const newInstructions = [...instructions];
-                                                                newInstructions.splice(idx + 1, 0, "");
+                                                                newInstructions.splice(idx + 1, 0, { text: "" });
                                                                 setInstructions(newInstructions);
                                                             }}
-                                                            className="p-1 text-content-muted hover:text-accent hover:bg-accent/10 rounded flex-shrink-0"
+                                                            className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
                                                             title="Insert Step Below"
                                                         >
                                                             <Plus className="w-4 h-4" />
@@ -587,12 +666,12 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                             shortLabel: "Image Gallery",
                                             emptyText: "Select an image below to add it to the Post Gallery.",
                                             urls: postImages,
-                                            onChange: (urls) => {
+                                            onChange: (urls: string[]) => {
                                                 setPostImages(urls);
                                             }
                                         }
                                     ]}
-                                    onMediaSelect={(item) => {
+                                    onMediaSelect={(item: { url: string }) => {
                                         if (postType === 'recipes' && !postImages.includes(item.url)) {
                                             setPostImages([item.url]); // Replace with selected image if it's strictly featured
                                         }
