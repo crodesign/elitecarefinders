@@ -7,9 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useContacts } from "@/hooks/useContacts";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAutoSave } from "@/hooks/useAutoSave";
 import { buildContactEditUrl } from "@/lib/slugUtils";
-import { SaveStatusIndicator } from "./SaveStatusIndicator";
 import { useUserRole } from "@/hooks/useUserRole";
 import ContactProgressBar from "./ContactProgressBar";
 import ContactInfoSection from "./contact-form/ContactInfoSection";
@@ -53,6 +51,7 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<any>(initialData || (isNew ? { status: "Active" } : {}));
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Initialize form data from initialData if provided
     useEffect(() => {
@@ -266,89 +265,26 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
         return contactData;
     }, []);
 
-    // Auto-save functionality
-    const handleAutoSave = useCallback(async (data: any) => {
-        console.log('handleAutoSave called, isNew:', isNew, 'loading:', loading);
-
-        // Skip auto-save during loading or if no data
-        if (loading || !data) {
-            return;
-        }
-
-        try {
-            if (isNew) {
-                // For new contacts, we need to create first
-                console.log('Creating new contact');
-                const savedContact = await createContact(convertFormToContact(data));
-
-                // Update URL to edit mode after creation
-                const residentName = data.residentFullName || data.resident_full_name || data.contactName;
-                router.replace(buildContactEditUrl(savedContact.id, residentName, {
-                    ...(fromPage ? { from: fromPage } : {}),
-                    tab: activeTab,
-                }));
-                return savedContact;
-            } else {
-                // Update existing contact
-                if (!contactId) return; // Should not happen if isNew is false
-                console.log('Updating existing contact:', contactId);
-                const result = await updateContact(contactId, convertFormToContact(data));
-                console.log('Update successful');
-                return result;
-            }
-        } catch (error) {
-            console.error('Auto-save failed:', error);
-            throw error;
-        }
-    }, [isNew, createContact, updateContact, contactId, router, activeTab, convertFormToContact, fromPage, loading]);
-
-    const autoSave = useAutoSave({
-        debounceMs: 2000,
-        onSave: handleAutoSave,
-        onError: (error) => {
-            toast({
-                title: "Auto-save failed",
-                description: "Your changes couldn't be saved automatically. Please try the manual save button.",
-                variant: "destructive",
-            });
-        },
-    });
-
-    // Enhanced setFormData that triggers auto-save
+    // Enhanced setFormData
     const handleFormDataChange = useCallback((newData: any) => {
-        // Don't trigger auto-save during initial loading
-        if (loading) {
-            setFormData(typeof newData === 'function' ? (prevData: any) => newData(prevData) : newData);
-            return;
-        }
-
         setFormData((prevData: any) => {
             const updatedData = typeof newData === 'function' ? newData(prevData) : newData;
 
-            // Only trigger auto-save if data actually changed and we have minimum required fields
-            const hasChanged = JSON.stringify(prevData) !== JSON.stringify(updatedData);
-            const hasMinimumFields = !!(updatedData.contactName && updatedData.contactName.trim() &&
-                (updatedData.contactPhone || updatedData.contactEmail));
-            const shouldSave = hasChanged && (!isNew || hasMinimumFields);
-
-            if (shouldSave) {
-                setHasUnsavedChanges(true);
-                // Use setTimeout to prevent blocking the state update
-                setTimeout(() => {
-                    if (!loading) {
-                        autoSave.save(updatedData);
-                    }
-                }, 100);
+            if (!loading) {
+                const hasChanged = JSON.stringify(prevData) !== JSON.stringify(updatedData);
+                if (hasChanged) {
+                    setHasUnsavedChanges(true);
+                }
             }
 
             return updatedData;
         });
-    }, [autoSave, loading, isNew]);
+    }, [loading]);
 
     // Prevent navigation if there are unsaved changes
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (hasUnsavedChanges && autoSave.status !== 'saved') {
+            if (hasUnsavedChanges) {
                 e.preventDefault();
                 e.returnValue = '';
             }
@@ -356,18 +292,37 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
 
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }, [hasUnsavedChanges, autoSave.status]);
+    }, [hasUnsavedChanges]);
 
     const handleSave = async () => {
-        try {
-            // Force immediate save
-            await autoSave.saveNow();
-            setHasUnsavedChanges(false);
+        if (!formData) return;
 
-            toast({
-                title: "Contact saved successfully",
-                description: "All changes have been saved.",
-            });
+        setIsSaving(true);
+        try {
+            const payload = convertFormToContact(formData);
+
+            if (isNew) {
+                const savedContact = await createContact(payload);
+                setHasUnsavedChanges(false);
+                toast({
+                    title: "Contact Created",
+                    description: "The new contact has been created successfully.",
+                });
+                // Update URL to edit mode after creation
+                const residentName = formData.residentFullName || formData.resident_full_name || formData.contactName;
+                router.replace(buildContactEditUrl(savedContact.id, residentName, {
+                    ...(fromPage ? { from: fromPage } : {}),
+                    tab: activeTab,
+                }));
+            } else {
+                if (!contactId) return;
+                await updateContact(contactId, payload);
+                setHasUnsavedChanges(false);
+                toast({
+                    title: "Contact saved successfully",
+                    description: "All changes have been saved.",
+                });
+            }
         } catch (error) {
             console.error('Error saving contact:', error);
             toast({
@@ -375,6 +330,8 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                 description: "There was an error saving the contact. Please try again.",
                 variant: "destructive",
             });
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -436,13 +393,20 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                     <div className="flex items-center gap-2">
                                         {isInvoiceEditMode ? <Files className="h-4 w-4" /> : <Users className="h-4 w-4" />}
                                         <h1 className="text-xl font-normal truncate">
-                                            {isInvoiceEditMode ? (formData as any)?.contactName || 'Contact' : (isNew ? 'New Contact' : `${(formData as any)?.contactName || 'Contact'}`)}
+                                            {isInvoiceEditMode ? 'Edit Invoice Contact' : (isNew ? 'New Contact' : 'Edit Contact')}
                                         </h1>
                                     </div>
-                                    {/* Resident Name under contact name at 80% font size */}
-                                    {!isNew && (formData as any)?.residentFullName && (formData as any)?.residentFullName !== (formData as any)?.contactName && (
-                                        <div className="ml-6 text-base">
-                                            <span className="font-normal text-muted-foreground">({(formData as any)?.residentFullName})</span>
+                                    {!isNew && (
+                                        <div className="ml-6 mt-0.5 text-sm flex items-center gap-1.5 truncate">
+                                            {((formData as any)?.residentFullName && (formData as any)?.residentFullName !== (formData as any)?.contactName) ? (
+                                                <>
+                                                    <span className="font-medium text-content-primary">{(formData as any)?.residentFullName}</span>
+                                                    <span className="text-content-muted text-xs">•</span>
+                                                    <span className="font-normal text-content-muted">{(formData as any)?.contactName}</span>
+                                                </>
+                                            ) : (
+                                                <span className="font-medium text-content-primary">{(formData as any)?.contactName || 'Unknown Resident'}</span>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -451,19 +415,19 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                 <Button
                                     variant={hasUnsavedChanges ? "default" : "outline"}
                                     onClick={handleSave}
+                                    disabled={!hasUnsavedChanges || isSaving}
                                     className="flex flex-col items-center gap-1 h-auto py-2 px-2 shrink-0 min-w-[80px]"
                                 >
                                     <div className="flex items-center gap-1.5">
-                                        <Save className="h-4 w-4" />
-                                        <span className="text-sm">{hasUnsavedChanges ? "Save" : "Saved"}</span>
+                                        {isSaving ? (
+                                            <span className="text-sm">Saving...</span>
+                                        ) : (
+                                            <>
+                                                <Save className="h-4 w-4" />
+                                                <span className="text-sm">{hasUnsavedChanges ? "Save" : "Saved"}</span>
+                                            </>
+                                        )}
                                     </div>
-                                    <SaveStatusIndicator
-                                        status={autoSave.status}
-                                        lastSaved={autoSave.lastSaved}
-                                        queuedCount={autoSave.queuedCount}
-                                        onRetry={autoSave.saveNow}
-                                        className="scale-75"
-                                    />
                                 </Button>
                             </div>
 
@@ -569,13 +533,20 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                     <div className="flex items-center gap-3">
                                         {isInvoiceEditMode ? <Files className="h-6 w-6" /> : <Users className="h-6 w-6" />}
                                         <h1 className="text-3xl font-light">
-                                            {isInvoiceEditMode ? (formData as any)?.contactName || 'Contact' : (isNew ? 'New Contact' : `${(formData as any)?.contactName || 'Contact'}`)}
+                                            {isInvoiceEditMode ? 'Edit Invoice Contact' : (isNew ? 'New Contact' : 'Edit Contact')}
                                         </h1>
                                     </div>
-                                    {/* Resident Name under contact name at 80% font size */}
-                                    {!isNew && (formData as any)?.residentFullName && (formData as any)?.residentFullName !== (formData as any)?.contactName && (
-                                        <div className="ml-10 text-xl font-light text-muted-foreground">
-                                            ({(formData as any)?.residentFullName})
+                                    {!isNew && (
+                                        <div className="ml-10 mt-1 flex items-center gap-2">
+                                            {((formData as any)?.residentFullName && (formData as any)?.residentFullName !== (formData as any)?.contactName) ? (
+                                                <>
+                                                    <span className="text-lg font-medium text-content-primary">{(formData as any)?.residentFullName}</span>
+                                                    <span className="text-content-muted">•</span>
+                                                    <span className="text-lg font-light text-content-muted">{(formData as any)?.contactName}</span>
+                                                </>
+                                            ) : (
+                                                <span className="text-lg font-medium text-content-primary">{(formData as any)?.contactName || 'Unknown Resident'}</span>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -586,19 +557,17 @@ const ContactEditor = ({ contactId, initialData }: ContactEditorProps) => {
                                 <Button
                                     variant={hasUnsavedChanges ? "default" : "outline"}
                                     onClick={handleSave}
-                                    className="flex items-center gap-2 min-w-[140px]"
+                                    disabled={!hasUnsavedChanges || isSaving}
+                                    className="flex items-center justify-center gap-2 min-w-[140px]"
                                 >
-                                    <Save className="h-4 w-4" />
-                                    <div className="flex flex-col items-start">
-                                        <span className="text-sm font-medium">{hasUnsavedChanges ? "Save Changes" : "Saved"}</span>
-                                        <SaveStatusIndicator
-                                            status={autoSave.status}
-                                            lastSaved={autoSave.lastSaved}
-                                            queuedCount={autoSave.queuedCount}
-                                            onRetry={autoSave.saveNow}
-                                            className="p-0 border-0 bg-transparent h-auto text-[10px]"
-                                        />
-                                    </div>
+                                    {isSaving ? (
+                                        <span className="text-sm font-medium">Saving...</span>
+                                    ) : (
+                                        <>
+                                            <Save className="h-4 w-4" />
+                                            <span className="text-sm font-medium">{hasUnsavedChanges ? (isNew ? "Create Contact" : "Save Changes") : "Saved"}</span>
+                                        </>
+                                    )}
                                 </Button>
                             </div>
                         </div>

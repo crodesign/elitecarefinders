@@ -52,7 +52,7 @@ export function MediaTile({
     onMediaSelect,
     isGalleryImage = false,
     isFeaturedImage = false,
-    captionClassName = 'bg-surface-caption',
+    captionClassName = 'bg-[var(--media-caption-bg)] text-[var(--text-primary)]',
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
@@ -213,11 +213,11 @@ export function MediaTile({
                 {/* Image info overlay in top left */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                     {showDimensions && (
-                        <div className="px-1.5 py-0.5 rounded-lg bg-surface-secondary/80 text-content-secondary text-[10px] flex items-center gap-1.5 backdrop-blur-sm">
+                        <div className="px-1.5 py-0.5 rounded-lg bg-[var(--media-dim-label-bg)] text-[var(--media-dim-label-text)] shadow-sm text-[10px] flex items-center gap-1.5 backdrop-blur-md">
                             {item.width && item.height && (
                                 <span>{item.width}×{item.height}</span>
                             )}
-                            <span className="uppercase">{item.mimeType.split("/")[1]}</span>
+                            <span className="uppercase font-medium">{item.mimeType.split("/")[1]}</span>
                         </div>
                     )}
                     {isFeaturedImage && (
@@ -248,7 +248,9 @@ export function MediaTile({
                         }}
                         className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected || isBulkSelected
                             ? "bg-accent text-white"
-                            : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
+                            : onMediaSelect
+                                ? "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
+                                : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
                             }`}
                     >
                         {(isSelected || isBulkSelected) ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
@@ -257,9 +259,9 @@ export function MediaTile({
                     <button
                         type="button"
                         onClick={handleTileClick}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected
+                        className={`absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-sm transition-all ${isSelected
                             ? "bg-accent text-white"
-                            : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
+                            : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-accent hover:text-white"
                             }`}
                     >
                         {isSelected ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
@@ -280,9 +282,9 @@ export function MediaTile({
                         onChange={(e) => setCaption(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Add caption..."
-                        className={`flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted focus:outline-none ${isSelected && !onMediaSelect
-                            ? "bg-surface-input rounded px-2 py-1.5"
-                            : "bg-transparent"
+                        className={`flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted focus:outline-none focus:bg-surface-input focus:ring-1 focus:ring-accent rounded-md px-1.5 transition-colors ${isSelected && !onMediaSelect
+                            ? "bg-surface-input py-1.5"
+                            : "bg-transparent py-0"
                             }`}
                     />
                     {/* Only show Save button when NOT in edit mode and has changes */}

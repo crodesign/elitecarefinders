@@ -27,7 +27,7 @@ import {
 import { Logo, LogoIcon } from "@/components/icons/Logo";
 import { getTaxonomies, updateTaxonomy } from "@/lib/services/taxonomyService";
 import { TaxonomyForm } from "./TaxonomyForm";
-import { StyleManagerPanel } from "./StyleManagerPanel";
+import { ProfilePanel } from "./ProfilePanel";
 import type { Taxonomy } from "@/types";
 
 const navigation = [
@@ -39,7 +39,7 @@ const navigation = [
     { name: "Homes", href: "/admin/homes", icon: Home, hasAddButton: true },
     { name: "Facilities", href: "/admin/facilities", icon: Building2, hasAddButton: true },
     { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
-    { name: "Blog", href: "/admin/blog", icon: FileText },
+    { name: "Posts", href: "/admin/posts", icon: FileText, hasAddButton: true },
     // { name: "Taxonomies", href: "/admin/taxonomies", icon: Tags }, // Moved to Settings menu
 ];
 
@@ -63,13 +63,13 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
     const { mode } = useTheme();
     const isLight = mode === 'light';
     const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-    const [showStyleManager, setShowStyleManager] = useState(false);
     const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
     const { handleNavigation } = useUnsavedChanges();
     const { user, signOut, canAccessSettings, canManageUsers, isSystemAdmin } = useAuth();
 
     const currentTaxonomyId = searchParams.get('id');
     const manageTaxonomyId = searchParams.get('manage_taxonomy');
+    const viewProfile = searchParams.get('view_profile') === 'true';
     const activeTaxonomy = taxonomies.find(t => t.id === currentTaxonomyId);
     const managingTaxonomy = taxonomies.find(t => t.id === manageTaxonomyId);
 
@@ -118,6 +118,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
     return (
         <aside
+            id="admin-sidebar"
             className={`h-screen bg-surface-secondary transition-all duration-300 flex flex-col relative overflow-hidden ${collapsed ? "w-20" : "w-64"
                 }`}
         >
@@ -160,9 +161,9 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             {/* Collapse Button - hidden on mobile */}
             <button
                 onClick={onToggle}
-                className="hidden md:flex absolute top-6 right-0 z-[100] h-6 w-6 items-center justify-center text-content-muted hover:text-accent hover:bg-accent/10 transition-colors shadow-lg"
+                className="hidden md:flex absolute top-6 right-0 z-[100] h-6 w-6 items-center justify-center text-content-muted hover:text-content-primary transition-colors"
                 style={{
-                    backgroundColor: 'var(--surface-primary)',
+                    backgroundColor: 'var(--surface-tab)',
                     borderRadius: '6px 0 0 6px',
                 }}
             >
@@ -190,13 +191,13 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                         return (
                             <div key={item.name}>
                                 <div className={`relative flex items-center rounded-lg transition-all duration-200 group ${isActive
-                                    ? "bg-surface-hover text-content-primary"
-                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    ? "bg-[var(--surface-tab)] text-content-primary"
+                                    : "text-content-secondary hover:bg-[var(--surface-tab)] hover:text-content-primary"
                                     }`}>
                                     <Link
                                         href={item.href}
                                         onClick={(e) => handleNavClick(e, item.href)}
-                                        className={`flex items-center px-3 py-2.5 text-sm font-medium flex-1`}
+                                        className={`flex items-center px-3 py-2.5 text-sm font-medium flex-1 ${collapsed ? 'justify-center mx-2' : ''}`}
                                     >
                                         <item.icon
                                             className={`h-5 w-5 flex-shrink-0 ${isActive ? "text-accent" : "text-content-muted group-hover:text-content-primary"
@@ -214,10 +215,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                                 e.stopPropagation(); // Stop propagation to parent link
                                                 handleNavClick(e, `${item.href}?action=create`);
                                             }}
-                                            className={`mr-2 p-1 rounded-md transition-colors ${isActive
-                                                ? "text-content-muted hover:text-content-primary hover:bg-surface-hover"
-                                                : `text-content-muted hover:text-content-primary ${isLight ? 'hover:bg-white' : 'hover:bg-surface-hover'}`
-                                                }`}
+                                            className={`mr-2 p-1 rounded-md transition-colors text-content-muted hover:text-content-primary hover:bg-surface-secondary`}
                                         >
                                             <Plus className="h-4 w-4" />
                                         </Link>
@@ -233,9 +231,17 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             <div className="flex-none bg-surface-card p-4 relative z-30">
                 <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
                     <Link
-                        href="/admin/profile"
-                        onClick={(e) => handleNavClick(e, "/admin/profile")}
-                        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg transition-colors hover:bg-surface-hover ${collapsed ? "justify-center p-1" : "p-1 -m-1"}`}
+                        href={`${pathname}?${new URLSearchParams({ ...Object.fromEntries(searchParams.entries()), view_profile: 'true' }).toString()}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (window.innerWidth < 768 && onMobileClose) {
+                                onMobileClose();
+                            }
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.set('view_profile', 'true');
+                            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                        }}
+                        className={`flex items-center gap-3 flex-1 min-w-0 rounded-lg transition-colors hover:bg-[var(--surface-tab)] ${collapsed ? "justify-center p-1" : "p-1 -m-1"}`}
                     >
                         {user?.profile?.photo_url ? (
                             <Image
@@ -297,7 +303,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             {/* Settings Menu - Slides up from bottom */}
             {!collapsed && (
                 <div
-                    className={`absolute inset-x-0 bottom-0 shadow-2xl z-20 overflow-hidden rounded-t-xl border-t border-ui-border
+                    className={`absolute inset-x-0 bottom-0 shadow-2xl z-20 overflow-hidden rounded-t-xl
                         transition-transform duration-300 ease-out
                         ${showSettingsMenu ? 'translate-y-0' : 'translate-y-full pointer-events-none'}`}
                     style={{
@@ -307,7 +313,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                         WebkitBackdropFilter: 'blur(16px)',
                     }}
                 >
-                    <div className="flex items-center justify-between px-4 py-3 bg-black/[0.04]">
+                    <div className="flex items-center justify-between px-4 py-3 bg-surface-card">
                         <h3 className="text-xs font-semibold text-content-secondary uppercase tracking-wider">
                             Settings
                         </h3>
@@ -375,25 +381,9 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Users
                         </Link>
-                        <button
-                            onClick={() => {
-                                setShowStyleManager(true);
-                                setShowSettingsMenu(false);
-                            }}
-                            className={`group flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-content-secondary hover:bg-surface-hover hover:text-content-primary`}
-                        >
-                            <Palette className="h-5 w-5 mr-3 flex-shrink-0 text-content-muted group-hover:text-content-primary" />
-                            Style Manager
-                        </button>
                     </div>
                 </div>
             )}
-
-            {/* Style Manager Overlay */}
-            <StyleManagerPanel
-                isOpen={showStyleManager}
-                onClose={() => setShowStyleManager(false)}
-            />
 
             {/* Global Taxonomy Manager Overlay */}
             {managingTaxonomy && (
@@ -417,6 +407,17 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                     offsetSidebar={true}
                 />
             )}
+
+            {/* Profile Panel Overlay */}
+            <ProfilePanel
+                isOpen={viewProfile}
+                onClose={() => {
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.delete('view_profile');
+                    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                }}
+                offsetSidebar={true}
+            />
         </aside>
     );
 }

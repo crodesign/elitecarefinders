@@ -46,8 +46,7 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
                     e.stopPropagation();
                     onRemove(url);
                 }}
-                className="absolute top-1 right-1 p-1 bg-surface-secondary/80 text-content-primary opacity-0 group-hover:opacity-100 transition-opacity rounded-md hover:bg-red-500 cursor-pointer"
-                title="Remove"
+                className="absolute top-1 right-1 p-1 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 transition-all rounded-md hover:!bg-accent hover:text-white cursor-pointer"
             >
                 <X className="h-3 w-3" />
             </button>

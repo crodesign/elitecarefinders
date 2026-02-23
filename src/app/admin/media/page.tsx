@@ -285,24 +285,66 @@ export default function MediaPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Handle ?folder=folder-slug URL parameter for deep linking
+    // Handle ?folder=folder-slug URL parameter for deep linking, OR default folder preference
     useEffect(() => {
         const folderSlug = searchParams.get('folder');
-        if (folderSlug && folders.length > 0) {
+        if (folders.length === 0) return;
+
+        let targetFolder: MediaFolder | null = null;
+
+        if (folderSlug) {
             // Convert slug back to original path
             const folderPath = slugToPath(folderSlug, folders);
             if (folderPath) {
-                const folder = findFolderByPath(folders, folderPath);
-                if (folder && folder !== selectedFolder) {
-                    setSelectedFolder(folder);
-                    setSelectedItemId(null);
+                targetFolder = findFolderByPath(folders, folderPath);
+            }
+        } else if (currentUser?.profile?.default_media_folder_id) {
+            // No slug, check default preference
+            targetFolder = findFolderById(folders, currentUser.profile.default_media_folder_id);
+            if (targetFolder) {
+                // If the target is the Hawaii state folder, auto-select Oahu
+                if (targetFolder.slug === 'hawaii') {
+                    const oahu = targetFolder.children?.find(c => c.name === 'Oahu');
+                    if (oahu) {
+                        targetFolder = oahu;
+                    }
                 }
-            } else {
-                // Folder not found, clear the parameter
-                router.replace('/admin/media', { scroll: false });
+            }
+
+            // If we found the default folder, push its slug to the URL so the deep link pattern holds
+            if (targetFolder) {
+                router.replace(`/admin/media?folder=${pathToSlug(targetFolder.path)}`, { scroll: false });
+                return; // The router replace will trigger this effect again with the new slug
             }
         }
-    }, [searchParams, folders, selectedFolder, router]);
+
+        if (targetFolder && targetFolder !== selectedFolder) {
+            setSelectedFolder(targetFolder);
+            setSelectedItemId(null);
+
+            // Sync the state selection to match the deep-linked folder so the tree view renders
+            let rootStateId = targetFolder.stateId;
+            if (!rootStateId && targetFolder.parentId) {
+                // Traverse up the tree to find the stateId from a parent
+                let currentParentId: string | undefined = targetFolder.parentId;
+                while (currentParentId) {
+                    const parent = findFolderById(folders, currentParentId);
+                    if (parent?.stateId) {
+                        rootStateId = parent.stateId;
+                        break;
+                    }
+                    currentParentId = parent?.parentId;
+                }
+            }
+
+            if (rootStateId && rootStateId !== selectedStateId) {
+                setSelectedStateId(rootStateId);
+            }
+        } else if (!targetFolder && folderSlug) {
+            // Folder not found, clear the parameter
+            router.replace('/admin/media', { scroll: false });
+        }
+    }, [searchParams, folders, selectedFolder, selectedStateId, router, currentUser]);
 
     // Reload media when folder changes
     useEffect(() => {
@@ -815,7 +857,7 @@ export default function MediaPage() {
                 <div className="h-full flex gap-6">
                     {/* Folder Tree Sidebar - Desktop */}
                     <div className="hidden md:block w-[296px] flex-shrink-0">
-                        <div className="bg-surface-primary rounded-xl h-full">
+                        <div className="bg-[var(--media-panel-bg)] rounded-xl h-full shadow-sm transition-colors duration-200">
                             <FolderTree
                                 folders={folders}
                                 selectedFolderId={selectedFolder?.id}
@@ -838,7 +880,7 @@ export default function MediaPage() {
                                 className="absolute inset-0 bg-black/60"
                                 onClick={() => setIsMobileFolderOpen(false)}
                             />
-                            <div className="absolute left-0 top-14 bottom-0 w-72 bg-surface-secondary shadow-2xl">
+                            <div className="absolute left-0 top-14 bottom-0 w-72 bg-[var(--media-panel-bg)] shadow-2xl transition-colors duration-200">
                                 <div className="flex items-center justify-between p-4 border-b border-ui-border">
                                     <span className="text-content-primary font-medium">Folders</span>
                                     <button
@@ -866,7 +908,7 @@ export default function MediaPage() {
 
                     {/* Media Grid or Add Media Landing */}
                     <div className="flex-1 min-w-0">
-                        <div className="bg-surface-primary rounded-xl h-full flex flex-col">
+                        <div className="bg-[var(--media-panel-bg)] rounded-xl h-full flex flex-col shadow-sm transition-colors duration-200">
                             {/* Uploader Zone - Animated slide down */}
                             <div
                                 className={`overflow-hidden transition-all duration-500 ease-out ${isUploaderOpen && selectedFolder && canUploadToSelectedFolder
@@ -952,7 +994,6 @@ export default function MediaPage() {
                                                     onToggleBulkSelect={() => handleToggleSelectItem(item.id)}
                                                     isGalleryImage={usedImageUrls.has(item.url)}
                                                     isFeaturedImage={featuredImageUrls.has(item.url)}
-                                                    captionClassName="bg-[#222222]"
                                                 />
                                             </div>
                                         ))}

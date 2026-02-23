@@ -43,13 +43,11 @@ export function Pagination({
             <div className="flex items-center gap-4">
                 {/* Desktop: Full description */}
                 <span className="hidden md:inline text-sm text-content-secondary">
-                    Showing <span className="text-content-primary font-medium">{startItem}</span> to{" "}
-                    <span className="text-content-primary font-medium">{endItem}</span> of{" "}
-                    <span className="text-content-primary font-medium">{totalItems}</span> entries
+                    {startItem}-{endItem} of {totalItems}
                 </span>
                 {/* Mobile: Just total count */}
                 <span className="md:hidden text-sm text-content-secondary">
-                    <span className="text-content-primary font-medium">{totalItems}</span> items
+                    {totalItems}
                 </span>
 
                 {/* Items per page - hidden on mobile */}
@@ -58,14 +56,14 @@ export function Pagination({
                         <button
                             type="button"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="form-input flex items-center gap-2 px-3 py-1.5 text-xs h-8 min-w-[110px]"
+                            className="form-input flex items-center gap-2 px-3 py-1.5 text-xs h-8 min-w-[150px]"
                         >
                             <span className="flex-1 text-left text-content-primary">{itemsPerPage} per page</span>
                             <ChevronDown className={`h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 text-content-muted ${dropdownOpen ? "rotate-180" : ""}`} />
                         </button>
 
                         {dropdownOpen && (
-                            <div className="dropdown-menu absolute left-0 bottom-full mb-1 w-full min-w-[110px] z-50 p-1">
+                            <div className="dropdown-menu absolute left-0 bottom-full mb-1 w-full min-w-[150px] z-50 p-1">
                                 {PER_PAGE_OPTIONS.map((opt) => (
                                     <button
                                         key={opt}
@@ -95,10 +93,10 @@ export function Pagination({
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-content-primary border border-ui-border rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Previous Page"
+                    className="flex items-center justify-center p-1.5 bg-surface-input text-content-primary rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="hidden md:inline">Previous</span>
+                    <ChevronLeft className="h-5 w-5" />
                 </button>
 
                 {/* Page Numbers - hidden on mobile */}
@@ -121,7 +119,7 @@ export function Pagination({
                                 onClick={() => onPageChange(pageNum)}
                                 className={`px-3 py-1.5 text-sm rounded transition-colors ${currentPage === pageNum
                                     ? "bg-accent text-white font-medium"
-                                    : "text-content-primary border border-ui-border hover:bg-surface-hover"
+                                    : "bg-surface-input text-content-primary hover:bg-surface-hover"
                                     }`}
                             >
                                 {pageNum}
@@ -139,10 +137,10 @@ export function Pagination({
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-2 md:px-3 py-1.5 text-sm text-content-primary border border-ui-border rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Next Page"
+                    className="flex items-center justify-center p-1.5 bg-surface-input text-content-primary rounded hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                    <span className="hidden md:inline">Next</span>
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-5 w-5" />
                 </button>
             </div>
         </div>

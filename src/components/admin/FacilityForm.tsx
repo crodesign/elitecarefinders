@@ -182,6 +182,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
+    const [teamImages, setTeamImages] = useState<string[]>([]);
 
     // Fetch Gallery Folder based on taxonomy location (matches Home system)
     useEffect(() => {
@@ -205,7 +206,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     if (entry.id === targetId) return { entry, path: currentPath };
                     if (entry.children) {
                         const found = findEntryAndPath(entry.children, targetId, currentPath);
-                        if (found) return found;
+                        if (found) found;
                     }
                 }
                 return null;
@@ -379,6 +380,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 // Images
                 setImages(facility.images || []);
+                setTeamImages(facility.teamImages || []);
             } else {
                 // Reset
                 setTitle("");
@@ -394,6 +396,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 // Images
                 setImages([]);
+                setTeamImages([]);
                 setZip("");
                 setRoomDetails({ customFields: {} });
                 // Reset contact
@@ -435,6 +438,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 if (street || city || state || zip) return true;
                 if (phone || email) return true;
                 if (images.length > 0) return true;
+                if (teamImages.length > 0) return true;
 
                 // Promotions
                 if (isFeatured || hasFeaturedVideo || isFacilityOfMonth || featuredLabel || facilityOfMonthDescription) return true;
@@ -459,6 +463,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
             if (!arraysEqual(taxonomyIds, facility.taxonomyIds || [])) return true;
             if (!arraysEqual(images, facility.images || [])) return true;
+            if (!arraysEqual(teamImages, (facility as any).teamImages || [])) return true;
 
             if (street !== (facility.address?.street || "")) return true;
             if (city !== (facility.address?.city || "")) return true;
@@ -496,7 +501,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     }, [
         isOpen, facility, setIsDirty,
         title, slug, description, licenseNumber, capacity,
-        status, taxonomyIds, images,
+        status, taxonomyIds, images, teamImages,
         street, city, state, zip, phone, email,
         isFeatured, hasFeaturedVideo, isFacilityOfMonth, featuredLabel, facilityOfMonthDescription,
         roomDetails
@@ -590,6 +595,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     facilityOfMonthDescription: isFacilityOfMonth ? facilityOfMonthDescription : "",
                 } as any),
                 images,
+                teamImages,
                 roomDetails,
             };
             await onSave(formData);
@@ -691,6 +697,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         galleryFolderId={galleryFolderId}
                         images={images}
                         setImages={setImages}
+                        teamImages={teamImages}
+                        setTeamImages={setTeamImages}
                         setIsDirty={setIsDirty}
                         isDirty={isDirty}
                     />
@@ -713,6 +721,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     };
     // Close Handler
     const [showCloseWarning, setShowCloseWarning] = useState(false);
+    const [showDisabledTabAlert, setShowDisabledTabAlert] = useState(false);
 
     const handleCloseInternal = () => {
         if (isDirty) {
@@ -752,6 +761,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
+                                const isDisabled = !facility?.id && tab.id !== 'information';
                                 // Tab color matches the border color exactly
                                 const tabColor = 'var(--surface-tab)';
 
@@ -759,11 +769,19 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                     <button
                                         key={tab.id}
                                         type="button"
-                                        onClick={() => handleTabChange(tab.id)}
+                                        aria-disabled={isDisabled}
+                                        onClick={() => {
+                                            if (isDisabled) {
+                                                setShowDisabledTabAlert(true);
+                                                return;
+                                            }
+                                            handleTabChange(tab.id);
+                                        }}
                                         className={`
                                             relative flex items-center gap-2 px-4 text-sm font-medium
                                             rounded-tl-lg rounded-tr-lg whitespace-nowrap
                                             transition-all duration-150 select-none
+                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                             ${isActive
                                                 ? 'pt-[10px] pb-[11px] text-content-primary z-10'
                                                 : 'pt-2 pb-2 bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-hover'
@@ -794,6 +812,22 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             })}
                         </div>
                         <div className="flex items-center gap-2">
+                            <div className="flex bg-surface-input p-1 rounded-lg mr-2 hidden md:flex">
+                                <button
+                                    type="button"
+                                    onClick={() => { setStatus('published'); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Published
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setStatus('draft'); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Draft
+                                </button>
+                            </div>
                             <button
                                 type="submit"
                                 form="facility-form"
@@ -858,6 +892,16 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 confirmLabel="Discard Changes"
                 cancelLabel="Keep Editing"
                 isDangerous={true}
+            />
+
+            <ConfirmationModal
+                isOpen={showDisabledTabAlert}
+                onClose={() => setShowDisabledTabAlert(false)}
+                onConfirm={() => setShowDisabledTabAlert(false)}
+                title="Action Required"
+                message="Please fill out required fields (Title, Facility Type, Location) and save the Facility before accessing other tabs."
+                confirmLabel="Understood"
+                hideCancel={true}
             />
         </>
     );

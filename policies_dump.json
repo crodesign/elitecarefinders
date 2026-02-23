@@ -1,0 +1,38 @@
+[
+  {
+    "polname": "Public insert contacts",
+    "polcmd": "a",
+    "polqual": null,
+    "polwithcheck": "((first_name IS NOT NULL) AND (first_name <> ''::text) AND ((email IS NOT NULL) OR (phone IS NOT NULL)))"
+  },
+  {
+    "polname": "Admin select contacts",
+    "polcmd": "r",
+    "polqual": "(get_user_role_fast(auth.uid()) = ANY (ARRAY['super_admin'::text, 'system_admin'::text]))",
+    "polwithcheck": null
+  },
+  {
+    "polname": "Admin update contacts",
+    "polcmd": "w",
+    "polqual": "(get_user_role_fast(auth.uid()) = ANY (ARRAY['super_admin'::text, 'system_admin'::text]))",
+    "polwithcheck": "(get_user_role_fast(auth.uid()) = ANY (ARRAY['super_admin'::text, 'system_admin'::text]))"
+  },
+  {
+    "polname": "Admin delete contacts",
+    "polcmd": "d",
+    "polqual": "(get_user_role_fast(auth.uid()) = ANY (ARRAY['super_admin'::text, 'system_admin'::text]))",
+    "polwithcheck": null
+  },
+  {
+    "polname": "Invoice manager select contacts",
+    "polcmd": "r",
+    "polqual": "((get_user_role_fast(auth.uid()) = 'invoice_manager'::text) AND ((care_level = ANY (ARRAY['won'::text, 'closed'::text])) OR (invoice_sent = true) OR (invoice_received = true)))",
+    "polwithcheck": null
+  },
+  {
+    "polname": "Invoice manager update contacts",
+    "polcmd": "w",
+    "polqual": "((get_user_role_fast(auth.uid()) = 'invoice_manager'::text) AND ((care_level = ANY (ARRAY['won'::text, 'closed'::text])) OR (invoice_sent = true) OR (invoice_received = true)))",
+    "polwithcheck": "(get_user_role_fast(auth.uid()) = 'invoice_manager'::text)"
+  }
+]

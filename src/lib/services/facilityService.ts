@@ -12,12 +12,13 @@ export async function getFacilities(): Promise<Facility[]> {
         throw new Error(error.message);
     }
 
-    return (data || []).map(facility => ({
+    return (data || []).map((facility: any) => ({
         ...facility,
         address: facility.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: facility.license_number,
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
+        teamImages: facility.team_images || [],
         roomDetails: facility.room_details || { customFields: {} },
         updatedAt: facility.updated_at,
     }));
@@ -41,12 +42,13 @@ export async function getFacility(id: string): Promise<Facility | null> {
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
 }
 
-export type CreateFacilityInput = Omit<Facility, "id" | "createdAt" | "updatedAt" | "images"> & { images?: string[] };
+export type CreateFacilityInput = Omit<Facility, "id" | "createdAt" | "updatedAt" | "images" | "teamImages"> & { images?: string[], teamImages?: string[] };
 
 export async function createFacility(facility: CreateFacilityInput): Promise<Facility> {
     const { data: { user } } = await supabase.auth.getUser();
@@ -61,6 +63,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         taxonomy_ids: facility.taxonomyIds,
         status: facility.status || 'draft',
         images: facility.images || [],
+        team_images: facility.teamImages || [],
         room_details: (facility as any).roomDetails || {},
         created_by: user?.id,
     };
@@ -82,6 +85,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -99,6 +103,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.taxonomyIds !== undefined) dbUpdates.taxonomy_ids = updates.taxonomyIds;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
     if ((updates as any).roomDetails !== undefined) dbUpdates.room_details = (updates as any).roomDetails;
 
     const { data, error } = await supabase
@@ -119,6 +124,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };

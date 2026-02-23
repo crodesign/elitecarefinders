@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
     message: string | React.ReactNode;
     confirmLabel?: string;
     cancelLabel?: string;
+    hideCancel?: boolean;
     isDangerous?: boolean;
     isLoading?: boolean;
     customActions?: React.ReactNode;
@@ -23,6 +24,7 @@ export function ConfirmationModal({
     message,
     confirmLabel = "Confirm",
     cancelLabel = "Cancel",
+    hideCancel = false,
     isDangerous = false,
     isLoading = false,
     customActions,
@@ -89,13 +91,15 @@ export function ConfirmationModal({
                         customActions
                     ) : (
                         <div className="flex justify-end gap-3">
-                            <button
-                                onClick={onClose}
-                                disabled={isLoading}
-                                className="px-4 py-2 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
-                            >
-                                {cancelLabel}
-                            </button>
+                            {!hideCancel && (
+                                <button
+                                    onClick={onClose}
+                                    disabled={isLoading}
+                                    className="px-4 py-2 text-sm text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
+                                >
+                                    {cancelLabel}
+                                </button>
+                            )}
                             <button
                                 onClick={onConfirm}
                                 disabled={isLoading}

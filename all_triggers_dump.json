@@ -1,0 +1,22 @@
+[
+  {
+    "trigger_name": "RI_ConstraintTrigger_a_17353",
+    "trigger_def": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_17353\" AFTER DELETE ON public.contacts FROM notes NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_cascade_del\"()"
+  },
+  {
+    "trigger_name": "RI_ConstraintTrigger_a_17354",
+    "trigger_def": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_a_17354\" AFTER UPDATE ON public.contacts FROM notes NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_noaction_upd\"()"
+  },
+  {
+    "trigger_name": "RI_ConstraintTrigger_c_17292",
+    "trigger_def": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_17292\" AFTER INSERT ON public.contacts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_ins\"()"
+  },
+  {
+    "trigger_name": "RI_ConstraintTrigger_c_17293",
+    "trigger_def": "CREATE CONSTRAINT TRIGGER \"RI_ConstraintTrigger_c_17293\" AFTER UPDATE ON public.contacts FROM auth.users NOT DEFERRABLE INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION \"RI_FKey_check_upd\"()"
+  },
+  {
+    "trigger_name": "update_contacts_updated_at",
+    "trigger_def": "CREATE TRIGGER update_contacts_updated_at BEFORE UPDATE ON public.contacts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()"
+  }
+]

@@ -11,20 +11,19 @@ export function toSlug(name: string): string {
         .replace(/-+/g, "-");
 }
 
-/**
- * Builds the canonical contact edit URL.
- * Pattern: /admin/contacts/[id]/[slug]/edit
- */
 export function buildContactEditUrl(
     id: string,
     name?: string | null,
     params?: Record<string, string>
 ): string {
     const slug = name ? toSlug(name) : "contact";
-    let url = `/admin/contacts/${id}/${slug}/edit`;
-    if (params && Object.keys(params).length > 0) {
-        const qs = new URLSearchParams(params).toString();
-        url += `?${qs}`;
-    }
-    return url;
+    let url = `/admin/contacts`;
+
+    const searchParams = new URLSearchParams(params || {});
+    searchParams.set('edit', id);
+    // Note: We include the slug in the query for aesthetic/analytics reasons,
+    // although the system only needs the ID to fetch the record.
+    searchParams.set('slug', slug);
+
+    return `${url}?${searchParams.toString()}`;
 }

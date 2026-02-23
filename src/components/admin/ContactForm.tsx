@@ -22,6 +22,7 @@ import CombinedCareSection from "@/components/contacts/contact-form/CombinedCare
 import ChecklistSection from "@/components/contacts/contact-form/ChecklistSection";
 import NotesSection from "@/components/contacts/contact-form/NotesSection";
 import { parseHawaiiDate } from "@/lib/hawaiiDate";
+import { convertFormToContact } from "@/lib/contactMapping";
 
 interface ContactFormProps {
     isOpen: boolean;
@@ -80,10 +81,13 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
 
             // Reverse mapping: Contact -> Form Data
             const mappedData = {
-                ...contact,
-                contactName: contact.first_name || contact.last_name ? `${contact.first_name || ''} ${contact.last_name || ''}`.trim() : '',
-                contactPhone: contact.phone,
-                contactEmail: contact.email,
+                ...contact, // Spread all existing snake_case fields first
+
+                // Then specifically map the camelCase variants needed by form components
+                contactName: `${contact.first_name || ''} ${contact.last_name || ''}`.trim(),
+                residentFullName: contact.resident_full_name || '',
+                contactPhone: contact.phone || '',
+                contactEmail: contact.email || '',
                 residentFirstName: contact.first_name, // Fallback if resident name logic is complex
                 residentLastName: contact.last_name,
 
@@ -145,174 +149,16 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         }
     }, [contact, isOpen]);
 
+    // Track dirty state via useEffect — avoids illegal setState-during-render
+    useEffect(() => {
+        const isUnchanged = JSON.stringify(formData) === JSON.stringify(originalDataRef.current);
+        setIsDirty(!isUnchanged);
+    }, [formData, setIsDirty]);
+
     const handleFormDataChange = (newData: any) => {
-        setFormData((prevData: any) => {
-            const updatedData = typeof newData === 'function' ? newData(prevData) : newData;
-
-            // Compare against the original saved snapshot
-            const isUnchanged = JSON.stringify(updatedData) === JSON.stringify(originalDataRef.current);
-            setIsDirty(!isUnchanged);
-            return updatedData;
-        });
-    };
-
-    const convertFormToContact = (data: any): Partial<Contact> => {
-        // Helper function to format dates properly
-        const formatDate = (dateValue: any) => {
-            if (!dateValue || dateValue === '') return undefined;
-            if (typeof dateValue === 'string' && dateValue.trim() === '') return undefined;
-            return dateValue;
-        };
-
-        // Helper function to format numeric values properly
-        const formatNumeric = (numericValue: any) => {
-            if (!numericValue || numericValue === '') return undefined;
-            if (typeof numericValue === 'string' && numericValue.trim() === '') return undefined;
-            const parsed = parseFloat(numericValue);
-            return isNaN(parsed) ? undefined : parsed;
-        };
-
-        // Parse contactName into first and last name
-        const parseContactName = (fullName: string) => {
-            if (!fullName) return { first: '', last: '' };
-            const parts = fullName.trim().split(' ');
-            if (parts.length === 1) return { first: parts[0], last: '' };
-            return { first: parts[0], last: parts.slice(1).join(' ') };
-        };
-
-        const contactName = data.contactName || '';
-        const parsedName = parseContactName(contactName);
-
-        // Construct the object matching Contact interface
-        // We use 'undefined' instead of null where appropriate to match Partial<Contact> which usually expects optional fields
-        return {
-            status: data.status,
-            first_name: parsedName.first || data.residentFirstName || data.first_name || '',
-            last_name: parsedName.last || data.residentLastName || data.last_name || '',
-            resident_full_name: data.resident_full_name,
-            phone: data.contactPhone,
-            email: data.contactEmail,
-            date_of_birth: formatDate(data.date_of_birth),
-            care_level: data.leadClassification,
-            dietary_needs: Array.isArray(data.careNeeds) ? data.careNeeds : (data.careNeeds ? [data.careNeeds] : []),
-            medication_management: Array.isArray(data.medicationManagement) ? data.medicationManagement : (data.medicationManagement ? [data.medicationManagement] : []),
-            personal_care_assistance: Array.isArray(data.careNeeds) ? data.careNeeds : (data.careNeeds ? [data.careNeeds] : []), // Note: logic from ContactEditor duplicates careNeeds here
-            health_conditions: Array.isArray(data.medicalConditions) ? data.medicalConditions : (data.medicalConditions ? [data.medicalConditions] : []),
-            mobility_level: Array.isArray(data.mobilityLevel) ? data.mobilityLevel : (data.mobilityLevel ? [data.mobilityLevel] : []),
-            housing_type: Array.isArray(data.housingType) ? data.housingType.join(',') : data.housingType,
-            // mental_health is not in the Contact interface in useContacts.tsx? 
-            // Wait, checking useContacts.tsx again... I don't see mental_health in the interface I read earlier.
-            // But ContactEditor used it. Maybe it was dropped or I missed it.
-            // I'll skip it if not in interface or use strict mapping if needed.
-            // checking useContacts.tsx lines 7-113... no mental_health.
-            // But converting anyway just in case the type definition is incomplete (Supabase is loose)
-
-            // emergency_contact info is in Contact interface
-            emergency_contact_name: data.emergencyContactName,
-            emergency_contact_phone: data.emergencyContactPhone,
-            emergency_contact_relationship: data.emergencyContactRelationship,
-            additional_notes: data.summary,
-
-            // Contact form specific fields
-            secondary_contact_name: data.secondaryContactName,
-            secondary_contact_email: data.secondaryContactEmail,
-            secondary_contact_phone: data.secondaryContactPhone,
-            enable_secondary_contact: data.enableSecondaryContact,
-            looking_for: data.lookingFor,
-            referral_date: formatDate(data.referralDate),
-            referral_name: data.referralName,
-            referral_phone: data.referralPhone,
-            referral_location: data.referralLocation,
-            // referral_location_address: data.referralLocationAddress, // Missing in Contact interface?
-            // createContact in useContacts doesn't seem to have it?
-            // Checked useContacts line 102: referral_location. 
-            // no referral_location_address in the interface I view... 
-            // But ContactEditor used it. 
-            // I'll leave it out if typescript complains, but since I return Partial<Contact>, let's restrict to known fields.
-
-            referral_monthly_rate: formatNumeric(data.referralMonthlyRate),
-            referral_fee_percentage: formatNumeric(data.referralFeePercentage),
-            referral_tax: formatNumeric(data.referralTax),
-            signature_name: data.signatureName,
-            signature_date: formatDate(data.signatureDate),
-            signature_data: data.signatureData,
-            waiver_text: data.waiverText,
-            waiver_agreed: data.waiverAgreed,
-
-            // Resident info
-            street_address: data.street_address,
-            city: data.city,
-            state: data.state,
-            zip_code: data.zip_code,
-            ethnicity: data.ethnicity,
-            gender: data.gender,
-            height_feet: formatNumeric(data.height_feet),
-            height_inches: formatNumeric(data.height_inches),
-            weight: formatNumeric(data.weight),
-            preferred_island: data.preferred_island,
-            preferred_neighborhood: data.preferred_neighborhood,
-            minimum_budget: formatNumeric(data.minimum_budget),
-            maximum_budget: formatNumeric(data.maximum_budget),
-            pcp_name: data.pcp_name,
-            pcp_email: data.pcp_email,
-            pcp_phone: data.pcp_phone,
-            primary_insurance: data.primary_insurance,
-            secondary_insurance: data.secondary_insurance,
-            diet_restrictions: data.diet_restrictions,
-            supplements: data.supplements,
-            diagnoses: data.diagnoses,
-            dentition: data.dentition,
-            vision: data.vision,
-            room_type: data.roomType,
-            bathroom_type: data.bathroomType,
-            shower_type: data.showerType,
-            time_to_move: data.timeToMove,
-            interests: data.interests,
-
-            // Checklist fields
-            actual_move_date: formatDate(data.actualMoveDate),
-            covid_test: data.covidTest,
-            covid_test_date: formatDate(data.covidTestDate),
-            covid_test_result: data.covidTestResult,
-            covid_vaccination_details: data.covidVaccinationDetails,
-            tb_clearance: data.tbClearance,
-            tb_clearance_field1: data.tbClearanceField1,
-            tb_clearance_field2: data.tbClearanceField2,
-            tb_clearance_field3: data.tbClearanceField3,
-            // chest_xray_date: formatDate(data.chestXrayDate), // Missing in Contact interface?
-            // chest_xray_result: data.chestXrayResult, // Missing in Contact interface?
-            // I see chest_xray (boolean) in interface but not date/result?
-            // I'll stick to what's in the interface to satisfy TS.
-            // If they are missing, I might need to update Contact interface later.
-
-            admission_hp: data.admissionHp,
-            care_home_forms: data.careHomeForms,
-            polst: data.polst,
-            mar_tar: data.marTar,
-            ad_poa: data.adPoa,
-            ad_poa_name: data.adPoaName,
-            ad_poa_phone: data.adPoaPhone,
-            ad_poa_email: data.adPoaEmail,
-            ad_poa_address: data.adPoaAddress,
-            ad_info: data.adInfo,
-            poa_hc: data.poaHc,
-            poa_financial: data.poaFinancial,
-            poa_comments: data.poaComments,
-            email_fax_records: data.emailFaxRecords,
-            records_date: formatDate(data.recordsDate),
-            cma_name: data.cmaName,
-            cma_phone: data.cmaPhone,
-            cma_email: data.cmaEmail,
-            care_provider_name: data.careProviderName,
-            care_provider_phone: data.careProviderPhone,
-            care_provider_email: data.careProviderEmail,
-
-            // Invoice fields
-            invoice_sent: data.invoiceSent,
-            invoice_sent_date: formatDate(data.invoiceSentDate),
-            invoice_received: data.invoiceReceived,
-            invoice_received_date: formatDate(data.invoiceReceivedDate),
-        };
+        setFormData((prevData: any) =>
+            typeof newData === 'function' ? newData(prevData) : newData
+        );
     };
 
     const handleSave = async (e?: React.FormEvent) => {
@@ -321,6 +167,8 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         try {
             const payload = convertFormToContact(formData);
             await onSave(payload);
+            // Update the snapshot so subsequent edits compare against the newly saved state
+            originalDataRef.current = formData;
             setIsDirty(false);
         } catch (error) {
             console.error("Failed to save contact", error);
@@ -374,7 +222,19 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 isOpen={isOpen}
                 onClose={handleCloseInternal}
                 title={contact ? "Edit Contact" : "New Contact"}
-                subtitle={contact ? `Manage details for ${contact.first_name} ${contact.last_name}` : "Add a new lead or contact"}
+                subtitle={contact ? (
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        {(contact.resident_full_name && contact.resident_full_name !== (contact.first_name + " " + contact.last_name).trim()) ? (
+                            <>
+                                <span className="font-medium text-content-primary">{contact.resident_full_name}</span>
+                                <span className="text-content-muted text-xs">•</span>
+                                <span className="font-normal text-content-muted">{[contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Unknown"}</span>
+                            </>
+                        ) : (
+                            <span className="font-medium text-content-primary">{[contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Unknown Resident"}</span>
+                        )}
+                    </div>
+                ) : "Add a new lead or contact"}
                 fullScreen
                 contentClassName={activeTab === "notes" ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
                 headerChildren={

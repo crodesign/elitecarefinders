@@ -84,6 +84,42 @@ export async function ensureLocationFolders(
 }
 
 /**
+ * Ensures that the folder structure exists for a given post.
+ * Structure: Post Images -> [Post Title]
+ * 
+ * @param postTitle - Title of the post
+ * @returns The UUID of the post title folder
+ */
+export async function ensurePostFolder(
+    postTitle: string
+): Promise<string | null> {
+    try {
+        console.log(`Ensuring folder for post: ${postTitle}`);
+
+        // 1. Find or Create "Post Images" Folder (at Root)
+        const rootFolderName = 'Post Images';
+        let rootFolder = await findFolderByName(rootFolderName, null);
+        if (!rootFolder) {
+            rootFolder = await createFolder(rootFolderName, null);
+        }
+        if (!rootFolder) throw new Error(`Could not find or create root folder: ${rootFolderName}`);
+
+        // 2. Find or Create Post Directory
+        let postFolder = await findFolderByName(postTitle, rootFolder.id);
+        if (!postFolder) {
+            postFolder = await createFolder(postTitle, rootFolder.id);
+        }
+        if (!postFolder) throw new Error(`Could not find or create post folder: ${postTitle}`);
+
+        return postFolder.id;
+
+    } catch (error) {
+        console.error("Error ensuring post folders:", error);
+        throw error;
+    }
+}
+
+/**
  * Helper to find a folder by name and parent ID.
  */
 async function findFolderByName(name: string, parentId: string | null): Promise<MediaFolder | null> {

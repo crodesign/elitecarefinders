@@ -66,7 +66,7 @@ function TruncatedText({ text, className }: { text: string; className?: string }
 // Folders that appear above the divider (filtered by state)
 const PRIMARY_FOLDER_SLUGS = ["home-images", "facility-images"];
 // Folders that appear below the divider
-const SECONDARY_FOLDER_SLUGS = ["blog-images", "site-images", "temp"];
+const SECONDARY_FOLDER_SLUGS = ["post-images", "site-images", "temp"];
 // Folders restricted to super_admin only
 const SUPER_ADMIN_ONLY_SLUGS = ["site-images"];
 // Folders that cannot have subfolders
@@ -158,6 +158,34 @@ export function FolderTree({
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [editingId, isCreating]);
+
+    // Auto-select island from folder path if deep linked
+    useEffect(() => {
+        if (isHawaiiSelected && selectedFolderId) {
+            const findIslandInPath = (foldersToSearch: MediaFolder[], targetId: string, currentIsland: string | null = null): string | null => {
+                for (const folder of foldersToSearch) {
+                    // Check if this folder is an island
+                    const isAnIsland = HAWAIIAN_ISLANDS.includes(folder.name);
+                    const islandName = isAnIsland ? folder.name : currentIsland;
+
+                    if (folder.id === targetId) {
+                        return islandName;
+                    }
+                    if (folder.children && folder.children.length > 0) {
+                        const result = findIslandInPath(folder.children, targetId, islandName);
+                        if (result) return result;
+                    }
+                }
+                return null;
+            };
+
+            const targetIsland = findIslandInPath(folders, selectedFolderId);
+            if (targetIsland && targetIsland !== selectedIsland) {
+                setSelectedIsland(targetIsland);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedFolderId, isHawaiiSelected, folders]);
 
     // Auto-expand parent folders when selected folder changes
     useEffect(() => {
@@ -281,15 +309,15 @@ export function FolderTree({
         const hasChildren = folder.children && folder.children.length > 0;
         const isEditing = editingId === folder.id;
         const isMenuOpen = menuOpenId === folder.id;
-        // Protect system folders by name (Home Images, Facility Images, Blog Images, Site Images, Temp)
-        const isProtected = ['Home Images', 'Facility Images', 'Blog Images', 'Site Images', 'Temp'].includes(folder.name);
+        // Protect system folders by name (Home Images, Facility Images, Post Images, Site Images, Temp)
+        const isProtected = ['Home Images', 'Facility Images', 'Post Images', 'Site Images', 'Temp'].includes(folder.name);
 
         return (
             <div key={folder.id}>
                 <div
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors group ${isSelected
-                        ? "bg-white/10 text-white"
-                        : "text-content-muted hover:bg-white/5 hover:text-white"
+                        ? "bg-[var(--media-tree-selected-bg)] text-[var(--media-tree-selected-text)]"
+                        : "text-content-muted hover:bg-[var(--media-tree-hover-bg)] hover:text-[var(--media-tree-hover-text)]"
                         }`}
                     style={{ paddingLeft: `${12 + depth * 16}px` }}
                     onClick={() => {
@@ -308,7 +336,7 @@ export function FolderTree({
                                 e.stopPropagation();
                                 toggleExpand(folder.id);
                             }}
-                            className="p-0.5 hover:bg-white/10 rounded flex-shrink-0"
+                            className="p-0.5 hover:bg-[var(--media-tree-hover-bg)] rounded flex-shrink-0"
                         >
                             {isExpanded ? (
                                 <ChevronDown className="h-4 w-4" />
@@ -339,7 +367,7 @@ export function FolderTree({
                                     if (e.key === "Escape") handleCancelEdit();
                                 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-content-muted focus:outline-none"
+                                className="w-full bg-[var(--surface-input)] rounded pl-2 pr-14 py-0.5 text-sm text-[var(--text-primary)] placeholder-content-muted focus:outline-none"
                                 autoFocus
                             />
                             <button
@@ -358,7 +386,7 @@ export function FolderTree({
 
                     {/* Item count badge */}
                     {!isEditing && folder.itemCount !== undefined && folder.itemCount > 0 && (
-                        <span className="text-xs text-content-muted bg-white/5 px-1.5 py-0.5 rounded">
+                        <span className="text-xs text-content-muted bg-[var(--media-panel-bg)] px-1.5 py-0.5 rounded">
                             {folder.itemCount}
                         </span>
                     )}
@@ -366,53 +394,41 @@ export function FolderTree({
                     {/* More menu button (edit/delete) - hidden for protected system folders */}
                     {!isEditing && !isProtected && onRenameFolder && onDeleteFolder && (
                         <div className="relative flex-shrink-0 folder-menu-container">
-                            <Tooltip.Provider delayDuration={500}>
-                                <Tooltip.Root>
-                                    <Tooltip.Trigger asChild>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setMenuOpenId(isMenuOpen ? null : folder.id);
-                                            }}
-                                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded"
-                                        >
-                                            <MoreVertical className="h-3.5 w-3.5" />
-                                        </button>
-                                    </Tooltip.Trigger>
-                                    <Tooltip.Portal>
-                                        <Tooltip.Content
-                                            className="px-3 py-2 text-sm text-white bg-surface-secondary border border-ui-border rounded-lg shadow-xl z-[9999]"
-                                            sideOffset={8}
-                                        >
-                                            More options
-                                            <Tooltip.Arrow className="fill-zinc-900" />
-                                        </Tooltip.Content>
-                                    </Tooltip.Portal>
-                                </Tooltip.Root>
-                            </Tooltip.Provider>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setMenuOpenId(isMenuOpen ? null : folder.id);
+                                }}
+                                className={`p-1 rounded transition-colors ${isMenuOpen
+                                    ? "opacity-100 bg-[var(--media-panel-bg)]"
+                                    : "opacity-0 group-hover:opacity-100 hover:bg-[var(--media-panel-bg)]"
+                                    }`}
+                            >
+                                <MoreVertical className="h-3.5 w-3.5" />
+                            </button>
 
                             {/* Dropdown menu */}
                             {isMenuOpen && (
-                                <div className="absolute right-0 top-full mt-1 bg-[#111111] border border-white/10 rounded-lg shadow-2xl z-50 min-w-[120px]">
+                                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 bg-surface-secondary shadow-lg rounded-md z-50 flex flex-col overflow-hidden">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleStartEdit(folder);
                                         }}
-                                        className="w-full text-left px-3 py-2 text-sm text-white hover:bg-white/5 flex items-center gap-2 rounded-t-lg"
+                                        className="p-2 text-content-secondary hover:bg-surface-hover hover:text-content-primary transition-colors"
+                                        title="Rename"
                                     >
                                         <Pencil className="h-3.5 w-3.5" />
-                                        Rename
                                     </button>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDelete(folder.id);
                                         }}
-                                        className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 rounded-b-lg"
+                                        className="p-2 text-red-500 hover:bg-red-500/10 transition-colors"
+                                        title="Delete"
                                     >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                        Delete
+                                        <Trash2 className="h-3 w-3" />
                                     </button>
                                 </div>
                             )}
@@ -421,31 +437,16 @@ export function FolderTree({
 
                     {/* Add subfolder button - hidden for folders that don't allow subfolders */}
                     {!isEditing && !NO_SUBFOLDER_SLUGS.includes(folder.slug) && (
-                        <Tooltip.Provider delayDuration={500}>
-                            <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleCreateStart(folder.id);
-                                            if (!isExpanded) toggleExpand(folder.id);
-                                        }}
-                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded"
-                                    >
-                                        <Plus className="h-3 w-3" />
-                                    </button>
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                    <Tooltip.Content
-                                        className="px-3 py-2 text-sm text-white bg-surface-secondary border border-ui-border rounded-lg shadow-xl z-[9999]"
-                                        sideOffset={8}
-                                    >
-                                        Add subfolder
-                                        <Tooltip.Arrow className="fill-zinc-900" />
-                                    </Tooltip.Content>
-                                </Tooltip.Portal>
-                            </Tooltip.Root>
-                        </Tooltip.Provider>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleCreateStart(folder.id);
+                                if (!isExpanded) toggleExpand(folder.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-[var(--media-panel-bg)] rounded"
+                        >
+                            <Plus className="h-3 w-3" />
+                        </button>
                     )}
                 </div>
 
@@ -467,7 +468,7 @@ export function FolderTree({
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 placeholder="Folder name"
-                                className="w-full bg-black/30 rounded pl-2 pr-14 py-0.5 text-sm text-white placeholder-content-muted focus:outline-none"
+                                className="w-full bg-[var(--surface-input)] rounded pl-2 pr-14 py-0.5 text-sm text-[var(--text-primary)] placeholder-content-muted focus:outline-none"
                                 autoFocus
                             />
                             <button
@@ -496,18 +497,18 @@ export function FolderTree({
     return (
         <div className="flex flex-col h-full px-2">
             {/* State Dropdown or Static Label */}
-            <div className="flex-none px-3 py-3" ref={stateDropdownRef}>
+            <div className="flex-none py-3" ref={stateDropdownRef}>
                 <div className="relative">
                     {states.length === 1 ? (
                         /* Single location — show as static label, no dropdown */
-                        <div className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white">
+                        <div className="w-full flex items-center pl-3 pr-8 py-2.5 bg-[var(--media-dropdown-btn-bg)] rounded-lg text-sm text-[var(--text-primary)]">
                             <span className="truncate">{states[0].name}</span>
                         </div>
                     ) : (
                         <>
                             <button
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                                className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white hover:bg-white/[0.12] transition-colors text-left"
+                                className="w-full flex items-center pl-3 pr-8 py-2.5 bg-[var(--media-dropdown-btn-bg)] rounded-lg text-sm text-[var(--text-primary)] hover:bg-[var(--media-dropdown-btn-hover)] transition-colors text-left"
                             >
                                 <span className="truncate flex-1">
                                     {selectedState ? selectedState.name : "Select State..."}
@@ -526,8 +527,8 @@ export function FolderTree({
                                                     setIsStateDropdownOpen(false);
                                                 }}
                                                 className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${state.id === selectedStateId
-                                                    ? "bg-white/10 text-white"
-                                                    : "text-content-secondary hover:bg-white/5 hover:text-white"
+                                                    ? "bg-[var(--media-tree-selected-bg)] text-[var(--media-tree-selected-text)]"
+                                                    : "text-content-secondary hover:bg-[var(--media-tree-hover-bg)] hover:text-[var(--media-tree-hover-text)]"
                                                     }`}
                                             >
                                                 <span className="flex-1">{state.name}</span>
@@ -548,11 +549,11 @@ export function FolderTree({
 
             {/* Island Dropdown - Only show for Hawaii */}
             {isHawaiiSelected && (
-                <div className="flex-none px-3 pb-3" ref={islandDropdownRef}>
+                <div className="flex-none pb-3" ref={islandDropdownRef}>
                     <div className="relative">
                         <button
                             onClick={() => setIsIslandDropdownOpen(!isIslandDropdownOpen)}
-                            className="w-full flex items-center pl-3 pr-8 py-2.5 bg-white/[0.08] rounded-lg text-sm text-white hover:bg-white/[0.12] transition-colors text-left"
+                            className="w-full flex items-center pl-3 pr-8 py-2.5 bg-[var(--media-dropdown-btn-bg)] rounded-lg text-sm text-[var(--text-primary)] hover:bg-[var(--media-dropdown-btn-hover)] transition-colors text-left"
                         >
                             <span className="truncate flex-1">
                                 {selectedIsland || "Select Island..."}
@@ -571,8 +572,8 @@ export function FolderTree({
                                                 setIsIslandDropdownOpen(false);
                                             }}
                                             className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${island === selectedIsland
-                                                ? "bg-white/10 text-white"
-                                                : "text-content-secondary hover:bg-white/5 hover:text-white"
+                                                ? "bg-[var(--media-tree-selected-bg)] text-[var(--media-tree-selected-text)]"
+                                                : "text-content-secondary hover:bg-[var(--media-tree-hover-bg)] hover:text-[var(--media-tree-hover-text)]"
                                                 }`}
                                         >
                                             <span className="flex-1">{island}</span>
@@ -601,10 +602,10 @@ export function FolderTree({
 
                 {/* Divider - only show when state is selected and secondary folders exist */}
                 {selectedStateId && secondaryFolders.length > 0 && (
-                    <div className="mx-4 my-3 border-t border-white/10" />
+                    <div className="mx-4 my-3 border-t-2 border-[var(--media-tree-selected-bg)]" />
                 )}
 
-                {/* Secondary folders (Blog Images, Site Images, Temp) */}
+                {/* Secondary folders (Post Images, Site Images, Temp) */}
                 <div className="space-y-0.5 group">
                     {secondaryFolders.map((folder) => renderFolder(folder))}
                 </div>

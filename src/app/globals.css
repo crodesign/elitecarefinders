@@ -36,7 +36,8 @@
   /* Borders */
   --ui-border: rgba(255, 255, 255, 0.07);
   --ui-border-hover: rgba(255, 255, 255, 0.14);
-  --surface-tab: rgba(255, 255, 255, 0.2);
+  --surface-tab: rgba(255, 255, 255, 0.08);
+  /* Synchronized with surface-input */
   --surface-tab-border: var(--surface-tab);
   /* Content */
   --content-primary: #fafafa;
@@ -46,8 +47,10 @@
   --glass-overlay: rgba(0, 0, 0, 0.5);
   /* Accent — overwritten dynamically by ThemeContext */
   --accent: #239ddb;
-  --accent-light: #4bb3e8;
-  --accent-dark: #1a7fb3;
+  --accent-light: #1a7fb3;
+  /* Darker (for dim hover in dark mode) */
+  --accent-dark: #4bb3e8;
+  /* Lighter */
   /* Switch */
   --switch-thumb-off: rgba(0, 0, 0, 0.8);
   /* Table row hover — subtler than full surface-hover */
@@ -60,6 +63,21 @@
   --text-muted: var(--content-muted);
   --border-color: var(--ui-border);
   --border-color-hover: var(--ui-border-hover);
+  /* Media Specific Theming */
+  --media-panel-bg: var(--surface-secondary);
+  --media-gallery-bg: rgba(255, 255, 255, 0.1);
+  --media-caption-bg: rgba(255, 255, 255, 0.1);
+  --media-edit-btn-bg: rgba(0, 0, 0, 0.6);
+  --media-edit-btn-hover-bg: #000000;
+  --media-edit-btn-text: #ffffff;
+  --media-dim-label-bg: rgba(0, 0, 0, 0.6);
+  --media-dim-label-text: #ffffff;
+  --media-tree-hover-bg: rgba(255, 255, 255, 0.05);
+  --media-tree-hover-text: #ffffff;
+  --media-tree-selected-bg: rgba(255, 255, 255, 0.1);
+  --media-tree-selected-text: #ffffff;
+  --media-dropdown-btn-bg: rgba(255, 255, 255, 0.08);
+  --media-dropdown-btn-hover: rgba(255, 255, 255, 0.12);
 }
 
 /* ── Light mode ──────────────────────────────────── */
@@ -74,18 +92,38 @@
   --surface-caption: #f9f9fa;
   --ui-border: rgba(0, 0, 0, 0.10);
   --ui-border-hover: rgba(0, 0, 0, 0.18);
-  --surface-tab: #dfe0e3;
-  --surface-tab-border: #dfe0e3;
+  --surface-tab: rgba(0, 0, 0, 0.07);
+  /* Synchronized with surface-input */
+  --surface-tab-border: var(--surface-tab);
   --content-primary: #09090b;
   --content-secondary: #52525b;
   --content-muted: #717179;
   /* Glass overlays — white tint for light mode */
   --glass-overlay: rgba(255, 255, 255, 0.5);
+  /* Accent */
+  --accent-light: #4bb3e8;
+  /* Lighter (for bright hover in light mode) */
+  --accent-dark: #1a7fb3;
+  /* Darker */
   /* Switch */
   --switch-thumb-off: #ffffff;
   /* Table row hover — subtler than full surface-hover */
   --surface-row-hover: rgba(0, 0, 0, 0.05);
-  /* --accent, --accent-light, --accent-dark carry over from :root */
+  /* Media Specific Theming */
+  --media-panel-bg: #ffffff;
+  --media-gallery-bg: rgba(0, 0, 0, 0.05);
+  --media-caption-bg: rgba(0, 0, 0, 0.1);
+  --media-edit-btn-bg: rgba(255, 255, 255, 0.6);
+  --media-edit-btn-hover-bg: #ffffff;
+  --media-edit-btn-text: #000000;
+  --media-dim-label-bg: rgba(255, 255, 255, 0.6);
+  --media-dim-label-text: #000000;
+  --media-tree-hover-bg: rgba(0, 0, 0, 0.05);
+  --media-tree-hover-text: #000000;
+  --media-tree-selected-bg: rgba(0, 0, 0, 0.1);
+  --media-tree-selected-text: #000000;
+  --media-dropdown-btn-bg: rgba(0, 0, 0, 0.04);
+  --media-dropdown-btn-hover: rgba(0, 0, 0, 0.08);
 }
 
 /* ── Dynamic Greyscales (Slate, Stone, Gray, Neutral) ── */
@@ -190,12 +228,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
+  background: #808080;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: #999999;
 }
 
 /* Light mode placeholder color — use muted dark tone, not white */
@@ -409,6 +447,15 @@ button.form-input:focus {
   .dropdown-item.active {
     background-color: var(--surface-hover);
     color: var(--content-primary);
+  }
+
+  /* ── Rich Text Editor ───────────────────────────── */
+  .editor-bg {
+    background-color: #000000;
+  }
+
+  [data-theme="light"] .editor-bg {
+    background-color: #ffffff;
   }
 }
 

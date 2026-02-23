@@ -41,7 +41,6 @@ export default function ContactsPage() {
 
     const loadContacts = useCallback(async () => {
         try {
-            setIsLoading(true);
             // Fetch all contacts for URL-param edit lookup
             const data = await fetchContacts();
             setContacts(data);
@@ -120,19 +119,22 @@ export default function ContactsPage() {
 
     const handleSave = async (data: Partial<Contact>) => {
         try {
+            let savedContact: Contact;
             if (editingContact) {
-                await updateContact(editingContact.id, data);
-                showNotification("Contact Updated", `${data.first_name} ${data.last_name}`);
+                savedContact = await updateContact(editingContact.id, data);
+                showNotification("Contact Updated", `${data.first_name || ''} ${data.last_name || ''}`.trim());
             } else {
-                // Create needs required fields, assuming logic handles it or partial allows undefined but API will check
-                await createContact(data as any);
-                showNotification("Contact Created", `${data.first_name} ${data.last_name}`);
+                savedContact = await createContact(data as any);
+                showNotification("Contact Created", `${data.first_name || ''} ${data.last_name || ''}`.trim());
             }
             await loadContacts();
-            // Don't close, just update state like HomeForm if needed, or close? 
-            // HomeForm keeps open. Let's keep open for now or follow typical pattern.
-            // Actually HomeForm keeps open to allow further edits. 
-            // For now let's just refresh list.
+
+            setEditingContact(savedContact);
+
+            const currentParams = new URLSearchParams(searchParams.toString());
+            currentParams.delete('action');
+            currentParams.set('edit', savedContact.id);
+            router.replace(`/admin/contacts?${currentParams.toString()}`, { scroll: false });
         } catch (error) {
             console.error("Save failed", error);
             showNotification("Error", "Failed to save contact");

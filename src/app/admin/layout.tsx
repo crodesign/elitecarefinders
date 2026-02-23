@@ -28,7 +28,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             />
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-surface-secondary/90 backdrop-blur-xl border-b border-ui-border flex items-center justify-between px-4">
+            <div id="admin-mobile-header" className="md:hidden fixed top-0 left-0 right-0 z-[60] h-14 bg-surface-secondary/90 backdrop-blur-xl border-b border-ui-border flex items-center justify-between px-4">
                 <Logo className="h-7 w-auto" />
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -45,7 +45,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
                 <div
-                    className="md:hidden fixed inset-0 z-40"
+                    className="md:hidden fixed inset-0 z-[65]"
                     style={{ backgroundColor: 'var(--glass-overlay)', opacity: 0.75 }}
                     onClick={() => setMobileMenuOpen(false)}
                 />
@@ -53,7 +53,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar - hidden on mobile, shown when menu open */}
             <div className={`
-            fixed top-0 left-0 z-[60] h-screen
+            fixed top-0 left-0 z-[70] h-screen
             transition-transform duration-300
             md:translate-x-0
             ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}

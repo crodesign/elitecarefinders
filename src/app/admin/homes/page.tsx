@@ -81,21 +81,23 @@ export default function HomesPage() {
             const taxonomyData = await getTaxonomies();
             setTaxonomies(taxonomyData);
 
-            // Fetch all entries for each taxonomy
+            // Fetch all entries for each taxonomy in parallel
             const entriesMap: Record<string, TaxonomyEntry> = {};
-            for (const taxonomy of taxonomyData) {
-                const entries = await getTaxonomyEntries(taxonomy.id);
-                // Flatten the tree structure and create a map
-                const flattenEntries = (entries: TaxonomyEntry[]): void => {
-                    entries.forEach(entry => {
-                        entriesMap[entry.id] = entry;
-                        if (entry.children && entry.children.length > 0) {
-                            flattenEntries(entry.children);
-                        }
-                    });
-                };
-                flattenEntries(entries);
-            }
+            const allEntriesResults = await Promise.all(
+                taxonomyData.map(taxonomy => getTaxonomyEntries(taxonomy.id))
+            );
+
+            // Flatten the tree structure and create a map
+            const flattenEntries = (entries: TaxonomyEntry[]): void => {
+                entries.forEach(entry => {
+                    entriesMap[entry.id] = entry;
+                    if (entry.children && entry.children.length > 0) {
+                        flattenEntries(entry.children);
+                    }
+                });
+            };
+
+            allEntriesResults.forEach(entries => flattenEntries(entries));
             setTaxonomyEntries(entriesMap);
         } catch (err) {
             console.error("Failed to fetch taxonomies:", err);

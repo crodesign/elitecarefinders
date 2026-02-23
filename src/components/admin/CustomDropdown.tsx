@@ -58,7 +58,7 @@ export function CustomDropdown({
                 {LeftIcon && (
                     <LeftIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                 )}
-                <span className={!selectedOption ? 'text-content-muted : ''}>
+                <span className={!selectedOption ? 'text-content-muted' : ''}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />

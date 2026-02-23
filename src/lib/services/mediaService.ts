@@ -7,7 +7,7 @@ import type { MediaFolder, MediaItem } from "@/types";
 const DEFAULT_FOLDERS = [
     { name: "Home Images", slug: "home-images", path: "/Home Images", display_order: 1 },
     { name: "Facility Images", slug: "facility-images", path: "/Facility Images", display_order: 2 },
-    { name: "Blog Images", slug: "blog-images", path: "/Blog Images", display_order: 3 },
+    { name: "Post Images", slug: "post-images", path: "/Post Images", display_order: 3 },
     { name: "Site Images", slug: "site-images", path: "/Site Images", display_order: 10 },
     { name: "Temp", slug: "temp", path: "/Temp", display_order: 99 },
 ];
@@ -39,7 +39,7 @@ export async function getFolders(): Promise<MediaFolder[]> {
         .select("folder_id");
 
     const folderCounts: Record<string, number> = {};
-    (countData || []).forEach(item => {
+    (countData || []).forEach((item: any) => {
         const folderId = item.folder_id as string;
         if (folderId) {
             folderCounts[folderId] = (folderCounts[folderId] || 0) + 1;
@@ -47,7 +47,7 @@ export async function getFolders(): Promise<MediaFolder[]> {
     });
 
     // Transform rows to use camelCase fields, then build tree
-    const transformedFolders = (data || []).map(row => ({
+    const transformedFolders = (data || []).map((row: any) => ({
         id: row.id as string,
         name: row.name as string,
         slug: row.slug as string,
@@ -203,9 +203,10 @@ export async function seedDefaultFolders(): Promise<void> {
 // Check if images are used in galleries
 export async function getAllUsedImageUrls(): Promise<Set<string>> {
     try {
-        const [homesResult, facilitiesResult] = await Promise.all([
+        const [homesResult, facilitiesResult, postsResult] = await Promise.all([
             supabase.from('homes').select('images'),
-            supabase.from('facilities').select('images')
+            supabase.from('facilities').select('images'),
+            supabase.from('posts').select('images')
         ]);
 
         if (homesResult.error) {
@@ -214,6 +215,10 @@ export async function getAllUsedImageUrls(): Promise<Set<string>> {
 
         if (facilitiesResult.error) {
             console.error("Error fetching facilities for image usage:", facilitiesResult.error);
+        }
+
+        if (postsResult.error) {
+            console.error("Error fetching posts for image usage:", postsResult.error);
         }
 
         const urls = new Set<string>();
@@ -234,6 +239,14 @@ export async function getAllUsedImageUrls(): Promise<Set<string>> {
             }
         });
 
+        (postsResult.data || []).forEach((post: any) => {
+            if (Array.isArray(post.images)) {
+                post.images.forEach((url: string) => {
+                    if (url) urls.add(url);
+                });
+            }
+        });
+
         return urls;
     } catch (error) {
         console.error("Error calculating used image URLs:", error);
@@ -244,9 +257,10 @@ export async function getAllUsedImageUrls(): Promise<Set<string>> {
 // Returns only the first image URL from each home/facility gallery (the "Featured Image")
 export async function getAllFeaturedImageUrls(): Promise<Set<string>> {
     try {
-        const [homesResult, facilitiesResult] = await Promise.all([
+        const [homesResult, facilitiesResult, postsResult] = await Promise.all([
             supabase.from('homes').select('images'),
-            supabase.from('facilities').select('images')
+            supabase.from('facilities').select('images'),
+            supabase.from('posts').select('images')
         ]);
 
         const urls = new Set<string>();
@@ -260,6 +274,12 @@ export async function getAllFeaturedImageUrls(): Promise<Set<string>> {
         (facilitiesResult.data || []).forEach((facility: any) => {
             if (Array.isArray(facility.images) && facility.images.length > 0 && facility.images[0]) {
                 urls.add(facility.images[0]);
+            }
+        });
+
+        (postsResult.data || []).forEach((post: any) => {
+            if (Array.isArray(post.images) && post.images.length > 0 && post.images[0]) {
+                urls.add(post.images[0]);
             }
         });
 

@@ -27,6 +27,7 @@ export interface UserProfile {
         zip: string;
     };
     phone?: string;
+    default_media_folder_id?: string;
     created_at?: string;
     updated_at?: string;
     manager_id?: string;

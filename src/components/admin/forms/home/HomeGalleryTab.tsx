@@ -4,6 +4,8 @@ import { MediaGallery } from "@/components/admin/media/MediaGallery";
 interface HomeGalleryTabProps {
     images: string[];
     setImages: Dispatch<SetStateAction<string[]>>;
+    teamImages?: string[];
+    setTeamImages?: Dispatch<SetStateAction<string[]>>;
     galleryFolderId: string | null;
     title: string;
     setIsDirty: (value: boolean) => void;
@@ -13,6 +15,8 @@ interface HomeGalleryTabProps {
 export function HomeGalleryTab({
     images,
     setImages,
+    teamImages = [],
+    setTeamImages,
     galleryFolderId,
     title,
     setIsDirty,
@@ -29,13 +33,30 @@ export function HomeGalleryTab({
                 <MediaGallery
                     folderId={galleryFolderId}
                     title={`${title} Gallery`}
-                    selectedUrls={images}
                     className="flex-1 min-h-0"
                     isDirty={isDirty}
-                    onSelectionChange={(urls) => {
-                        setImages(urls);
-                        setIsDirty(true);
-                    }}
+                    galleries={[
+                        {
+                            id: "main",
+                            title: "Gallery Images",
+                            shortLabel: "Image Gallery",
+                            urls: images,
+                            onChange: (urls) => {
+                                setImages(urls);
+                                setIsDirty(true);
+                            }
+                        },
+                        {
+                            id: "team",
+                            title: "Team Images",
+                            shortLabel: "Team Photos",
+                            urls: teamImages,
+                            onChange: (urls) => {
+                                setTeamImages?.(urls);
+                                setIsDirty(true);
+                            }
+                        }
+                    ]}
                 />
             )}
         </div>

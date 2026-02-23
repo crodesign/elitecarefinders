@@ -144,7 +144,6 @@ export function MediaUploader({ isOpen, onClose, onUpload, folderName, hideClose
                     <p className="text-content-primary font-medium">
                         {isDragging ? "Drop images here" : `Drag & drop images for ${folderName || "this folder"} here`}
                     </p>
-                    <p className="text-sm text-content-muted mt-1">or click to browse</p>
                 </div>
 
                 {/* Upload progress list */}

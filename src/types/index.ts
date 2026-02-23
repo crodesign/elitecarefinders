@@ -28,6 +28,7 @@ export interface BaseEntity {
     slug: string;
     description: string;
     images: string[];
+    teamImages?: string[];
     createdAt: string;
     updatedAt: string;
 }
@@ -64,14 +65,41 @@ export interface Review {
     entityId: string; // ID of the Home or Facility being reviewed
     createdAt: string;
     status: 'pending' | 'approved' | 'rejected';
+    source?: string;
+    sourceLink?: string;
+    authorPhotoUrl?: string;
+    externalId?: string;
 }
 
-export interface BlogPost extends BaseEntity {
-    content: string; // Markdown or HTML
-    authorId: string;
+export type PostType = 'caregiver_resources' | 'news_events' | 'recipes' | 'caregiving_for_caregivers' | 'general' | 'resident_resources';
+
+export interface NewsLink {
+    text: string;
+    url: string;
+}
+
+export interface PostMetadata {
+    // Shared or general metadata
+    // For News & Events
+    links?: NewsLink[];
+    // For Recipes
+    ingredients?: string[];
+    instructions?: string[];
+    prepTime?: number;
+    cookTime?: number;
+    yield?: string;
+}
+
+export interface Post extends BaseEntity {
+    content?: string; // HTML/Markdown
+    excerpt?: string;
+    featuredImageId?: string;
+    featuredImageUrl?: string | null;
+    authorId?: string;
+    postType: PostType;
     status: 'draft' | 'published' | 'archived';
+    metadata?: PostMetadata;
     publishedAt?: string;
-    tags: string[];
 }
 
 // Media Manager Types

@@ -1,0 +1,45 @@
+
+BEGIN
+  -- Auto-adjust invoice toggles based on dates
+  -- If date is null, set toggle to false
+  IF NEW.invoice_sent_date IS NULL THEN
+    NEW.invoice_sent_toggle_position := false;
+  ELSE
+    NEW.invoice_sent_toggle_position := true;
+  END IF;
+  
+  IF NEW.invoice_received_date IS NULL THEN
+    NEW.invoice_received_toggle_position := false;
+  ELSE
+    NEW.invoice_received_toggle_position := true;
+  END IF;
+  
+  -- Validate invoice logical dependencies only when dates exist
+  IF NEW.invoice_received_date IS NOT NULL AND NEW.invoice_sent_date IS NULL THEN
+    RAISE EXCEPTION 'Invoice must be sent before it can be received';
+  END IF;
+  
+  IF NEW.invoice_received_date IS NOT NULL AND NEW.invoice_sent_date IS NOT NULL AND NEW.invoice_received_date < NEW.invoice_sent_date THEN
+    RAISE EXCEPTION 'Invoice received date cannot be before sent date';
+  END IF;
+  
+  -- Validate COVID test dependencies
+  IF NEW.covid_test_toggle_position = true AND (NEW.covid_test_date IS NULL OR NEW.covid_test_result IS NULL) THEN
+    RAISE EXCEPTION 'COVID test date and result are required when COVID test is marked as completed';
+  END IF;
+  
+  -- Validate AD POA dependencies
+  IF NEW.ad_poa_toggle_position = true AND (NEW.ad_poa_name IS NULL OR NEW.ad_poa_name = '') THEN
+    RAISE EXCEPTION 'AD POA name is required when AD POA is enabled';
+  END IF;
+  
+  -- Validate secondary contact dependencies
+  IF NEW.enable_secondary_contact = true AND (
+    NEW.secondary_contact_name IS NULL OR NEW.secondary_contact_name = '' OR
+    (NEW.secondary_contact_email IS NULL AND NEW.secondary_contact_phone IS NULL)
+  ) THEN
+    RAISE EXCEPTION 'Secondary contact name and at least one contact method (email or phone) are required when secondary contact is enabled';
+  END IF;
+  
+  RETURN NEW;
+END;

@@ -11,6 +11,7 @@ export interface Contact {
   leadClassification?: string;
   first_name: string;
   last_name: string;
+  slug?: string;
   resident_full_name?: string;
   phone?: string;
   email?: string;
@@ -80,6 +81,9 @@ export interface Contact {
   tb_clearance_field1?: string;
   tb_clearance_field2?: string;
   tb_clearance_field3?: string;
+  chest_xray?: boolean;
+  chest_xray_date?: string;
+  chest_xray_result?: string;
   admission_hp?: boolean;
   care_home_forms?: boolean;
   polst?: boolean;
@@ -112,6 +116,8 @@ export interface Contact {
   invoice_sent_date?: string;
   invoice_received?: boolean;
   invoice_received_date?: string;
+  housing_additional_notes?: string;
+  care_additional_notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -292,12 +298,16 @@ export function useContacts() {
       .eq('id', id)
       .single();
 
+    console.log('[updateContact debug] Payload:', contactData);
+
     const { data, error } = await supabase
       .from('contacts')
       .update(contactData)
       .eq('id', id)
       .select()
       .single();
+
+    console.log('[updateContact debug] Response:', { data, error });
 
     if (error) {
       console.error('Error updating contact:', error);
@@ -312,49 +322,18 @@ export function useContacts() {
 
         // Only add history entry if there are meaningful changes
         if (changeDescription && changeDescription.trim()) {
-          // Add history entry
           const today = getCurrentHawaiiDate();
 
-          // Check if there's already an entry for today
-          const { data: existingEntry } = await supabase
-            .from('contact_history')
-            .select('*')
-            .eq('contact_id', id)
-            .eq('change_date', today)
-            .single();
+          // Use the RPC to safely merge or insert without triggering RLS READ blocks
+          const { error: rpcError } = await supabase.rpc('upsert_contact_history', {
+            p_contact_id: id,
+            p_user_id: user.id,
+            p_change_date: today,
+            p_changes_summary: changeDescription
+          });
 
-          if (existingEntry) {
-            // Merge HTML lists by combining list items
-            const existingSummary = existingEntry.changes_summary;
-            let updatedSummary;
-
-            if (existingSummary.includes('<ul>') && changeDescription.includes('<ul>')) {
-              // Both are HTML lists, merge the list items
-              const existingItems = existingSummary.replace('<ul>', '').replace('</ul>', '');
-              const newItems = changeDescription.replace('<ul>', '').replace('</ul>', '');
-              updatedSummary = `<ul>${existingItems}${newItems}</ul>`;
-            } else if (existingSummary.includes('<ul>')) {
-              // Existing is HTML list, append new item
-              updatedSummary = existingSummary.replace('</ul>', `<li>${changeDescription}</li></ul>`);
-            } else {
-              // Create new HTML list
-              updatedSummary = changeDescription;
-            }
-
-            await supabase
-              .from('contact_history')
-              .update({ changes_summary: updatedSummary })
-              .eq('id', existingEntry.id);
-          } else {
-            // Create new entry for today
-            await supabase
-              .from('contact_history')
-              .insert({
-                contact_id: id,
-                user_id: user.id,
-                change_date: today,
-                changes_summary: changeDescription,
-              });
+          if (rpcError) {
+            console.error('Failed to upsert contact history:', rpcError);
           }
         }
       } catch (historyError) {

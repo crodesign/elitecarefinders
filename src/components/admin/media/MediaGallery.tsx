@@ -26,24 +26,35 @@ import {
     horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
+export interface GalleryConfig {
+    id: "main" | "team";
+    title: string;
+    shortLabel: string;
+    urls: string[];
+    emptyText?: string;
+    onChange: (urls: string[]) => void;
+}
+
 interface MediaGalleryProps {
     folderId: string | null;
     title?: string;
     className?: string;
     onMediaSelect?: (media: MediaItem) => void;
     folders?: MediaFolder[];
-    selectedUrls?: string[];
-    onSelectionChange?: (urls: string[]) => void;
+    galleries?: GalleryConfig[];
     isDirty?: boolean;
+    dropzoneText?: string;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], selectedUrls, onSelectionChange, isDirty = false }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText }: MediaGalleryProps) {
+    const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploaderOpen, setIsUploaderOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [folderPath, setFolderPath] = useState<string | null>(null);
+    const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const { showNotification } = useNotification();
 
     // Fetch the folder path to build the media library deep-link
@@ -94,11 +105,12 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
-        if (over && active.id !== over.id && selectedUrls && onSelectionChange) {
-            const oldIndex = selectedUrls.indexOf(active.id as string);
-            const newIndex = selectedUrls.indexOf(over.id as string);
+        const activeGallery = galleries?.find(g => g.id === activeGalleryId);
+        if (over && active.id !== over.id && activeGallery) {
+            const oldIndex = activeGallery.urls.indexOf(active.id as string);
+            const newIndex = activeGallery.urls.indexOf(over.id as string);
 
-            onSelectionChange(arrayMove(selectedUrls, oldIndex, newIndex));
+            activeGallery.onChange(arrayMove(activeGallery.urls, oldIndex, newIndex));
         }
     };
 
@@ -147,13 +159,17 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         });
 
         // If the URL changed (due to rename), we must update the selection state
-        // because selectedUrls tracks items by URL, not ID.
-        if (updatedItem.url && selectedUrls) {
+        // across all provided galleries.
+        if (updatedItem.url && galleries) {
             const oldItem = mediaItems.find(i => i.id === id);
-            if (oldItem && oldItem.url !== updatedItem.url && selectedUrls.includes(oldItem.url)) {
-                // Replace the old URL with the new URL in the selection list
-                const newUrls = selectedUrls.map(u => u === oldItem.url ? updatedItem.url! : u);
-                onSelectionChange?.(newUrls);
+            if (oldItem && oldItem.url !== updatedItem.url) {
+                // Update every gallery that contains this old URL
+                galleries.forEach(gallery => {
+                    if (gallery.urls.includes(oldItem.url)) {
+                        const newUrls = gallery.urls.map(u => u === oldItem.url ? updatedItem.url! : u);
+                        gallery.onChange(newUrls);
+                    }
+                });
             }
         }
     };
@@ -172,12 +188,13 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     };
 
     const handleToggleSelection = (url: string) => {
-        if (!onSelectionChange || !selectedUrls) return;
+        const activeGallery = galleries?.find(g => g.id === activeGalleryId);
+        if (!activeGallery) return;
 
-        if (selectedUrls.includes(url)) {
-            onSelectionChange(selectedUrls.filter(u => u !== url));
+        if (activeGallery.urls.includes(url)) {
+            activeGallery.onChange(activeGallery.urls.filter(u => u !== url));
         } else {
-            onSelectionChange([...selectedUrls, url]);
+            activeGallery.onChange([...activeGallery.urls, url]);
         }
     };
 
@@ -189,8 +206,6 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         );
     }
 
-    const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
-
     const handleImageError = (url: string) => {
         setBrokenImageUrls(prev => {
             if (prev.includes(url)) return prev;
@@ -199,13 +214,17 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     };
 
     const handleRemoveBrokenImages = () => {
-        if (!onSelectionChange || !selectedUrls) return;
+        const activeGallery = galleries?.find(g => g.id === activeGalleryId);
+        if (!activeGallery) return;
 
-        const newUrls = selectedUrls.filter(url => !brokenImageUrls.includes(url));
-        onSelectionChange(newUrls);
+        const newUrls = activeGallery.urls.filter(url => !brokenImageUrls.includes(url));
+        activeGallery.onChange(newUrls);
         setBrokenImageUrls([]);
         showNotification("Gallery Updated", "Broken images detected and removed.");
     };
+
+    const activeGallery = galleries?.find(g => g.id === activeGalleryId);
+    const activeUrls = activeGallery ? activeGallery.urls : [];
 
     return (
         <div className={`flex flex-col gap-4 ${className}`}>
@@ -223,47 +242,93 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 message={`We detected ${brokenImageUrls.length} broken image(s) in your gallery. Would you like to remove them?`}
                 confirmLabel="Remove Broken Images"
                 cancelLabel="Ignore"
-                variant="destructive"
+                isDangerous={true}
             />
 
             {/* Selected Images Container */}
-            {selectedUrls && selectedUrls.length > 0 && (
-                <div className="bg-surface-well rounded-lg p-4 overflow-x-auto">
-                    <h4 className="text-xs font-medium text-content-muted mb-3 uppercase tracking-wider flex items-center justify-between">
-                        <span>Selected Images ({selectedUrls.length})</span>
-                        <button
-                            type="button"
-                            onClick={() => onSelectionChange?.([])}
-                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                        >
-                            Clear All
-                        </button>
-                    </h4>
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
-                        <div className="flex gap-3 pb-2">
-                            <SortableContext
-                                items={selectedUrls}
-                                strategy={horizontalListSortingStrategy}
-                            >
-                                {selectedUrls.map((url) => (
-                                    <SortableGalleryItem
-                                        key={url}
-                                        url={url}
-                                        onRemove={(urlToRemove) => handleToggleSelection(urlToRemove)}
-                                        onError={handleImageError}
-                                    />
+            {galleries && galleries.length > 0 && (
+                <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 overflow-x-auto">
+                    <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-4">
+                        {galleries.length > 1 ? (
+                            <div className="flex bg-surface-input p-1 rounded-lg">
+                                {galleries.map(g => (
+                                    <button
+                                        key={g.id}
+                                        type="button"
+                                        onClick={() => setActiveGalleryId(g.id)}
+                                        className={`flex items-center justify-center gap-2 flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${activeGalleryId === g.id
+                                            ? "bg-accent text-white shadow-sm"
+                                            : "text-content-muted hover:text-content-secondary"
+                                            }`}
+                                    >
+                                        <span>{g.shortLabel}</span>
+                                        {g.urls.length > 0 && (
+                                            <span
+                                                className={`flex items-center justify-center w-[18px] h-[18px] rounded-[4px] text-[10px] font-bold tracking-tight ${activeGalleryId === g.id
+                                                    ? "bg-white text-accent"
+                                                    : "bg-[var(--media-gallery-bg)] text-content-primary opacity-75"
+                                                    }`}
+                                            >
+                                                {g.urls.length}
+                                            </span>
+                                        )}
+                                    </button>
                                 ))}
-                            </SortableContext>
+                            </div>
+                        ) : (
+                            <div className="flex items-center">
+                                <h3 className="text-sm font-medium text-content-primary py-1">
+                                    {galleries[0].title}
+                                </h3>
+                            </div>
+                        )}
+                        <div className="flex items-center">
+                            {activeUrls.length > 0 && activeGallery && (
+                                <button
+                                    type="button"
+                                    onClick={() => activeGallery.onChange([])}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all bg-[var(--media-gallery-bg)] ${activeUrls.length > 0 ? "text-content-secondary hover:bg-accent hover:text-white" : "opacity-50 cursor-not-allowed text-content-muted"}`}
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                    Clear
+                                </button>
+                            )}
                         </div>
-                    </DndContext>
+                    </div>
+
+                    {activeUrls.length > 0 ? (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <div className="flex gap-3 pb-2 pt-1 min-h-[104px] items-center">
+                                <SortableContext
+                                    items={activeUrls}
+                                    strategy={horizontalListSortingStrategy}
+                                >
+                                    {activeUrls.map((url) => (
+                                        <SortableGalleryItem
+                                            key={url}
+                                            url={url}
+                                            onRemove={(urlToRemove) => handleToggleSelection(urlToRemove)}
+                                            onError={handleImageError}
+                                        />
+                                    ))}
+                                </SortableContext>
+                            </div>
+                        </DndContext>
+                    ) : (
+                        <div className="h-[104px] flex items-center justify-center border-2 border-dashed border-ui-border rounded-lg bg-surface-primary/30 text-center px-4">
+                            <p className="text-sm text-content-muted">
+                                {activeGallery?.emptyText || `Select an image below to add it to the ${activeGallery?.shortLabel} Gallery.`}
+                            </p>
+                        </div>
+                    )}
                 </div>
             )}
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-content-primary">{title}</h3>
+            <div className="flex items-center justify-between mt-2">
+                <h3 className="text-lg font-medium text-content-primary">Images for {title.replace(' Gallery', '')}</h3>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
@@ -288,9 +353,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         type="button"
                         onClick={handleManageImages}
                         title="Manage Images in Media Library"
-                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors"
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap bg-[var(--media-gallery-bg)] text-content-secondary hover:bg-accent hover:text-white"
                     >
                         <FolderOpen className="h-4 w-4" />
+                        Manage Media
                     </button>
                 </div>
             </div>
@@ -301,7 +367,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         isOpen={true}
                         onClose={() => setIsUploaderOpen(false)}
                         onUpload={handleUpload}
-                        folderName="this property"
+                        folderName={dropzoneText || "this property"}
                     />
                 </div>
             )}
@@ -316,20 +382,17 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         isOpen={true}
                         onClose={() => { }}
                         onUpload={handleUpload}
-                        folderName="this property"
+                        folderName={dropzoneText || "this property"}
                     />
-                    <p className="text-center text-sm text-content-muted">
-                        Drop images above or click to browse
-                    </p>
                 </div>
             ) : (
-                <div className="bg-surface-well rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
-                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+                <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
+                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
                         {mediaItems.map((item) => (
                             <div key={item.id}>
                                 <MediaTile
                                     item={item}
-                                    isSelected={(selectedUrls?.includes(item.url)) || selectedItemId === item.id}
+                                    isSelected={(activeUrls.includes(item.url)) || selectedItemId === item.id}
                                     folders={folders}
                                     onClick={() => setSelectedItemId(item.id)}
                                     onUpdate={handleUpdateItem}
@@ -338,8 +401,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                     showUrlField={false}
                                     showFolderMove={false}
                                     showDimensions={false}
-                                    isFeaturedImage={!!(selectedUrls && selectedUrls.length > 0 && selectedUrls[0] === item.url)}
-                                    onMediaSelect={onSelectionChange ? () => handleToggleSelection(item.url) : onMediaSelect}
+                                    isFeaturedImage={!!(activeUrls.length > 0 && activeUrls[0] === item.url && activeGallery?.id === 'main')}
+                                    onMediaSelect={galleries ? () => handleToggleSelection(item.url) : onMediaSelect}
                                 />
                             </div>
                         ))}

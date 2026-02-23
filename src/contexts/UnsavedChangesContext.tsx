@@ -9,6 +9,7 @@ interface UnsavedChangesContextType {
     setIsDirty: (dirty: boolean) => void;
     registerSaveHandler: (handler: () => Promise<void | boolean>) => void;
     handleNavigation: (href: string) => void;
+    handleAction: (action: () => void) => void;
 }
 
 const UnsavedChangesContext = createContext<UnsavedChangesContextType | undefined>(undefined);
@@ -17,6 +18,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
     const [isDirty, setIsDirty] = useState(false);
     const [saveHandler, setSaveHandler] = useState<(() => Promise<void | boolean>) | null>(null);
     const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -28,6 +30,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
         setIsDirty(false);
         setSaveHandler(null);
         setPendingNavigation(null);
+        setPendingAction(null);
         setShowModal(false);
     }, [pathname]);
 
@@ -38,11 +41,22 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
     const handleNavigation = useCallback((href: string) => {
         if (isDirty) {
             setPendingNavigation(href);
+            setPendingAction(null);
             setShowModal(true);
         } else {
             router.push(href);
         }
     }, [isDirty, router]);
+
+    const handleAction = useCallback((action: () => void) => {
+        if (isDirty) {
+            setPendingAction(() => action);
+            setPendingNavigation(null);
+            setShowModal(true);
+        } else {
+            action();
+        }
+    }, [isDirty]);
 
     const handleConfirm = async () => {
         if (saveHandler) {
@@ -65,6 +79,8 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
                 setShowModal(false);
                 if (pendingNavigation) {
                     router.push(pendingNavigation);
+                } else if (pendingAction) {
+                    pendingAction();
                 }
             } catch (error) {
                 console.error("Failed to save during navigation:", error);
@@ -80,6 +96,8 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
             setShowModal(false);
             if (pendingNavigation) {
                 router.push(pendingNavigation);
+            } else if (pendingAction) {
+                pendingAction();
             }
         }
     };
@@ -89,16 +107,19 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
         setShowModal(false);
         if (pendingNavigation) {
             router.push(pendingNavigation);
+        } else if (pendingAction) {
+            pendingAction();
         }
     };
 
     const handleCancel = () => {
         setPendingNavigation(null);
+        setPendingAction(null);
         setShowModal(false);
     };
 
     return (
-        <UnsavedChangesContext.Provider value={{ isDirty, setIsDirty, registerSaveHandler, handleNavigation }}>
+        <UnsavedChangesContext.Provider value={{ isDirty, setIsDirty, registerSaveHandler, handleNavigation, handleAction }}>
             {children}
             {showModal && (
                 <ConfirmationModal
@@ -158,4 +179,8 @@ export function useUnsavedChanges() {
         throw new Error("useUnsavedChanges must be used within an UnsavedChangesProvider");
     }
     return context;
+}
+
+export function useUnsavedChangesSafe() {
+    return useContext(UnsavedChangesContext);
 }

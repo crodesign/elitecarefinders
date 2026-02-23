@@ -63,11 +63,18 @@ function darken(hex: string, amount: number) {
 }
 
 /** Apply accent CSS variables to the document root */
-function applyAccent(hex: string) {
+function applyAccent(hex: string, mode: ThemeMode = 'dark') {
     const root = document.documentElement;
     root.style.setProperty('--accent', hex);
-    root.style.setProperty('--accent-light', lighten(hex, 12));
-    root.style.setProperty('--accent-dark', darken(hex, 12));
+    if (mode === 'dark') {
+        // In dark mode, 'accent-light' diminishes (darkens) the button
+        root.style.setProperty('--accent-light', darken(hex, 12));
+        root.style.setProperty('--accent-dark', lighten(hex, 12));
+    } else {
+        // In light mode, 'accent-light' brightens the button
+        root.style.setProperty('--accent-light', lighten(hex, 12));
+        root.style.setProperty('--accent-dark', darken(hex, 12));
+    }
 }
 
 /** Apply mode (light/dark) to the document root */
@@ -122,7 +129,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Apply initial theme from cookie before the first Supabase fetch
     useEffect(() => {
-        applyAccent(initial.accent);
+        applyAccent(initial.accent, initial.mode);
         applyMode(initial.mode);
         applyGrey(initial.grey);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,7 +141,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) {
                 // Apply defaults even if not logged in
-                applyAccent(DEFAULT_ACCENT);
+                applyAccent(DEFAULT_ACCENT, DEFAULT_MODE);
                 applyMode(DEFAULT_MODE);
                 applyGrey(DEFAULT_GREY);
                 return;
@@ -155,7 +162,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 setModeState(savedMode);
                 setGreyState(savedGrey);
 
-                applyAccent(savedAccent);
+                applyAccent(savedAccent, savedMode);
                 applyMode(savedMode);
                 applyGrey(savedGrey);
 
@@ -212,13 +219,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const setAccent = useCallback((hex: string) => {
         setAccentState(hex);
-        applyAccent(hex);
+        applyAccent(hex, mode);
         savePrefs(hex, mode, grey);
     }, [mode, grey, savePrefs]);
 
     const setMode = useCallback((newMode: ThemeMode) => {
         setModeState(newMode);
         applyMode(newMode);
+        applyAccent(accent, newMode);
         savePrefs(accent, newMode, grey);
     }, [accent, grey, savePrefs]);
 

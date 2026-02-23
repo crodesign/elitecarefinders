@@ -161,7 +161,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
         </div>
 
         {/* Column 2: Notes History — fixed header, scrollable body only */}
-        <div className="flex flex-col min-h-0 border border-ui-border rounded-md">
+        <div className="flex flex-col min-h-0 border-2 rounded-md" style={{ borderColor: 'var(--surface-input)' }}>
           <h3 className="flex-none text-lg font-semibold text-content-primary py-3 px-6 bg-surface-input rounded-t-md">Notes History</h3>
           <div className="flex-1 min-h-0 overflow-y-auto pt-4 pb-4">
             {notes.length === 0 ? (

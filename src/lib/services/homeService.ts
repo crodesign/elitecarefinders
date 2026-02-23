@@ -13,7 +13,7 @@ export async function getHomes(): Promise<Home[]> {
     }
 
     // Ensure address is properly typed (it comes as JSON)
-    return (data || []).map(home => ({
+    return (data || []).map((home: any) => ({
         ...home,
         address: home.address || { street: "", city: "", state: "", zip: "" },
         displayReferenceNumber: home.display_reference_number,
@@ -25,6 +25,7 @@ export async function getHomes(): Promise<Home[]> {
         featuredLabel: home.featured_label,
         homeOfMonthDescription: home.home_of_month_description,
         images: home.images || [],
+        teamImages: home.team_images || [],
         roomDetails: home.room_details || { customFields: {} },
         updatedAt: home.updated_at,
     }));
@@ -54,12 +55,13 @@ export async function getHome(id: string): Promise<Home | null> {
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
 }
 
-export type CreateHomeInput = Omit<Home, "id" | "createdAt" | "updatedAt" | "images"> & { images?: string[] };
+export type CreateHomeInput = Omit<Home, "id" | "createdAt" | "updatedAt" | "images" | "teamImages"> & { images?: string[], teamImages?: string[] };
 
 export async function createHome(home: CreateHomeInput): Promise<Home> {
     const dbPayload = {
@@ -79,6 +81,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         featured_label: home.featuredLabel,
         home_of_month_description: home.homeOfMonthDescription,
         images: home.images || [],
+        team_images: home.teamImages || [],
         room_details: home.roomDetails || {},
     };
 
@@ -104,7 +107,8 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         isHomeOfMonth: data.is_home_of_month,
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
-        images: [],
+        images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -129,6 +133,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.featuredLabel !== undefined) dbUpdates.featured_label = updates.featuredLabel;
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
+    if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
     if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
 
     const { data, error } = await supabase
@@ -155,6 +160,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         featuredLabel: data.featured_label,
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
+        teamImages: data.team_images || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };

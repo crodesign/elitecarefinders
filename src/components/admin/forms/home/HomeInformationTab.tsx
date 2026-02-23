@@ -47,8 +47,8 @@ export interface HomeInformationTabProps {
     setPhone: (value: string) => void;
     email: string;
     setEmail: (value: string) => void;
-    status: 'draft' | 'published' | 'archived';
-    setStatus: (value: 'draft' | 'published' | 'archived') => void;
+    status: 'draft' | 'published';
+    setStatus: (value: 'draft' | 'published') => void;
     availableTaxonomies: any[]; // Using any[] to match HomeForm structure
     taxonomyEntryIds: string[];
     setTaxonomyEntryIds: (value: string[]) => void;
@@ -155,7 +155,7 @@ export function HomeInformationTab({
                             }}
                             placeholder="Describe the facility location, amenities, and care offered..."
                             minHeight="min-h-[200px]"
-                            className="flex-1"
+                            className="flex-1 bg-surface-input text-content-primary placeholder-content-muted border-none"
                         />
                     </div>
                 </div>
@@ -364,41 +364,7 @@ export function HomeInformationTab({
 
             {/* Col C — Status + Classification + Promotions (order-3) */}
             <div className="order-3 space-y-6">
-                {/* Status Section */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-4">
-                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-3">
-                        <Globe className="h-4 w-4 text-accent" />
-                        Publish Status
-                    </h3>
-                    <div className="flex bg-surface-input p-1 rounded-lg">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setStatus('published');
-                                setIsDirty(true);
-                            }}
-                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'published'
-                                ? "bg-emerald-600 text-white shadow-sm"
-                                : "text-content-muted hover:text-content-secondary"
-                                }`}
-                        >
-                            Published
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setStatus('draft');
-                                setIsDirty(true);
-                            }}
-                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${status === 'draft'
-                                ? "bg-surface-hover text-white shadow-sm"
-                                : "text-content-muted hover:text-content-secondary"
-                                }`}
-                        >
-                            Draft
-                        </button>
-                    </div>
-                </div>
+
 
                 {/* Promotions */}
                 <div className="space-y-3">

@@ -174,6 +174,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     zip
                 },
                 images,
+                teamImages,
                 roomDetails
             };
 
@@ -203,7 +204,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [zip, setZip] = useState("");
 
     // Status & Taxonomies
-    const [status, setStatus] = useState<'published' | 'draft' | 'archived'>('published');
+    const [status, setStatus] = useState<'published' | 'draft'>('published');
     const [taxonomyEntryIds, setTaxonomyEntryIds] = useState<string[]>([]);
     const [availableTaxonomies, setAvailableTaxonomies] = useState<TaxonomyWithEntries[]>([]);
 
@@ -225,6 +226,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
+    const [teamImages, setTeamImages] = useState<string[]>([]);
 
     // Fetch Gallery Folder - Only on initial load or if missing
     // We removed the auto-update logic to prevent folder migration issues.
@@ -397,10 +399,18 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         }
     }, [isOpen, searchParams]);
 
+    // Hydration flag to prevent premature dirty state checks
+    const isInitializedRef = useRef(false);
+
     // Reset or populate form
     useEffect(() => {
         if (isOpen) {
             setError(null);
+            isInitializedRef.current = false; // Reset hydration flag
+
+            // Only reset to empty if we are explicitly in "Create New Home" mode (isOpen && home is undefined/null)
+            // If home is provided, we populate. If it's missing, we reset.
+            // Note: The parent component should ensure 'home' is fully loaded before setting isOpen=true for edits.
             if (home) {
                 setTitle(home.title);
                 setSlug(home.slug);
@@ -409,7 +419,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setEmail(home.email || "");
                 setDisplayReferenceNumber(home.displayReferenceNumber || false);
                 setShowAddress(home.showAddress !== false); // default true
-                setStatus(home.status || 'published');
+                setStatus(((home.status === 'archived' ? 'draft' : home.status) as 'published' | 'draft') || 'published');
                 setTaxonomyEntryIds(home.taxonomyEntryIds || []);
 
                 setIsFeatured(home.isFeatured || false);
@@ -430,6 +440,15 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
                 // Images
                 setImages(home.images || []);
+                setTeamImages(home.teamImages || []);
+
+                // Explicitly clear dirty state when we finish populating from a prop
+                // We use a timeout to allow the React state queue to flush so checkIsDirty runs against the NEW state
+                setTimeout(() => {
+                    setIsDirty(false);
+                    isInitializedRef.current = true;
+                }, 50);
+
             } else {
                 // Reset
                 setTitle("");
@@ -458,9 +477,17 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
                 // Reset Images
                 setImages([]);
+
+                // Clear dirty state on reset
+                setTimeout(() => {
+                    setIsDirty(false);
+                    isInitializedRef.current = true;
+                }, 50);
             }
+        } else {
+            isInitializedRef.current = false;
         }
-    }, [isOpen, home]);
+    }, [isOpen, home, setIsDirty]);
 
     // Auto-generate slug from title if creating
     // Removed to handle in onChange instead to prevent overwriting existing slugs on load
@@ -475,18 +502,40 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
     // Check if form state differs from initial/saved state
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen || !isInitializedRef.current) return;
 
         const checkIsDirty = () => {
-            // Helper for array comparison (order matters)
-            const arraysEqual = (a: any[], b: any[]) => {
-                if (a.length !== b.length) return false;
-                return a.every((val, index) => val === b[index]);
+            // Helper for array comparison (order matters, treats null/undefined as empty)
+            const arraysEqual = (a: any[] | null | undefined, b: any[] | null | undefined) => {
+                const arrA = a || [];
+                const arrB = b || [];
+                if (arrA.length !== arrB.length) return false;
+                return arrA.every((val, index) => val === arrB[index]);
             };
 
-            // Helper for customs fields comparison
-            const customFieldsEqual = (current: Record<string, any>, original: Record<string, any> | undefined) => {
-                return JSON.stringify(current) === JSON.stringify(original || {});
+            // Helper for customs fields comparison (treats null/undefined as empty object)
+            const customFieldsEqual = (current: Record<string, any> | null | undefined, original: Record<string, any> | null | undefined) => {
+                const objCurrent = current || {};
+                const objOriginal = original || {};
+
+                // Remove undefined or empty values before comparison to ensure { key: "" } equals {}
+                const cleanObj = (obj: Record<string, any>) => {
+                    return Object.entries(obj).reduce((acc, [k, v]) => {
+                        if (v !== undefined && v !== null && v !== "") {
+                            acc[k] = v;
+                        }
+                        return acc;
+                    }, {} as Record<string, any>);
+                };
+
+                return JSON.stringify(cleanObj(objCurrent)) === JSON.stringify(cleanObj(objOriginal));
+            };
+
+            // Helper to compare rich text by stripping HTML attributes that the editor might add
+            const cleanHtml = (html: string | undefined | null) => {
+                if (!html) return "";
+                // Remove class attributes and other formatting the editor injects on load
+                return html.replace(/ class="[^"]*"/g, '').replace(/ dir="[^"]*"/g, '').trim();
             };
 
             if (!home) {
@@ -503,50 +552,58 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 if (isFeatured || hasFeaturedVideo || isHomeOfMonth || featuredLabel || homeOfMonthDescription) return true;
 
                 // Room Details
-                if (Object.keys(roomDetails.customFields).length > 0) return true;
+                if (Object.keys(roomDetails.customFields || {}).length > 0) return true;
                 if (roomDetails.roomPrice || roomDetails.bedroomType || roomDetails.bathroomType || roomDetails.showerType || (roomDetails.languages && roomDetails.languages.length > 0)) return true;
 
                 return false;
             }
 
+            // Edit Mode Debug Logging function
+            const check = (condition: boolean, field: string, curr: any, orig: any) => {
+                if (condition) {
+                    console.log(`[HomeForm IS DIRTY]: field '${field}' changed from '${orig}' to '${curr}'`);
+                }
+                return condition;
+            };
+
             // Edit Mode - compare against home prop
-            if (title !== home.title) return true;
-            if (slug !== home.slug) return true;
-            if (description !== (home.description || "")) return true;
-            if (phone !== (home.phone || "")) return true;
-            if (email !== (home.email || "")) return true;
-            if (displayReferenceNumber !== (home.displayReferenceNumber ?? false)) return true;
-            if (showAddress !== (home.showAddress !== false)) return true;
-            if (status !== (home.status || 'published')) return true;
+            if (check(title !== home.title, "title", title, home.title)) return true;
+            if (check(slug !== home.slug, "slug", slug, home.slug)) return true;
+            if (check(cleanHtml(description) !== cleanHtml(home.description), "description", cleanHtml(description), cleanHtml(home.description))) return true;
+            if (check(phone !== (home.phone || ""), "phone", phone, home.phone)) return true;
+            if (check(email !== (home.email || ""), "email", email, home.email)) return true;
+            if (check(displayReferenceNumber !== (home.displayReferenceNumber ?? false), "displayReferenceNumber", displayReferenceNumber, home.displayReferenceNumber)) return true;
+            if (check(showAddress !== (home.showAddress !== false), "showAddress", showAddress, home.showAddress)) return true;
+            if (check(status !== (home.status || 'published'), "status", status, home.status)) return true;
 
-            if (!arraysEqual(taxonomyEntryIds, home.taxonomyEntryIds || [])) return true;
-            if (!arraysEqual(images, home.images || [])) return true;
+            if (check(!arraysEqual(taxonomyEntryIds, home.taxonomyEntryIds), "taxonomyEntryIds", taxonomyEntryIds, home.taxonomyEntryIds)) return true;
+            if (check(!arraysEqual(images, home.images), "images", images, home.images)) return true;
 
-            if (street !== (home.address?.street || "")) return true;
-            if (city !== (home.address?.city || "")) return true;
-            if (state !== (home.address?.state || "")) return true;
-            if (zip !== (home.address?.zip || "")) return true;
+            if (check(street !== (home.address?.street || ""), "street", street, home.address?.street)) return true;
+            if (check(city !== (home.address?.city || ""), "city", city, home.address?.city)) return true;
+            if (check(state !== (home.address?.state || ""), "state", state, home.address?.state)) return true;
+            if (check(zip !== (home.address?.zip || ""), "zip", zip, home.address?.zip)) return true;
 
             // Promotions
-            if (isFeatured !== (home.isFeatured || false)) return true;
-            if (hasFeaturedVideo !== (home.hasFeaturedVideo || false)) return true;
-            if (isHomeOfMonth !== (home.isHomeOfMonth || false)) return true;
-            if (featuredLabel !== (home.featuredLabel || "")) return true;
-            if (homeOfMonthDescription !== (home.homeOfMonthDescription || "")) return true;
+            if (check(isFeatured !== (home.isFeatured || false), "isFeatured", isFeatured, home.isFeatured)) return true;
+            if (check(hasFeaturedVideo !== (home.hasFeaturedVideo || false), "hasFeaturedVideo", hasFeaturedVideo, home.hasFeaturedVideo)) return true;
+            if (check(isHomeOfMonth !== (home.isHomeOfMonth || false), "isHomeOfMonth", isHomeOfMonth, home.isHomeOfMonth)) return true;
+            if (check(featuredLabel !== (home.featuredLabel || ""), "featuredLabel", featuredLabel, home.featuredLabel)) return true;
+            if (check(homeOfMonthDescription !== (home.homeOfMonthDescription || ""), "homeOfMonthDescription", homeOfMonthDescription, home.homeOfMonthDescription)) return true;
 
             // Room Details
-            if (roomDetails.roomPrice !== home.roomDetails?.roomPrice) return true;
-            if (roomDetails.bedroomType !== (home.roomDetails?.bedroomType || undefined)) return true;
-            if (roomDetails.bathroomType !== (home.roomDetails?.bathroomType || undefined)) return true;
-            if (roomDetails.showerType !== (home.roomDetails?.showerType || undefined)) return true;
+            if (check(roomDetails.roomPrice !== home.roomDetails?.roomPrice && !(roomDetails.roomPrice === undefined && home.roomDetails?.roomPrice === null), "roomPrice", roomDetails.roomPrice, home.roomDetails?.roomPrice)) return true;
+            if (check(roomDetails.bedroomType !== (home.roomDetails?.bedroomType || undefined), "bedroomType", roomDetails.bedroomType, home.roomDetails?.bedroomType)) return true;
+            if (check(roomDetails.bathroomType !== (home.roomDetails?.bathroomType || undefined), "bathroomType", roomDetails.bathroomType, home.roomDetails?.bathroomType)) return true;
+            if (check(roomDetails.showerType !== (home.roomDetails?.showerType || undefined), "showerType", roomDetails.showerType, home.roomDetails?.showerType)) return true;
 
             // Languages (array order irrelevant usually, but simple sort check or strict check)
             // Assuming strict order for simplicity, or sort
             const currentLangs = [...(roomDetails.languages || [])].sort();
             const originalLangs = [...(home.roomDetails?.languages || [])].sort();
-            if (!arraysEqual(currentLangs, originalLangs)) return true;
+            if (check(!arraysEqual(currentLangs, originalLangs), "languages", currentLangs, originalLangs)) return true;
 
-            if (!customFieldsEqual(roomDetails.customFields, home.roomDetails?.customFields)) return true;
+            if (check(!customFieldsEqual(roomDetails.customFields, home.roomDetails?.customFields), "customFields", roomDetails.customFields, home.roomDetails?.customFields)) return true;
 
             return false;
         };
@@ -719,6 +776,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     <HomeGalleryTab
                         images={images}
                         setImages={setImages}
+                        teamImages={teamImages}
+                        setTeamImages={setTeamImages}
                         galleryFolderId={galleryFolderId}
                         title={title}
                         setIsDirty={setIsDirty}
@@ -731,6 +790,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     };
     // Close Handler
     const [showCloseWarning, setShowCloseWarning] = useState(false);
+    const [showDisabledTabAlert, setShowDisabledTabAlert] = useState(false);
 
     const handleCloseInternal = () => {
         if (isDirty) {
@@ -761,7 +821,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 isOpen={isOpen}
                 onClose={handleCloseInternal}
                 title={isEditing ? "Edit Home" : "Add Home"}
-                subtitle={isEditing ? "Update home details and settings" : "Add a new residential care home"}
+                subtitle={isEditing ? (title || "Update home details and settings") : "Add a new residential care home"}
                 fullScreen
                 contentClassName={activeTab === 'gallery' ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 headerChildren={
@@ -770,6 +830,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
+                                const isDisabled = !home?.id && tab.id !== 'information';
                                 // Tab color matches the border color exactly
                                 const tabColor = 'var(--surface-tab)';
 
@@ -777,11 +838,19 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                     <button
                                         key={tab.id}
                                         type="button"
-                                        onClick={() => handleTabChange(tab.id)}
+                                        aria-disabled={isDisabled}
+                                        onClick={() => {
+                                            if (isDisabled) {
+                                                setShowDisabledTabAlert(true);
+                                                return;
+                                            }
+                                            handleTabChange(tab.id);
+                                        }}
                                         className={`
                                             relative flex items-center gap-2 px-4 text-sm font-medium
                                             whitespace-nowrap
                                             transition-colors duration-150 select-none
+                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                             ${isActive
                                                 ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
                                                 : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
@@ -812,6 +881,23 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                             })}
                         </div>
                         <div className="flex items-center gap-2">
+                            <div className="flex bg-surface-input p-1 rounded-lg mr-2 hidden md:flex">
+                                <button
+                                    type="button"
+                                    onClick={() => { setStatus('published'); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Published
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setStatus('draft'); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Draft
+                                </button>
+
+                            </div>
                             <button
                                 type="submit"
                                 form="home-form"
@@ -868,6 +954,16 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 confirmLabel="Discard Changes"
                 cancelLabel="Keep Editing"
                 isDangerous={true}
+            />
+
+            <ConfirmationModal
+                isOpen={showDisabledTabAlert}
+                onClose={() => setShowDisabledTabAlert(false)}
+                onConfirm={() => setShowDisabledTabAlert(false)}
+                title="Action Required"
+                message="Please fill out required fields (Title, Home Type, Location) and save the Home before accessing other tabs."
+                confirmLabel="Understood"
+                hideCancel={true}
             />
         </>
     );

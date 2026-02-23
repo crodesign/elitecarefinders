@@ -64,7 +64,7 @@ const theme = {
         italic: "italic",
         underline: "underline",
         strikethrough: "line-through",
-        code: "font-mono bg-white/10 px-1 rounded text-sm",
+        code: "font-mono bg-surface-secondary px-1 rounded text-sm text-content-primary",
     },
     heading: {
         h2: "text-xl font-bold mt-3 mb-1",
@@ -122,16 +122,16 @@ function LinkModal({
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-surface-secondary/60 backdrop-blur-sm" onClick={onClose} />
             {/* Modal */}
-            <div className="relative bg-surface-secondary border border-white/10 rounded-xl shadow-2xl p-5 w-full max-w-md mx-4 flex flex-col gap-4">
+            <div className="relative bg-surface-primary border border-ui-border rounded-xl shadow-2xl p-5 w-full max-w-md mx-4 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2">
                         <LinkIcon className="w-4 h-4 text-accent" />
                         Insert Link
                     </h3>
                     <button type="button" onClick={onClose}
-                        className="p-1 rounded hover:bg-white/10 text-content-muted hover:text-white transition-colors">
+                        className="p-1 rounded hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors">
                         <X className="w-4 h-4" />
                     </button>
                 </div>
@@ -145,7 +145,7 @@ function LinkModal({
                         value={url}
                         onChange={e => setUrl(e.target.value)}
                         placeholder="https://example.com"
-                        className={`w-full bg-black/40 rounded-lg px-3 py-2 text-sm text-white placeholder-content-muted focus:outline-none transition-colors font-mono border-2 ${showError
+                        className={`w-full bg-surface-input rounded-lg px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:outline-none transition-colors font-mono border-2 ${showError
                             ? "border-red-500"
                             : "border-transparent"
                             }`}
@@ -162,15 +162,15 @@ function LinkModal({
                 </div>
 
                 {/* New Tab Toggle */}
-                <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5 bg-white/10 rounded-lg">
-                    <label className="text-sm font-medium text-white/80 whitespace-nowrap">
+                <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5 bg-surface-input rounded-lg">
+                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
                         Open in new tab
                     </label>
                     <button
                         type="button"
                         onClick={() => setNewTab(v => !v)}
-                        className="relative w-8 h-4 rounded-full transition-colors flex-shrink-0 focus:outline-none"
-                        style={{ backgroundColor: newTab ? "var(--color-accent, #3b82f6)" : "rgba(255,255,255,0.2)" }}
+                        className="relative w-8 h-4 rounded-full transition-colors flex-shrink-0 focus:outline-none bg-surface-hover"
+                        style={{ backgroundColor: newTab ? "var(--color-accent, #3b82f6)" : undefined }}
                     >
                         <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-all ${newTab ? "left-[18px]" : "left-0.5"}`} />
                     </button>
@@ -188,7 +188,7 @@ function LinkModal({
                     </button>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={onClose}
-                            className="px-3 py-1.5 text-xs text-content-muted hover:text-white rounded-lg hover:bg-white/10 transition-colors">
+                            className="px-3 py-1.5 text-xs text-content-muted hover:text-content-primary rounded-lg hover:bg-surface-hover transition-colors">
                             Cancel
                         </button>
                         <button type="button" onClick={handleSave}
@@ -283,12 +283,12 @@ function Toolbar() {
     };
 
     const btn = (active: boolean) =>
-        `p-2 rounded transition-colors ${active ? "bg-accent text-white" : "text-content-muted hover:text-white hover:bg-white/10"}`;
+        `p-2 rounded transition-colors ${active ? "bg-accent text-white" : "text-content-muted hover:text-content-primary hover:bg-surface-hover"}`;
 
-    const dropdownBtn = "flex items-center gap-2 w-full px-3 py-2 text-xs rounded hover:bg-white/10 text-left";
+    const dropdownBtn = "flex items-center gap-2 w-full px-3 py-2 text-xs rounded hover:bg-surface-hover text-left";
 
     return (
-        <div className="flex items-center gap-1 p-2 bg-white/10 flex-wrap">
+        <div className="flex items-center gap-1 p-2 bg-transparent flex-wrap">
             {/* Bold / Italic / Underline */}
             <button type="button" className={btn(isBold)} title="Bold"
                 onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}>
@@ -303,7 +303,7 @@ function Toolbar() {
                 <Underline className="w-4 h-4" />
             </button>
 
-            <div className="w-px h-4 bg-white/10 mx-1 flex-shrink-0" />
+            <div className="w-px h-4 bg-ui-border mx-1 flex-shrink-0" />
 
             {/* Heading picker */}
             <div className="relative">
@@ -314,7 +314,7 @@ function Toolbar() {
                     <ChevronDown className="w-3 h-3" />
                 </button>
                 {showHeadingMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-surface-secondary border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
+                    <div className="absolute top-full left-0 mt-1 bg-surface-primary border border-ui-border rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
                         {([["paragraph", <Type className="w-4 h-4" />, "Normal"],
                         ["h2", <Heading2 className="w-4 h-4" />, "Heading 2"],
                         ["h3", <Heading3 className="w-4 h-4" />, "Heading 3"],
@@ -329,7 +329,7 @@ function Toolbar() {
                 )}
             </div>
 
-            <div className="w-px h-4 bg-white/10 mx-1 flex-shrink-0" />
+            <div className="w-px h-4 bg-ui-border mx-1 flex-shrink-0" />
 
             {/* Lists */}
             <button type="button" className={btn(isBullet)} title="Bullet list"
@@ -343,7 +343,7 @@ function Toolbar() {
                 <ListOrdered className="w-4 h-4" />
             </button>
 
-            <div className="w-px h-4 bg-white/10 mx-1 flex-shrink-0" />
+            <div className="w-px h-4 bg-ui-border mx-1 flex-shrink-0" />
 
             {/* Alignment */}
             <div className="relative">
@@ -354,7 +354,7 @@ function Toolbar() {
                     <ChevronDown className="w-3 h-3" />
                 </button>
                 {showAlignMenu && (
-                    <div className="absolute top-full left-0 mt-1 bg-surface-secondary border border-white/10 rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[120px]">
+                    <div className="absolute top-full left-0 mt-1 bg-surface-primary border border-ui-border rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[120px]">
                         {([["left", <AlignLeft className="w-4 h-4" />, "Left"],
                         ["center", <AlignCenter className="w-4 h-4" />, "Center"],
                         ["right", <AlignRight className="w-4 h-4" />, "Right"],
@@ -372,7 +372,7 @@ function Toolbar() {
                 )}
             </div>
 
-            <div className="w-px h-4 bg-white/10 mx-1 flex-shrink-0" />
+            <div className="w-px h-4 bg-ui-border mx-1 flex-shrink-0" />
 
             {/* Link */}
             <button type="button" className={btn(isLink)} title="Link"
@@ -472,13 +472,13 @@ export function RichTextEditor({
 
     return (
         <LexicalComposer initialConfig={initialConfig}>
-            <div className={`w-full bg-black/30 rounded-lg overflow-hidden flex flex-col transition-colors hover:bg-black/50 focus-within:bg-black/50 ${className}`}>
+            <div className={`w-full bg-surface-input border border-ui-border rounded-lg overflow-hidden flex flex-col transition-colors focus-within:border-accent focus-within:ring-1 focus-within:ring-accent ${className}`}>
                 <Toolbar />
                 <div className="relative flex-1 flex flex-col">
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable
-                                className={`prose prose-invert max-w-none focus:outline-none text-sm text-white ${minHeight} flex-1 p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-semibold [&_h4]:text-base [&_h4]:font-semibold`}
+                                className={`editor-bg max-w-none focus:outline-none text-sm text-content-primary ${minHeight} flex-1 p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-content-primary [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-content-primary [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-content-primary [&_p]:text-content-secondary [&_a]:text-accent hover:[&_a]:underline`}
                             />
                         }
                         placeholder={<PlaceholderComponent text={placeholder} />}

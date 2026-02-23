@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { useUnsavedChangesSafe } from "@/contexts/UnsavedChangesContext";
 
 interface SlidePanelProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    subtitle?: string;
+    subtitle?: React.ReactNode;
     children: React.ReactNode;
     /** Width in pixels for md+ screens, full width on mobile */
     width?: number;
@@ -48,6 +50,13 @@ export function SlidePanel({
 }: SlidePanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const { collapsed: sidebarCollapsed } = useSidebar();
+    const unsavedContext = useUnsavedChangesSafe();
+    const handleAction = unsavedContext?.handleAction || ((action: () => void) => action());
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const backdropZ = 54 + stackLevel * 4;
     const panelZ = 55 + stackLevel * 4;
@@ -56,12 +65,30 @@ export function SlidePanel({
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === "Escape" && isOpen) {
-                onClose();
+                handleAction(onClose);
             }
         };
         document.addEventListener("keydown", handleEscape);
         return () => document.removeEventListener("keydown", handleEscape);
-    }, [isOpen, onClose]);
+    }, [isOpen, onClose, handleAction]);
+
+    // Handle clicks on sidebar / header to close panel
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (!isOpen || !closeOnOverlayClick) return;
+            const target = e.target as HTMLElement;
+
+            const isSidebar = target.closest('#admin-sidebar') || target.closest('#admin-mobile-header');
+            const isInteractive = target.closest('a') || target.closest('button') || target.closest('input') || target.closest('select');
+
+            if (isSidebar && !isInteractive) {
+                handleAction(onClose);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => document.removeEventListener("mousedown", handleOutsideClick);
+    }, [isOpen, closeOnOverlayClick, onClose, handleAction]);
 
     // Prevent body scroll when open
     useEffect(() => {
@@ -75,20 +102,20 @@ export function SlidePanel({
         };
     }, [isOpen]);
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
     // Determine left position based on sidebar state
     const sidebarLeftClass = sidebarCollapsed ? "md:left-20" : "md:left-64";
     const shouldOffset = fullScreen || offsetSidebar;
 
-    return (
+    return createPortal(
         <>
             {/* Backdrop - Always full screen and independent of panel positioning */}
             {showOverlay && isOpen && (
                 <div
                     className={`fixed inset-0 backdrop-blur-sm transition-opacity ${closeOnOverlayClick ? 'cursor-pointer' : 'cursor-default'}`}
                     style={{ zIndex: backdropZ, backgroundColor: 'var(--glass-overlay)' }}
-                    onClick={closeOnOverlayClick ? onClose : undefined}
+                    onClick={closeOnOverlayClick ? () => handleAction(onClose) : undefined}
                 />
             )}
 
@@ -103,10 +130,11 @@ export function SlidePanel({
                 {/* Panel - full width on mobile, fixed width on md+ */}
                 <div
                     ref={panelRef}
-                    className="slide-panel absolute right-0 top-0 h-full w-full bg-surface-secondary shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto"
+                    className="slide-panel absolute right-0 top-0 h-full w-full bg-surface-secondary shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto border-l-2"
                     style={{
                         animation: "slideInFromRight 0.3s ease-out",
                         "--panel-width": fullScreen ? "100%" : `${width}px`,
+                        borderColor: "var(--surface-tab-border)",
                     } as React.CSSProperties}
                 >
                     <style>{`
@@ -128,7 +156,7 @@ export function SlidePanel({
                             <div className="flex items-center gap-2">
                                 {actions}
                                 <button
-                                    onClick={onClose}
+                                    onClick={() => handleAction(onClose)}
                                     className="p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-hover transition-colors"
                                 >
                                     <X className="h-5 w-5" />
@@ -161,6 +189,7 @@ export function SlidePanel({
         }
       `}</style>
             </div>
-        </>
+        </>,
+        document.body
     );
 }

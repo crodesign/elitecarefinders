@@ -77,7 +77,7 @@ export async function PATCH(request: Request) {
     const body = await request.json();
 
     // Only allow updating specific profile fields (not role, not email)
-    const allowedFields = ['full_name', 'nickname', 'photo_url', 'phone', 'address'];
+    const allowedFields = ['full_name', 'nickname', 'photo_url', 'phone', 'address', 'default_media_folder_id'];
     const updates: Record<string, any> = {};
     for (const key of allowedFields) {
         if (key in body) {

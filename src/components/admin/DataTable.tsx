@@ -52,7 +52,7 @@ export function DataTable<T>({
                                 </th>
                             ))}
                             {actions && (
-                                <th className="px-6 py-3 text-right">Actions</th>
+                                <th className="px-6 py-3 text-right border-l border-ui-border w-1 whitespace-nowrap">Actions</th>
                             )}
                         </tr>
                     </thead>
@@ -65,7 +65,7 @@ export function DataTable<T>({
                                     </td>
                                 ))}
                                 {actions && (
-                                    <td className="px-6 py-2">
+                                    <td className="px-6 py-2 border-l border-ui-border w-1 whitespace-nowrap">
                                         <div className="flex justify-end gap-1">
                                             {actions(item)}
                                         </div>
