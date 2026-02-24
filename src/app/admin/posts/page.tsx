@@ -199,7 +199,7 @@ export default function PostsPage() {
                     </span>
                     <div>
                         <div className="font-medium text-content-primary group-hover:text-accent transition-colors">{post.title}</div>
-                        <div className="text-xs text-content-muted hidden md:block max-w-sm truncate" title={post.excerpt}>{post.excerpt || '—'}</div>
+                        <div className="text-xs text-content-muted hidden md:block max-w-sm truncate">{post.excerpt || '—'}</div>
                     </div>
                 </button>
             ),
@@ -226,14 +226,13 @@ export default function PostsPage() {
 
     const renderActions = (post: Post) => (
         <>
-            <button className="btn-ghost" onClick={() => handleOpenEdit(post)} title="Edit Post">
+            <button className="btn-ghost" onClick={() => handleOpenEdit(post)}>
                 <Pencil className="h-4 w-4" />
             </button>
             <button
                 className="btn-danger"
                 onClick={() => handleDelete(post)}
                 disabled={isDeleting === post.id}
-                title="Delete Post"
             >
                 {isDeleting === post.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

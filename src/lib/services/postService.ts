@@ -140,13 +140,17 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
 }
 
 export async function deletePost(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error, count } = await supabase
         .from("posts")
-        .delete()
+        .delete({ count: 'exact' })
         .eq("id", id);
 
     if (error) {
         console.error(`Error deleting post ${id}:`, error);
         throw new Error(error.message);
+    }
+
+    if (count === 0) {
+        throw new Error("Post could not be deleted. It may not exist or you lack permission.");
     }
 }
