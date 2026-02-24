@@ -130,7 +130,19 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     };
 }
 
-export async function deleteFacility(id: string): Promise<void> {
+export async function deleteFacility(id: string, slug?: string): Promise<void> {
+    if (slug) {
+        try {
+            await fetch('/api/media/delete-entity', {
+                method: 'POST',
+                body: JSON.stringify({ slug }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (e) {
+            console.error(`Failed to delete media for facility ${slug}:`, e);
+        }
+    }
+
     const { error } = await supabase
         .from("facilities")
         .delete()

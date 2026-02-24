@@ -158,13 +158,15 @@ export default function FacilitiesPage() {
     const handleOpenCreate = () => {
         setEditingFacility(null);
         setIsFormOpen(true);
+        // Update URL to reflect creation state with default tab
+        router.push(`/admin/facilities?action=create&tab=information`, { scroll: false });
     };
 
     const handleOpenEdit = (facility: Facility) => {
         setEditingFacility(facility);
         setIsFormOpen(true);
-        // Update URL to reflect editing state
-        router.push(`/admin/facilities?edit=${facility.slug}`, { scroll: false });
+        // Update URL to reflect editing state with default tab
+        router.push(`/admin/facilities?edit=${facility.slug}&tab=information`, { scroll: false });
     };
 
     const handleCloseForm = () => {
@@ -218,7 +220,7 @@ export default function FacilitiesPage() {
 
         setIsDeleting(true);
         try {
-            await deleteFacility(itemToDelete.id);
+            await deleteFacility(itemToDelete.id, itemToDelete.slug);
             await fetchFacilities();
             showNotification("Facility Deleted", "Facility has been removed");
         } catch (err) {

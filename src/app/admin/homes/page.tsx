@@ -157,13 +157,15 @@ export default function HomesPage() {
     const handleOpenCreate = () => {
         setEditingHome(null);
         setIsFormOpen(true);
+        // Update URL to reflect creation state with default tab
+        router.push(`/admin/homes?action=create&tab=information`, { scroll: false });
     };
 
     const handleOpenEdit = (home: Home) => {
         setEditingHome(home);
         setIsFormOpen(true);
-        // Update URL to reflect editing state
-        router.push(`/admin/homes?edit=${home.slug}`, { scroll: false });
+        // Update URL to reflect editing state with default tab
+        router.push(`/admin/homes?edit=${home.slug}&tab=information`, { scroll: false });
     };
 
     const handleCloseForm = () => {
@@ -220,7 +222,7 @@ export default function HomesPage() {
 
         setIsDeleting(true);
         try {
-            await deleteHome(itemToDelete.id);
+            await deleteHome(itemToDelete.id, itemToDelete.slug);
             await fetchHomes();
             showNotification("Home Deleted", "Home has been removed");
         } catch (err) {

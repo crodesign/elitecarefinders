@@ -166,7 +166,19 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     };
 }
 
-export async function deleteHome(id: string): Promise<void> {
+export async function deleteHome(id: string, slug?: string): Promise<void> {
+    if (slug) {
+        try {
+            await fetch('/api/media/delete-entity', {
+                method: 'POST',
+                body: JSON.stringify({ slug }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (e) {
+            console.error(`Failed to delete media for home ${slug}:`, e);
+        }
+    }
+
     const { error } = await supabase
         .from("homes")
         .delete()
