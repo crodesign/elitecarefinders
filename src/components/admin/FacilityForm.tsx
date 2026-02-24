@@ -123,6 +123,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     // Use ref to keep track of latest handleSaveInternal without re-registering
     const saveHandlerRef = useRef<() => Promise<boolean>>(async () => false);
 
+    // Track original title for rename detection
+    const originalTitleRef = useRef<string>("");
+
     // Update ref when state changes
     useEffect(() => {
         saveHandlerRef.current = handleSaveInternal;
@@ -184,11 +187,15 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
 
-    // Fetch Gallery Folder based on taxonomy location (matches Home system)
+    // Fetch Gallery Folder - Only on initial load for EXISTING facilities
+    // For NEW facilities, folder is created in the save handler.
     useEffect(() => {
         const fetchFolder = async () => {
-            // If we already have a folder ID, do NOT update it automatically on location change
             if (galleryFolderId) return;
+            if (!facility?.id) return; // New facility — folder created in save handler
+
+            const savedTitle = facility.title;
+            if (!savedTitle) return;
 
             // Find "Location" or "Locations" taxonomy
             const locationTaxonomy = availableTaxonomies.find(t =>
@@ -206,7 +213,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     if (entry.id === targetId) return { entry, path: currentPath };
                     if (entry.children) {
                         const found = findEntryAndPath(entry.children, targetId, currentPath);
-                        if (found) found;
+                        if (found) return found;
                     }
                 }
                 return null;
@@ -222,8 +229,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     if (result) {
                         const { path } = result;
                         if (path.length > 0) {
-                            derivedState = path[0].name; // Root
-                            derivedCity = path[path.length - 1].name; // Leaf (Selected)
+                            derivedState = path[0].name;
+                            derivedCity = path[path.length - 1].name;
                             hasLocationSelection = true;
                         }
                     }
@@ -232,8 +239,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
             const validLocation = hasLocationSelection || (state && city);
 
-            if (validLocation && title) {
-                // Use full state name for folder structure if using address state code
+            if (validLocation) {
                 let stateName = derivedState;
                 if (!hasLocationSelection && derivedState.length === 2) {
                     const stateObj = US_STATES.find(s => s.code === derivedState || s.name === derivedState);
@@ -241,7 +247,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 }
 
                 try {
-                    const id = await ensureLocationFolders(stateName, derivedCity, title, 'facility');
+                    const id = await ensureLocationFolders(stateName, derivedCity, savedTitle, 'facility');
                     setGalleryFolderId(id);
                 } catch (error) {
                     console.error("Error ensuring location folders:", error);
@@ -251,7 +257,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         };
         fetchFolder();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state, city, title, taxonomyIds, availableTaxonomies, galleryFolderId]);
+    }, [state, city, taxonomyIds, availableTaxonomies, galleryFolderId, facility?.id]);
 
     // Room Fields State (for Facility Details tab)
     const [roomCategories, setRoomCategories] = useState<RoomFieldCategory[]>([]);
@@ -350,6 +356,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             setError(null);
             if (facility) {
                 setTitle(facility.title);
+                originalTitleRef.current = facility.title;
                 setSlug(facility.slug);
                 setDescription(facility.description);
                 setLicenseNumber(facility.licenseNumber || "");
@@ -566,10 +573,55 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         setError(null);
         setIsSubmitting(true);
 
+        // SLUG OVERWRITE FIX: Generate the final slug synchronously BEFORE saving to the database
+        // so that if the title changed, we don't accidentally send the old cached `slug` state variable back to the DB!
+        const finalSlug = (facility?.id && title !== originalTitleRef.current)
+            ? (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : slug)
+            : slug;
+
+        let finalImages = images;
+        let finalTeamImages = teamImages;
+
         try {
+            // ── Transparent Rename Detection ──
+            if (facility?.id && title !== originalTitleRef.current && originalTitleRef.current) {
+                console.log(`[FacilityForm] Title changed: "${originalTitleRef.current}" → "${title}", triggering rename...`);
+                try {
+                    const renameRes = await fetch('/api/media/rename-entity', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            entityType: 'facility',
+                            entityId: facility.id,
+                            oldTitle: originalTitleRef.current,
+                            newTitle: title,
+                            folderId: galleryFolderId,
+                        }),
+                    });
+                    const renameData = await renameRes.json();
+                    if (!renameRes.ok) {
+                        console.error('[FacilityForm] Rename failed:', renameData.error);
+                    } else {
+                        console.log('[FacilityForm] Rename succeeded:', renameData.results);
+                        originalTitleRef.current = title;
+
+                        // IMPORTANT: Update local arrays with renamed files so onSave doesn't overwrite the DB with the old ones!
+                        if (renameData.renamedFiles && Object.keys(renameData.renamedFiles).length > 0) {
+                            const mapUrl = (url: string) => renameData.renamedFiles[url] || url;
+                            finalImages = images.map(mapUrl);
+                            setImages(finalImages);
+                            finalTeamImages = teamImages.map(mapUrl);
+                            setTeamImages(finalTeamImages);
+                        }
+                    }
+                } catch (renameErr) {
+                    console.error('[FacilityForm] Rename API error:', renameErr);
+                }
+            }
+
             const formData: Partial<Facility> = {
                 title,
-                slug,
+                slug: finalSlug,
                 description,
                 licenseNumber,
                 capacity: capacity === "" ? 0 : capacity,
@@ -594,10 +646,54 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     featuredLabel: isFeatured ? featuredLabel : "",
                     facilityOfMonthDescription: isFacilityOfMonth ? facilityOfMonthDescription : "",
                 } as any),
-                images,
-                teamImages,
+                images: finalImages,
+                teamImages: finalTeamImages,
                 roomDetails,
             };
+            // For BOTH new and existing facilities: ensure the gallery folder is in the right location.
+            // If the city/state changed, ensureLocationFolders will move the existing folder.
+            if (title) {
+                try {
+                    const locationTaxonomy = availableTaxonomies.find(t =>
+                        t.slug === 'location' || t.slug === 'locations' || t.name === 'Location' || t.name === 'Locations'
+                    );
+                    let stateName = state || '';
+                    let cityName = city || '';
+                    let hasTaxonomyLocation = false;
+
+                    if (locationTaxonomy?.entries) {
+                        const findEntry = (entries: any[], id: string, path: any[] = []): any[] | null => {
+                            for (const e of entries) {
+                                const p = [...path, e];
+                                if (e.id === id) return p;
+                                if (e.children) { const r = findEntry(e.children, id, p); if (r) return r; }
+                            }
+                            return null;
+                        };
+                        for (const tid of taxonomyIds) {
+                            const p = findEntry(locationTaxonomy.entries, tid);
+                            if (p && p.length > 0) {
+                                stateName = p[0].name;
+                                cityName = p[p.length - 1].name;
+                                hasTaxonomyLocation = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasTaxonomyLocation || (stateName && cityName)) {
+                        if (stateName.length === 2 && !hasTaxonomyLocation) {
+                            const stateObj = US_STATES.find(s => s.code === stateName);
+                            if (stateObj) stateName = stateObj.name;
+                        }
+                        const fid = await ensureLocationFolders(stateName, cityName, title, 'facility', galleryFolderId);
+                        if (!galleryFolderId) setGalleryFolderId(fid);
+                    }
+                } catch (err) {
+                    console.error("Error creating/moving gallery folder on save:", err);
+                }
+            }
+
             await onSave(formData);
             setIsDirty(false);
             return true;

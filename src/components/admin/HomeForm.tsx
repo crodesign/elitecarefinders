@@ -108,6 +108,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     // Use ref to keep track of latest handleSaveInternal without re-registering
     const saveHandlerRef = useRef<() => Promise<boolean>>(async () => false);
 
+    // Track original title for rename detection
+    const originalTitleRef = useRef<string>("");
+
     // Update ref when state changes (effectively on every render)
     useEffect(() => {
         saveHandlerRef.current = handleSaveInternal;
@@ -151,10 +154,56 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         setIsSubmitting(true);
         setError(null);
 
+        // SLUG OVERWRITE FIX: Generate the final slug synchronously BEFORE saving to the database
+        // so that if the title changed, we don't accidentally send the old cached `slug` state variable back to the DB!
+        const finalSlug = (home?.id && title !== originalTitleRef.current)
+            ? (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : slug)
+            : slug;
+
+        let finalImages = images;
+        let finalTeamImages = teamImages;
+
         try {
+            // ── Transparent Rename Detection ──
+            // If title changed on an existing entity, call rename API first
+            if (home?.id && title !== originalTitleRef.current && originalTitleRef.current) {
+                console.log(`[HomeForm] Title changed: "${originalTitleRef.current}" → "${title}", triggering rename...`);
+                try {
+                    const renameRes = await fetch('/api/media/rename-entity', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            entityType: 'home',
+                            entityId: home.id,
+                            oldTitle: originalTitleRef.current,
+                            newTitle: title,
+                            folderId: galleryFolderId,
+                        }),
+                    });
+                    const renameData = await renameRes.json();
+                    if (!renameRes.ok) {
+                        console.error('[HomeForm] Rename failed:', renameData.error);
+                    } else {
+                        console.log('[HomeForm] Rename succeeded:', renameData.results);
+                        originalTitleRef.current = title;
+
+                        // IMPORTANT: Update local arrays with renamed files so onSave doesn't overwrite the DB with the old ones!
+                        if (renameData.renamedFiles && Object.keys(renameData.renamedFiles).length > 0) {
+                            const mapUrl = (url: string) => renameData.renamedFiles[url] || url;
+                            finalImages = images.map(mapUrl);
+                            setImages(finalImages);
+                            finalTeamImages = teamImages.map(mapUrl);
+                            setTeamImages(finalTeamImages);
+                        }
+                    }
+                } catch (renameErr) {
+                    console.error('[HomeForm] Rename API error:', renameErr);
+                }
+            }
+
             const formData: Partial<HomeType> = {
                 title,
-                slug,
+                slug: finalSlug,
                 description,
                 phone,
                 email,
@@ -173,10 +222,54 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     state,
                     zip
                 },
-                images,
-                teamImages,
+                images: finalImages,
+                teamImages: finalTeamImages,
                 roomDetails
             };
+
+            // For BOTH new and existing homes: ensure the gallery folder is in the right location.
+            // If the city/state changed, ensureLocationFolders will move the existing folder.
+            if (title) {
+                try {
+                    const locationTaxonomy = availableTaxonomies.find(t =>
+                        t.slug === 'location' || t.slug === 'locations' || t.name === 'Location' || t.name === 'Locations'
+                    );
+                    let stateName = state || '';
+                    let cityName = city || '';
+                    let hasTaxonomyLocation = false;
+
+                    if (locationTaxonomy?.entries) {
+                        const findEntry = (entries: any[], id: string, path: any[] = []): any[] | null => {
+                            for (const e of entries) {
+                                const p = [...path, e];
+                                if (e.id === id) return p;
+                                if (e.children) { const r = findEntry(e.children, id, p); if (r) return r; }
+                            }
+                            return null;
+                        };
+                        for (const tid of taxonomyEntryIds) {
+                            const p = findEntry(locationTaxonomy.entries, tid);
+                            if (p && p.length > 0) {
+                                stateName = p[0].name;
+                                cityName = p[p.length - 1].name;
+                                hasTaxonomyLocation = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasTaxonomyLocation || (stateName && cityName)) {
+                        if (stateName.length === 2 && !hasTaxonomyLocation) {
+                            const stateObj = US_STATES.find(s => s.code === stateName);
+                            if (stateObj) stateName = stateObj.name;
+                        }
+                        const fid = await ensureLocationFolders(stateName, cityName, title, 'home', galleryFolderId);
+                        if (!galleryFolderId) setGalleryFolderId(fid);
+                    }
+                } catch (err) {
+                    console.error("Error creating/moving gallery folder on save:", err);
+                }
+            }
 
             await onSave(formData);
 
@@ -228,14 +321,18 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
 
-    // Fetch Gallery Folder - Only on initial load or if missing
-    // We removed the auto-update logic to prevent folder migration issues.
-    // This now only ensures a folder exists based on current data if one isn't already set.
+    // Fetch Gallery Folder - Only on initial load for EXISTING homes
+    // For NEW homes, folder is created in the save handler.
+    // This prevents orphaned partial-name folders from being created while typing.
     useEffect(() => {
         const fetchFolder = async () => {
-            // If we already have a folder ID, do NOT update it automatically on location change
-            // This prevents the "Gallery disappeared" issue and "Move Files" requirement.
+            // Only run for existing homes, and only once
             if (galleryFolderId) return;
+            if (!home?.id) return; // New home — folder created in save handler
+
+            // Use the SAVED title from the home record, not the live typing state
+            const savedTitle = home.title;
+            if (!savedTitle) return;
 
             // Find "Location" or "Locations" taxonomy
             const locationTaxonomy = availableTaxonomies.find(t =>
@@ -279,7 +376,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
             const validLocation = hasLocationSelection || (state && city);
 
-            if (validLocation && title) {
+            if (validLocation) {
                 // Use full state name for folder structure if using address state code
                 let stateName = derivedState;
                 if (!hasLocationSelection && derivedState.length === 2) {
@@ -288,7 +385,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 }
 
                 try {
-                    const id = await ensureLocationFolders(stateName, derivedCity, title, 'home');
+                    const id = await ensureLocationFolders(stateName, derivedCity, savedTitle, 'home');
                     setGalleryFolderId(id);
                 } catch (error) {
                     console.error("Error ensuring location folders:", error);
@@ -298,7 +395,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         };
         fetchFolder();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state, city, title, taxonomyEntryIds, availableTaxonomies, galleryFolderId]);
+    }, [state, city, taxonomyEntryIds, availableTaxonomies, galleryFolderId, home?.id]);
 
     // Room Fields State
     // Room Fields State
@@ -413,6 +510,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
             // Note: The parent component should ensure 'home' is fully loaded before setting isOpen=true for edits.
             if (home) {
                 setTitle(home.title);
+                originalTitleRef.current = home.title;
                 setSlug(home.slug);
                 setDescription(home.description);
                 setPhone(home.phone || "");

@@ -32,6 +32,7 @@ interface MediaTileProps {
     onMediaSelect?: (item: MediaItem) => void;
     isGalleryImage?: boolean;
     isFeaturedImage?: boolean;
+    stepLabel?: string;
     captionClassName?: string;
 }
 
@@ -52,6 +53,7 @@ export function MediaTile({
     onMediaSelect,
     isGalleryImage = false,
     isFeaturedImage = false,
+    stepLabel,
     captionClassName = 'bg-[var(--media-caption-bg)] text-[var(--text-primary)]',
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
@@ -226,7 +228,13 @@ export function MediaTile({
                             Featured Image
                         </div>
                     )}
-                    {isGalleryImage && !isFeaturedImage && (
+                    {stepLabel && (
+                        <div className="px-1.5 py-0.5 rounded-lg bg-amber-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                            <span className="w-1 h-1 rounded-full bg-white"></span>
+                            {stepLabel}
+                        </div>
+                    )}
+                    {isGalleryImage && !isFeaturedImage && !stepLabel && (
                         <div className="px-1.5 py-0.5 rounded-lg bg-emerald-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
                             <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
                             In Gallery

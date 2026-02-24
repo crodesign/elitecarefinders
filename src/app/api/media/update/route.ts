@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rename, mkdir } from "fs/promises";
+import { rename } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 import { createClient } from "@/lib/supabase-server";
@@ -95,34 +95,10 @@ export async function POST(request: NextRequest) {
                 if (newFilename !== currentFilename) {
                     console.log("[Media Update] Caption rename:", { currentFilename, newFilename });
 
-                    // Build physical path for current folder
-                    const buildPhysicalPath = async (currentFolderId: string): Promise<string> => {
-                        const pathParts: string[] = [];
-                        let currentId: string | null = currentFolderId;
-
-                        while (currentId) {
-                            const { data: f } = await supabase
-                                .from("media_folders")
-                                .select("slug, parent_id")
-                                .eq("id", currentId)
-                                .single();
-
-                            if (f) {
-                                pathParts.unshift(f.slug as string);
-                                currentId = f.parent_id as string | null;
-                            } else {
-                                break;
-                            }
-                        }
-
-                        return pathParts.join("/");
-                    };
-
-                    const folderPath = folderId ? await buildPhysicalPath(folderId) : "";
+                    // FLAT STORAGE: files are directly in public/images/media/
                     const mediaRoot = path.join(process.cwd(), "public", "images", "media");
-
-                    const oldFilePath = path.join(mediaRoot, folderPath, currentFilename);
-                    const newFilePath = path.join(mediaRoot, folderPath, newFilename);
+                    const oldFilePath = path.join(mediaRoot, currentFilename);
+                    const newFilePath = path.join(mediaRoot, newFilename);
 
                     // Rename physical file
                     if (existsSync(oldFilePath)) {
@@ -130,10 +106,10 @@ export async function POST(request: NextRequest) {
                             await rename(oldFilePath, newFilePath);
                             console.log("[Media Update] File renamed successfully");
 
-                            // Update database fields
+                            // Update database fields (flat URL)
                             updates.filename = newFilename;
-                            updates.url = `/images/media/${folderPath}/${newFilename}`;
-                            updates.storage_path = `/images/media/${folderPath}/${newFilename}`;
+                            updates.url = `/images/media/${newFilename}`;
+                            updates.storage_path = `/images/media/${newFilename}`;
                         } catch (renameErr) {
                             console.error("[Media Update] Failed to rename file:", renameErr);
                             // Continue without renaming if file rename fails
@@ -145,7 +121,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Handle folder change
+        // Handle folder change (DB-only in flat storage — no physical file move)
         if (newFolderId !== undefined && newFolderId !== mediaItem.folder_id) {
             console.log("[Media Update] Folder change detected:", {
                 oldFolderId: mediaItem.folder_id,
@@ -153,8 +129,6 @@ export async function POST(request: NextRequest) {
             });
 
             // RESTRICTION CHECK: Prevent moving to restricted folders
-            // 1. Root folder check (newFolderId is null/undefined but different from old)
-            // Note: newFolderId coming as null means "Root"
             if (!newFolderId) {
                 return NextResponse.json(
                     { error: "Files cannot be moved to the root folder. Please select a subfolder." },
@@ -162,9 +136,7 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            // 2. Restricted parent folder check
             const RESTRICTED_PARENT_FOLDERS = ["Home Images", "Facility Images"];
-            // Get new folder details to check name
             const { data: folder } = await supabase
                 .from("media_folders")
                 .select("id, name, path, parent_id")
@@ -172,9 +144,7 @@ export async function POST(request: NextRequest) {
                 .single();
 
             if (folder) {
-                // If it's a top-level folder (no parent) AND it's in the restricted list
-                // OR if it's the root folder (id check failed earlier but just in case)
-                if ((!folder.parent_id && RESTRICTED_PARENT_FOLDERS.includes(folder.name))) {
+                if (!folder.parent_id && RESTRICTED_PARENT_FOLDERS.includes(folder.name)) {
                     return NextResponse.json(
                         { error: `Files cannot be moved directly to '${folder.name}'. Please select a subfolder.` },
                         { status: 400 }
@@ -182,104 +152,9 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // Get new folder path (logic continues...)
-            let newFolderPath = "";
-            if (newFolderId) {
-                const { data: folder } = await supabase
-                    .from("media_folders")
-                    .select("path, slug")
-                    .eq("id", newFolderId)
-                    .single();
-                if (folder) {
-                    // Build physical path by getting slugs from parent chain
-                    const buildPhysicalPath = async (folderId: string): Promise<string> => {
-                        const pathParts: string[] = [];
-                        let currentId: string | null = folderId;
-
-                        while (currentId) {
-                            const { data: f } = await supabase
-                                .from("media_folders")
-                                .select("slug, parent_id")
-                                .eq("id", currentId)
-                                .single();
-
-                            if (f) {
-                                pathParts.unshift(f.slug as string);
-                                currentId = f.parent_id as string | null;
-                            } else {
-                                break;
-                            }
-                        }
-
-                        return pathParts.join("/");
-                    };
-
-                    newFolderPath = await buildPhysicalPath(newFolderId);
-                }
-            }
-
-            // Calculate old and new physical paths
-            const filename = mediaItem.filename;
-            const mediaRoot = path.join(process.cwd(), "public", "images", "media");
-
-            // Get old file path from storage_path or URL
-            let oldFilePath: string;
-            const storagePath = mediaItem.storage_path as string;
-
-            if (storagePath && storagePath.startsWith("/images/media/")) {
-                // storage_path is relative like /images/media/folder/file.jpg
-                oldFilePath = path.join(process.cwd(), "public", storagePath);
-            } else if (storagePath && existsSync(storagePath)) {
-                // storage_path is absolute
-                oldFilePath = storagePath;
-            } else {
-                // Fallback: derive from URL
-                const currentUrl = mediaItem.url as string;
-                const urlPath = currentUrl.replace("/images/media/", "");
-                const oldRelativePath = urlPath.substring(0, urlPath.lastIndexOf("/"));
-                oldFilePath = path.join(mediaRoot, oldRelativePath, filename);
-            }
-
-            const newFilePath = path.join(mediaRoot, newFolderPath, filename);
-            const newStoragePath = `/images/media/${newFolderPath}/${filename}`;
-
-            console.log("[Media Update] File paths:", {
-                storagePath: storagePath,
-                oldFilePath: oldFilePath,
-                newFolderPath: newFolderPath,
-                newFilePath: newFilePath,
-                newStoragePath: newStoragePath,
-            });
-
-            // Ensure new folder exists
-            const newFolderDir = path.join(mediaRoot, newFolderPath);
-            if (!existsSync(newFolderDir)) {
-                console.log("[Media Update] Creating directory:", newFolderDir);
-                await mkdir(newFolderDir, { recursive: true });
-            }
-
-            // Move the file
-            if (existsSync(oldFilePath)) {
-                console.log("[Media Update] Moving file from", oldFilePath, "to", newFilePath);
-                try {
-                    await rename(oldFilePath, newFilePath);
-                    console.log("[Media Update] File moved successfully");
-                } catch (moveErr) {
-                    console.error("[Media Update] Failed to move file:", moveErr);
-                    return NextResponse.json({ error: "Failed to move file on disk" }, { status: 500 });
-                }
-            } else {
-                console.error("[Media Update] WARNING: Source file not found at", oldFilePath);
-                return NextResponse.json({ error: "Source file not found on disk" }, { status: 404 });
-            }
-
-            // Update database with new paths
-            const newUrl = `/images/media/${newFolderPath}/${filename}`;
+            // FLAT STORAGE: Just update the folder_id in DB — no physical file move needed
             updates.folder_id = newFolderId;
-            updates.url = newUrl;
-            updates.storage_path = newStoragePath;
-
-            console.log("[Media Update] Database updates:", updates);
+            console.log("[Media Update] Folder move (DB-only):", { newFolderId });
         }
 
         // Update database

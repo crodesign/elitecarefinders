@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rename, mkdir, readdir, stat } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
@@ -28,10 +25,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, count: 0, message: "Source and destination are the same" });
         }
 
-        // 1. Get Source and Destination Folder Details
+        // Verify both folders exist
         const { data: sourceFolder, error: sourceError } = await supabase
             .from("media_folders")
-            .select("*")
+            .select("id, name")
             .eq("id", sourceFolderId)
             .single();
 
@@ -41,7 +38,7 @@ export async function POST(request: NextRequest) {
 
         const { data: destFolder, error: destError } = await supabase
             .from("media_folders")
-            .select("*")
+            .select("id, name")
             .eq("id", destinationFolderId)
             .single();
 
@@ -49,24 +46,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Destination folder not found" }, { status: 404 });
         }
 
-        // Only proceed if paths are valid strings
-        if (!sourceFolder.path || !destFolder.path) {
-            return NextResponse.json({ error: "Invalid folder paths" }, { status: 400 });
-        }
-
-        const sourcePath = path.join(process.cwd(), "public", "images", "media", sourceFolder.path.replace(/^\//, ''));
-        const destPath = path.join(process.cwd(), "public", "images", "media", destFolder.path.replace(/^\//, ''));
-
-        console.log(`[Move Folder] Moving contents from ${sourcePath} to ${destPath}`);
-
-        // 2. Fetch all media items in source folder
+        // Fetch all media items in source folder
         const { data: mediaItems, error: itemsError } = await supabase
             .from("media_items")
-            .select("*")
+            .select("id")
             .eq("folder_id", sourceFolderId);
 
         if (itemsError) {
-            console.error("Error fetching media items:", itemsError);
             return NextResponse.json({ error: "Failed to fetch media items" }, { status: 500 });
         }
 
@@ -74,70 +60,26 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, count: 0, message: "No items to move" });
         }
 
-        // 3. Move Files and Update Database
-        let moveCount = 0;
-        const errors: any[] = [];
-        const updatedItems: any[] = [];
+        // FLAT STORAGE: Just update folder_id in DB — no physical file moves needed
+        const itemIds = mediaItems.map(item => item.id);
+        const { error: updateError } = await supabase
+            .from("media_items")
+            .update({
+                folder_id: destinationFolderId,
+                updated_at: new Date().toISOString()
+            })
+            .in("id", itemIds);
 
-        // Ensure destination directory exists
-        if (!existsSync(destPath)) {
-            await mkdir(destPath, { recursive: true });
+        if (updateError) {
+            return NextResponse.json({ error: `DB update failed: ${updateError.message}` }, { status: 500 });
         }
 
-        for (const item of mediaItems) {
-            try {
-                const filename = item.filename;
-                const oldFilePath = path.join(sourcePath, filename);
-                const newFilePath = path.join(destPath, filename);
-
-                // Check if file exists in source
-                if (existsSync(oldFilePath)) {
-                    // Move file
-                    await rename(oldFilePath, newFilePath);
-                } else {
-                    console.warn(`[Move Folder] File not found at ${oldFilePath}, skipping physical move but updating DB.`);
-                }
-
-                // Construct new URL and storage path
-                // Assumes URL structure: /images/media/Folder/Name/file.jpg
-                const cleanDestPath = destFolder.path.replace(/^\//, ''); // Remove leading slash
-                const newStoragePath = `/images/media/${cleanDestPath}/${filename}`;
-                const newUrl = `/images/media/${cleanDestPath}/${filename}`;
-
-                // Update Database Record
-                const { data: updatedItem, error: updateError } = await supabase
-                    .from("media_items")
-                    .update({
-                        folder_id: destinationFolderId,
-                        url: newUrl,
-                        storage_path: newStoragePath,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq("id", item.id)
-                    .select()
-                    .single();
-
-                if (updateError) {
-                    throw new Error(`DB Update failed: ${updateError.message}`);
-                }
-
-                if (updatedItem) {
-                    updatedItems.push(updatedItem);
-                    moveCount++;
-                }
-
-            } catch (err) {
-                console.error(`[Move Folder] Failed to move item ${item.id}:`, err);
-                errors.push({ id: item.id, error: err instanceof Error ? err.message : String(err) });
-            }
-        }
+        console.log(`[Move Folder] Moved ${itemIds.length} items from "${sourceFolder.name}" to "${destFolder.name}" (DB-only)`);
 
         return NextResponse.json({
             success: true,
-            count: moveCount,
+            count: itemIds.length,
             total: mediaItems.length,
-            errors: errors.length > 0 ? errors : undefined,
-            updatedItems
         });
 
     } catch (error) {

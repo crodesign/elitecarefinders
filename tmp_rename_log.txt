@@ -1,0 +1,28 @@
+Starting logic test...
+Testing with home: Fres-000012240 (fres-000012240)
+Images: ["/images/media/chan-000012240-4.jpg","/images/media/chan-000012240-3.jpg","/images/media/chan-000012240-2.jpg","/images/media/chan-000012240-1.jpg","/images/media/chan-000012240-5.jpg"]
+
+Processing URL: /images/media/chan-000012240-4.jpg -> filename: chan-000012240-4.jpg
+  Found media item: chan-000012240-4.jpg in folder 2d06933d-398a-4046-83d3-909ff58ab78e
+  Folder slug prefix: fres-000012240
+  Match FAILED! Escaped prefix ^fres-000012240-(.+)$ did not match chan-000012240-4.jpg
+
+Processing URL: /images/media/chan-000012240-3.jpg -> filename: chan-000012240-3.jpg
+  Found media item: chan-000012240-3.jpg in folder 2d06933d-398a-4046-83d3-909ff58ab78e
+  Folder slug prefix: fres-000012240
+  Match FAILED! Escaped prefix ^fres-000012240-(.+)$ did not match chan-000012240-3.jpg
+
+Processing URL: /images/media/chan-000012240-2.jpg -> filename: chan-000012240-2.jpg
+  Found media item: chan-000012240-2.jpg in folder 2d06933d-398a-4046-83d3-909ff58ab78e
+  Folder slug prefix: fres-000012240
+  Match FAILED! Escaped prefix ^fres-000012240-(.+)$ did not match chan-000012240-2.jpg
+
+Processing URL: /images/media/chan-000012240-1.jpg -> filename: chan-000012240-1.jpg
+  Found media item: chan-000012240-1.jpg in folder 2d06933d-398a-4046-83d3-909ff58ab78e
+  Folder slug prefix: fres-000012240
+  Match FAILED! Escaped prefix ^fres-000012240-(.+)$ did not match chan-000012240-1.jpg
+
+Processing URL: /images/media/chan-000012240-5.jpg -> filename: chan-000012240-5.jpg
+  Found media item: chan-000012240-5.jpg in folder 2d06933d-398a-4046-83d3-909ff58ab78e
+  Folder slug prefix: fres-000012240
+  Match FAILED! Escaped prefix ^fres-000012240-(.+)$ did not match chan-000012240-5.jpg

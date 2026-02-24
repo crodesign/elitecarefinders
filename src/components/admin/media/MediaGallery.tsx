@@ -37,16 +37,18 @@ export interface GalleryConfig {
 
 interface MediaGalleryProps {
     folderId: string | null;
-    title?: string;
+    title?: React.ReactNode;
     className?: string;
     onMediaSelect?: (media: MediaItem) => void;
     folders?: MediaFolder[];
     galleries?: GalleryConfig[];
     isDirty?: boolean;
     dropzoneText?: string;
+    featuredImageUrl?: string;
+    stepImageMap?: Record<string, number>;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap }: MediaGalleryProps) {
     const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -392,7 +394,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                             <div key={item.id}>
                                 <MediaTile
                                     item={item}
-                                    isSelected={(activeUrls.includes(item.url)) || selectedItemId === item.id}
+                                    isSelected={(activeUrls.includes(item.url)) || selectedItemId === item.id || (!!featuredImageUrl && featuredImageUrl === item.url)}
                                     folders={folders}
                                     onClick={() => setSelectedItemId(item.id)}
                                     onUpdate={handleUpdateItem}
@@ -401,7 +403,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                     showUrlField={false}
                                     showFolderMove={false}
                                     showDimensions={false}
-                                    isFeaturedImage={!!(activeUrls.length > 0 && activeUrls[0] === item.url && activeGallery?.id === 'main')}
+                                    isFeaturedImage={featuredImageUrl ? featuredImageUrl === item.url : !!(activeUrls.length > 0 && activeUrls[0] === item.url && activeGallery?.id === 'main')}
+                                    stepLabel={stepImageMap && stepImageMap[item.url] !== undefined ? `Step ${stepImageMap[item.url]}` : undefined}
                                     onMediaSelect={galleries ? () => handleToggleSelection(item.url) : onMediaSelect}
                                 />
                             </div>

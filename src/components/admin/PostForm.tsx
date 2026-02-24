@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction } from "@/types";
 import { MediaGallery } from "@/components/admin/media/MediaGallery";
-import { getFolders, createFolder } from "@/lib/services/mediaService";
+import { getFolders, createFolder, getMediaItems } from "@/lib/services/mediaService";
 import { ensurePostFolder } from "@/lib/services/mediaFolderService";
 import { supabase } from "@/lib/supabase";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
@@ -56,6 +57,26 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
     const [prepTime, setPrepTime] = useState<string>("");
     const [cookTime, setCookTime] = useState<string>("");
     const [recipeYield, setRecipeYield] = useState<string>("");
+    const [stepImageSelectorOpen, setStepImageSelectorOpen] = useState<number | null>(null);
+    const [folderMediaUrls, setFolderMediaUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (stepImageSelectorOpen !== null && mediaFolderId) {
+            getMediaItems(mediaFolderId).then(items => {
+                setFolderMediaUrls(items.map(i => i.url));
+            }).catch(err => console.error("Failed to fetch folder media for step selector:", err));
+        }
+    }, [stepImageSelectorOpen, mediaFolderId]);
+
+    const stepImageMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        instructions.forEach((inst, idx) => {
+            if (inst.image) {
+                map[inst.image] = idx + 1;
+            }
+        });
+        return map;
+    }, [instructions]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -69,12 +90,16 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
     const isInitializedRef = useRef(false);
 
+    // Track original title for rename detection
+    const originalTitleRef = useRef<string>("");
+
     useEffect(() => {
         if (isOpen) {
             isInitializedRef.current = false;
 
             if (post) {
                 setTitle(post.title || "");
+                originalTitleRef.current = post.title || "";
                 setSlug(post.slug || "");
                 setContent(post.content || "");
                 setExcerpt(post.excerpt || "");
@@ -178,9 +203,9 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
         const fetchFolder = async () => {
             if (mediaFolderId) return;
 
-            if (title && title.trim().length > 2) {
+            if (title && title.trim().length > 2 && postType) {
                 try {
-                    const id = await ensurePostFolder(title.trim());
+                    const id = await ensurePostFolder(title.trim(), postType);
                     setMediaFolderId(id || undefined);
                 } catch (error) {
                     console.error("Error ensuring post media folder:", error);
@@ -222,13 +247,40 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
         setIsSubmitting(true);
 
         try {
+            // ── Transparent Rename Detection ──
+            if (post?.id && title !== originalTitleRef.current && originalTitleRef.current) {
+                console.log(`[PostForm] Title changed: "${originalTitleRef.current}" → "${title}", triggering rename...`);
+                try {
+                    const renameRes = await fetch('/api/media/rename-entity', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            entityType: 'post',
+                            entityId: post.id,
+                            oldTitle: originalTitleRef.current,
+                            newTitle: title,
+                            folderId: mediaFolderId,
+                        }),
+                    });
+                    const renameData = await renameRes.json();
+                    if (!renameRes.ok) {
+                        console.error('[PostForm] Rename failed:', renameData.error);
+                    } else {
+                        console.log('[PostForm] Rename succeeded:', renameData.results);
+                        originalTitleRef.current = title;
+                    }
+                } catch (renameErr) {
+                    console.error('[PostForm] Rename API error:', renameErr);
+                }
+            }
+
             // Package dynamic fields into metadata JSON
             const metadata: PostMetadata = {};
             if (postType === 'news_events') {
                 metadata.links = links.filter(l => l.text.trim() || l.url.trim());
             } else if (postType === 'recipes') {
                 metadata.ingredients = ingredients.filter(i => i.amount.trim() || i.name.trim());
-                metadata.instructions = instructions.filter(i => i.text.trim());
+                metadata.instructions = instructions.filter(i => i.text.trim() || i.image);
                 metadata.prepTime = prepTime ? parseInt(prepTime) : undefined;
                 metadata.cookTime = cookTime ? parseInt(cookTime) : undefined;
                 metadata.yield = recipeYield;
@@ -581,33 +633,36 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                                             <span className="text-sm font-medium text-content-muted">{idx + 1}.</span>
                                                         </div>
                                                         <div className="flex flex-col gap-2 w-20 shrink-0">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const url = window.prompt("Enter image URL for this step (or leave blank to remove):", inst.image || "");
-                                                                    if (url !== null) {
-                                                                        const newInst = [...instructions];
-                                                                        newInst[idx] = { ...inst, image: url ? url : undefined };
-                                                                        setInstructions(newInst);
-                                                                    }
-                                                                }}
-                                                                className="h-20 w-full border border-dashed border-ui-border rounded-md flex flex-col items-center justify-center gap-1 hover:bg-surface-hover/50 hover:border-accent text-content-muted hover:text-accent transition-colors overflow-hidden group/img relative bg-surface-primary"
-                                                                title="Add step image"
-                                                            >
+                                                            <div className="h-20 w-full rounded-md flex flex-col items-center justify-center overflow-hidden group/img relative bg-surface-primary transition-colors">
                                                                 {inst.image ? (
                                                                     <>
-                                                                        <img src={inst.image} alt={`Step ${idx + 1}`} className="w-full h-full object-cover" />
-                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-                                                                            <ImageIcon className="w-4 h-4 text-white" />
-                                                                        </div>
+                                                                        <img src={inst.image} alt={`Step ${idx + 1}`} className="w-full h-full object-cover cursor-pointer" onClick={() => setStepImageSelectorOpen(idx)} />
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                const newInst = [...instructions];
+                                                                                newInst[idx] = { ...inst, image: undefined };
+                                                                                setInstructions(newInst);
+                                                                            }}
+                                                                            className="absolute top-1 right-1 p-1 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover/img:opacity-100 transition-all rounded-md hover:!bg-accent hover:text-white cursor-pointer z-10"
+                                                                            title="Remove image"
+                                                                        >
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
                                                                     </>
                                                                 ) : (
-                                                                    <>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setStepImageSelectorOpen(idx)}
+                                                                        className="w-full h-full flex flex-col items-center justify-center gap-1 text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors cursor-pointer"
+                                                                        title="Add step image"
+                                                                    >
                                                                         <ImageIcon className="w-5 h-5" />
                                                                         <span className="text-[10px] uppercase font-medium">Image</span>
-                                                                    </>
+                                                                    </button>
                                                                 )}
-                                                            </button>
+                                                            </div>
                                                         </div>
                                                         <textarea
                                                             value={inst.text}
@@ -656,7 +711,12 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             {mediaFolderId ? (
                                 <MediaGallery
                                     folderId={mediaFolderId}
-                                    title="Post Images"
+                                    title={postType === 'recipes' ? (
+                                        <div className="flex flex-col">
+                                            <span>Post Images</span>
+                                            <span className="text-xs text-content-muted font-normal mt-0.5">Select an image to be the Featured Image</span>
+                                        </div>
+                                    ) : "Post Images"}
                                     dropzoneText="this post"
                                     className="flex-1 min-h-0"
                                     galleries={postType === 'recipes' ? undefined : [
@@ -672,11 +732,19 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         }
                                     ]}
                                     onMediaSelect={(item: { url: string }) => {
-                                        if (postType === 'recipes' && !postImages.includes(item.url)) {
+                                        if (postType === 'recipes') {
                                             setPostImages([item.url]); // Replace with selected image if it's strictly featured
+                                        } else {
+                                            if (postImages.includes(item.url)) {
+                                                setPostImages(postImages.filter(u => u !== item.url));
+                                            } else {
+                                                setPostImages([...postImages, item.url]);
+                                            }
                                         }
                                     }}
                                     isDirty={isDirty}
+                                    featuredImageUrl={postType === 'recipes' && postImages.length > 0 ? postImages[0] : undefined}
+                                    stepImageMap={postType === 'recipes' ? stepImageMap : undefined}
                                 />
                             ) : (
                                 <div className="p-8 text-center border border-dashed border-ui-border rounded-xl">
@@ -688,7 +756,81 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 </div>
             </SlidePanel>
 
+            {/* Step Image Selector Modal */}
+            {stepImageSelectorOpen !== null && typeof document !== 'undefined' && createPortal(
+                <div className="fixed inset-0 z-[100] bg-ui-bg/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-surface-primary w-full max-w-2xl rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-4 border-b border-ui-border flex items-center justify-between shrink-0 bg-surface-secondary">
+                            <h2 className="text-lg font-semibold text-content-primary">
+                                Select Image for Step {stepImageSelectorOpen + 1}
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={() => setStepImageSelectorOpen(null)}
+                                className="p-2 -m-2 text-content-muted hover:text-content-primary rounded-lg transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-4 overflow-y-auto flex-1">
+                            {folderMediaUrls.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <ImageIcon className="w-12 h-12 text-content-muted mx-auto mb-3 opacity-50" />
+                                    <p className="text-content-secondary font-medium">No images available</p>
+                                    <p className="text-sm text-content-muted mt-1">Upload images to the Post Gallery first to select them for steps.</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    {folderMediaUrls.map((url) => {
+                                        const isSelected = instructions[stepImageSelectorOpen].image === url;
+                                        // Check if this image is assigned to ANOTHER step to show a badge / grayscale
+                                        const assignedStep = stepImageMap[url];
+                                        const isAssignedElsewhere = assignedStep !== undefined && assignedStep !== stepImageSelectorOpen + 1;
 
+                                        return (
+                                            <button
+                                                key={url}
+                                                type="button"
+                                                onClick={() => {
+                                                    const newInst = [...instructions];
+                                                    // Toggle selection
+                                                    if (isSelected) {
+                                                        newInst[stepImageSelectorOpen] = { ...newInst[stepImageSelectorOpen], image: undefined };
+                                                    } else {
+                                                        newInst[stepImageSelectorOpen] = { ...newInst[stepImageSelectorOpen], image: url };
+                                                    }
+                                                    setInstructions(newInst);
+                                                    setStepImageSelectorOpen(null);
+                                                }}
+                                                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${isSelected ? "border-accent" : "border-transparent hover:border-ui-border"}`}
+                                            >
+                                                <img
+                                                    src={url}
+                                                    alt="Gallery image"
+                                                    className={`w-full h-full object-cover transition-opacity ${isSelected || isAssignedElsewhere ? "opacity-50 grayscale" : ""}`}
+                                                />
+                                                {isSelected && (
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <div className="bg-accent text-white rounded-full p-1.5 shadow-lg">
+                                                            <Check className="w-5 h-5" />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {isAssignedElsewhere && !isSelected && (
+                                                    <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-lg bg-amber-500/90 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-sm shadow-sm">
+                                                        <span className="w-1 h-1 rounded-full bg-white"></span>
+                                                        Step {assignedStep}
+                                                    </div>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                , document.body)}
         </>
     );
 }

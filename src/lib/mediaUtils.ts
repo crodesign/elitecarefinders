@@ -1,44 +1,50 @@
 
-import { SupabaseClient } from "@supabase/supabase-js";
+/**
+ * FLAT STORAGE: All media files live in public/images/media/ (single flat directory).
+ * Virtual folder organization is handled entirely by the media_folders DB table.
+ */
 
 /**
- * Recursively builds the full physical path for a folder by traversing up the parent tree.
- * Returns a path string like "grandparent-slug/parent-slug/folder-slug".
+ * Returns the public URL for a media file in flat storage.
  */
-export async function buildPhysicalPath(supabase: SupabaseClient, folderId: string): Promise<string> {
-    const pathParts: string[] = [];
-    let currentId: string | null = folderId;
+export function getMediaUrl(filename: string): string {
+    return `/images/media/${filename}`;
+}
 
-    // Safety limit to prevent infinite loops in case of circular references (though DB constraints should prevent this)
-    let depth = 0;
-    const MAX_DEPTH = 20;
+/**
+ * Removes deleted image URLs from entity records across homes, facilities, and posts.
+ * Called when images or folders are deleted to prevent stale/broken references.
+ */
+export async function cleanEntityImageRefs(
+    supabase: any,
+    deletedUrls: string[]
+): Promise<number> {
+    if (deletedUrls.length === 0) return 0;
 
-    interface MediaFolder {
-        slug: string;
-        parent_id: string | null;
+    let cleaned = 0;
+    const entityTables = [
+        { table: 'homes', fields: ['images', 'team_images'] },
+        { table: 'facilities', fields: ['images', 'team_images'] },
+        { table: 'posts', fields: ['images'] },
+    ];
+
+    for (const { table, fields } of entityTables) {
+        for (const field of fields) {
+            const { data: rows } = await supabase
+                .from(table)
+                .select(`id, ${field}`);
+
+            for (const row of (rows || []) as Record<string, any>[]) {
+                const arr = row[field];
+                if (!Array.isArray(arr) || arr.length === 0) continue;
+                const filtered = arr.filter((url: string) => !deletedUrls.includes(url));
+                if (filtered.length !== arr.length) {
+                    await supabase.from(table).update({ [field]: filtered }).eq('id', row.id);
+                    cleaned++;
+                }
+            }
+        }
     }
 
-    while (currentId && depth < MAX_DEPTH) {
-        const { data } = await supabase
-            .from("media_folders")
-            .select("slug, parent_id")
-            .eq("id", currentId)
-            .single();
-
-        const f = data as unknown as MediaFolder;
-
-        if (!f) {
-            // Folders might be missing if concurrently deleted
-            break;
-        }
-
-        if (f.slug) {
-            pathParts.unshift(f.slug);
-        }
-
-        currentId = f.parent_id;
-        depth++;
-    }
-
-    return pathParts.join("/");
+    return cleaned;
 }

@@ -1,0 +1,68 @@
+Home: CHAN-000012240 (slug: chan-000012240)
+Images: [
+  "/images/media/chan-000012240-4.jpg",
+  "/images/media/chan-000012240-3.jpg",
+  "/images/media/chan-000012240-2.jpg",
+  "/images/media/chan-000012240-1.jpg",
+  "/images/media/chan-000012240-5.jpg"
+]
+
+Checking URL: /images/media/chan-000012240-4.jpg
+Filename extracted: chan-000012240-4.jpg
+  ✅ Found media item:
+     id: ba6a90f8-3f57-421d-a2bd-a65a55a2cd0b
+     filename: chan-000012240-4.jpg
+     url: /images/media/chan-000012240-4.jpg
+     folder_id: 2d06933d-398a-4046-83d3-909ff58ab78e
+  📂 Inside Folder:
+     name: CHAN-000012240
+     slug: chan-000012240
+     path: /Arizona/Home Images/Phoenix/CHAN-000012240
+
+Checking URL: /images/media/chan-000012240-3.jpg
+Filename extracted: chan-000012240-3.jpg
+  ✅ Found media item:
+     id: 5a6873f2-dda5-484c-887c-8b3938cfcec4
+     filename: chan-000012240-3.jpg
+     url: /images/media/chan-000012240-3.jpg
+     folder_id: 2d06933d-398a-4046-83d3-909ff58ab78e
+  📂 Inside Folder:
+     name: CHAN-000012240
+     slug: chan-000012240
+     path: /Arizona/Home Images/Phoenix/CHAN-000012240
+
+Checking URL: /images/media/chan-000012240-2.jpg
+Filename extracted: chan-000012240-2.jpg
+  ✅ Found media item:
+     id: 7257092f-7841-48d9-9802-a1caa5204d92
+     filename: chan-000012240-2.jpg
+     url: /images/media/chan-000012240-2.jpg
+     folder_id: 2d06933d-398a-4046-83d3-909ff58ab78e
+  📂 Inside Folder:
+     name: CHAN-000012240
+     slug: chan-000012240
+     path: /Arizona/Home Images/Phoenix/CHAN-000012240
+
+Checking URL: /images/media/chan-000012240-1.jpg
+Filename extracted: chan-000012240-1.jpg
+  ✅ Found media item:
+     id: 5b3bb5ef-f764-4bdd-8852-8127e8359842
+     filename: chan-000012240-1.jpg
+     url: /images/media/chan-000012240-1.jpg
+     folder_id: 2d06933d-398a-4046-83d3-909ff58ab78e
+  📂 Inside Folder:
+     name: CHAN-000012240
+     slug: chan-000012240
+     path: /Arizona/Home Images/Phoenix/CHAN-000012240
+
+Checking URL: /images/media/chan-000012240-5.jpg
+Filename extracted: chan-000012240-5.jpg
+  ✅ Found media item:
+     id: 3f29295d-b345-49d5-87c5-0941c6367ae3
+     filename: chan-000012240-5.jpg
+     url: /images/media/chan-000012240-5.jpg
+     folder_id: 2d06933d-398a-4046-83d3-909ff58ab78e
+  📂 Inside Folder:
+     name: CHAN-000012240
+     slug: chan-000012240
+     path: /Arizona/Home Images/Phoenix/CHAN-000012240

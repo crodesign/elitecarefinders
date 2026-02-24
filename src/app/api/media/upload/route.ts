@@ -97,50 +97,20 @@ export async function POST(request: NextRequest) {
         const filename = `${folderSlug}-${nextNumber}.${extension}`;
         console.log("[Upload] Auto-generated filename:", filename, "from existing count:", numbers.length);
 
-        // Determine folder path from database using slug chain
-        let folderPath = "";
-        if (folderId) {
-            // Build physical path by traversing parent folder chain
-            const buildPhysicalPath = async (currentFolderId: string): Promise<string> => {
-                const pathParts: string[] = [];
-                let currentId: string | null = currentFolderId;
-
-                while (currentId) {
-                    const { data: f } = await supabase
-                        .from("media_folders")
-                        .select("slug, parent_id")
-                        .eq("id", currentId)
-                        .single();
-
-                    if (f) {
-                        pathParts.unshift(f.slug as string);
-                        currentId = f.parent_id as string | null;
-                    } else {
-                        break;
-                    }
-                }
-
-                return pathParts.join("/");
-            };
-
-            folderPath = await buildPhysicalPath(folderId);
-            console.log("[Upload] Built folder path:", folderPath);
-        }
-
-        // Create directory structure
-        const uploadDir = path.join(process.cwd(), "public", "images", "media", folderPath);
+        // FLAT STORAGE: Write directly to public/images/media/
+        const uploadDir = path.join(process.cwd(), "public", "images", "media");
         if (!existsSync(uploadDir)) {
             await mkdir(uploadDir, { recursive: true });
         }
 
-        // Write file to disk
+        // Write file to disk (flat directory)
         const filePath = path.join(uploadDir, filename);
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
         await writeFile(filePath, buffer);
 
-        // Generate public URL (relative to public folder)
-        const publicUrl = `/images/media/${folderPath ? folderPath + "/" : ""}${filename}`;
+        // Generate flat public URL
+        const publicUrl = `/images/media/${filename}`;
 
         // Get image dimensions (for images only)
         let width: number | undefined;
@@ -160,7 +130,7 @@ export async function POST(request: NextRequest) {
                 file_size: file.size,
                 width,
                 height,
-                storage_path: filePath,
+                storage_path: publicUrl,
                 url: publicUrl,
             })
             .select()

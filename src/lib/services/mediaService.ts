@@ -290,6 +290,40 @@ export async function getAllFeaturedImageUrls(): Promise<Set<string>> {
     }
 }
 
+// Returns a map of image URLs to their assigned recipe step number across all recipes
+export async function getAllRecipeStepImageMap(): Promise<Record<string, number>> {
+    try {
+        const { data: postsResult, error } = await supabase
+            .from('posts')
+            .select('post_type, metadata')
+            .eq('post_type', 'recipes');
+
+        if (error) {
+            console.error("Error fetching recipe posts for step mapping:", error);
+            return {};
+        }
+
+        const map: Record<string, number> = {};
+
+        (postsResult || []).forEach((post: any) => {
+            const meta = post.metadata || {};
+            const instructions = meta.instructions || [];
+            if (Array.isArray(instructions)) {
+                instructions.forEach((inst: any, idx: number) => {
+                    if (inst && typeof inst === 'object' && inst.image && typeof inst.image === 'string') {
+                        map[inst.image] = idx + 1;
+                    }
+                });
+            }
+        });
+
+        return map;
+    } catch (error) {
+        console.error("Error calculating recipe step image map:", error);
+        return {};
+    }
+}
+
 export async function getMediaItems(folderId?: string): Promise<MediaItem[]> {
     let query = supabase
         .from("media_items")

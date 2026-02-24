@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import fs from "fs/promises";
 import path from "path";
-import { buildPhysicalPath } from "@/lib/mediaUtils";
 
 export async function POST(request: NextRequest) {
     try {
@@ -31,49 +30,20 @@ export async function POST(request: NextRequest) {
         }
 
         const oldPath = folder.path as string;
-        const oldName = folder.name as string;
+        const oldSlug = folder.slug as string;
 
         // Build new path
         const pathParts = oldPath.split("/");
         pathParts[pathParts.length - 1] = newName;
         const newPath = pathParts.join("/");
 
-        // Generate new slug from name using hyphens
+        // Generate new slug from name
         const newSlug = newName
             .toLowerCase()
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
             .replace(/-+/g, "-")
             .replace(/^-|-$/g, "");
-        const oldSlug = folder.slug as string;
-
-        // Calculate physical paths using slugs
-        // Need to build the full physical path including parent folder slugs
-        let oldPhysicalPath = oldSlug;
-        let newPhysicalPath = newSlug;
-
-        if (folder.parent_id) {
-            // Get parent folder to build full path recursively
-            const parentPhysicalPath = await buildPhysicalPath(supabase, folder.parent_id);
-            oldPhysicalPath = `${parentPhysicalPath}/${oldSlug}`;
-            newPhysicalPath = `${parentPhysicalPath}/${newSlug}`;
-        }
-
-        // Rename physical folder on disk
-        const mediaDir = path.join(process.cwd(), "public", "images", "media");
-        const oldFullPath = path.join(mediaDir, oldPhysicalPath);
-        const newFullPath = path.join(mediaDir, newPhysicalPath);
-
-        console.log("Renaming folder:", { oldFullPath, newFullPath });
-
-        try {
-            await fs.access(oldFullPath);
-            await fs.rename(oldFullPath, newFullPath);
-            console.log("Physical folder renamed successfully");
-        } catch (err) {
-            console.log("Could not rename physical folder:", err);
-            // Folder might not exist on disk yet, that's OK
-        }
 
         // Update folder in database
         const { data: updatedFolder, error: updateError } = await supabase
@@ -94,38 +64,53 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Update URLs for all media items in this folder
+        // FLAT STORAGE: Rename files in flat directory (caption-preserving slug swap)
         const { data: mediaItems } = await supabase
             .from("media_items")
-            .select("id, storage_path, url")
+            .select("id, filename, url, storage_path")
             .eq("folder_id", folderId);
+
+        const mediaRoot = path.join(process.cwd(), "public", "images", "media");
 
         if (mediaItems && mediaItems.length > 0) {
             for (const item of mediaItems) {
-                const itemStoragePath = item.storage_path as string;
-                const itemUrl = item.url as string;
+                const oldFilename = item.filename as string;
 
-                // Replace the old slug with new slug in paths (slugs are used in physical paths)
-                const newStoragePath = itemStoragePath.replace(
-                    `/${oldSlug}/`,
-                    `/${newSlug}/`
-                );
-                const newUrl = itemUrl.replace(
-                    `/${oldSlug}/`,
-                    `/${newSlug}/`
-                );
+                // Extract suffix: old-slug-living-room.jpg → suffix = "living-room"
+                // Or: old-slug-1.jpg → suffix = "1"
+                const escapedOldSlug = oldSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const suffixMatch = oldFilename.match(new RegExp(`^${escapedOldSlug}-(.+)$`));
 
-                await supabase
-                    .from("media_items")
-                    .update({
-                        storage_path: newStoragePath,
-                        url: newUrl,
-                    })
-                    .eq("id", item.id);
+                if (suffixMatch) {
+                    const suffix = suffixMatch[1]; // "living-room.jpg" or "1.jpg"
+                    const newFilename = `${newSlug}-${suffix}`;
+
+                    // Rename physical file
+                    const oldFilePath = path.join(mediaRoot, oldFilename);
+                    const newFilePath = path.join(mediaRoot, newFilename);
+
+                    try {
+                        await fs.access(oldFilePath);
+                        await fs.rename(oldFilePath, newFilePath);
+                    } catch {
+                        console.log(`[Folder Rename] Could not rename file ${oldFilename}:`, "file may not exist");
+                    }
+
+                    // Update media_items record (flat URL)
+                    const newUrl = `/images/media/${newFilename}`;
+                    await supabase
+                        .from("media_items")
+                        .update({
+                            filename: newFilename,
+                            url: newUrl,
+                            storage_path: newUrl,
+                        })
+                        .eq("id", item.id);
+                }
             }
         }
 
-        // Also update child folders' paths
+        // Update child folders' paths
         const { data: childFolders } = await supabase
             .from("media_folders")
             .select("id, path")

@@ -16,7 +16,8 @@ export async function ensureLocationFolders(
     stateName: string,
     cityName: string,
     propertyName: string,
-    propertyType: 'home' | 'facility'
+    propertyType: 'home' | 'facility',
+    existingFolderId?: string | null
 ): Promise<string | null> {
     try {
         console.log(`Ensuring folders for: ${stateName} -> ${cityName} -> ${propertyName} (${propertyType})`);
@@ -49,8 +50,6 @@ export async function ensureLocationFolders(
         }
 
         // 3. Find or Create Type Folder (home-images/facility-images)
-        // User requested: "inserted before the city"
-        // Use full display name so slug generation works as expected with our updated API route
         const typeFolderName = propertyType === 'home' ? 'Home Images' : 'Facility Images';
 
         let typeFolder = await findFolderByName(typeFolderName, parentFolderId);
@@ -68,7 +67,44 @@ export async function ensureLocationFolders(
         }
         if (!cityFolder) throw new Error(`Could not find or create city folder: ${cityName}`);
 
-        // 5. Find or Create Property Folder
+        // 5. If existingFolderId is provided, MOVE it to the new parent
+        if (existingFolderId) {
+            const { data: existingFolder } = await supabase
+                .from("media_folders")
+                .select("*")
+                .eq("id", existingFolderId)
+                .single();
+
+            if (existingFolder) {
+                // Check if already in the right place with the right name
+                if (existingFolder.parent_id === cityFolder.id && existingFolder.name === propertyName) {
+                    return existingFolderId;
+                }
+
+                const newPath = `${cityFolder.path}/${propertyName}`;
+                const newSlug = propertyName
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, "")
+                    .replace(/-+/g, "-")
+                    .replace(/^-|-$/g, "");
+
+                const { error: moveError } = await supabase
+                    .from("media_folders")
+                    .update({
+                        parent_id: cityFolder.id,
+                        name: propertyName,
+                        path: newPath,
+                        slug: newSlug
+                    })
+                    .eq("id", existingFolderId);
+
+                if (moveError) throw new Error(`Failed to move existing folder: ${moveError.message}`);
+                return existingFolderId;
+            }
+        }
+
+        // 6. Otherwise, Find or Create Property Folder
         let propertyFolder = await findFolderByName(propertyName, cityFolder.id);
         if (!propertyFolder) {
             propertyFolder = await createFolder(propertyName, cityFolder.id);
@@ -85,16 +121,18 @@ export async function ensureLocationFolders(
 
 /**
  * Ensures that the folder structure exists for a given post.
- * Structure: Post Images -> [Post Title]
+ * Structure: Post Images -> [Post Type] -> [Post Title]
  * 
  * @param postTitle - Title of the post
+ * @param postType - The routing slug/type of the post (e.g., 'recipes', 'news_events')
  * @returns The UUID of the post title folder
  */
 export async function ensurePostFolder(
-    postTitle: string
+    postTitle: string,
+    postType: string
 ): Promise<string | null> {
     try {
-        console.log(`Ensuring folder for post: ${postTitle}`);
+        console.log(`Ensuring folder for post: ${postTitle} under type: ${postType}`);
 
         // 1. Find or Create "Post Images" Folder (at Root)
         const rootFolderName = 'Post Images';
@@ -104,10 +142,28 @@ export async function ensurePostFolder(
         }
         if (!rootFolder) throw new Error(`Could not find or create root folder: ${rootFolderName}`);
 
-        // 2. Find or Create Post Directory
-        let postFolder = await findFolderByName(postTitle, rootFolder.id);
+        // 2. Determine Human-Readable Category Name
+        const categoryMap: Record<string, string> = {
+            'general': 'General Posts',
+            'caregiver_resources': 'Caregiver Resources',
+            'caregiving_for_caregivers': 'Caregiving for Caregivers',
+            'resident_resources': 'Resident Resources',
+            'news_events': 'News & Events',
+            'recipes': 'Recipes',
+        };
+        const categoryName = categoryMap[postType] || postType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        // 3. Find or Create Type Directory
+        let typeFolder = await findFolderByName(categoryName, rootFolder.id);
+        if (!typeFolder) {
+            typeFolder = await createFolder(categoryName, rootFolder.id);
+        }
+        if (!typeFolder) throw new Error(`Could not find or create category folder: ${categoryName}`);
+
+        // 4. Find or Create Post Directory
+        let postFolder = await findFolderByName(postTitle, typeFolder.id);
         if (!postFolder) {
-            postFolder = await createFolder(postTitle, rootFolder.id);
+            postFolder = await createFolder(postTitle, typeFolder.id);
         }
         if (!postFolder) throw new Error(`Could not find or create post folder: ${postTitle}`);
 

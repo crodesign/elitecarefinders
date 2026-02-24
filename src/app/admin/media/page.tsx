@@ -32,6 +32,7 @@ import {
     seedDefaultFolders,
     getAllUsedImageUrls,
     getAllFeaturedImageUrls,
+    getAllRecipeStepImageMap,
 } from "@/lib/services/mediaService";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 
@@ -41,6 +42,7 @@ export default function MediaPage() {
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [usedImageUrls, setUsedImageUrls] = useState<Set<string>>(new Set());
     const [featuredImageUrls, setFeaturedImageUrls] = useState<Set<string>>(new Set());
+    const [stepImageMap, setStepImageMap] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMedia, setIsLoadingMedia] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -149,10 +151,11 @@ export default function MediaPage() {
     const loadMediaItems = useCallback(async () => {
         setIsLoadingMedia(true);
         try {
-            const [items, usedUrls, featuredUrls] = await Promise.all([
+            const [items, usedUrls, featuredUrls, stepMap] = await Promise.all([
                 getMediaItems(selectedFolder?.id),
                 getAllUsedImageUrls(),
-                getAllFeaturedImageUrls()
+                getAllFeaturedImageUrls(),
+                getAllRecipeStepImageMap()
             ]);
             console.log("MediaPage loaded items:", items.length);
             console.log("MediaPage usedUrls count:", usedUrls.size);
@@ -164,6 +167,7 @@ export default function MediaPage() {
             setMediaItems(items);
             setUsedImageUrls(usedUrls);
             setFeaturedImageUrls(featuredUrls);
+            setStepImageMap(stepMap);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to load media");
             // On error, clear the items
@@ -179,10 +183,11 @@ export default function MediaPage() {
             setIsLoading(true);
 
             // Load folders and used URLs first
-            let [folderData, usedUrls, featuredUrls] = await Promise.all([
+            let [folderData, usedUrls, featuredUrls, stepMap] = await Promise.all([
                 getFolders(),
                 getAllUsedImageUrls(),
-                getAllFeaturedImageUrls()
+                getAllFeaturedImageUrls(),
+                getAllRecipeStepImageMap()
             ]);
 
             if (folderData.length === 0) {
@@ -192,6 +197,7 @@ export default function MediaPage() {
             setFolders(folderData);
             setUsedImageUrls(usedUrls);
             setFeaturedImageUrls(featuredUrls);
+            setStepImageMap(stepMap);
 
             // Load states from location taxonomy
             try {
@@ -994,6 +1000,7 @@ export default function MediaPage() {
                                                     onToggleBulkSelect={() => handleToggleSelectItem(item.id)}
                                                     isGalleryImage={usedImageUrls.has(item.url)}
                                                     isFeaturedImage={featuredImageUrls.has(item.url)}
+                                                    stepLabel={stepImageMap[item.url] !== undefined ? `Recipe Step ${stepImageMap[item.url]}` : undefined}
                                                 />
                                             </div>
                                         ))}

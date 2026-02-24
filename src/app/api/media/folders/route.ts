@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir } from "fs/promises";
 import { existsSync } from "fs";
+import { unlink } from "fs/promises";
 import path from "path";
-import { createClient } from "@/lib/supabase-server"; // Use server client
-
-import { buildPhysicalPath } from "@/lib/mediaUtils";
+import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
     // Create authenticated client
@@ -32,21 +30,17 @@ export async function POST(request: NextRequest) {
         if (slug === "site-images") slug = "site";
         if (slug === "blog-images") slug = "blog";
 
-        // Determine path - use slug for physical path, name for display path
+        // Determine path
         let dbPath = `/${name}`;
-        let physicalPath = slug;
 
         if (parentId) {
             const { data: parent } = await supabase
                 .from("media_folders")
-                .select("path, slug")
+                .select("path")
                 .eq("id", parentId)
                 .single();
             if (parent) {
                 dbPath = `${parent.path}/${name}`;
-                // Build physical path recursively
-                const parentPhysicalPath = await buildPhysicalPath(supabase, parentId);
-                physicalPath = `${parentPhysicalPath}/${slug}`;
             }
         }
 
@@ -123,11 +117,7 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Create physical directory
-        const uploadDir = path.join(process.cwd(), "public", "images", "media", physicalPath);
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
+        // FLAT STORAGE: No physical directory creation needed — folders are virtual
 
         // Create database record
         const { data, error } = await supabase
@@ -192,16 +182,20 @@ export async function DELETE(request: NextRequest) {
         // Get all media items in this folder
         const { data: mediaItems } = await supabase
             .from("media_items")
-            .select("id, storage_path")
+            .select("id, filename, url, storage_path")
             .eq("folder_id", folderId);
 
-        // Delete media files from disk
+        // FLAT STORAGE: Delete media files from flat directory
+        const deletedUrls: string[] = [];
         if (mediaItems && mediaItems.length > 0) {
-            const { unlink } = await import("fs/promises");
+            const mediaRoot = path.join(process.cwd(), "public", "images", "media");
             for (const item of mediaItems) {
                 try {
-                    const filePath = path.join(process.cwd(), "public", item.storage_path as string);
-                    await unlink(filePath);
+                    const filePath = path.join(mediaRoot, item.filename as string);
+                    if (existsSync(filePath)) {
+                        await unlink(filePath);
+                    }
+                    if (item.url) deletedUrls.push(item.url as string);
                 } catch {
                     // File may not exist, continue
                 }
@@ -222,6 +216,24 @@ export async function DELETE(request: NextRequest) {
 
         if (childFolders && childFolders.length > 0) {
             for (const child of childFolders) {
+                // Get child media items for URL tracking
+                const { data: childMedia } = await supabase
+                    .from("media_items")
+                    .select("id, filename, url")
+                    .eq("folder_id", child.id);
+
+                // Delete child files from flat dir
+                if (childMedia) {
+                    const mediaRoot = path.join(process.cwd(), "public", "images", "media");
+                    for (const item of childMedia) {
+                        try {
+                            const filePath = path.join(mediaRoot, item.filename as string);
+                            if (existsSync(filePath)) await unlink(filePath);
+                            if (item.url) deletedUrls.push(item.url as string);
+                        } catch { /* continue */ }
+                    }
+                }
+
                 // Delete media items in child folders
                 await supabase
                     .from("media_items")
@@ -236,72 +248,32 @@ export async function DELETE(request: NextRequest) {
                 .in("id", childFolders.map((c: { id: string }) => c.id));
         }
 
-        // Delete the physical folder from disk
-        const { rm } = await import("fs/promises");
+        // ENTITY IMAGES[] CLEANUP: Remove deleted URLs from all entity records
+        if (deletedUrls.length > 0) {
+            console.log(`[Folder Delete] Cleaning ${deletedUrls.length} URLs from entity records`);
+            const entityTables = [
+                { table: 'homes', fields: ['images', 'team_images'] },
+                { table: 'facilities', fields: ['images', 'team_images'] },
+                { table: 'posts', fields: ['images'] },
+            ];
 
-        // Strategy 1: Try recursive path (Correct logic)
-        const fullPhysicalPath = await buildPhysicalPath(supabase, folderId);
-        const correctPhysicalPath = path.join(process.cwd(), "public", "images", "media", fullPhysicalPath);
+            for (const { table, fields } of entityTables) {
+                for (const field of fields) {
+                    const { data: rows } = await supabase
+                        .from(table)
+                        .select(`id, ${field}`);
 
-        console.log("----------------------------------------");
-        console.log("DEBUG: Attempting to delete physical folder");
-        console.log("DEBUG: Path 1 (Correct):", correctPhysicalPath);
-
-        let deleted = false;
-
-        try {
-            if (existsSync(correctPhysicalPath)) {
-                await rm(correctPhysicalPath, { recursive: true, force: true });
-                console.log("DEBUG: Deleted via correct path");
-                deleted = true;
-            }
-        } catch (err) {
-            console.error("DEBUG: Failed to delete correct path:", err);
-        }
-
-        // Strategy 2: Try legacy/fragmented path (Fallback for folders created with old bug)
-        // If the folder was created deeply nested but with shallow parent logic, it might be at parentSlug/slug
-        if (!deleted && folder.parent_id) {
-            const { data: parent } = await supabase
-                .from("media_folders")
-                .select("slug")
-                .eq("id", folder.parent_id)
-                .single();
-
-            if (parent && folder.slug) {
-                const legacyPath = path.join(process.cwd(), "public", "images", "media", parent.slug, folder.slug);
-                console.log("DEBUG: Path 2 (Legacy/Fragmented):", legacyPath);
-
-                try {
-                    if (existsSync(legacyPath)) {
-                        await rm(legacyPath, { recursive: true, force: true });
-                        console.log("DEBUG: Deleted via legacy path");
-                        deleted = true;
+                    for (const row of (rows || []) as Record<string, any>[]) {
+                        const arr = row[field];
+                        if (!Array.isArray(arr) || arr.length === 0) continue;
+                        const filtered = arr.filter((url: string) => !deletedUrls.includes(url));
+                        if (filtered.length !== arr.length) {
+                            await supabase.from(table).update({ [field]: filtered }).eq('id', row.id);
+                        }
                     }
-                } catch (err) {
-                    console.error("DEBUG: Failed to delete legacy path:", err);
                 }
             }
         }
-
-        // Strategy 3: Try really shallow path (Just slug at root - if parent was missed)
-        if (!deleted && folder.slug) {
-            const shallowPath = path.join(process.cwd(), "public", "images", "media", folder.slug);
-            console.log("DEBUG: Path 3 (Shallow):", shallowPath);
-            try {
-                // Be careful not to delete root folders like 'home-images' if we are deleting 'home-images'
-                // But since folderId matches, it should be fine.
-                // Only do this if it's NOT a root folder in DB, but exists at root on disk (orphan)
-                if (folder.parent_id && existsSync(shallowPath)) {
-                    await rm(shallowPath, { recursive: true, force: true });
-                    console.log("DEBUG: Deleted via shallow path");
-                }
-            } catch (err) {
-                console.error("DEBUG: Failed to delete shallow path:", err);
-            }
-        }
-        console.log("----------------------------------------");
-        console.log("----------------------------------------");
 
         // Delete the folder from database
         const { error: deleteError } = await supabase
