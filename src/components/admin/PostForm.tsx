@@ -97,6 +97,11 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
         if (isOpen) {
             isInitializedRef.current = false;
 
+            // Always reset the folder ID so the lookup re-fires for both new
+            // and existing posts. Without this, switching from new → edit after
+            // saving keeps a stale undefined (new post) or previous post's ID.
+            setMediaFolderId(undefined);
+
             if (post) {
                 setTitle(post.title || "");
                 originalTitleRef.current = post.title || "";
@@ -220,7 +225,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
         return () => clearTimeout(timer);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [title, mediaFolderId]);
+    }, [title, postType, mediaFolderId]);
 
     const autoGenerateSlug = (value: string) => {
         if (post && post.id) return; // Don't auto-update if editing existing
@@ -268,6 +273,31 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                     } else {
                         console.log('[PostForm] Rename succeeded:', renameData.results);
                         originalTitleRef.current = title;
+
+                        // --- IMPORTANT: Update our local arrays immediately! ---
+                        const renamedFiles = renameData.renamedFiles || [];
+                        const urlMap = new Map<string, string>(renamedFiles.map((rf: any) => [rf.oldUrl, rf.newUrl]));
+
+                        // Update post images
+                        if (postImages.length > 0) {
+                            const newImages = postImages.map(url => urlMap.get(url) || url);
+                            setPostImages(newImages);
+                            // Also update the local variable immediately so payload uses it
+                            postImages.splice(0, postImages.length, ...newImages);
+                        }
+
+                        // Update instruction images if any
+                        if (instructions.length > 0) {
+                            const newInstructions = instructions.map(inst => {
+                                if (inst.image && urlMap.has(inst.image)) {
+                                    return { ...inst, image: urlMap.get(inst.image) as string };
+                                }
+                                return inst;
+                            });
+                            setInstructions(newInstructions);
+                            // Also update the local variable immediately for payload
+                            instructions.splice(0, instructions.length, ...newInstructions);
+                        }
                     }
                 } catch (renameErr) {
                     console.error('[PostForm] Rename API error:', renameErr);

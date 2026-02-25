@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PostForm } from "@/components/admin/PostForm";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 function timeAgo(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
@@ -50,6 +51,8 @@ export default function PostsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -130,19 +133,26 @@ export default function PostsPage() {
         }
     };
 
-    const handleDelete = async (post: Post) => {
-        if (!confirm(`Are you sure you want to delete "${post.title}"?`)) return;
+    const handleDeleteClick = (post: Post) => {
+        setPostToDelete(post);
+        setIsDeleteModalOpen(true);
+    };
 
-        setIsDeleting(post.id);
+    const confirmDelete = async () => {
+        if (!postToDelete) return;
+
+        setIsDeleting(postToDelete.id);
+        setIsDeleteModalOpen(false);
         try {
-            await deletePost(post.id);
+            await deletePost(postToDelete.id, postToDelete.slug);
             showNotification("Post Deleted", "Post has been removed");
-            setPosts(posts.filter(p => p.id !== post.id));
+            setPosts(posts.filter(p => p.id !== postToDelete.id));
         } catch (error) {
             console.error("Failed to delete post:", error);
             showNotification("Error", "Failed to delete post");
         } finally {
             setIsDeleting(null);
+            setPostToDelete(null);
         }
     };
 
@@ -226,12 +236,23 @@ export default function PostsPage() {
 
     const renderActions = (post: Post) => (
         <>
-            <button className="btn-ghost" onClick={() => handleOpenEdit(post)}>
+            <button
+                className="btn-ghost"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    handleOpenEdit(post);
+                }}
+            >
                 <Pencil className="h-4 w-4" />
             </button>
             <button
                 className="btn-danger"
-                onClick={() => handleDelete(post)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    handleDeleteClick(post);
+                }}
                 disabled={isDeleting === post.id}
             >
                 {isDeleting === post.id ? (
@@ -317,6 +338,17 @@ export default function PostsPage() {
                 onClose={handleCloseForm}
                 onSave={handleSave}
                 post={editingPost}
+            />
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Post"
+                message={`Are you sure you want to delete "${postToDelete?.title}"? This action cannot be undone and will permanently remove this post and all of its gallery images from the server.`}
+                confirmLabel={isDeleting ? "Deleting..." : "Delete Post"}
+                cancelLabel="Cancel"
+                isDangerous={true}
             />
         </>
     );

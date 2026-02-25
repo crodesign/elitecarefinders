@@ -139,18 +139,26 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
     };
 }
 
-export async function deletePost(id: string): Promise<void> {
-    const { error, count } = await supabase
+export async function deletePost(id: string, slug?: string): Promise<void> {
+    if (slug) {
+        try {
+            await fetch('/api/media/delete-entity', {
+                method: 'POST',
+                body: JSON.stringify({ slug }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (e) {
+            console.error(`Failed to delete media for post ${slug}:`, e);
+        }
+    }
+
+    const { error } = await supabase
         .from("posts")
-        .delete({ count: 'exact' })
+        .delete()
         .eq("id", id);
 
     if (error) {
         console.error(`Error deleting post ${id}:`, error);
         throw new Error(error.message);
-    }
-
-    if (count === 0) {
-        throw new Error("Post could not be deleted. It may not exist or you lack permission.");
     }
 }

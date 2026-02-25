@@ -15,56 +15,109 @@ export async function POST(request: NextRequest) {
 
         console.log(`[Delete Entity Media] Starting deletion for slug: ${slug}`);
 
-        // 1. Physically delete all files matching `${slug}-*` in public/images/media/
+        const supabaseAdmin = createClient();
         const mediaDir = path.join(process.cwd(), "public", "images", "media");
         let physicalDeletedCount = 0;
+        let dbDeletedCount = 0;
+        const deletedFilenames = new Set<string>();
 
+        // ── Strategy 1: Folder-based deletion (most reliable) ──
+        // Look up the media folder by slug and delete ALL items inside it.
+        // This handles ALL images associated with the post (gallery, featured, step images)
+        // using the direct DB relationship rather than filename prefix guessing.
+        const { data: folder } = await supabaseAdmin
+            .from("media_folders")
+            .select("id, name, slug")
+            .eq("slug", slug)
+            .maybeSingle();
+
+        if (folder) {
+            console.log(`[Delete Entity Media] Found folder: "${folder.name}" (id: ${folder.id})`);
+
+            // Get ALL media items in this folder
+            const { data: folderItems } = await supabaseAdmin
+                .from("media_items")
+                .select("id, filename, url")
+                .eq("folder_id", folder.id);
+
+            if (folderItems && folderItems.length > 0) {
+                // Delete physical files
+                for (const item of folderItems) {
+                    const filename = item.filename as string;
+                    if (filename) {
+                        deletedFilenames.add(filename);
+                        if (existsSync(mediaDir)) {
+                            const filePath = path.join(mediaDir, filename);
+                            if (existsSync(filePath)) {
+                                try {
+                                    await unlink(filePath);
+                                    physicalDeletedCount++;
+                                } catch (err) {
+                                    console.error(`[Delete Entity Media] Failed to delete file ${filename}:`, err);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Delete all media_items records for this folder
+                const { count } = await supabaseAdmin
+                    .from("media_items")
+                    .delete()
+                    .eq("folder_id", folder.id);
+                dbDeletedCount += count || folderItems.length;
+            }
+
+            // Delete the virtual folder record
+            const { error: folderError } = await supabaseAdmin
+                .from("media_folders")
+                .delete()
+                .eq("id", folder.id);
+
+            if (folderError) {
+                console.error("[Delete Entity Media] Folder deletion error:", folderError);
+            }
+        } else {
+            console.log(`[Delete Entity Media] No folder found for slug "${slug}", falling back to filename prefix scan.`);
+        }
+
+        // ── Strategy 2: Filename prefix scan fallback ──
+        // Catch any orphaned physical files or media_items that are not
+        // properly linked to the folder (e.g. from legacy data or edge cases).
         if (existsSync(mediaDir)) {
             const files = await readdir(mediaDir);
-            // Must end with hyphen to avoid prefix collisions (e.g. chan-12 vs chan-123)
             const filePrefix = `${slug}-`;
 
-            const filesToDelete = files.filter(f => f.startsWith(filePrefix));
+            const orphanedFiles = files.filter(f =>
+                f.startsWith(filePrefix) && !deletedFilenames.has(f)
+            );
 
-            for (const file of filesToDelete) {
+            for (const file of orphanedFiles) {
                 try {
                     await unlink(path.join(mediaDir, file));
                     physicalDeletedCount++;
+                    console.log(`[Delete Entity Media] Cleaned up orphaned file: ${file}`);
                 } catch (err) {
-                    console.error(`[Delete Entity Media] Failed to delete file ${file}:`, err);
+                    console.error(`[Delete Entity Media] Failed to delete orphaned file ${file}:`, err);
                 }
+            }
+
+            // Also clean up any orphaned media_items records by filename prefix
+            if (orphanedFiles.length > 0) {
+                const { count } = await supabaseAdmin
+                    .from("media_items")
+                    .delete()
+                    .like("filename", `${slug}-%`);
+                dbDeletedCount += count || 0;
             }
         }
 
-        // 2. Delete database records in media_items via Admin Client
-        const supabaseAdmin = createClient();
-
-        const { count: dbDeletedCount, error: dbError } = await supabaseAdmin
-            .from("media_items")
-            .delete()
-            .like("filename", `${slug}-%`);
-
-        if (dbError) {
-            console.error("[Delete Entity Media] Database deletion error:", dbError);
-            // We don't throw here because we want to return the physical success even if db fails
-        }
-
-        // 3. Delete the virtual folder from media_folders
-        const { error: folderError } = await supabaseAdmin
-            .from("media_folders")
-            .delete()
-            .eq("slug", slug);
-
-        if (folderError) {
-            console.error("[Delete Entity Media] Folder deletion error:", folderError);
-        }
-
-        console.log(`[Delete Entity Media] Finished for ${slug}. Physical: ${physicalDeletedCount}, DB: ${dbDeletedCount || 0}`);
+        console.log(`[Delete Entity Media] Finished for "${slug}". Physical: ${physicalDeletedCount}, DB: ${dbDeletedCount}`);
 
         return NextResponse.json({
             success: true,
             physicalDeletedCount,
-            dbDeletedCount: dbDeletedCount || 0
+            dbDeletedCount,
         });
 
     } catch (error) {
