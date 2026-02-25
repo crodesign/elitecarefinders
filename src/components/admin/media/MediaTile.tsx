@@ -18,6 +18,7 @@ const isRestrictedFolder = (folder: MediaFolder | null): boolean => {
 interface MediaTileProps {
     item: MediaItem;
     isSelected: boolean;
+    isEditMode?: boolean;
     folders: MediaFolder[];
     onClick: () => void;
     onUpdate: (id: string, updates: Partial<MediaItem>) => Promise<void>;
@@ -39,6 +40,7 @@ interface MediaTileProps {
 export function MediaTile({
     item,
     isSelected,
+    isEditMode = false,
     folders,
     onClick,
     onUpdate,
@@ -62,6 +64,7 @@ export function MediaTile({
     const [folderSearch, setFolderSearch] = useState("");
     const [showFolderDropdown, setShowFolderDropdown] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // Sync local state when item changes (fixes stale state issues)
     useEffect(() => {
@@ -196,15 +199,18 @@ export function MediaTile({
     const currentFolder = flatFolders.find(({ folder }) => folder.id === folderId);
     const currentFolderName = currentFolder ? currentFolder.folder.name : "";
 
+    // Edit panel is open when: library mode tile is selected, OR gallery mode explicitly editing
+    const showEditPanel = isEditMode || (isSelected && !onMediaSelect);
+
     return (
-        <div className={`flex flex-col rounded-xl transition-all ${isSelected && !onMediaSelect ? "ring-2 ring-accent overflow-visible" : "overflow-hidden"}`}>
+        <div className="flex flex-col rounded-xl overflow-hidden group">
             {/* Image container */}
             <div className="relative w-full aspect-square bg-surface-input rounded-t-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
                     <img
                         src={item.url}
                         alt={item.altText || item.filename}
-                        className={`w-full h-full object-cover transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
+                        className={`w-full h-full ${item.mimeType === 'image/svg+xml' ? 'object-contain p-1' : 'object-cover'} transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-content-muted">
@@ -242,218 +248,125 @@ export function MediaTile({
                     )}
                 </div>
 
-                {/* Edit/Close button in upper right - or checkbox in bulk/selection mode */}
-                {(isBulkSelectMode || onMediaSelect) ? (
+                {/* Top-right: context-sensitive action buttons */}
+                {isBulkSelectMode ? (
+                    // Bulk select mode: single checkbox
                     <button
                         type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (onMediaSelect) {
-                                onMediaSelect(item);
-                            } else if (onToggleBulkSelect) {
-                                onToggleBulkSelect();
-                            }
-                        }}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected || isBulkSelected
+                        onClick={(e) => { e.stopPropagation(); onToggleBulkSelect?.(); }}
+                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isBulkSelected
                             ? "bg-accent text-white"
-                            : onMediaSelect
-                                ? "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
-                                : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
+                            : "bg-surface-secondary/80 text-content-secondary hover:bg-surface-secondary hover:text-content-primary"
                             }`}
                     >
-                        {(isSelected || isBulkSelected) ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                        {isBulkSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                     </button>
+                ) : onMediaSelect ? (
+                    // Gallery mode: stacked select checkbox + edit pencil
+                    <div className="absolute top-2 right-2 flex flex-col gap-1">
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onMediaSelect(item); }}
+                            className={`p-1.5 rounded-lg transition-all ${isSelected
+                                ? "bg-accent text-white"
+                                : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
+                                }`}
+                            title={isSelected ? "Remove from gallery" : "Add to gallery"}
+                        >
+                            {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
+                            className="p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
+                            title="Delete Image"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </button>
+                    </div>
                 ) : (
+                    // Library/Gallery mode: single delete button
                     <button
                         type="button"
-                        onClick={handleTileClick}
-                        className={`absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-sm transition-all ${isSelected
-                            ? "bg-accent text-white"
-                            : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-accent hover:text-white"
-                            }`}
+                        onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
+                        className="absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
+                        title="Delete Image"
                     >
-                        {isSelected ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                        <Trash2 className="h-4 w-4" />
                     </button>
                 )}
+
+                {/* URL Overlay - Standard theme alignment (Soft glass look) */}
+                <div className="absolute bottom-0 left-0 right-0 p-1.5 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex items-center gap-1.5 px-2 py-1 overflow-hidden rounded ring-1 ring-black/5 dark:ring-white/5 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)]">
+                        <span className="text-[9px] uppercase font-black opacity-30 shrink-0">URL</span>
+                        <span className="flex-1 text-[10px] truncate font-mono font-medium opacity-60">{item.url}</span>
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(item.url);
+                            }}
+                            className="flex-shrink-0 p-1 opacity-40 hover:opacity-100 transition-all ml-1"
+                            title="Copy URL"
+                        >
+                            <Copy className="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Caption and edit fields container */}
-            <div className={`p-3 ${captionClassName} ${isSelected && !onMediaSelect ? "space-y-2 rounded-b-xl" : ""}`}>
+            {/* Caption area */}
+            <div className={`p-1.5 ${captionClassName} space-y-1.5`}>
                 {/* Caption row */}
-                <div className="flex items-center gap-2">
-                    {isSelected && !onMediaSelect && (
-                        <label className="text-xs text-content-muted flex-shrink-0 w-12">Caption</label>
-                    )}
+                <div className="flex items-center gap-1.5">
                     <input
                         type="text"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Add caption..."
-                        className={`flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted focus:outline-none focus:bg-surface-input focus:ring-1 focus:ring-accent rounded-md px-1.5 transition-colors ${isSelected && !onMediaSelect
-                            ? "bg-surface-input py-1.5"
-                            : "bg-transparent py-0"
-                            }`}
+                        className="flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted dark:placeholder-content-secondary focus:outline-none focus:ring-1 focus:ring-accent rounded-md px-2 py-1.5 transition-colors bg-surface-input"
                     />
-                    {/* Only show Save button when NOT in edit mode and has changes */}
-                    {(!isSelected || onMediaSelect) && captionChanged && (
+                    {captionChanged && (
                         <button
                             type="button"
                             onClick={handleSaveCaptionOnly}
                             disabled={isSaving}
-                            className="flex-shrink-0 px-2 py-0.5 text-xs bg-accent text-white rounded hover:bg-accent-light transition-colors disabled:opacity-50"
+                            className="flex-shrink-0 px-2.5 py-1.5 text-xs bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
                             title="Save caption (Enter)"
                         >
-                            {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                            {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
                         </button>
                     )}
                 </div>
 
-                {/* Edit fields - only when selected AND NOT in selection mode */}
-                {isSelected && !onMediaSelect && (
-                    <>
-                        {/* URL row */}
-                        {showUrlField && (
-                            <div className="flex items-center gap-2">
-                                <label className="text-xs text-content-muted flex-shrink-0 w-12">URL</label>
-                                <input
-                                    type="text"
-                                    value={item.url}
-                                    readOnly
-                                    className="flex-1 min-w-0 bg-surface-input rounded px-2 py-1.5 text-xs text-content-muted truncate"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(item.url);
-                                    }}
-                                    className="flex-shrink-0 px-2 py-1.5 bg-surface-input border border-ui-border rounded text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors"
-                                    title="Copy URL"
-                                >
-                                    <Copy className="h-3 w-3" />
-                                </button>
-                            </div>
-                        )}
+                {/* Deactivation/Delete Confirmation Modal */}
+                <ConfirmationModal
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={() => { setShowDeleteModal(false); onDelete(item.id); }}
+                    title="Delete Image"
+                    message={
+                        <div className="space-y-3">
+                            <p>Are you sure you want to permanently delete <strong>&quot;{item.filename}&quot;</strong>? This will remove the physical file from the server and cannot be undone.</p>
 
-                        {/* Folder row - searchable dropdown */}
-                        {showFolderMove && (
-                            <div className="flex items-center gap-2">
-                                <label className="text-xs text-content-muted flex-shrink-0 w-12">Folder</label>
-                                <div className="flex-1 min-w-0 relative">
-                                    <input
-                                        type="text"
-                                        value={showFolderDropdown ? folderSearch : currentFolderName}
-                                        onChange={(e) => {
-                                            setFolderSearch(e.target.value);
-                                            setShowFolderDropdown(true);
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        onFocus={() => {
-                                            setFolderSearch("");
-                                            setShowFolderDropdown(true);
-                                        }}
-                                        onBlur={() => {
-                                            // Delay to allow click on dropdown item
-                                            setTimeout(() => setShowFolderDropdown(false), 150);
-                                        }}
-                                        placeholder="Search folders..."
-                                        className="w-full rounded px-2 py-1.5 text-xs focus:outline-none bg-surface-input text-content-primary"
-                                    />
-                                    {showFolderDropdown && (
-                                        <div className="absolute top-full left-0 right-0 mt-1 bg-surface-secondary rounded shadow-lg max-h-40 overflow-auto z-50">
-                                            <button
-                                                type="button"
-                                                // Use onMouseDown to prevent blur from closing dropdown before click registers
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault(); // Prevent focus loss
-                                                    setFolderId(null);
-                                                    setShowFolderDropdown(false);
-                                                    setFolderSearch("");
-                                                }}
-                                                className="w-full text-left px-2 py-1.5 text-xs text-content-muted hover:bg-surface-hover hover:text-content-primary"
-                                            >
-                                                No folder
-                                            </button>
-                                            {filteredFolders.map(({ folder, depth }) => {
-                                                const isRestricted = isRestrictedFolder(folder);
-                                                return (
-                                                    <button
-                                                        key={folder.id}
-                                                        type="button"
-                                                        disabled={isRestricted}
-                                                        // Use onMouseDown to prevent blur from closing dropdown before click registers
-                                                        onMouseDown={(e) => {
-                                                            if (isRestricted) return;
-                                                            e.preventDefault(); // Prevent focus loss
-                                                            setFolderId(folder.id);
-                                                            setShowFolderDropdown(false);
-                                                            setFolderSearch("");
-                                                        }}
-                                                        className={`w-full text-left px-2 py-1.5 text-xs flex items-center justify-between group ${isRestricted
-                                                            ? "text-content-muted opacity-50 cursor-not-allowed"
-                                                            : "text-content-primary hover:bg-surface-hover"
-                                                            }`}
-                                                    >
-                                                        <span>{"—".repeat(depth)} {folder.name}</span>
-                                                        {isRestricted && (
-                                                            <span className="text-[10px] text-content-muted group-hover:text-content-secondary">(Restricted)</span>
-                                                        )}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
+                            {(isGalleryImage || isFeaturedImage || stepLabel) && (
+                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                    <p className="text-red-200 text-sm font-medium flex items-center gap-2">
+                                        <span className="text-lg">⚠️</span> Warning: Image in Use
+                                    </p>
+                                    <p className="mt-1 text-red-300/80 text-xs pl-7">
+                                        This image is currently displayed in a gallery or featured slot. Deleting it will result in a broken image on the site.
+                                    </p>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Actions row */}
-                        <div className="flex items-center justify-between pt-2 border-t border-ui-border">
-                            <button
-                                type="button"
-                                onClick={() => onDelete(item.id)}
-                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-3 py-1.5 text-xs text-content-muted hover:text-content-primary transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleSaveClick}
-                                    disabled={isSaving || !hasChanges}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-xs bg-accent text-white font-medium rounded hover:bg-accent-light transition-colors disabled:opacity-50"
-                                >
-                                    {isSaving && <Loader2 className="h-3 w-3 animate-spin" />}
-                                    Save
-                                </button>
-                            </div>
+                            )}
                         </div>
-
-                        {showFolderMove && (
-                            <ConfirmationModal
-                                isOpen={showConfirmModal}
-                                onClose={handleCancelSave}
-                                onConfirm={handleSaveConfirmed}
-                                title="Move File?"
-                                message={
-                                    <div>
-                                        <p>Are you sure you want to move this file to <strong>{currentFolderName || "the root folder"}</strong>?</p>
-                                        <p className="mt-2 text-content-muted text-xs">This will physically relocate the file on the server and update all database references.</p>
-                                    </div>
-                                }
-                                confirmLabel="Move File"
-                                isLoading={isSaving}
-                            />
-                        )}
-                    </>
-                )}
+                    }
+                    confirmLabel="Delete Permanently"
+                    cancelLabel="Cancel"
+                    isDangerous={true}
+                />
             </div>
         </div>
     );

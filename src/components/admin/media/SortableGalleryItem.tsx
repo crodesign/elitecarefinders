@@ -36,7 +36,7 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
             <img
                 src={url}
                 alt=""
-                className="w-full h-full object-cover pointer-events-none"
+                className={`w-full h-full ${url.toLowerCase().endsWith('.svg') ? 'object-contain p-1' : 'object-cover'} pointer-events-none`}
                 onError={() => onError?.(url)}
             />
             <button

@@ -8,7 +8,7 @@ const DEFAULT_FOLDERS = [
     { name: "Home Images", slug: "home-images", path: "/Home Images", display_order: 1 },
     { name: "Facility Images", slug: "facility-images", path: "/Facility Images", display_order: 2 },
     { name: "Post Images", slug: "post-images", path: "/Post Images", display_order: 3 },
-    { name: "Site Images", slug: "site-images", path: "/Site Images", display_order: 10 },
+    { name: "Images", slug: "images", path: "/Images", display_order: 10 },
     { name: "Temp", slug: "temp", path: "/Temp", display_order: 99 },
 ];
 
@@ -17,12 +17,12 @@ const FOLDER_ORDER: Record<string, number> = {
     "home-images": 1,
     "facility-images": 2,
     "blog-images": 3,
-    "site-images": 10,
+    "images": 10,
     "temp": 99,
 };
 
 // Folders that should have a separator before them
-const SEPARATOR_BEFORE: string[] = ["site-images"];
+const SEPARATOR_BEFORE: string[] = ["images"];
 
 // Folder Operations
 export async function getFolders(): Promise<MediaFolder[]> {
@@ -324,13 +324,15 @@ export async function getAllRecipeStepImageMap(): Promise<Record<string, number>
     }
 }
 
-export async function getMediaItems(folderId?: string): Promise<MediaItem[]> {
+export async function getMediaItems(folderId?: string | null): Promise<MediaItem[]> {
     let query = supabase
         .from("media_items")
         .select("*")
         .order("created_at", { ascending: false });
 
-    if (folderId) {
+    if (folderId === null) {
+        query = query.is("folder_id", null);
+    } else if (folderId) {
         query = query.eq("folder_id", folderId);
     }
 
@@ -393,7 +395,7 @@ export async function deleteMediaItem(id: string): Promise<{ filename: string }>
 
 export async function uploadMedia(
     file: File,
-    folderId?: string,
+    folderId?: string | null,
     onProgress?: (progress: number) => void
 ): Promise<MediaItem> {
     // Create form data for API upload
@@ -443,7 +445,7 @@ export async function uploadMedia(
 
 export async function bulkUploadMedia(
     files: File[],
-    folderId?: string,
+    folderId?: string | null,
     onProgress?: (completed: number, total: number) => void
 ): Promise<MediaItem[]> {
     const results: MediaItem[] = [];

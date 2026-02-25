@@ -32,26 +32,38 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
 
-        // Restricted folders - cannot upload directly to root or these parent folders
-        const RESTRICTED_PARENT_FOLDERS = ["Home Images", "Facility Images"];
-
-        // Check if uploading to root (no folder selected)
-        if (!folderId) {
-            return NextResponse.json(
-                { error: "Please select a folder. Images cannot be saved to the root directory." },
-                { status: 400 }
-            );
+        // Get folder info early for auto-naming and redirection
+        let folderSlug = "site"; // Default if root
+        let selectedFolder = null;
+        if (folderId) {
+            const { data } = await supabase
+                .from("media_folders")
+                .select("name, slug, path, parent_id")
+                .eq("id", folderId)
+                .single();
+            if (data) {
+                selectedFolder = data;
+                folderSlug = data.slug as string;
+            }
         }
 
-        // Check if uploading to a restricted parent folder
-        const { data: selectedFolder } = await supabase
-            .from("media_folders")
-            .select("name, path, parent_id")
-            .eq("id", folderId)
-            .single();
+        // Determine if this is a redirected folder (root or "Images" folder)
+        const isRedirectedFolder = !folderId || (folderId && folderSlug === 'images');
 
-        if (selectedFolder) {
-            // Check if this is a restricted parent folder (no parent and name matches)
+        // Restricted folders - cannot upload directly to these parent folders
+        const RESTRICTED_PARENT_FOLDERS = ["Home Images", "Facility Images"];
+
+        // Determine storage path and URL based on folder
+        let uploadDir = path.join(process.cwd(), "public", "images", "media");
+        let publicUrlBase = "/images/media/";
+
+        if (isRedirectedFolder) {
+            // Root library or "Images" folder goes directly to /public/images
+            uploadDir = path.join(process.cwd(), "public", "images");
+            publicUrlBase = "/images/";
+            console.log(`[Upload] Redirected folder detected (${folderSlug}), redirecting to /public/images`);
+        } else if (selectedFolder) {
+            // Check if uploading to a restricted parent folder
             const isRestrictedParent = !selectedFolder.parent_id &&
                 RESTRICTED_PARENT_FOLDERS.includes(selectedFolder.name);
 
@@ -63,54 +75,63 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Get folder info for auto-naming
-        let folderSlug = "media"; // Default if no folder
-        if (folderId) {
-            const { data: folder } = await supabase
-                .from("media_folders")
-                .select("slug")
-                .eq("id", folderId)
-                .single();
-            if (folder) {
-                folderSlug = folder.slug as string;
+        // Determine naming strategy
+        let filename: string;
+
+        if (isRedirectedFolder) {
+            // Use original filename for redirected folders
+            const originalName = file.name;
+            const extension = originalName.split('.').pop()?.toLowerCase() || "jpg";
+            const baseName = originalName.replace(/\.[^/.]+$/, "");
+
+            // Collision check: append suffix if file exists
+            let suffix = 0;
+            let currentFilename = originalName;
+
+            while (existsSync(path.join(uploadDir, currentFilename))) {
+                suffix++;
+                currentFilename = `${baseName}-${suffix}.${extension}`;
             }
+            filename = currentFilename;
+            console.log("[Upload] Using original filename (with collision check):", filename);
+        } else {
+            // Sequential naming for other folders
+            const extension = file.name.split('.').pop()?.toLowerCase() || "jpg";
+
+            // Query existing files in this folder to find highest number
+            const query = supabase.from("media_items").select("filename");
+            if (folderId) {
+                query.eq("folder_id", folderId);
+            } else {
+                query.is("folder_id", null);
+            }
+            const { data: filteredFiles } = await query;
+
+            // Parse numbers from existing filenames and find max
+            const pattern = new RegExp(`^${folderSlug}-(\\d+)`, 'i');
+            const numbers = (filteredFiles || []).map(f => {
+                const match = (f.filename as string).match(pattern);
+                return match ? parseInt(match[1]) : 0;
+            }) || [];
+            const nextNumber = Math.max(0, ...numbers) + 1;
+
+            filename = `${folderSlug}-${nextNumber}.${extension}`;
+            console.log("[Upload] Auto-generated filename:", filename, "from folder:", folderSlug);
         }
 
-        // Get file extension
-        const extension = file.name.split('.').pop()?.toLowerCase() || "jpg";
-
-        // Query existing files in this folder to find highest number
-        const { data: existingFiles } = await supabase
-            .from("media_items")
-            .select("filename")
-            .eq("folder_id", folderId);
-
-        // Parse numbers from existing filenames and find max
-        const pattern = new RegExp(`^${folderSlug}-(\\d+)`, 'i');
-        const numbers = existingFiles?.map(f => {
-            const match = (f.filename as string).match(pattern);
-            return match ? parseInt(match[1]) : 0;
-        }) || [];
-        const nextNumber = Math.max(0, ...numbers) + 1;
-
-        // Create filename based on folder slug and sequential number
-        const filename = `${folderSlug}-${nextNumber}.${extension}`;
-        console.log("[Upload] Auto-generated filename:", filename, "from existing count:", numbers.length);
-
-        // FLAT STORAGE: Write directly to public/images/media/
-        const uploadDir = path.join(process.cwd(), "public", "images", "media");
+        // Ensure directory exists
         if (!existsSync(uploadDir)) {
             await mkdir(uploadDir, { recursive: true });
         }
 
-        // Write file to disk (flat directory)
+        // Write file to disk
         const filePath = path.join(uploadDir, filename);
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
         await writeFile(filePath, buffer);
 
-        // Generate flat public URL
-        const publicUrl = `/images/media/${filename}`;
+        // Generate public URL
+        const publicUrl = `${publicUrlBase}${filename}`;
 
         // Get image dimensions (for images only)
         let width: number | undefined;

@@ -32,8 +32,8 @@ export async function DELETE(request: NextRequest) {
         // Determine the physical file path
         let filePath: string;
 
-        if (storagePath && storagePath.startsWith("/images/media/")) {
-            // storage_path is relative like /images/media/folder/file.jpg
+        if (storagePath && (storagePath.startsWith("/images/media/") || storagePath.startsWith("/images/"))) {
+            // storage_path is relative like /images/media/file.jpg or /images/file.jpg
             filePath = path.join(process.cwd(), "public", storagePath);
         } else if (storagePath && existsSync(storagePath)) {
             // storage_path is absolute

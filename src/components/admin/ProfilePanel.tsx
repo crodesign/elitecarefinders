@@ -596,13 +596,12 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                 }}
                                                 options={[
                                                     { value: "", label: "Library Root" },
-                                                    ...states.map(state => {
-                                                        const stateFolder = mediaFolders.find(f => f.stateId === state.id && !f.parentId);
-                                                        return {
-                                                            value: stateFolder?.id || "",
-                                                            label: state.name
-                                                        };
-                                                    }).filter(opt => opt.value !== "")
+                                                    ...mediaFolders
+                                                        .filter(f => f.slug === "images")
+                                                        .map(f => ({
+                                                            value: f.id,
+                                                            label: f.name
+                                                        }))
                                                 ]}
                                                 placeholder="Select a preferred folder..."
                                             />

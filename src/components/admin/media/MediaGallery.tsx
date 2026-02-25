@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Plus, Loader2, RefreshCw, X, FolderOpen } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Loader2, RefreshCw, X } from "lucide-react";
 import { MediaItem, MediaFolder } from "@/types";
 import { getMediaItems, deleteMediaItem, updateMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
-import { supabase } from "@/lib/supabase";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 import { SortableGalleryItem } from "@/components/admin/media/SortableGalleryItem";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
     DndContext,
@@ -55,43 +55,9 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const [isUploaderOpen, setIsUploaderOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const [folderPath, setFolderPath] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const { showNotification } = useNotification();
 
-    // Fetch the folder path to build the media library deep-link
-    useEffect(() => {
-        if (!folderId) { setFolderPath(null); return; }
-        supabase
-            .from('media_folders')
-            .select('path')
-            .eq('id', folderId)
-            .single()
-            .then(({ data }: { data: { path: string } | null }) => setFolderPath(data?.path ?? null));
-    }, [folderId]);
-
-    // Build deep-link URL using same pathToSlug logic as media page.tsx
-    // Splits on '/', lowercases+hyphenates each segment without stripping the
-    // leading empty string, so the resulting slug keeps its leading slash:
-    //   "/Hawaii/Oahu/Home Images" → "/hawaii/oahu/home-images"
-    const mediaLibraryUrl = useMemo(() => {
-        if (!folderPath) return '/admin/media';
-        const slug = folderPath
-            .split('/')
-            .map(s => s.toLowerCase().replace(/\s+/g, '-'))
-            .join('/');
-        return `/admin/media?folder=${slug}`;
-    }, [folderPath]);
-
-    const handleManageImages = () => {
-        if (isDirty) {
-            const confirmed = window.confirm(
-                'You have unsaved changes. If you navigate away, your changes will be lost.\n\nContinue to Media Library?'
-            );
-            if (!confirmed) return;
-        }
-        window.location.href = mediaLibraryUrl;
-    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -177,11 +143,24 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     };
 
     const handleDeleteItem = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this image?")) return;
+        // Find the item's URL before deleting so we can deselect it everywhere
+        const item = mediaItems.find(i => i.id === id);
+        const deletedUrl = item?.url;
 
         try {
             await deleteMediaItem(id);
             showNotification("Image deleted");
+
+            // Remove the deleted URL from all gallery selections so the
+            // thumbnail strip and dirty state stay in sync
+            if (deletedUrl && galleries) {
+                galleries.forEach(gallery => {
+                    if (gallery.urls.includes(deletedUrl)) {
+                        gallery.onChange(gallery.urls.filter(u => u !== deletedUrl));
+                    }
+                });
+            }
+
             await loadMedia();
         } catch (err) {
             console.error("Delete failed:", err);
@@ -350,16 +329,6 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                             Add
                         </button>
                     )}
-                    {/* Manage Images — deep-links to the media library folder */}
-                    <button
-                        type="button"
-                        onClick={handleManageImages}
-                        title="Manage Images in Media Library"
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap bg-[var(--media-gallery-bg)] text-content-secondary hover:bg-accent hover:text-white shrink-0"
-                    >
-                        <FolderOpen className="h-4 w-4" />
-                        Manage
-                    </button>
                 </div>
             </div>
 
@@ -389,20 +358,21 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             ) : (
                 <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
-                    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
                         {mediaItems.map((item) => (
                             <div key={item.id}>
                                 <MediaTile
                                     item={item}
                                     isSelected={(activeUrls.includes(item.url)) || selectedItemId === item.id || (!!featuredImageUrl && featuredImageUrl === item.url)}
+                                    isEditMode={selectedItemId === item.id}
                                     folders={folders}
                                     onClick={() => setSelectedItemId(item.id)}
                                     onUpdate={handleUpdateItem}
                                     onDelete={handleDeleteItem}
                                     onClose={() => setSelectedItemId(null)}
-                                    showUrlField={false}
+                                    showUrlField={true}
                                     showFolderMove={false}
-                                    showDimensions={false}
+                                    showDimensions={true}
                                     isFeaturedImage={featuredImageUrl ? featuredImageUrl === item.url : !!(activeUrls.length > 0 && activeUrls[0] === item.url && activeGallery?.id === 'main')}
                                     stepLabel={stepImageMap && stepImageMap[item.url] !== undefined ? `Step ${stepImageMap[item.url]}` : undefined}
                                     onMediaSelect={galleries ? () => handleToggleSelection(item.url) : onMediaSelect}

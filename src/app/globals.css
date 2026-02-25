@@ -67,7 +67,7 @@
   --media-panel-bg: var(--surface-secondary);
   --media-gallery-bg: rgba(255, 255, 255, 0.1);
   --media-caption-bg: rgba(255, 255, 255, 0.1);
-  --media-edit-btn-bg: rgba(0, 0, 0, 0.6);
+  --media-edit-btn-bg: rgba(0, 0, 0, 0.45);
   --media-edit-btn-hover-bg: #000000;
   --media-edit-btn-text: #ffffff;
   --media-dim-label-bg: rgba(0, 0, 0, 0.6);
@@ -113,7 +113,7 @@
   --media-panel-bg: #ffffff;
   --media-gallery-bg: rgba(0, 0, 0, 0.05);
   --media-caption-bg: rgba(0, 0, 0, 0.1);
-  --media-edit-btn-bg: rgba(255, 255, 255, 0.6);
+  --media-edit-btn-bg: rgba(255, 255, 255, 0.7);
   --media-edit-btn-hover-bg: #ffffff;
   --media-edit-btn-text: #000000;
   --media-dim-label-bg: rgba(255, 255, 255, 0.6);

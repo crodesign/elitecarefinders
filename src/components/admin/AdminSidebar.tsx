@@ -35,7 +35,6 @@ const navigation = [
     { name: "Users", href: "/admin/users", icon: Users, requireSystemAdmin: true }, // Only System Admins can see this
     { name: "Invoices", href: "/admin/invoices", icon: FileText, requireInvoiceManager: true }, // Replaced Blog icon which was FileText
     { name: "Contacts", href: "/admin/contacts", icon: Users },
-    { name: "Media", href: "/admin/media", icon: ImageIcon },
     { name: "Homes", href: "/admin/homes", icon: Home, hasAddButton: true },
     { name: "Facilities", href: "/admin/facilities", icon: Building2, hasAddButton: true },
     { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
@@ -65,7 +64,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
     const [showSettingsMenu, setShowSettingsMenu] = useState(false);
     const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
     const { handleNavigation } = useUnsavedChanges();
-    const { user, signOut, canAccessSettings, canManageUsers, isSystemAdmin } = useAuth();
+    const { user, signOut, canAccessSettings, canManageUsers, isSystemAdmin, isSuperAdmin } = useAuth();
 
     const currentTaxonomyId = searchParams.get('id');
     const manageTaxonomyId = searchParams.get('manage_taxonomy');
@@ -381,6 +380,19 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Users
                         </Link>
+                        {isSuperAdmin && (
+                            <Link
+                                href="/admin/settings/site-images"
+                                onClick={(e) => handleNavClick(e, "/admin/settings/site-images")}
+                                className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/site-images")
+                                    ? "bg-surface-hover text-content-primary"
+                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    }`}
+                            >
+                                <ImageIcon className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/site-images") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                                Site Images
+                            </Link>
+                        )}
                     </div>
                 </div>
             )}

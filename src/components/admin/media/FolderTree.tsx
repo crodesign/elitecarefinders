@@ -274,13 +274,9 @@ export function FolderTree({
         }
     };
 
-    // With hierarchical structure:
-    // - State folders are top-level folders with stateId matching the selected state
-    // - Home/Facility folders are children of state folders
-    // - When a state is selected, show its children (Home Images, Facility Images) directly
-    const stateFolders = selectedStateId
-        ? folders.filter(f => f.stateId === selectedStateId && !f.parentId)
-        : [];
+    // For hierarchical structure:
+    // User requested to ONLY see the "Images" folder, so we hide primary state-based folders
+    const stateFolders: MediaFolder[] = [];
 
     // Get the children of the selected state folder (Home Images, Facility Images)
     let primaryFolders = stateFolders.length > 0 && stateFolders[0].children
@@ -294,10 +290,8 @@ export function FolderTree({
     }
 
     const secondaryFolders = folders.filter(f => {
-        if (!SECONDARY_FOLDER_SLUGS.includes(f.slug)) return false;
-        // Site Images only visible to super admins
-        if (SUPER_ADMIN_ONLY_SLUGS.includes(f.slug) && !isSuperAdmin) return false;
-        return true;
+        // ONLY show the "Images" folder as requested
+        return f.slug === "images";
     });
 
     // Get selected state name

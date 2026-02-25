@@ -188,14 +188,16 @@ export async function DELETE(request: NextRequest) {
         // FLAT STORAGE: Delete media files from flat directory
         const deletedUrls: string[] = [];
         if (mediaItems && mediaItems.length > 0) {
-            const mediaRoot = path.join(process.cwd(), "public", "images", "media");
             for (const item of mediaItems) {
                 try {
-                    const filePath = path.join(mediaRoot, item.filename as string);
+                    const url = item.url as string;
+                    if (!url) continue;
+
+                    const filePath = path.join(process.cwd(), "public", url);
                     if (existsSync(filePath)) {
                         await unlink(filePath);
                     }
-                    if (item.url) deletedUrls.push(item.url as string);
+                    deletedUrls.push(url);
                 } catch {
                     // File may not exist, continue
                 }
@@ -222,14 +224,16 @@ export async function DELETE(request: NextRequest) {
                     .select("id, filename, url")
                     .eq("folder_id", child.id);
 
-                // Delete child files from flat dir
+                // Delete child files
                 if (childMedia) {
-                    const mediaRoot = path.join(process.cwd(), "public", "images", "media");
                     for (const item of childMedia) {
                         try {
-                            const filePath = path.join(mediaRoot, item.filename as string);
+                            const url = item.url as string;
+                            if (!url) continue;
+
+                            const filePath = path.join(process.cwd(), "public", url);
                             if (existsSync(filePath)) await unlink(filePath);
-                            if (item.url) deletedUrls.push(item.url as string);
+                            deletedUrls.push(url);
                         } catch { /* continue */ }
                     }
                 }
