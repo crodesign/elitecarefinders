@@ -19,6 +19,7 @@ export async function getFacilities(): Promise<Facility[]> {
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
         teamImages: facility.team_images || [],
+        videos: facility.videos || [],
         roomDetails: facility.room_details || { customFields: {} },
         updatedAt: facility.updated_at,
     }));
@@ -43,6 +44,7 @@ export async function getFacility(id: string): Promise<Facility | null> {
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -64,6 +66,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         status: facility.status || 'draft',
         images: facility.images || [],
         team_images: facility.teamImages || [],
+        videos: facility.videos || [],
         room_details: (facility as any).roomDetails || {},
         created_by: user?.id,
     };
@@ -86,6 +89,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -104,6 +108,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
+    if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if ((updates as any).roomDetails !== undefined) dbUpdates.room_details = (updates as any).roomDetails;
 
     const { data, error } = await supabase
@@ -125,6 +130,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };

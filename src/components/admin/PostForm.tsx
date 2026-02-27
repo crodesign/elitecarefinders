@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
@@ -39,6 +39,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
     const [slug, setSlug] = useState("");
     const [content, setContent] = useState("");
     const [excerpt, setExcerpt] = useState("");
+    const [videoUrl, setVideoUrl] = useState("");
     const [status, setStatus] = useState<'published' | 'draft'>('published');
     const [postType, setPostType] = useState<PostType | "">("");
 
@@ -108,6 +109,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setSlug(post.slug || "");
                 setContent(post.content || "");
                 setExcerpt(post.excerpt || "");
+                setVideoUrl(post.videoUrl || "");
                 setStatus(((post.status === 'archived' ? 'draft' : post.status) as 'published' | 'draft') || "draft");
                 setPostType(post.postType || "");
                 setPostImages(post.images || []);
@@ -128,6 +130,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setSlug("");
                 setContent("");
                 setExcerpt("");
+                setVideoUrl("");
                 setStatus("draft");
                 setPostType("");
                 setPostImages([]);
@@ -169,7 +172,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
             if (!post) {
                 // New Post Mode
-                if (title || slug || content || excerpt || postType) return true;
+                if (title || slug || content || excerpt || videoUrl || postType) return true;
                 if (status !== 'draft') return true;
                 if (postImages.length > 0) return true;
                 if (links.length > 0 || ingredients.length > 0 || instructions.length > 0 || prepTime || cookTime || recipeYield) return true;
@@ -181,6 +184,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
             if (slug !== post.slug) return true;
             if (cleanHtml(content) !== cleanHtml(post.content)) return true;
             if (excerpt !== (post.excerpt || "")) return true;
+            if (videoUrl !== (post.videoUrl || "")) return true;
             if (status !== ((post.status === 'archived' ? 'draft' : post.status) || 'draft')) return true;
             if (postType !== (post.postType || "")) return true;
             if (!arraysEqual(postImages, post.images)) return true;
@@ -198,7 +202,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
         setIsDirty(checkIsDirty());
     }, [
-        title, slug, content, excerpt, status, postType, postImages,
+        title, slug, content, excerpt, videoUrl, status, postType, postImages,
         links, ingredients, instructions, prepTime, cookTime, recipeYield,
         isOpen, post, setIsDirty
     ]);
@@ -321,6 +325,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 slug,
                 content,
                 excerpt,
+                videoUrl: videoUrl.trim() || null,
                 postType: postType as PostType,
                 status,
                 images: postImages,
@@ -464,6 +469,20 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         onChange={(e) => setExcerpt(e.target.value)}
                                         className="form-input text-sm p-3 rounded-lg resize-y min-h-[80px]"
                                         placeholder="Short description for preview cards..."
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5">
+                                        <Youtube className="h-4 w-4 text-red-500" />
+                                        YouTube URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={videoUrl}
+                                        onChange={(e) => setVideoUrl(e.target.value)}
+                                        className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
+                                        placeholder="https://www.youtube.com/watch?v=..."
                                     />
                                 </div>
 

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c \"npm run dev\")",
+      "Bash(sed -n '455,490p' \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/PostForm.tsx\")",
+      "Bash(grep -n \"videos\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/lib/services/homeService.ts\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/lib/services/facilityService.ts\")",
+      "Bash(grep -A1 \"db:\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/package.json\")",
+      "Bash(node -e \":*)",
+      "Bash(grep -n \"z-index\\\\|z-[0-9]\\\\|zIndex\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/CLAUDE.md\")",
+      "Bash(grep -rn \"z-\\\\[\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/ui/\")",
+      "Bash(grep -n \"beforeunload\\\\|unsaved\\\\|isDirty\\\\|onClose\\\\|ConfirmationModal\\\\|three\\\\|discard\\\\|leave\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/HomeForm.tsx\")",
+      "Bash(grep -n \"beforeunload\\\\|useUnsavedChanges\\\\|three\\\\|options\\\\|Save\\\\|Discard\\\\|Cancel\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/contexts/UnsavedChangesContext.tsx\")",
+      "Bash(grep -n \"beforeunload\\\\|browser\\\\|window\\\\.\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/contexts/UnsavedChangesContext.tsx\")",
+      "Bash(grep -rn \"beforeunload\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/\")",
+      "Bash(grep -n \"showCloseWarning\\\\|handleCloseInternal\\\\|isDirty\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/HomeForm.tsx\")",
+      "Bash(grep -n \"HomeForm\\\\|onClose\\\\|handleAction\\\\|handleNavigation\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/app/admin/homes/page.tsx\")",
+      "Bash(grep -n \"handleCloseForm\\\\|handleAction\\\\|handleNavigation\\\\|useUnsaved\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/app/admin/homes/page.tsx\")",
+      "Bash(grep -n \"handleAction\\\\|handleNavigation\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/HomeForm.tsx\")",
+      "Bash(grep -n \"handleAction\\\\|handleNavigation\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/FacilityForm.tsx\")",
+      "Bash(grep -n \"const { isDirty\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/FacilityForm.tsx\")",
+      "Bash(grep -n \"showCloseWarning\\\\|handleCloseInternal\\\\|handleDiscardChanges\\\\|isDirty, setIsDirty\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/FacilityForm.tsx\")",
+      "Bash(grep -n \"onClose\\\\|isOpen\\\\|onOpenChange\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/ui/SlidePanel.tsx\")",
+      "Bash(find \"c:/Clients/\\\\`Git Repository/elitecarefinders/src\" -name \"SlidePanel*\")",
+      "Bash(grep -n \"onClose\\\\|isOpen\\\\|useEffect\\\\|onOpenChange\" \"c:/Clients/\\\\`Git Repository/elitecarefinders/src/components/admin/SlidePanel.tsx\")"
+    ]
+  }
+}

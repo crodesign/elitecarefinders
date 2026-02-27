@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
+import sharp from "sharp";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -78,26 +79,26 @@ export async function POST(request: NextRequest) {
         // Determine naming strategy
         let filename: string;
 
+        // Images are always stored as WebP; non-images keep their original extension
+        const isImage = file.type.startsWith("image/");
+        const outputExt = isImage ? "webp" : (file.name.split('.').pop()?.toLowerCase() || "bin");
+
         if (isRedirectedFolder) {
-            // Use original filename for redirected folders
-            const originalName = file.name;
-            const extension = originalName.split('.').pop()?.toLowerCase() || "jpg";
-            const baseName = originalName.replace(/\.[^/.]+$/, "");
+            // Use original filename for redirected folders (swap extension to webp for images)
+            const baseName = file.name.replace(/\.[^/.]+$/, "");
 
             // Collision check: append suffix if file exists
             let suffix = 0;
-            let currentFilename = originalName;
+            let currentFilename = `${baseName}.${outputExt}`;
 
             while (existsSync(path.join(uploadDir, currentFilename))) {
                 suffix++;
-                currentFilename = `${baseName}-${suffix}.${extension}`;
+                currentFilename = `${baseName}-${suffix}.${outputExt}`;
             }
             filename = currentFilename;
             console.log("[Upload] Using original filename (with collision check):", filename);
         } else {
             // Sequential naming for other folders
-            const extension = file.name.split('.').pop()?.toLowerCase() || "jpg";
-
             // Query existing files in this folder to find highest number
             const query = supabase.from("media_items").select("filename");
             if (folderId) {
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
             }) || [];
             const nextNumber = Math.max(0, ...numbers) + 1;
 
-            filename = `${folderSlug}-${nextNumber}.${extension}`;
+            filename = `${folderSlug}-${nextNumber}.${outputExt}`;
             console.log("[Upload] Auto-generated filename:", filename, "from folder:", folderSlug);
         }
 
@@ -124,20 +125,54 @@ export async function POST(request: NextRequest) {
             await mkdir(uploadDir, { recursive: true });
         }
 
-        // Write file to disk
         const filePath = path.join(uploadDir, filename);
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        await writeFile(filePath, buffer);
 
         // Generate public URL
         const publicUrl = `${publicUrlBase}${filename}`;
 
-        // Get image dimensions (for images only)
+        // Image processing with sharp (images only)
         let width: number | undefined;
         let height: number | undefined;
-        // Note: For actual dimension detection, you'd use a library like sharp
-        // For now, we skip this on server side
+        let urlLarge: string | undefined;
+        let urlMedium: string | undefined;
+        let urlThumb: string | undefined;
+
+        if (file.type.startsWith("image/")) {
+            const img = sharp(buffer);
+            const meta = await img.metadata();
+
+            // Resize original if too large (fit inside 1940x1940, proportional, no crop)
+            const needsResize = (meta.width ?? 0) > 1940 || (meta.height ?? 0) > 1940;
+            const base = needsResize
+                ? img.resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
+                : img;
+
+            // Write (possibly resized) original in its native format
+            const outMeta = await base.clone().toFile(filePath);
+            width = outMeta.width;
+            height = outMeta.height;
+
+            // Derive variant filenames (WebP for smaller sizes)
+            const stem = path.basename(filename, path.extname(filename));
+            const largeFilename  = `${stem}-500x500.webp`;
+            const mediumFilename = `${stem}-200x200.webp`;
+            const thumbFilename  = `${stem}-100x100.webp`;
+
+            await base.clone().resize(500, 500,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toFile(path.join(uploadDir, largeFilename));
+            await base.clone().resize(200, 200,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toFile(path.join(uploadDir, mediumFilename));
+            await base.clone().resize(100, 100,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toFile(path.join(uploadDir, thumbFilename));
+
+            urlLarge  = `${publicUrlBase}${largeFilename}`;
+            urlMedium = `${publicUrlBase}${mediumFilename}`;
+            urlThumb  = `${publicUrlBase}${thumbFilename}`;
+
+            console.log(`[Upload] Variants generated: ${largeFilename}, ${mediumFilename}, ${thumbFilename}`);
+        } else {
+            // Non-image file: write as-is
+            await writeFile(filePath, buffer);
+        }
 
         // Create database record
         const { data, error } = await supabase
@@ -153,6 +188,9 @@ export async function POST(request: NextRequest) {
                 height,
                 storage_path: publicUrl,
                 url: publicUrl,
+                url_large: urlLarge,
+                url_medium: urlMedium,
+                url_thumb: urlThumb,
             })
             .select()
             .single();
@@ -171,7 +209,12 @@ export async function POST(request: NextRequest) {
                 title: data.title,
                 mimeType: data.mime_type,
                 fileSize: data.file_size,
+                width: data.width,
+                height: data.height,
                 url: data.url,
+                urlLarge: data.url_large,
+                urlMedium: data.url_medium,
+                urlThumb: data.url_thumb,
                 createdAt: data.created_at,
             },
         });

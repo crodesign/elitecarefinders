@@ -26,6 +26,7 @@ export async function getHomes(): Promise<Home[]> {
         homeOfMonthDescription: home.home_of_month_description,
         images: home.images || [],
         teamImages: home.team_images || [],
+        videos: home.videos || [],
         roomDetails: home.room_details || { customFields: {} },
         updatedAt: home.updated_at,
     }));
@@ -56,6 +57,7 @@ export async function getHome(id: string): Promise<Home | null> {
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -82,6 +84,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         home_of_month_description: home.homeOfMonthDescription,
         images: home.images || [],
         team_images: home.teamImages || [],
+        videos: home.videos || [],
         room_details: home.roomDetails || {},
     };
 
@@ -109,6 +112,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
@@ -134,6 +138,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
+    if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
 
     const { data, error } = await supabase
@@ -161,6 +166,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };

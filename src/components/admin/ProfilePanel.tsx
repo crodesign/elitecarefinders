@@ -19,12 +19,10 @@ import {
     Check
 } from "lucide-react";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
-import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
 import { supabase } from "@/lib/supabase";
-import { getFolders } from "@/lib/services/mediaService";
-import type { MediaFolder } from "@/types";
+
 import { SlidePanel } from "@/components/admin/SlidePanel";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -93,8 +91,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
     const [state, setState] = useState("");
     const [zip, setZip] = useState("");
     const [managerName, setManagerName] = useState("");
-    const [defaultMediaFolderId, setDefaultMediaFolderId] = useState("");
-    const [mediaFolders, setMediaFolders] = useState<MediaFolder[]>([]);
+
 
     // Password fields
     const [currentPassword, setCurrentPassword] = useState("");
@@ -141,7 +138,6 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                     setState(data.address?.state || "");
                     setZip(data.address?.zip || "");
                     setManagerName(data.manager_name || "");
-                    setDefaultMediaFolderId(data.default_media_folder_id || "");
                 }
             } catch (err) {
                 console.error("Failed to load profile:", err);
@@ -278,19 +274,9 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
             }
         };
 
-        const loadMediaFolders = async () => {
-            try {
-                const folders = await getFolders();
-                setMediaFolders(folders);
-            } catch (err) {
-                console.error("Failed to load media folders:", err);
-            }
-        };
-
         loadProfile();
         loadLocations();
         loadStates();
-        loadMediaFolders();
     }, [isOpen, user, authLoading, isSuperAdmin, isSystemAdmin]);
 
     const handlePhotoClick = () => {
@@ -361,7 +347,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                         state: state.trim(),
                         zip: zip.trim(),
                     },
-                    default_media_folder_id: defaultMediaFolderId || null,
+
                 }),
             });
 
@@ -583,32 +569,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
 
                                         </div>
 
-                                        {/* Default Media Folder Setting */}
-                                        <div className="mt-4 w-full text-left max-w-sm">
-                                            <label className="text-sm font-medium text-content-secondary block mb-1.5">
-                                                Default Media Folder
-                                            </label>
-                                            <EnhancedSelect
-                                                value={defaultMediaFolderId}
-                                                onChange={(val) => {
-                                                    setDefaultMediaFolderId(val);
-                                                    setIsDirty(true);
-                                                }}
-                                                options={[
-                                                    { value: "", label: "Library Root" },
-                                                    ...mediaFolders
-                                                        .filter(f => f.slug === "images")
-                                                        .map(f => ({
-                                                            value: f.id,
-                                                            label: f.name
-                                                        }))
-                                                ]}
-                                                placeholder="Select a preferred folder..."
-                                            />
-                                            <p className="text-xs text-content-muted mt-1.5 leading-relaxed">
-                                                The Media Library will automatically open to this folder.
-                                            </p>
-                                        </div>
+
                                     </div>
                                 </div>
 

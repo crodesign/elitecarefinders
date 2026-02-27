@@ -49,7 +49,7 @@ export function FacilityLocationTab({
             {/* Column 1: Levels of Care (Fixed) */}
             <div className="space-y-6">
                 <div className="space-y-4">
-                    <div className="bg-surface-input rounded-lg p-3 space-y-3">
+                    <div className="bg-surface-hover rounded-lg p-3 space-y-3">
                         {(() => {
                             const Icon = fixedFieldIcons["levelOfCare"] ? ICON_MAP[fixedFieldIcons["levelOfCare"]] : null;
                             return (
@@ -80,15 +80,15 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
-                                                ? "bg-surface-hover text-content-primary"
-                                                : "bg-surface-hover hover:bg-surface-secondary text-content-secondary"
+                                                ? "bg-surface-input text-content-primary"
+                                                : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
-                                            <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
-                                                ? "border border-accent bg-accent text-white"
-                                                : "bg-surface-input"
-                                                }`}>
+                                            <div
+                                                className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                            >
                                                 {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
                                             </div>
                                         </button>
@@ -100,7 +100,7 @@ export function FacilityLocationTab({
 
                 {/* Languages Spoken (Fixed) */}
                 <div className="space-y-4">
-                    <div className="bg-surface-input rounded-lg p-3 space-y-3">
+                    <div className="bg-surface-hover rounded-lg p-3 space-y-3">
                         {(() => {
                             const Icon = fixedFieldIcons["language"] ? ICON_MAP[fixedFieldIcons["language"]] : null;
                             return (
@@ -131,15 +131,15 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
-                                                ? "bg-surface-hover text-content-primary"
-                                                : "bg-surface-hover hover:bg-surface-secondary text-content-secondary"
+                                                ? "bg-surface-input text-content-primary"
+                                                : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
-                                            <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
-                                                ? "border border-accent bg-accent text-white"
-                                                : "bg-surface-input"
-                                                }`}>
+                                            <div
+                                                className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                            >
                                                 {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
                                             </div>
                                         </button>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Home, Bed, Image, Users, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Minus, ChevronUp, ChevronDown, Mail, DollarSign } from "lucide-react";
+import { Home, Bed, Image, Users, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Minus, ChevronUp, ChevronDown, Mail, DollarSign, Youtube } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import { FEATURED_LABELS, US_STATES } from "@/lib/constants/formConstants";
 import type {
@@ -12,7 +12,8 @@ import type {
     RoomFieldCategory,
     RoomFieldDefinition,
     RoomFixedFieldOption,
-    RoomDetails
+    RoomDetails,
+    VideoEntry
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import {
@@ -34,6 +35,7 @@ import { HomeRoomsTab } from "./forms/home/HomeRoomsTab";
 import { HomeLocationTab } from "./forms/home/HomeLocationTab";
 import { HomeProviderTab } from "./forms/home/HomeProviderTab";
 import { HomeGalleryTab } from "./forms/home/HomeGalleryTab";
+import { HomeVideosTab } from "./forms/home/HomeVideosTab";
 import { TaxonomySelector } from "./TaxonomySelector";
 import { SimpleSelect } from "./SimpleSelect";
 import { EntryTree } from "./taxonomy/EntryTree";
@@ -51,7 +53,7 @@ interface HomeFormProps {
     home?: HomeType | null;
 }
 
-type TabId = "information" | "rooms" | "location" | "gallery" | "provider";
+type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider";
 
 interface Tab {
     id: TabId;
@@ -84,7 +86,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     // Sync activeTab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ["information", "rooms", "location", "gallery", "provider"].includes(tab)) {
+        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider"].includes(tab)) {
             setActiveTab(tab as TabId);
         }
     }, [searchParams]);
@@ -224,6 +226,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 },
                 images: finalImages,
                 teamImages: finalTeamImages,
+                videos,
                 roomDetails
             };
 
@@ -320,6 +323,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
+    const [videos, setVideos] = useState<VideoEntry[]>([]);
 
     // Fetch Gallery Folder - Only on initial load for EXISTING homes
     // For NEW homes, folder is created in the save handler.
@@ -435,6 +439,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         ...(hasRoomFields ? [{ id: "rooms" as const, label: "Room Details", icon: Bed }] : []),
         ...(hasLocationFields ? [{ id: "location" as const, label: "Location Details", icon: MapPin }] : []),
         { id: "gallery", label: "Gallery", icon: Image },
+        { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
     ];
 
@@ -536,9 +541,10 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 // Room Details
                 setRoomDetails(home.roomDetails || { customFields: {} });
 
-                // Images
+                // Images & Videos
                 setImages(home.images || []);
                 setTeamImages(home.teamImages || []);
+                setVideos(home.videos || []);
 
                 // Explicitly clear dirty state when we finish populating from a prop
                 // We use a timeout to allow the React state queue to flush so checkIsDirty runs against the NEW state
@@ -676,6 +682,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
             if (check(!arraysEqual(taxonomyEntryIds, home.taxonomyEntryIds), "taxonomyEntryIds", taxonomyEntryIds, home.taxonomyEntryIds)) return true;
             if (check(!arraysEqual(images, home.images), "images", images, home.images)) return true;
+            if (JSON.stringify(videos) !== JSON.stringify(home.videos || [])) return true;
 
             if (check(street !== (home.address?.street || ""), "street", street, home.address?.street)) return true;
             if (check(city !== (home.address?.city || ""), "city", city, home.address?.city)) return true;
@@ -712,7 +719,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         isOpen, home, setIsDirty,
         title, slug, description, phone, email,
         displayReferenceNumber, showAddress, status,
-        taxonomyEntryIds, images,
+        taxonomyEntryIds, images, videos,
         street, city, state, zip,
         isFeatured, hasFeaturedVideo, isHomeOfMonth, featuredLabel, homeOfMonthDescription,
         roomDetails
@@ -882,25 +889,23 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         isDirty={isDirty}
                     />
                 );
+            case "videos":
+                return (
+                    <HomeVideosTab
+                        videos={videos}
+                        setVideos={setVideos}
+                        setIsDirty={setIsDirty}
+                        title={title}
+                    />
+                );
             default:
                 return null;
         }
     };
     // Close Handler
-    const [showCloseWarning, setShowCloseWarning] = useState(false);
     const [showDisabledTabAlert, setShowDisabledTabAlert] = useState(false);
 
     const handleCloseInternal = () => {
-        if (isDirty) {
-            setShowCloseWarning(true);
-        } else {
-            onClose();
-        }
-    };
-
-    const handleDiscardChanges = () => {
-        setShowCloseWarning(false);
-        setIsDirty(false); // Clear dirty state
         onClose();
     };
 
@@ -921,7 +926,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 title={isEditing ? "Edit Home" : "Add Home"}
                 subtitle={isEditing ? (title || "Update home details and settings") : "Add a new residential care home"}
                 fullScreen
-                contentClassName={activeTab === 'gallery' ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
@@ -1015,8 +1020,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     </div>
                 }
             >
-                <form id="home-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-full">
-                    <div className={activeTab === 'gallery' ? 'flex flex-col flex-1 min-h-0' : 'flex-1'}>{renderTabContent()}</div>
+                <form id="home-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex flex-col flex-1 min-h-0' : 'flex-1'}>{renderTabContent()}</div>
                 </form>
 
             </SlidePanel>
@@ -1042,17 +1047,6 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     isLoading={loadingEntries}
                 />
             </SlidePanel>
-
-            <ConfirmationModal
-                isOpen={showCloseWarning}
-                onClose={() => setShowCloseWarning(false)}
-                onConfirm={handleDiscardChanges}
-                title="Unsaved Changes"
-                message="You have unsaved changes. Are you sure you want to close? Your changes will be lost."
-                confirmLabel="Discard Changes"
-                cancelLabel="Keep Editing"
-                isDangerous={true}
-            />
 
             <ConfirmationModal
                 isOpen={showDisabledTabAlert}

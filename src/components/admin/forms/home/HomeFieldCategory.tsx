@@ -131,10 +131,10 @@ export function HomeFieldCategory({
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt}</span>
-                                            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt
-                                                ? "border border-accent bg-accent text-white"
-                                                : "bg-surface-secondary"
-                                                }`}>
+                                            <div
+                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt ? "border border-accent bg-accent text-white" : ""}`}
+                                                style={roomDetails.customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                            >
                                                 {roomDetails.customFields[field.id] === opt
                                                     ? <div className="w-1.5 h-1.5 rounded-full bg-white" />
                                                     : <X className="h-2.5 w-2.5 text-content-muted" />}
@@ -395,10 +395,10 @@ export function HomeFieldCategory({
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
-                                                <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
-                                                    ? "border border-accent bg-accent text-white"
-                                                    : "bg-surface-secondary"
-                                                    }`}>
+                                                <div
+                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                    style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                                >
                                                     {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
                                                 </div>
                                             </button>
@@ -431,10 +431,10 @@ export function HomeFieldCategory({
                                                         }`}
                                                 >
                                                     <span className="text-sm font-medium">{opt}</span>
-                                                    <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
-                                                        ? "border border-accent bg-accent text-white"
-                                                        : "bg-surface-secondary"
-                                                        }`}>
+                                                    <div
+                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                                    >
                                                         {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
                                                     </div>
                                                 </button>

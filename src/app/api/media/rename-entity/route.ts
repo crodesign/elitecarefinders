@@ -220,6 +220,28 @@ export async function POST(request: NextRequest) {
             // Track URL mapping
             oldUrlToNew[url] = newUrl;
 
+            // Rename variant files and build variant URL updates
+            const oldStem = path.basename(oldFilename, path.extname(oldFilename));
+            const newStem = path.basename(newFilename, path.extname(newFilename));
+            const variantDefs = [
+                { suffix: "-500x500.webp", col: "url_large" },
+                { suffix: "-200x200.webp", col: "url_medium" },
+                { suffix: "-100x100.webp", col: "url_thumb" },
+            ];
+            const variantUpdates: Record<string, string> = {};
+            for (const { suffix, col } of variantDefs) {
+                const oldVariant = `${oldStem}${suffix}`;
+                const newVariant = `${newStem}${suffix}`;
+                const oldVariantPath = path.join(mediaRoot, oldVariant);
+                const newVariantPath = path.join(mediaRoot, newVariant);
+                if (existsSync(oldVariantPath)) {
+                    await rename(oldVariantPath, newVariantPath).catch((err) =>
+                        console.warn(`[Rename] Failed to rename variant ${oldVariant}:`, err)
+                    );
+                }
+                variantUpdates[col] = `/images/media/${newVariant}`;
+            }
+
             // Update media_items record
             const { error: mediaUpdateErr } = await supabase
                 .from("media_items")
@@ -227,6 +249,7 @@ export async function POST(request: NextRequest) {
                     filename: newFilename,
                     url: newUrl,
                     storage_path: newUrl,
+                    ...variantUpdates,
                 })
                 .eq("id", mediaItem.id);
 

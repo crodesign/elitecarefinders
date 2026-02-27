@@ -414,10 +414,12 @@ function Toolbar() {
 function HtmlPlugin({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     const [editor] = useLexicalComposerContext();
     const [initialized, setInitialized] = useState(false);
+    const suppressNextRef = useRef(false);
 
     // Load initial HTML value
     useEffect(() => {
         if (!initialized && value) {
+            suppressNextRef.current = true;
             editor.update(() => {
                 const root = $getRoot();
                 if (root.getFirstChild() === null || root.getTextContent() === "") {
@@ -427,6 +429,10 @@ function HtmlPlugin({ value, onChange }: { value: string; onChange: (v: string) 
                     root.clear();
                     $insertNodes(nodes);
                 }
+            }, {
+                onUpdate: () => {
+                    editor.getRootElement()?.blur();
+                },
             });
             setInitialized(true);
         }
@@ -434,7 +440,12 @@ function HtmlPlugin({ value, onChange }: { value: string; onChange: (v: string) 
 
     return (
         <OnChangePlugin
+            ignoreSelectionChange
             onChange={(editorState: EditorState, editor: LexicalEditor) => {
+                if (suppressNextRef.current) {
+                    suppressNextRef.current = false;
+                    return;
+                }
                 editorState.read(() => {
                     const html = $generateHtmlFromNodes(editor, null);
                     onChange(html);

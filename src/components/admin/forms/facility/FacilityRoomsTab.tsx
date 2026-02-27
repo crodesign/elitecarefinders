@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { Bed, ChevronUp, ChevronDown } from "lucide-react";
+import { Bed, Check, ChevronUp, ChevronDown, X } from "lucide-react";
 import type { RoomDetails, RoomFieldCategory, RoomFieldDefinition, RoomFixedFieldOption } from "@/types";
 import { SimpleSelect } from "../../SimpleSelect";
 import { FacilityFieldCategory } from "./FacilityFieldCategory";
@@ -91,19 +91,37 @@ export function FacilityRoomsTab({
                         </div>
                     </div>
 
-                    {/* Bedroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary">Bedroom Type</label>
-                        <SimpleSelect
-                            value={roomDetails.bedroomType || ""}
-                            onChange={(val) => {
-                                setRoomDetails((prev: RoomDetails) => ({ ...prev, bedroomType: val }));
-                                setIsDirty(true);
-                            }}
-                            options={fixedFieldOptions.filter(o => o.fieldType === 'bedroom').map(o => o.value)}
-                            placeholder="Select..."
-                            className="w-32 text-sm"
-                        />
+                    {/* Bedroom Type - multi-select */}
+                    <div className="py-2 pl-3.5 pr-2 rounded-lg bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary block mb-2">Bedroom Type</label>
+                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                            {fixedFieldOptions.filter(o => o.fieldType === 'bedroom').map((opt) => {
+                                const selected = (roomDetails.bedroomTypes || []).includes(opt.value);
+                                return (
+                                    <button
+                                        key={opt.id}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = roomDetails.bedroomTypes || [];
+                                            const updated = selected
+                                                ? current.filter(v => v !== opt.value)
+                                                : [...current, opt.value];
+                                            setRoomDetails((prev: RoomDetails) => ({ ...prev, bedroomTypes: updated }));
+                                            setIsDirty(true);
+                                        }}
+                                        className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                    >
+                                        <span className="text-sm font-medium">{opt.value}</span>
+                                        <div
+                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-accent bg-accent text-white" : ""}`}
+                                            style={!selected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                        >
+                                            {selected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Bathroom Type */}
@@ -136,22 +154,37 @@ export function FacilityRoomsTab({
                         />
                     </div>
 
-                    {/* Room Types Available */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary">Room Types</label>
-                        <SimpleSelect
-                            value={roomDetails.roomTypes?.[0] || ""}
-                            onChange={(val) => {
-                                setRoomDetails((prev: RoomDetails) => ({
-                                    ...prev,
-                                    roomTypes: val ? [val] : []
-                                }));
-                                setIsDirty(true);
-                            }}
-                            options={fixedFieldOptions.filter(o => o.fieldType === 'roomType').map(o => o.value)}
-                            placeholder="Select..."
-                            className="w-32 text-sm"
-                        />
+                    {/* Room Types - multi-select */}
+                    <div className="py-2 pl-3.5 pr-2 rounded-lg bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary block mb-2">Room Types</label>
+                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                            {fixedFieldOptions.filter(o => o.fieldType === 'roomType').map((opt) => {
+                                const selected = (roomDetails.roomTypes || []).includes(opt.value);
+                                return (
+                                    <button
+                                        key={opt.id}
+                                        type="button"
+                                        onClick={() => {
+                                            const current = roomDetails.roomTypes || [];
+                                            const updated = selected
+                                                ? current.filter(v => v !== opt.value)
+                                                : [...current, opt.value];
+                                            setRoomDetails((prev: RoomDetails) => ({ ...prev, roomTypes: updated }));
+                                            setIsDirty(true);
+                                        }}
+                                        className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                    >
+                                        <span className="text-sm font-medium">{opt.value}</span>
+                                        <div
+                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-accent bg-accent text-white" : ""}`}
+                                            style={!selected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                        >
+                                            {selected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 

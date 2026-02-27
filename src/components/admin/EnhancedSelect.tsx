@@ -5,7 +5,7 @@ interface OptionType {
     value: string;
     label: string;
     description?: string;
-    icon?: LucideIcon;
+    icon?: React.ComponentType<{ className?: string }>;
     iconColor?: string;
 }
 
@@ -16,7 +16,7 @@ interface EnhancedSelectProps {
     placeholder?: string;
     className?: string;
     textSize?: string;
-    leftIcon?: LucideIcon;
+    leftIcon?: React.ComponentType<{ className?: string }>;
     allowNone?: boolean;
 }
 

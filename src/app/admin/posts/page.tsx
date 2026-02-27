@@ -198,7 +198,7 @@ export default function PostsPage() {
                         <div className="h-[60px] w-[60px] rounded border-2 border-ui-border flex items-center justify-center overflow-hidden">
                             {post.featuredImageUrl ? (
                                 <img
-                                    src={post.featuredImageUrl}
+                                    src={post.featuredImageUrl.startsWith('/images/media/') ? post.featuredImageUrl.replace(/(\.[^.]+)$/, '-100x100.webp') : post.featuredImageUrl}
                                     alt={`${post.title} cover`}
                                     className="h-full w-full object-cover"
                                 />

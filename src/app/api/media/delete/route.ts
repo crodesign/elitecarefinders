@@ -4,6 +4,8 @@ import { existsSync } from "fs";
 import path from "path";
 import { createClient } from "@/lib/supabase-server";
 
+const VARIANT_SUFFIXES = ["-500x500.webp", "-200x200.webp", "-100x100.webp"];
+
 export async function DELETE(request: NextRequest) {
     try {
         const supabase = createClient();
@@ -64,6 +66,18 @@ export async function DELETE(request: NextRequest) {
             }
         } else {
             console.warn("[Media Delete] File not found on disk:", filePath);
+        }
+
+        // Delete variant files (only for media-dir images)
+        if (storagePath && storagePath.startsWith("/images/media/")) {
+            const mediaDir = path.join(process.cwd(), "public", "images", "media");
+            const stem = path.basename(filename, path.extname(filename));
+            for (const suffix of VARIANT_SUFFIXES) {
+                const variantPath = path.join(mediaDir, `${stem}${suffix}`);
+                if (existsSync(variantPath)) {
+                    await unlink(variantPath).catch(() => {});
+                }
+            }
         }
 
         // Delete from database

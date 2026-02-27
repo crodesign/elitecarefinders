@@ -55,6 +55,11 @@
   --switch-thumb-off: rgba(0, 0, 0, 0.8);
   /* Table row hover — subtler than full surface-hover */
   --surface-row-hover: rgba(255, 255, 255, 0.06);
+  /* Radio/checkbox unselected indicator */
+  --radio-indicator: rgba(0, 0, 0, 0.20);
+  /* Scrollbar */
+  --scrollbar-thumb: #404040;
+  --scrollbar-thumb-hover: #4d4d4d;
   /* Legacy aliases kept for backward-compat */
   --bg-primary: var(--surface-primary);
   --bg-secondary: var(--surface-secondary);
@@ -109,6 +114,11 @@
   --switch-thumb-off: #ffffff;
   /* Table row hover — subtler than full surface-hover */
   --surface-row-hover: rgba(0, 0, 0, 0.05);
+  /* Radio/checkbox unselected indicator */
+  --radio-indicator: rgba(255, 255, 255, 0.20);
+  /* Scrollbar */
+  --scrollbar-thumb: #c0c0c0;
+  --scrollbar-thumb-hover: #cccccc;
   /* Media Specific Theming */
   --media-panel-bg: #ffffff;
   --media-gallery-bg: rgba(0, 0, 0, 0.05);
@@ -228,12 +238,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #808080;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999999;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Light mode placeholder color — use muted dark tone, not white */

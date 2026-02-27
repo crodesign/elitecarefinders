@@ -208,7 +208,7 @@ export function MediaTile({
             <div className="relative w-full aspect-square bg-surface-input rounded-t-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
                     <img
-                        src={item.url}
+                        src={item.urlMedium || item.url}
                         alt={item.altText || item.filename}
                         className={`w-full h-full ${item.mimeType === 'image/svg+xml' ? 'object-contain p-1' : 'object-cover'} transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
                     />
@@ -271,7 +271,6 @@ export function MediaTile({
                                 ? "bg-accent text-white"
                                 : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
                                 }`}
-                            title={isSelected ? "Remove from gallery" : "Add to gallery"}
                         >
                             {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                         </button>
@@ -279,7 +278,6 @@ export function MediaTile({
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
                             className="p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
-                            title="Delete Image"
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
@@ -290,7 +288,6 @@ export function MediaTile({
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
                         className="absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
-                        title="Delete Image"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
@@ -308,7 +305,6 @@ export function MediaTile({
                                 navigator.clipboard.writeText(item.url);
                             }}
                             className="flex-shrink-0 p-1 opacity-40 hover:opacity-100 transition-all ml-1"
-                            title="Copy URL"
                         >
                             <Copy className="h-3 w-3" />
                         </button>
@@ -334,7 +330,6 @@ export function MediaTile({
                             onClick={handleSaveCaptionOnly}
                             disabled={isSaving}
                             className="flex-shrink-0 px-2.5 py-1.5 text-xs bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
-                            title="Save caption (Enter)"
                         >
                             {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
                         </button>

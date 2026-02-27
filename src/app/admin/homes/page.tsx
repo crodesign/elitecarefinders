@@ -254,7 +254,7 @@ export default function HomesPage() {
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         {home.images && home.images.length > 0 ? (
                             <img
-                                src={home.images[0]}
+                                src={home.images[0].startsWith('/images/media/') ? home.images[0].replace(/(\.[^.]+)$/, '-100x100.webp') : home.images[0]}
                                 alt={home.title}
                                 className="h-[60px] w-[60px] rounded object-cover"
                             />

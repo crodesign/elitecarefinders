@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign } from "lucide-react";
+import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type {
     Facility,
@@ -11,7 +11,8 @@ import type {
     RoomFieldCategory,
     RoomFieldDefinition,
     RoomFixedFieldOption,
-    RoomDetails
+    RoomDetails,
+    VideoEntry
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import {
@@ -36,6 +37,7 @@ import { FacilityInformationTab } from "./forms/facility/FacilityInformationTab"
 import { FacilityRoomsTab } from "./forms/facility/FacilityRoomsTab";
 import { FacilityLocationTab } from "./forms/facility/FacilityLocationTab";
 import { FacilityGalleryTab } from "./forms/facility/FacilityGalleryTab";
+import { FacilityVideosTab } from "./forms/facility/FacilityVideosTab";
 import { FacilityProviderTab } from "./forms/facility/FacilityProviderTab";
 import { ensureLocationFolders } from "@/lib/services/mediaFolderService";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -54,7 +56,7 @@ interface FacilityFormProps {
     facility?: Facility | null;
 }
 
-type TabId = "information" | "rooms" | "location" | "gallery" | "provider";
+type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider";
 
 interface Tab {
     id: TabId;
@@ -108,7 +110,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     // Sync activeTab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ["information", "rooms", "location", "gallery", "provider"].includes(tab)) {
+        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider"].includes(tab)) {
             setActiveTab(tab as TabId);
         }
     }, [searchParams]);
@@ -186,6 +188,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
+    const [videos, setVideos] = useState<VideoEntry[]>([]);
 
     // Fetch Gallery Folder - Only on initial load for EXISTING facilities
     // For NEW facilities, folder is created in the save handler.
@@ -299,6 +302,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         ...(hasRoomFields ? [{ id: "rooms" as const, label: "Room Details", icon: Bed }] : []),
         ...(hasLocationFields ? [{ id: "location" as const, label: "Location Details", icon: Map }] : []),
         { id: "gallery", label: "Gallery", icon: FileText },
+        { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
     ];
 
@@ -358,7 +362,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setTitle(facility.title);
                 originalTitleRef.current = facility.title;
                 setSlug(facility.slug);
-                setDescription(facility.description);
+                setDescription(facility.description || "");
                 setLicenseNumber(facility.licenseNumber || "");
                 setCapacity(facility.capacity || "");
                 setStatus(facility.status || 'published');
@@ -385,9 +389,10 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 // Room Details (if stored)
                 setRoomDetails((facility as any).roomDetails || { customFields: {} });
 
-                // Images
+                // Images & Videos
                 setImages(facility.images || []);
                 setTeamImages(facility.teamImages || []);
+                setVideos(facility.videos || []);
             } else {
                 // Reset
                 setTitle("");
@@ -452,7 +457,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 // Room Details
                 if (Object.keys(roomDetails.customFields).length > 0) return true;
-                if (roomDetails.roomPrice || roomDetails.bedroomType || roomDetails.bathroomType || roomDetails.showerType || (roomDetails.languages && roomDetails.languages.length > 0)) return true;
+                if (roomDetails.roomPrice || (roomDetails.bedroomTypes && roomDetails.bedroomTypes.length > 0) || roomDetails.bathroomType || roomDetails.showerType || (roomDetails.languages && roomDetails.languages.length > 0)) return true;
 
                 return false;
             }
@@ -471,6 +476,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             if (!arraysEqual(taxonomyIds, facility.taxonomyIds || [])) return true;
             if (!arraysEqual(images, facility.images || [])) return true;
             if (!arraysEqual(teamImages, (facility as any).teamImages || [])) return true;
+            if (JSON.stringify(videos) !== JSON.stringify(facility.videos || [])) return true;
 
             if (street !== (facility.address?.street || "")) return true;
             if (city !== (facility.address?.city || "")) return true;
@@ -489,14 +495,27 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
             // Room Details
             if (roomDetails.roomPrice !== (facility as any).roomDetails?.roomPrice) return true;
-            if (roomDetails.bedroomType !== ((facility as any).roomDetails?.bedroomType || undefined)) return true;
-            if (roomDetails.bathroomType !== ((facility as any).roomDetails?.bathroomType || undefined)) return true;
-            if (roomDetails.showerType !== ((facility as any).roomDetails?.showerType || undefined)) return true;
+
+            const currentBedroomTypes = [...(roomDetails.bedroomTypes || [])].sort();
+            const originalBedroomTypes = [...((facility as any).roomDetails?.bedroomTypes || [])].sort();
+            if (!arraysEqual(currentBedroomTypes, originalBedroomTypes)) return true;
+
+            if (roomDetails.bathroomType !== (facility as any).roomDetails?.bathroomType) return true;
+            if (roomDetails.showerType !== (facility as any).roomDetails?.showerType) return true;
+
+            const currentRoomTypes = [...(roomDetails.roomTypes || [])].sort();
+            const originalRoomTypes = [...((facility as any).roomDetails?.roomTypes || [])].sort();
+            if (!arraysEqual(currentRoomTypes, originalRoomTypes)) return true;
 
             // Languages
             const currentLangs = [...(roomDetails.languages || [])].sort();
             const originalLangs = [...((facility as any).roomDetails?.languages || [])].sort();
             if (!arraysEqual(currentLangs, originalLangs)) return true;
+
+            // Level of Care
+            const currentLOC = [...(roomDetails.levelOfCare || [])].sort();
+            const originalLOC = [...((facility as any).roomDetails?.levelOfCare || [])].sort();
+            if (!arraysEqual(currentLOC, originalLOC)) return true;
 
             if (!customFieldsEqual(roomDetails.customFields, (facility as any).roomDetails?.customFields)) return true;
 
@@ -508,7 +527,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     }, [
         isOpen, facility, setIsDirty,
         title, slug, description, licenseNumber, capacity,
-        status, taxonomyIds, images, teamImages,
+        status, taxonomyIds, images, teamImages, videos,
         street, city, state, zip, phone, email,
         isFeatured, hasFeaturedVideo, isFacilityOfMonth, featuredLabel, facilityOfMonthDescription,
         roomDetails
@@ -648,6 +667,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 } as any),
                 images: finalImages,
                 teamImages: finalTeamImages,
+                videos,
                 roomDetails,
             };
             // For BOTH new and existing facilities: ensure the gallery folder is in the right location.
@@ -786,6 +806,15 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setInvalidEmailFields={setInvalidEmailFields}
                     />
                 );
+            case "videos":
+                return (
+                    <FacilityVideosTab
+                        videos={videos}
+                        setVideos={setVideos}
+                        setIsDirty={setIsDirty}
+                        title={title}
+                    />
+                );
             case "gallery":
                 return (
                     <FacilityGalleryTab
@@ -816,20 +845,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         }
     };
     // Close Handler
-    const [showCloseWarning, setShowCloseWarning] = useState(false);
     const [showDisabledTabAlert, setShowDisabledTabAlert] = useState(false);
 
     const handleCloseInternal = () => {
-        if (isDirty) {
-            setShowCloseWarning(true);
-        } else {
-            onClose();
-        }
-    };
-
-    const handleDiscardChanges = () => {
-        setShowCloseWarning(false);
-        setIsDirty(false); // Clear dirty state
         onClose();
     };
 
@@ -850,7 +868,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 title={isEditing ? "Editing Facility" : "Add New Facility"}
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
-                contentClassName={activeTab === 'gallery' ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
@@ -950,8 +968,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 )}
 
                 {/* Tab Content */}
-                <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1" onChange={handleFormChange}>
-                    <div className={activeTab === 'gallery' ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
+                <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0" onChange={handleFormChange}>
+                    <div className={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
                         {renderTabContent()}
                     </div>
                 </form>
@@ -978,17 +996,6 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     isLoading={loadingEntries}
                 />
             </SlidePanel>
-
-            <ConfirmationModal
-                isOpen={showCloseWarning}
-                onClose={() => setShowCloseWarning(false)}
-                onConfirm={handleDiscardChanges}
-                title="Unsaved Changes"
-                message="You have unsaved changes. Are you sure you want to close? Your changes will be lost."
-                confirmLabel="Discard Changes"
-                cancelLabel="Keep Editing"
-                isDangerous={true}
-            />
 
             <ConfirmationModal
                 isOpen={showDisabledTabAlert}

@@ -25,7 +25,7 @@ export function FacilityGalleryTab({
     isDirty,
 }: FacilityGalleryTabProps) {
     return (
-        <div className="h-full flex flex-col">
+        <div className="flex flex-col flex-1 min-h-0">
             {!galleryFolderId || !title ? (
                 <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
                     <p className="text-content-secondary mb-2">Location Classification and Name Required</p>

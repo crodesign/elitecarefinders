@@ -91,7 +91,7 @@ export async function GET(request: Request) {
         }
 
         // 4. Fetch Reviews
-        // The Node.js client library doesn't expose mybusinessreviews natively right now,
+        // The Node.js client library doesn't expose mybusinessreviews natively in this version,
         // so we fetch directly using the standard Google API URL and our fresh access token.
         const { token } = await oauth2Client.getAccessToken();
         if (!token) throw new Error("Could not retrieve access token for syncing");
@@ -117,7 +117,6 @@ export async function GET(request: Request) {
         // 5. Transform and Upsert into Supabase
         const transformedReviews = externalReviews.map((rev: any) => {
             // Google names reviews like "accounts/X/locations/Y/reviews/Z"
-            // We use this full string as the unique external_id
             const externalId = rev.name;
 
             // Convert Google rating enum (e.g. "FIVE") to integer
@@ -132,13 +131,9 @@ export async function GET(request: Request) {
                 author_photo_url: rev.reviewer?.profilePhotoUrl || null,
                 rating: rating,
                 content: rev.comment || '',
-                // If there's no comment, we'll store a default or skip rendering it
                 source: 'google',
-                // Google doesn't provide a direct permanent single-review link easily through this API response 
-                // but we can try to link to the general location page or leave blank if unavailable
-                source_link: null,
-                status: 'approved', // Auto-approve Google reviews
-                // We don't have a reliable entity_id context for single-location syncs, use a placeholder or null if schema allows
+                source_link: null, // GMB API doesn't provide a direct link easily here
+                status: 'approved',
                 entity_id: '00000000-0000-0000-0000-000000000000',
                 created_at: rev.createTime || new Date().toISOString()
             };
@@ -158,6 +153,18 @@ export async function GET(request: Request) {
 
     } catch (error: any) {
         console.error('Error syncing Google reviews:', error);
+
+        // Specific error message for Quota Exceeded
+        if (error.message?.includes('Quota exceeded') || error.code === 429) {
+            return NextResponse.json(
+                {
+                    error: 'API Quota Exceeded',
+                    details: 'Google Business Profile API quota exceeded. Please ensure the My Business API is fully approved/enabled in Google Cloud Console. This often happens if the project is in a restricted state or API approval is pending.'
+                },
+                { status: 500 }
+            );
+        }
+
         return NextResponse.json(
             { error: 'Failed to sync reviews', details: error.message },
             { status: 500 }

@@ -342,6 +342,17 @@ export async function getMediaItems(folderId?: string | null): Promise<MediaItem
     return (data || []).map(transformMediaItem);
 }
 
+export async function getMediaItemsByUrls(urls: string[]): Promise<MediaItem[]> {
+    if (urls.length === 0) return [];
+    const { data, error } = await supabase
+        .from("media_items")
+        .select("*")
+        .in("url", urls)
+        .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data || []).map(transformMediaItem);
+}
+
 export async function getMediaItem(id: string): Promise<MediaItem> {
     const { data, error } = await supabase
         .from("media_items")
@@ -502,6 +513,9 @@ function transformMediaItem(row: Record<string, unknown>): MediaItem {
         height: row.height as number | undefined,
         storagePath: row.storage_path as string,
         url: row.url as string,
+        urlLarge: row.url_large as string | undefined,
+        urlMedium: row.url_medium as string | undefined,
+        urlThumb: row.url_thumb as string | undefined,
         createdAt: row.created_at as string,
         updatedAt: row.updated_at as string,
     };

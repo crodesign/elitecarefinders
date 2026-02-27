@@ -22,6 +22,13 @@ export interface Address {
     };
 }
 
+export interface VideoEntry {
+    url: string;
+    caption?: string;
+    duration?: string;
+    thumbnailUrl?: string;
+}
+
 export interface BaseEntity {
     id: string;
     title: string;
@@ -29,6 +36,7 @@ export interface BaseEntity {
     description: string;
     images: string[];
     teamImages?: string[];
+    videos?: VideoEntry[];
     createdAt: string;
     updatedAt: string;
 }
@@ -69,6 +77,7 @@ export interface Review {
     sourceLink?: string;
     authorPhotoUrl?: string;
     externalId?: string;
+    images?: string[];
 }
 
 export type PostType = 'caregiver_resources' | 'news_events' | 'recipes' | 'caregiving_for_caregivers' | 'general' | 'resident_resources';
@@ -143,6 +152,9 @@ export interface MediaItem {
     height?: number;
     storagePath: string;
     url: string;
+    urlLarge?: string;
+    urlMedium?: string;
+    urlThumb?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -186,6 +198,7 @@ export interface RoomFixedFieldOption {
 export interface RoomDetails {
     roomPrice?: number;
     bedroomType?: string;
+    bedroomTypes?: string[];
     bathroomType?: string;
     showerType?: string;
     roomTypes?: string[];

@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Loader2, RefreshCw, X } from "lucide-react";
 import { MediaItem, MediaFolder } from "@/types";
-import { getMediaItems, deleteMediaItem, updateMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
+import { getMediaItems, getMediaItemsByUrls, deleteMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
 import { MediaTile } from "@/components/admin/media/MediaTile";
 import { SortableGalleryItem } from "@/components/admin/media/SortableGalleryItem";
 import { useNotification } from "@/contexts/NotificationContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
     DndContext,
@@ -57,7 +56,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const { showNotification } = useNotification();
-
+    const galleriesRef = useRef(galleries);
+    useEffect(() => { galleriesRef.current = galleries; }, [galleries]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -87,7 +87,13 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         setIsLoading(true);
         setError(null);
         try {
-            const items = await getMediaItems(folderId);
+            let items = await getMediaItems(folderId);
+            if (items.length === 0 && galleriesRef.current) {
+                const allGalleryUrls = galleriesRef.current.flatMap(g => g.urls);
+                if (allGalleryUrls.length > 0) {
+                    items = await getMediaItemsByUrls(allGalleryUrls);
+                }
+            }
             setMediaItems(items);
         } catch (err) {
             console.error("Failed to load media:", err);
@@ -315,7 +321,6 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         type="button"
                         onClick={loadMedia}
                         className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors shrink-0"
-                        title="Refresh"
                     >
                         <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                     </button>

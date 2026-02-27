@@ -163,7 +163,7 @@ export function HomeRoomsTab({
                 </div>
 
                 {/* Languages */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-3">
+                <div className="bg-surface-hover rounded-lg p-4 space-y-3">
                     <div className="flex items-center gap-2 mb-2">
                         <Languages className="h-4 w-4 text-accent" />
                         <h3 className="text-base font-medium text-content-primary">Languages Spoken</h3>
@@ -188,15 +188,15 @@ export function HomeRoomsTab({
                                         });
                                     }}
                                     className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
-                                        ? "bg-surface-hover text-content-primary"
-                                        : "bg-surface-hover hover:bg-surface-secondary text-content-secondary"
+                                        ? "bg-surface-input text-content-primary"
+                                        : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                         }`}
                                 >
                                     <span className="text-sm font-medium">{lang}</span>
-                                    <div className={`w-4 h-4 rounded flex items-center justify-center ${isSelected
-                                        ? "border border-accent bg-accent text-white"
-                                        : "bg-surface-secondary"
-                                        }`}>
+                                    <div
+                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                    >
                                         {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
                                     </div>
                                 </button>
