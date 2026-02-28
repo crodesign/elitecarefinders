@@ -27,7 +27,7 @@ export async function getHomes(): Promise<Home[]> {
         images: home.images || [],
         teamImages: home.team_images || [],
         videos: home.videos || [],
-        roomDetails: home.room_details || { customFields: {} },
+        roomDetails: { customFields: {}, ...(home.room_details || {}) },
         updatedAt: home.updated_at,
     }));
 }
@@ -58,7 +58,7 @@ export async function getHome(id: string): Promise<Home | null> {
         images: data.images || [],
         teamImages: data.team_images || [],
         videos: data.videos || [],
-        roomDetails: data.room_details || { customFields: {} },
+        roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
     };
 }
@@ -113,7 +113,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         images: data.images || [],
         teamImages: data.team_images || [],
         videos: data.videos || [],
-        roomDetails: data.room_details || { customFields: {} },
+        roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
     };
 }
@@ -167,7 +167,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         images: data.images || [],
         teamImages: data.team_images || [],
         videos: data.videos || [],
-        roomDetails: data.room_details || { customFields: {} },
+        roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
     };
 }

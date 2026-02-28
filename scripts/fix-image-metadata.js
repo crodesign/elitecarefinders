@@ -26,22 +26,34 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const BATCH_SIZE = 500;
+const VARIANT_PATTERN = /-\d+x\d+\.webp$/;
+
+async function fetchAllItems() {
+    const all = [];
+    let offset = 0;
+    while (true) {
+        const { data, error } = await supabase
+            .from('media_items')
+            .select('id, filename, mime_type, width, height')
+            .like('url', '/images/media/%')
+            .order('created_at', { ascending: true })
+            .range(offset, offset + BATCH_SIZE - 1);
+        if (error) { console.error('Fetch error:', error.message); process.exit(1); }
+        if (!data || data.length === 0) break;
+        all.push(...data);
+        if (data.length < BATCH_SIZE) break;
+        offset += BATCH_SIZE;
+    }
+    return all;
+}
+
 async function run() {
     console.log(DRY_RUN ? '[DRY RUN] No changes will be made.\n' : '[LIVE] Fixing image metadata...\n');
 
-    const { data: items, error } = await supabase
-        .from('media_items')
-        .select('id, filename, mime_type, width, height')
-        .like('url', '/images/media/%')
-        .order('created_at', { ascending: true });
-
-    if (error) {
-        console.error('Failed to fetch media_items:', error.message);
-        process.exit(1);
-    }
+    const items = await fetchAllItems();
 
     // Exclude variant files (they have dimension suffixes like -500x500)
-    const VARIANT_PATTERN = /-\d+x\d+\.webp$/;
     const originals = items.filter(item => !VARIANT_PATTERN.test(item.filename));
 
     console.log(`Found ${originals.length} original items to check.\n`);
