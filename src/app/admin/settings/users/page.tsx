@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getUsers, getUserProfile, deleteUser, updateUser, createUser, UserListItem } from '@/lib/services/userService';
-import { Users as UsersIcon, Plus, Pencil, Trash2, MapPin, Loader2, Search, User, Shield } from 'lucide-react';
+import { Users as UsersIcon, Plus, Pencil, Trash2, MapPin, Map, Loader2, Search, User, Shield } from 'lucide-react';
 import { DataTable, type ColumnDef } from '@/components/admin/DataTable';
 import { Pagination } from '@/components/admin/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
@@ -115,6 +115,7 @@ export default function SettingsUsersPage() {
                 role: formData.role,
                 profile: formData.profile,
                 location_ids: formData.locationIds,
+                entity_assignments: formData.entityAssignments,
                 manager_id: formData.manager_id
             });
 
@@ -131,6 +132,7 @@ export default function SettingsUsersPage() {
                 role: formData.role,
                 profile: formData.profile,
                 location_ids: formData.locationIds,
+                entity_assignments: formData.entityAssignments,
                 manager_id: formData.manager_id
             });
 
@@ -171,6 +173,8 @@ export default function SettingsUsersPage() {
         switch (role) {
             case 'local_user':
                 return User;
+            case 'location_manager':
+                return Map;
             case 'regional_manager':
                 return UsersIcon;
             case 'system_admin':
@@ -184,8 +188,9 @@ export default function SettingsUsersPage() {
         const badges = {
             super_admin: { bg: 'bg-red-500', label: 'Super Admin' },
             system_admin: { bg: 'bg-orange-500', label: 'System Admin' },
-            regional_manager: { bg: 'bg-blue-500', label: 'Regional Manager' },
-            local_user: { bg: 'bg-green-500', label: 'Local User' }
+            regional_manager: { bg: 'bg-purple-500', label: 'Regional Manager' },
+            location_manager: { bg: 'bg-blue-500', label: 'Location Manager' },
+            local_user: { bg: 'bg-green-500', label: 'Local User' },
         };
 
         const badge = badges[role as keyof typeof badges] || badges.local_user;

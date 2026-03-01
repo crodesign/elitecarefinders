@@ -348,13 +348,13 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
       )}
 
       {/* Column 1: Progress/Status + Primary Contact + Secondary Contact */}
-      <div className="space-y-3">
+      <div className="space-y-[10px]">
         {/* Progress & Status - only show if not hidden */}
         {!hideProgressAndStatus && (
-          <div className="bg-surface-input rounded-lg p-4 space-y-3">
+          <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
             {/* Progress */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Progress</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Progress</label>
               <div className="relative w-40" ref={progressRef}>
                 <button
                   type="button"
@@ -401,8 +401,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
             </div>
 
             {/* Status */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Status</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Status</label>
               <div className="relative w-40" ref={statusRef}>
                 <button
                   type="button"
@@ -476,14 +476,14 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
         )}
 
         {/* Primary Contact */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <UserCircle className="h-4 w-4 text-accent" />
             Primary Contact
           </h3>
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Full Name</label>
               <input
                 id="contact-name"
                 type="text"
@@ -494,8 +494,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                 className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
               <input
                 id="contact-phone"
                 type="tel"
@@ -506,8 +506,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                 className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
               />
             </div>
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
               <div className="flex flex-col items-end">
                 <input
                   id="contact-email"
@@ -527,7 +527,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
         </div>
 
         {/* Secondary Contact */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
               <UserPlus className="h-4 w-4 text-accent" />
@@ -547,8 +547,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
 
           {formData?.enableSecondaryContact && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
+              <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Full Name</label>
                 <input
                   id="secondary-contact-name"
                   type="text"
@@ -559,8 +559,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                   className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+              <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
                 <input
                   id="secondary-contact-phone"
                   type="tel"
@@ -571,8 +571,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                   className={`form-input text-sm text-left w-48 h-8 rounded-md px-3 ${readOnly ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
+              <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
                 <div className="flex flex-col items-end">
                   <input
                     id="secondary-contact-email"
@@ -594,9 +594,9 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
       </div >
 
       {/* Column 2: Looking For + Referral Details */}
-      < div className="space-y-3" >
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+      < div className="space-y-[10px]" >
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <span className="font-medium text-sm text-content-secondary">Looking For</span>
             <SimpleSelect
               value={formData?.lookingFor || ""}
@@ -609,15 +609,15 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
         </div>
 
         {/* Referral Details */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Share2 className="h-4 w-4 text-accent" />
             Referral Details
           </h3>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Date</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Referral Date</label>
               <Popover open={referralCalendarOpen} onOpenChange={setReferralCalendarOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -738,8 +738,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
               </Popover>
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Name</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Referral Name</label>
               <input
                 id="referral-name"
                 type="text"
@@ -751,8 +751,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
               />
             </div>
 
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Referral Phone</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Referral Phone</label>
               <input
                 id="referral-phone"
                 type="tel"
@@ -768,8 +768,8 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
       </div >
 
       {/* Columns 3-4: Waiver Section */}
-      < div className="lg:col-span-2 bg-surface-input rounded-lg p-4 space-y-4" >
-        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+      < div className="lg:col-span-2 bg-surface-input rounded-lg p-[5px] space-y-4" >
+        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
           <FileSignature className="h-4 w-4 text-accent" />
           Acknowledgment and Waiver
         </h3>
@@ -809,8 +809,8 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Legal Name</label>
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Full Legal Name</label>
             <input
               id="signature-name"
               type="text"
@@ -822,8 +822,8 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Date</label>
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Date</label>
             <input
               type="text"
               value={localSignatureDate ? (parseHawaiiDate(localSignatureDate) ? format(parseHawaiiDate(localSignatureDate)!, "PPP") : "Invalid date") : format(new Date(), "PPP")}

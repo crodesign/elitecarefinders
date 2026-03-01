@@ -3,10 +3,10 @@ import { Label } from "@/components/ui/label";
 
 const CareNeedsSection = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-[10px]">
       {/* Care Needs */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">CARE NEEDS</h3>
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-muted-foreground pt-[5px] pl-[5px] pb-[5px]">CARE NEEDS</h3>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center space-x-2">
             <Checkbox id="no-care" />

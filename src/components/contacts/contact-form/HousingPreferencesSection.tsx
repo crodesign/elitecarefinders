@@ -54,10 +54,10 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
       {/* Column 1: Move-in Dates + Housing Type */}
-      <div className="space-y-6">
+      <div className="space-y-[10px]">
         {/* Move-in Timeframe */}
         <div className="bg-surface-hover rounded-lg">
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5">
+          <div className="flex items-center justify-between gap-2 p-[5px]">
             <span className="font-medium text-sm text-content-secondary whitespace-nowrap flex items-center gap-2">
               <CalendarClock className="h-4 w-4 text-accent" />
               Move-in Date
@@ -73,8 +73,8 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
         </div>
 
         {/* Housing Type */}
-        <div className="bg-surface-hover rounded-lg p-3 space-y-4">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Home className="h-4 w-4 text-accent" />Housing Type
           </label>
 
@@ -108,9 +108,9 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
       </div>
 
       {/* Column 2: Room Type + Bathroom Type */}
-      <div className="space-y-6">
-        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+      <div className="space-y-[10px]">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <BedDouble className="h-4 w-4 text-accent" />Room Type
           </label>
           <div className="space-y-2">
@@ -120,8 +120,8 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
           </div>
         </div>
 
-        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Bath className="h-4 w-4 text-accent" />Bathroom Type
           </label>
           <div className="space-y-2">
@@ -133,9 +133,9 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
       </div>
 
       {/* Column 3: Shower Type + Interests */}
-      <div className="space-y-6">
-        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+      <div className="space-y-[10px]">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <ShowerHead className="h-4 w-4 text-accent" />Shower Type
           </label>
           <div className="space-y-2">
@@ -145,8 +145,8 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
           </div>
         </div>
 
-        <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Heart className="h-4 w-4 text-accent" />Interests
           </label>
           <div className="space-y-2">
@@ -162,9 +162,9 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
       </div>
 
       {/* Column 4: Additional Notes */}
-      <div className="space-y-6">
-        <div className="bg-surface-hover rounded-lg p-4 space-y-4">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
+      <div className="space-y-[10px]">
+        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <StickyNote className="h-4 w-4 text-accent" />
             Additional Notes
           </h3>

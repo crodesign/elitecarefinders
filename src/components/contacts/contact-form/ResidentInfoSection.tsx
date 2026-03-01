@@ -85,18 +85,18 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
       {/* Column 1: Resident Info */}
-      <div className="space-y-3">
+      <div className="space-y-[10px]">
         {/* Resident Info container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <User className="h-4 w-4 text-accent" />
             Resident Info
           </h3>
 
           {/* Full Name */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Full Name</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Full Name</label>
               <input
                 type="text"
                 value={formData?.resident_full_name || ""}
@@ -111,8 +111,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           <div className="space-y-2 pt-1">
             <h4 className="text-sm font-medium text-content-secondary">Address</h4>
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Street</label>
+              <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                 <input
                   type="text"
                   value={formData?.street_address || ""}
@@ -121,8 +121,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                   placeholder="Street address"
                 />
               </div>
-              <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">City</label>
+              <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">City</label>
                 <input
                   type="text"
                   value={formData?.city || ""}
@@ -132,8 +132,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                 />
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all flex-1">
-                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap">State</label>
+                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all flex-1">
+                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
                   <input
                     type="text"
                     list="states-list-resident"
@@ -150,8 +150,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                     ))}
                   </datalist>
                 </div>
-                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Zip</label>
+                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                  <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
                   <input
                     type="text"
                     value={formData?.zip_code || ""}
@@ -167,15 +167,15 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
         </div>
 
         {/* Resident Details container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <UserCheck className="h-4 w-4 text-accent" />
             Resident Details
           </h3>
 
           {/* Date of Birth */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Date of Birth</label>
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Date of Birth</label>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -303,7 +303,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Gender */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <span className="font-medium text-sm text-content-secondary">Gender</span>
             <SimpleSelect
               value={formData?.gender || ""}
@@ -315,7 +315,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Ethnicity */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <span className="font-medium text-sm text-content-secondary">Ethnicity</span>
             <SimpleSelect
               value={formData?.ethnicity || ""}
@@ -327,7 +327,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Height & Weight */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <div className="flex items-center gap-1.5">
               <label className="text-sm font-medium text-content-secondary">Height</label>
               <div className="relative w-14">
@@ -375,15 +375,15 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
       </div>
 
       {/* Column 2: Preferred Location + Primary Care Physician */}
-      <div className="space-y-3">
+      <div className="space-y-[10px]">
         {/* Preferred Location container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Compass className="h-4 w-4 text-accent" />
             Preferred Location
           </h3>
           {/* Island - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <span className="font-medium text-sm text-content-secondary">Island</span>
             <SimpleSelect
               value={formData?.preferred_island || ""}
@@ -398,7 +398,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Neighborhood - Inline dropdown */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <span className="font-medium text-sm text-content-secondary">Neighborhood</span>
             <SimpleSelect
               value={formData?.preferred_neighborhood || ""}
@@ -410,7 +410,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Min Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <label className="text-sm font-medium text-content-secondary">Min Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.minimum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
@@ -449,7 +449,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </div>
 
           {/* Max Budget - Currency field */}
-          <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
+          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <label className="text-sm font-medium text-content-secondary">Max Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.maximum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
@@ -489,16 +489,16 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
         </div>
 
         {/* Primary Care Physician container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Stethoscope className="h-4 w-4 text-accent" />
             Primary Care Physician
           </h3>
 
           <div className="space-y-2">
             {/* PCP Name */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Name</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Name</label>
               <input
                 type="text"
                 value={formData?.pcp_name || ""}
@@ -509,8 +509,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
             </div>
 
             {/* PCP Phone */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
               <input
                 type="tel"
                 value={formData?.pcp_phone || ""}
@@ -524,8 +524,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
             </div>
 
             {/* PCP Email */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
               <div className="flex flex-col items-end">
                 <input
                   type="email"
@@ -552,18 +552,18 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
       </div>
 
       {/* Column 3: Insurance + Diagnoses */}
-      <div className="space-y-3">
+      <div className="space-y-[10px]">
         {/* Insurance Information container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <ShieldCheck className="h-4 w-4 text-accent" />
             Insurance Information
           </h3>
 
           <div className="space-y-2">
             {/* Primary Insurance */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Primary</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Primary</label>
               <input
                 type="text"
                 value={formData?.primary_insurance || ""}
@@ -574,8 +574,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
             </div>
 
             {/* Secondary Insurance */}
-            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-              <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Secondary</label>
+            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+              <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Secondary</label>
               <input
                 type="text"
                 value={formData?.secondary_insurance || ""}
@@ -588,8 +588,8 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
         </div>
 
         {/* Diagnoses container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Activity className="h-4 w-4 text-accent" />
             Diagnoses
           </h3>
@@ -607,10 +607,10 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
       </div>
 
       {/* Column 4: Additional Information */}
-      <div className="space-y-3">
+      <div className="space-y-[10px]">
         {/* Additional Information container */}
-        <div className="bg-surface-input rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Info className="h-4 w-4 text-accent" />
             Additional Information
           </h3>

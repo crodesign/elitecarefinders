@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { SlidePanel } from "./SlidePanel";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ImageCropModal } from "./ImageCropModal";
-import { User, Mail, Phone, MapPin, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Map, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search, Loader2 } from 'lucide-react';
 import { createClientComponentClient } from "@/lib/supabase";
 import type { UserProfile, UserRole } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,6 +19,8 @@ const getRoleIcon = (roleValue: UserRole) => {
     switch (roleValue) {
         case 'local_user':
             return User;
+        case 'location_manager':
+            return Map;
         case 'regional_manager':
             return Users;
         case 'system_admin':
@@ -30,17 +32,19 @@ const getRoleIcon = (roleValue: UserRole) => {
 
 const ROLE_OPTIONS: { value: UserRole; label: string; description: string }[] = [
     { value: 'super_admin', label: 'Super Admin', description: 'Full system access' },
-    { value: 'system_admin', label: 'System Admin', description: 'Can manage Regional Managers and Local Users' },
-    { value: 'regional_manager', label: 'Regional Manager', description: 'Can manage Local Users in their regions' },
-    { value: 'local_user', label: 'Local User', description: 'Can only manage their own content' }
+    { value: 'system_admin', label: 'System Admin', description: 'Can manage Regional Managers and Location Managers' },
+    { value: 'regional_manager', label: 'Regional Manager', description: 'Can manage Location Managers in their regions' },
+    { value: 'location_manager', label: 'Location Manager', description: 'Can manage Local Users in their locations' },
+    { value: 'local_user', label: 'Local User', description: 'Assigned to specific homes/facilities' },
 ];
 
 const ROLE_COLORS: Record<UserRole, string> = {
     super_admin: 'text-red-500',
     system_admin: 'text-orange-500',
-    regional_manager: 'text-blue-500',
+    regional_manager: 'text-purple-500',
+    location_manager: 'text-blue-500',
     local_user: 'text-green-500',
-    invoice_manager: 'text-purple-500',
+    invoice_manager: 'text-indigo-500',
 };
 
 const US_STATES = [
@@ -79,12 +83,14 @@ export interface UserFormData {
         };
     };
     locationIds: string[];
+    entityAssignments?: { entity_id: string; entity_type: 'home' | 'facility' }[];
     manager_id?: string;
 }
 
 interface ManagerOption {
     id: string;
     name: string;
+    managerId?: string;
 }
 
 interface UserFormProps {
@@ -97,6 +103,7 @@ interface UserFormProps {
         role: { role: UserRole };
         profile?: UserProfile;
         location_ids?: string[];
+        entity_assignments?: { id: string; entity_id: string; entity_type: 'home' | 'facility' }[];
         manager_id?: string;
     } | null;
 }
@@ -129,8 +136,11 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
     const [zip, setZip] = useState('');
-    const [managerId, setManagerId] = useState<string>('');
+    const [reportsToType, setReportsToType] = useState<'' | 'regional_manager'>('');
+    const [selectedRMId, setSelectedRMId] = useState<string>('');
+    const [selectedLMId, setSelectedLMId] = useState<string>('');
     const [managers, setManagers] = useState<ManagerOption[]>([]);
+    const [allLocationManagers, setAllLocationManagers] = useState<ManagerOption[]>([]);
 
     // Location assignment state
     const [locationIds, setLocationIds] = useState<string[]>([]);
@@ -138,6 +148,15 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
     const [locationSearch, setLocationSearch] = useState('');
     const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
     const locationDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Entity assignment state (for local_user role)
+    const [entityAssignments, setEntityAssignments] = useState<{ entity_id: string; entity_type: 'home' | 'facility'; name: string }[]>([]);
+    const [entitySearch, setEntitySearch] = useState('');
+    const [isEntityDropdownOpen, setIsEntityDropdownOpen] = useState(false);
+    const [entitySearchResults, setEntitySearchResults] = useState<{ id: string; name: string; type: 'home' | 'facility' }[]>([]);
+    const entityDropdownRef = useRef<HTMLDivElement>(null);
+    const entitySearchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const supabaseClient = createClientComponentClient();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -176,7 +195,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                         try {
                             const { data: rmRoles } = await supabaseClient
                                 .from('user_roles')
-                                .select('user_id')
+                                .select('user_id, display_name')
                                 .eq('role', 'regional_manager');
 
                             if (rmRoles && rmRoles.length > 0) {
@@ -186,15 +205,44 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     .select('user_id, full_name')
                                     .in('user_id', ids);
 
-                                if (profiles) {
-                                    setManagers(profiles.map(p => ({
-                                        id: p.user_id,
-                                        name: p.full_name
-                                    })).sort((a, b) => a.name.localeCompare(b.name)));
-                                }
+                                const profileMap: Record<string, string> = {};
+                                (profiles || []).forEach(p => { if (p.full_name) profileMap[p.user_id] = p.full_name; });
+
+                                setManagers(rmRoles.map(r => ({
+                                    id: r.user_id,
+                                    name: profileMap[r.user_id] || r.display_name || r.user_id
+                                })).sort((a, b) => a.name.localeCompare(b.name)));
                             }
                         } catch (err) {
                             console.error('Failed to fetch managers:', err);
+                        }
+                    })(),
+                    (async () => {
+                        if (!isSuperAdmin && !isSystemAdmin) return;
+                        try {
+                            const { data: lmRoles } = await supabaseClient
+                                .from('user_roles')
+                                .select('user_id, display_name')
+                                .eq('role', 'location_manager');
+
+                            if (lmRoles && lmRoles.length > 0) {
+                                const ids = lmRoles.map(r => r.user_id);
+                                const { data: profiles } = await supabaseClient
+                                    .from('user_profiles')
+                                    .select('user_id, full_name, manager_id')
+                                    .in('user_id', ids);
+
+                                const profileMap: Record<string, { name: string; managerId?: string }> = {};
+                                (profiles || []).forEach(p => { profileMap[p.user_id] = { name: p.full_name, managerId: p.manager_id || undefined }; });
+
+                                setAllLocationManagers(lmRoles.map(r => ({
+                                    id: r.user_id,
+                                    name: profileMap[r.user_id]?.name || r.display_name || r.user_id,
+                                    managerId: profileMap[r.user_id]?.managerId
+                                })).sort((a, b) => a.name.localeCompare(b.name)));
+                            }
+                        } catch (err) {
+                            console.error('Failed to fetch location managers:', err);
                         }
                     })()
                 ]);
@@ -210,11 +258,14 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
         }
     }, [isOpen, isSuperAdmin, isSystemAdmin, supabaseClient]);
 
-    // Close location dropdown when clicking outside
+    // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target as Node)) {
                 setIsLocationDropdownOpen(false);
+            }
+            if (entityDropdownRef.current && !entityDropdownRef.current.contains(event.target as Node)) {
+                setIsEntityDropdownOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -231,7 +282,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
             return states.map(s => ({ ...s, level: 'state' as const, children: [] }));
         }
 
-        if (role === 'local_user') {
+        if (role === 'location_manager') {
             if (isSuperAdmin || isSystemAdmin) {
                 // Super/System admins can assign any location
                 return states.map(s => ({
@@ -254,7 +305,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
         return [];
     }, [taxonomyEntries, role, isSuperAdmin, isSystemAdmin, currentUser]);
 
-    const showLocationSelector = role === 'regional_manager' || role === 'local_user';
+    const showLocationSelector = role === 'regional_manager' || role === 'location_manager';
 
     const isEditing = !!user;
 
@@ -275,7 +326,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
         } else {
             populatedRef.current = false;
         }
-    }, [email, password, editPassword, fullName, nickname, phone, role, street, city, state, zip, managerId, locationIds, photoUrl, isFormPopulated]);
+    }, [email, password, editPassword, fullName, nickname, phone, role, street, city, state, zip, reportsToType, selectedRMId, selectedLMId, locationIds, entityAssignments, photoUrl, isFormPopulated]);
 
     // Close guard
     const handleCloseInternal = () => {
@@ -313,7 +364,26 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setState(user.profile?.address?.state || '');
                 setZip(user.profile?.address?.zip || '');
                 setLocationIds(user.location_ids || []);
-                setManagerId(user.manager_id || '');
+                // manager_id will be resolved by the separate useEffect below
+                setEntityAssignments([]);
+                if (user.entity_assignments?.length) {
+                    (async () => {
+                        const homeIds = user.entity_assignments!.filter(ea => ea.entity_type === 'home').map(ea => ea.entity_id);
+                        const facilityIds = user.entity_assignments!.filter(ea => ea.entity_type === 'facility').map(ea => ea.entity_id);
+                        const [{ data: homes }, { data: facilities }] = await Promise.all([
+                            homeIds.length > 0 ? supabaseClient.from('homes').select('id, title').in('id', homeIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+                            facilityIds.length > 0 ? supabaseClient.from('facilities').select('id, title').in('id', facilityIds) : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+                        ]);
+                        const nameMap: Record<string, string> = {};
+                        (homes || []).forEach((h: { id: string; title: string }) => { nameMap[h.id] = h.title; });
+                        (facilities || []).forEach((f: { id: string; title: string }) => { nameMap[f.id] = f.title; });
+                        setEntityAssignments(user.entity_assignments!.map(ea => ({
+                            entity_id: ea.entity_id,
+                            entity_type: ea.entity_type,
+                            name: nameMap[ea.entity_id] || ea.entity_id,
+                        })));
+                    })();
+                }
             } else {
                 setEmail('');
                 setPassword('');
@@ -328,7 +398,11 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 setState('');
                 setZip('');
                 setLocationIds([]);
-                setManagerId('');
+                setEntityAssignments([]);
+                setEntitySearch('');
+                setReportsToType('');
+                setSelectedRMId('');
+                setSelectedLMId('');
             }
 
             // Add a small delay to ensure state updates are fully processed and painted
@@ -342,6 +416,35 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
             setIsFormPopulated(false);
         }
     }, [isOpen, user]);
+
+    // Resolve manager_id → reportsToType / selectedRMId / selectedLMId for edit mode
+    useEffect(() => {
+        if (!isOpen || !user?.manager_id) {
+            if (!user?.manager_id) {
+                setReportsToType('');
+                setSelectedRMId('');
+                setSelectedLMId('');
+            }
+            return;
+        }
+        const mid = user.manager_id;
+        // Check if it's a regional manager
+        if (managers.find(m => m.id === mid)) {
+            setReportsToType('regional_manager');
+            setSelectedRMId(mid);
+            setSelectedLMId('');
+            return;
+        }
+        // Check if it's a location manager
+        const lm = allLocationManagers.find(m => m.id === mid);
+        if (lm) {
+            setReportsToType('regional_manager');
+            setSelectedRMId(lm.managerId || '');
+            setSelectedLMId(mid);
+            return;
+        }
+        // Data not loaded yet — will re-run when managers/allLocationManagers update
+    }, [isOpen, user?.manager_id, managers, allLocationManagers]);
 
     const handleResetPassword = async () => {
         if (!user?.email) return;
@@ -451,7 +554,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                     } : {})
                 },
                 locationIds: showLocationSelector ? locationIds : [],
-                ...((role === 'local_user' && (isSuperAdmin || isSystemAdmin) && managerId) ? { manager_id: managerId } : {})
+                ...(role === 'local_user' ? { entityAssignments: entityAssignments.map(ea => ({ entity_id: ea.entity_id, entity_type: ea.entity_type })) } : {}),
+                ...(((role === 'location_manager' || role === 'local_user') && (isSuperAdmin || isSystemAdmin)) ? { manager_id: selectedLMId || selectedRMId || '' } : {})
             };
 
             await onSave(formData);
@@ -473,6 +577,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                 isOpen={isOpen}
                 onClose={handleCloseInternal}
                 title={isEditing ? 'Edit User' : 'Add New User'}
+                subtitle={isEditing && user ? <>{user.profile?.full_name} <span className="text-content-muted">·</span> {user.email}</> : undefined}
                 width={900}
                 actions={
                     <button
@@ -498,17 +603,17 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                         )}
 
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-6">
-                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+                            <div className="space-y-[10px]">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <User className="h-4 w-4 text-accent" />
                                         Account Information
                                     </h3>
 
-                                    <div className="flex gap-4 mb-3">
+                                    <div className="flex gap-4 mb-[5px]">
                                         <div className="flex-1 space-y-2">
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                     Full Name
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                                 </label>
@@ -523,8 +628,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                 />
                                             </div>
 
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Nickname</label>
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Nickname</label>
                                                 <input
                                                     type="text"
                                                     value={nickname}
@@ -570,8 +675,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
+                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                 Email
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                             </label>
@@ -591,8 +696,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         </div>
 
                                         {!isEditing && (
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                     Password
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                                 </label>
@@ -659,8 +764,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             </div>
                                         )}
 
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap">
+                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap pl-[5px]">
                                                 Role
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                                                 <Tooltip content={<div className="space-y-2">
@@ -696,38 +801,163 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             </div>
                                         </div>
 
-                                        {/* Reports To (Manager) - Only for Admins creating Local Users */}
-                                        {(isSuperAdmin || isSystemAdmin) && role === 'local_user' && (
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap">
-                                                    Reports To
-                                                    <Tooltip content="Assign a Regional Manager to this user.">
-                                                        <Info className="h-3.5 w-3.5 text-content-muted hover:text-content-secondary cursor-help" />
-                                                    </Tooltip>
+                                        {/* Reports To - cascading: type → RM → optional LM */}
+                                        {(isSuperAdmin || isSystemAdmin) && (role === 'location_manager' || role === 'local_user') && (
+                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+                                                {/* Step 1: manager type */}
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap pl-[5px]">
+                                                        Reports To
+                                                    </label>
+                                                    <div className="w-56">
+                                                        <EnhancedSelect
+                                                            value={reportsToType}
+                                                            onChange={(value) => {
+                                                                setReportsToType(value as '' | 'regional_manager');
+                                                                if (!value) { setSelectedRMId(''); setSelectedLMId(''); }
+                                                            }}
+                                                            options={[
+                                                                { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
+                                                                { value: 'regional_manager', label: 'Regional Manager', icon: Users },
+                                                            ]}
+                                                            leftIcon={Shield}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                {/* Step 2: pick specific RM */}
+                                                {reportsToType === 'regional_manager' && (
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
+                                                            Regional Manager
+                                                        </label>
+                                                        <div className="w-56">
+                                                            <EnhancedSelect
+                                                                value={selectedRMId}
+                                                                onChange={(value) => { setSelectedRMId(value); setSelectedLMId(''); }}
+                                                                options={managers.map(m => ({ value: m.id, label: m.name, icon: Users }))}
+                                                                placeholder="Select Regional Manager"
+                                                                leftIcon={Users}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {/* Step 3: optional LM (local_user only, filtered by selected RM) */}
+                                                {role === 'local_user' && selectedRMId && allLocationManagers.filter(m => m.managerId === selectedRMId).length > 0 && (
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
+                                                            Location Manager
+                                                            <span className="text-content-muted text-xs font-normal ml-1">(optional)</span>
+                                                        </label>
+                                                        <div className="w-56">
+                                                            <EnhancedSelect
+                                                                value={selectedLMId}
+                                                                onChange={(value) => setSelectedLMId(value)}
+                                                                options={[
+                                                                    { value: '', label: 'None', icon: Shield },
+                                                                    ...allLocationManagers
+                                                                        .filter(m => m.managerId === selectedRMId)
+                                                                        .map(m => ({ value: m.id, label: m.name, icon: Map }))
+                                                                ]}
+                                                                leftIcon={Map}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Entity Assignments - shown for Local User role */}
+                                        {role === 'local_user' && (
+                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2 transition-all">
+                                                <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 w-full">
+                                                    <MapPin className="h-3.5 w-3.5 text-accent" />
+                                                    Assigned Homes / Facilities
                                                 </label>
-                                                <div className="w-56">
-                                                    <EnhancedSelect
-                                                        value={managerId}
-                                                        onChange={(value) => setManagerId(value)}
-                                                        options={[
-                                                            { value: '', label: 'None (Directly Managed)', description: 'Managed by Admins', icon: Shield },
-                                                            ...managers.map(m => ({
-                                                                value: m.id,
-                                                                label: m.name,
-                                                                description: 'Regional Manager',
-                                                                icon: Users
-                                                            }))
-                                                        ]}
-                                                        placeholder="Select Manager"
-                                                        leftIcon={Users}
-                                                    />
+
+                                                {entityAssignments.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mb-2">
+                                                        {entityAssignments.map(ea => (
+                                                            <span
+                                                                key={`${ea.entity_type}-${ea.entity_id}`}
+                                                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-accent/15 text-accent text-xs font-medium"
+                                                            >
+                                                                <span className="text-[10px] text-accent/70 uppercase font-semibold">{ea.entity_type === 'home' ? 'H' : 'F'}</span>
+                                                                {ea.name}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setEntityAssignments(prev => prev.filter(e => !(e.entity_id === ea.entity_id && e.entity_type === ea.entity_type)))}
+                                                                    className="hover:text-white transition-colors"
+                                                                >
+                                                                    <X className="h-3 w-3" />
+                                                                </button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                <div className="relative" ref={entityDropdownRef}>
+                                                    <div className="relative">
+                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
+                                                        <input
+                                                            type="text"
+                                                            value={entitySearch}
+                                                            onChange={(e) => {
+                                                                const q = e.target.value;
+                                                                setEntitySearch(q);
+                                                                setIsEntityDropdownOpen(true);
+                                                                if (entitySearchTimeout.current) clearTimeout(entitySearchTimeout.current);
+                                                                if (!q.trim()) { setEntitySearchResults([]); return; }
+                                                                entitySearchTimeout.current = setTimeout(async () => {
+                                                                    const term = `%${q}%`;
+                                                                    const [{ data: homes }, { data: facilities }] = await Promise.all([
+                                                                        supabaseClient.from('homes').select('id, title').ilike('title', term).limit(10),
+                                                                        supabaseClient.from('facilities').select('id, title').ilike('title', term).limit(10),
+                                                                    ]);
+                                                                    setEntitySearchResults([
+                                                                        ...(homes || []).map((h: { id: string; title: string }) => ({ id: h.id, name: h.title, type: 'home' as const })),
+                                                                        ...(facilities || []).map((f: { id: string; title: string }) => ({ id: f.id, name: f.title, type: 'facility' as const })),
+                                                                    ].sort((a, b) => a.name.localeCompare(b.name)));
+                                                                }, 300);
+                                                            }}
+                                                            onFocus={() => setIsEntityDropdownOpen(true)}
+                                                            className="form-input text-sm text-left w-full h-8 rounded-md pl-9 pr-3"
+                                                            placeholder="Search homes & facilities..."
+                                                            autoComplete="off"
+                                                        />
+                                                    </div>
+
+                                                    {isEntityDropdownOpen && entitySearchResults.length > 0 && (
+                                                        <div className="dropdown-menu absolute z-50 w-full mt-1 max-h-48 overflow-y-auto p-1">
+                                                            {entitySearchResults.map(result => {
+                                                                const isAssigned = entityAssignments.some(ea => ea.entity_id === result.id && ea.entity_type === result.type);
+                                                                return (
+                                                                    <button
+                                                                        key={`${result.type}-${result.id}`}
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (isAssigned) {
+                                                                                setEntityAssignments(prev => prev.filter(e => !(e.entity_id === result.id && e.entity_type === result.type)));
+                                                                            } else {
+                                                                                setEntityAssignments(prev => [...prev, { entity_id: result.id, entity_type: result.type, name: result.name }]);
+                                                                            }
+                                                                        }}
+                                                                        className={`w-full text-left px-3 py-1.5 rounded text-sm flex items-center gap-2 transition-colors ${isAssigned ? 'bg-surface-hover text-content-primary' : 'text-content-secondary hover:bg-surface-hover hover:text-content-primary'}`}
+                                                                    >
+                                                                        <span className="text-[10px] text-content-muted uppercase font-semibold w-4 flex-shrink-0">{result.type === 'home' ? 'H' : 'F'}</span>
+                                                                        <span>{result.name}</span>
+                                                                        {isAssigned && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Location Assignments - shown for RM and Local User */}
+                                        {/* Location Assignments - shown for RM and Location Manager */}
                                         {showLocationSelector && (
-                                            <div className="bg-surface-hover rounded-lg p-3 space-y-3 transition-all">
+                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2 transition-all">
                                                 <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 w-full">
                                                     <Globe className="h-3.5 w-3.5 text-accent" />
                                                     Location Assignments
@@ -816,8 +1046,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                                                     {isStateSelected && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
                                                                                 </button>
 
-                                                                                {/* City children (only for local_user role) */}
-                                                                                {role === 'local_user' && loc.children && loc.children.length > 0 && (
+                                                                                {/* City children (only for location_manager role) */}
+                                                                                {role === 'location_manager' && loc.children && loc.children.length > 0 && (
                                                                                     <div className="ml-4">
                                                                                         {loc.children
                                                                                             .filter((c: { name: string }) => !searchLower || c.name.toLowerCase().includes(searchLower) || matchesSearch)
@@ -860,16 +1090,16 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                 </div>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+                            <div className="space-y-[10px]">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <Phone className="h-4 w-4 text-accent" />
                                         Contact Information
                                     </h3>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
                                             <div className="relative flex-shrink-0">
                                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                                 <input
@@ -885,15 +1115,15 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
                                 </div>
 
-                                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <MapPin className="h-4 w-4 text-accent" />
                                         Address
                                     </h3>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Street</label>
+                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                                             <input
                                                 type="text"
                                                 value={street}
@@ -904,8 +1134,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             />
                                         </div>
 
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">City</label>
+                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">City</label>
                                             <input
                                                 type="text"
                                                 value={city}
@@ -916,8 +1146,8 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             />
                                         </div>
 
-                                        <div className="flex items-center gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex-shrink-0">State / Zip</label>
+                                        <div className="flex items-center gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex-shrink-0 pl-[5px]">State / Zip</label>
                                             <div className="flex gap-2 ml-auto">
                                                 <SimpleSelect
                                                     value={state}

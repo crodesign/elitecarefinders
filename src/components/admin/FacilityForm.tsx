@@ -869,9 +869,19 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
                 contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                actions={
+                    <button
+                        type="submit"
+                        form="facility-form"
+                        disabled={isEditing ? (!isDirty || isSubmitting) : (!canCreate || isSubmitting)}
+                        className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                    >
+                        {isSubmitting ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
+                    </button>
+                }
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex items-end overflow-visible gap-0.5 pt-2 px-2">
+                        <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -893,12 +903,12 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                         }}
                                         className={`
                                             relative flex items-center gap-2 px-4 text-sm font-medium
-                                            rounded-tl-lg rounded-tr-lg whitespace-nowrap
-                                            transition-all duration-150 select-none
+                                            whitespace-nowrap
+                                            transition-colors duration-150 select-none
                                             ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                             ${isActive
-                                                ? 'pt-[10px] pb-[11px] text-content-primary z-10'
-                                                : 'pt-2 pb-2 bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-hover'
+                                                ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
+                                                : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
                                             }
                                         `}
                                         style={isActive ? { backgroundColor: tabColor } : undefined}
@@ -926,7 +936,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             })}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex bg-surface-input p-1 rounded-lg mr-2 hidden md:flex">
+                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex">
                                 <button
                                     type="button"
                                     onClick={() => { setStatus('published'); setIsDirty(true); }}
@@ -942,21 +952,6 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                     Draft
                                 </button>
                             </div>
-                            <button
-                                type="submit"
-                                form="facility-form"
-                                disabled={isEditing ? (!isDirty || isSubmitting) : (!canCreate || isSubmitting)}
-                                className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
-                            >
-                                {isSubmitting ? (
-                                    "Saving..."
-                                ) : (
-                                    <>
-                                        <span className="hidden md:inline">{isEditing ? "Update Facility" : "Create Facility"}</span>
-                                        <Save className="h-7 w-7 md:hidden" />
-                                    </>
-                                )}
-                            </button>
                         </div>
                     </div>
                 }

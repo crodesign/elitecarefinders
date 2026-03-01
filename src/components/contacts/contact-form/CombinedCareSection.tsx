@@ -33,9 +33,9 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Column 1: Care Needs + Medical Conditions */}
-      <div className="space-y-6">
-        <div className="bg-surface-input rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2"><HeartPulse className="h-4 w-4 text-accent" />Care Needs</label>
+      <div className="space-y-[10px]">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><HeartPulse className="h-4 w-4 text-accent" />Care Needs</label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "No Care", "Memory Care", "Complete personal care", "Feeding Assistance",
@@ -57,8 +57,8 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
           </div>
         </div>
 
-        <div className="bg-surface-input rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2"><Thermometer className="h-4 w-4 text-accent" />Medical Conditions</label>
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Thermometer className="h-4 w-4 text-accent" />Medical Conditions</label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Blood Sugar Monitoring", "Sliding Scale Injections", "Insulin Injections",
@@ -81,9 +81,9 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
       </div>
 
       {/* Column 2: Level of Mobility + Mental Health */}
-      <div className="space-y-6">
-        <div className="bg-surface-input rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2"><Footprints className="h-4 w-4 text-accent" />Level of Mobility</label>
+      <div className="space-y-[10px]">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Footprints className="h-4 w-4 text-accent" />Level of Mobility</label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Hoyer Lift", "Non Ambulatory", "Wheelchair", "Cane",
@@ -103,8 +103,8 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
           </div>
         </div>
 
-        <div className="bg-surface-input rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2"><Brain className="h-4 w-4 text-accent" />Mental Health</label>
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Brain className="h-4 w-4 text-accent" />Mental Health</label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Memory Issues", "Hallucinations", "Wandering", "Aggressiveness towards Others",
@@ -128,9 +128,9 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
       </div>
 
       {/* Column 3: Medication Management */}
-      <div className="space-y-6">
-        <div className="bg-surface-input rounded-lg p-3 space-y-3">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2"><Pill className="h-4 w-4 text-accent" />Medication Management</label>
+      <div className="space-y-[10px]">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Pill className="h-4 w-4 text-accent" />Medication Management</label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Independent", "Reminders Only", "Setup Assistance", "Full Assistance",
@@ -152,9 +152,9 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
       </div>
 
       {/* Column 4: Additional Notes */}
-      <div className="space-y-6">
-        <div className="bg-surface-input rounded-lg p-4 space-y-4">
-          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
+      <div className="space-y-[10px]">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+          <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <StickyNote className="h-4 w-4 text-accent" />
             Additional Notes
           </h3>

@@ -93,14 +93,23 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: listError.message }, { status: 500 });
     }
 
-    const { data: roles } = await supabaseAdmin.from('user_roles').select('*');
-    const { data: profiles } = await supabaseAdmin.from('user_profiles').select('*');
-    const { data: locations } = await supabaseAdmin.from('user_location_assignments').select('*');
+    const [
+        { data: roles },
+        { data: profiles },
+        { data: locations },
+        { data: entityAssignments }
+    ] = await Promise.all([
+        supabaseAdmin.from('user_roles').select('*'),
+        supabaseAdmin.from('user_profiles').select('*'),
+        supabaseAdmin.from('user_location_assignments').select('*'),
+        supabaseAdmin.from('user_entity_assignments').select('*'),
+    ]);
 
     const combinedUsers = users.map(u => {
         const role = roles?.find(r => r.user_id === u.id);
         const profile = profiles?.find(p => p.user_id === u.id);
         const userLocations = locations?.filter(l => l.user_id === u.id) || [];
+        const userEntities = entityAssignments?.filter(e => e.user_id === u.id) || [];
 
         return {
             id: u.id,
@@ -113,7 +122,9 @@ export async function GET(request: Request) {
                 address: { street: '', city: '', state: '', zip: '' }
             },
             location_ids: userLocations.map(l => l.location_id),
-            location_count: userLocations.length
+            location_count: userLocations.length,
+            entity_assignments: userEntities.map(e => ({ id: e.id, entity_id: e.entity_id, entity_type: e.entity_type })),
+            entity_count: userEntities.length
         };
     });
 
@@ -141,7 +152,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, role, profile, location_ids, manager_id } = body;
+    const { email, password, role, profile, location_ids, entity_assignments, manager_id } = body;
 
     // Determine manager_id:
     // 1. If explicitly provided (by Admin), use it.
@@ -210,12 +221,27 @@ export async function POST(request: Request) {
             if (locError) throw locError;
         }
 
+        if (entity_assignments && entity_assignments.length > 0) {
+            const entityInserts = entity_assignments.map((ea: { entity_id: string; entity_type: string }) => ({
+                user_id: userId,
+                entity_id: ea.entity_id,
+                entity_type: ea.entity_type
+            }));
+
+            const { error: entityError } = await supabaseAdmin
+                .from('user_entity_assignments')
+                .insert(entityInserts);
+
+            if (entityError) throw entityError;
+        }
+
         return NextResponse.json({
             id: userId,
             email,
             role: { role },
             profile,
-            location_count: location_ids?.length || 0
+            location_count: location_ids?.length || 0,
+            entity_count: entity_assignments?.length || 0
         });
 
     } catch (error: any) {

@@ -44,16 +44,17 @@ export function FacilityRoomsTab({
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {/* Column 1: General Info & Col 1 Categories */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {/* Fixed Fields Section (General Room Info) */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    <div className="flex items-center gap-2 pl-[5px]">
                         <Bed className="h-4 w-4 text-accent" />
-                        <h3 className="text-base font-medium text-content-primary">General Info</h3>
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pb-[5px]">General Info</h3>
                     </div>
+                    <div className="space-y-2">
                     {/* Room Price */}
-                    <div className="min-h-[40px] flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary">Room Price</label>
+                    <div className="min-h-[40px] flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary pl-[5px]">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-content-secondary" : "text-content-muted"}`}>$</span>
                             <input
@@ -92,8 +93,8 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bedroom Type - multi-select */}
-                    <div className="py-2 pl-3.5 pr-2 rounded-lg bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary block mb-2">Bedroom Type</label>
+                    <div className="p-[5px] rounded-lg bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary block mb-2 pl-[5px]">Bedroom Type</label>
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions.filter(o => o.fieldType === 'bedroom').map((opt) => {
                                 const selected = (roomDetails.bedroomTypes || []).includes(opt.value);
@@ -109,7 +110,7 @@ export function FacilityRoomsTab({
                                             setRoomDetails((prev: RoomDetails) => ({ ...prev, bedroomTypes: updated }));
                                             setIsDirty(true);
                                         }}
-                                        className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div
@@ -125,8 +126,8 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary">Bathroom Type</label>
+                    <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary pl-[5px]">Bathroom Type</label>
                         <SimpleSelect
                             value={roomDetails.bathroomType || ""}
                             onChange={(val) => {
@@ -140,8 +141,8 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary">Shower Type</label>
+                    <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary pl-[5px]">Shower Type</label>
                         <SimpleSelect
                             value={roomDetails.showerType || ""}
                             onChange={(val) => {
@@ -155,8 +156,8 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Room Types - multi-select */}
-                    <div className="py-2 pl-3.5 pr-2 rounded-lg bg-surface-hover">
-                        <label className="text-sm font-medium text-content-secondary block mb-2">Room Types</label>
+                    <div className="p-[5px] rounded-lg bg-surface-hover">
+                        <label className="text-sm font-medium text-content-secondary block mb-2 pl-[5px]">Room Types</label>
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions.filter(o => o.fieldType === 'roomType').map((opt) => {
                                 const selected = (roomDetails.roomTypes || []).includes(opt.value);
@@ -172,7 +173,7 @@ export function FacilityRoomsTab({
                                             setRoomDetails((prev: RoomDetails) => ({ ...prev, roomTypes: updated }));
                                             setIsDirty(true);
                                         }}
-                                        className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div
@@ -185,6 +186,7 @@ export function FacilityRoomsTab({
                                 );
                             })}
                         </div>
+                    </div>
                     </div>
                 </div>
 
@@ -206,7 +208,7 @@ export function FacilityRoomsTab({
             </div>
 
             {/* Column 2 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 2 && c.section === 'room_details')
                     .map(category => (
@@ -224,7 +226,7 @@ export function FacilityRoomsTab({
             </div>
 
             {/* Column 3 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 3 && c.section === 'room_details')
                     .map(category => (
@@ -242,7 +244,7 @@ export function FacilityRoomsTab({
             </div>
 
             {/* Column 4 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 4 && c.section === 'room_details')
                     .map(category => (

@@ -24,10 +24,10 @@ const MentalHealthSection = ({ formData, setFormData, readOnly = false }: Mental
     updateField('mentalHealth', newConditions);
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-[10px]">
       {/* Mental Health */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">MENTAL HEALTH</h3>
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-muted-foreground pt-[5px] pl-[5px] pb-[5px]">MENTAL HEALTH</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center space-x-2">
             <Checkbox 

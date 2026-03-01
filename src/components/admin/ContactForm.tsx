@@ -239,6 +239,16 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 ) : "Add a new lead or contact"}
                 fullScreen
                 contentClassName={activeTab === "notes" ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
+                actions={
+                    <button
+                        type="submit"
+                        form="contact-form"
+                        disabled={!isDirty || isSubmitting}
+                        className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                    >
+                        {isSubmitting ? "Saving..." : (contact ? "Update Contact" : "Create Contact")}
+                    </button>
+                }
                 headerChildren={
                     <div className="flex flex-col w-full">
                         {/* Top Row: Tabs + Save Button */}
@@ -290,22 +300,6 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                                 })}
                             </div>
 
-                            {/* Save Button Container */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="submit"
-                                    form="contact-form"
-                                    disabled={!isDirty || isSubmitting}
-                                    className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
-                                >
-                                    {isSubmitting ? "Saving..." : (
-                                        <>
-                                            <span className="hidden md:inline">{contact ? "Update Contact" : "Create Contact"}</span>
-                                            <Save className="h-7 w-7 md:hidden" />
-                                        </>
-                                    )}
-                                </button>
-                            </div>
                         </div>
 
                         {/* Progress Bar Strip (Bottom Row) */}

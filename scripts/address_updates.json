@@ -1,0 +1,4146 @@
+[
+  {
+    "id": "4a8bc3cc-4a4e-4a21-b231-a8518df932ab",
+    "slug": "kailua-1001-01p",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "381 Wanaao Road Kailua"
+    },
+    "new": {
+      "street": "381 Wanaao Road",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "64e2fded-ca15-49ab-b268-a46b98360fdc",
+    "slug": "wphu-1055",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1118 Kahuanui Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-1118 Kahuanui Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "36625f05-815a-4db5-8c05-a59b57ecff44",
+    "slug": "ewab-1007",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1372 Kamahoi St."
+    },
+    "new": {
+      "street": "91-1372 Kamahoi St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "27b64560-221d-457c-b0ad-7d5a14d389b1",
+    "slug": "wphu-1004",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1116 Hina St."
+    },
+    "new": {
+      "street": "94-1116 Hina St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "65dcd953-21cb-4da2-bcfe-56b20c14418b",
+    "slug": "wphu-vp-1003",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-715 Kaaka Street Waipahu"
+    },
+    "new": {
+      "street": "94-715 Kaaka Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "560ea9ca-1358-4a56-8b3e-2014388205d8",
+    "slug": "wphu-1013",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1215 Kahuaina St."
+    },
+    "new": {
+      "street": "94-1215 Kahuaina St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c1b86e6a-bf42-4646-9385-9a4672275ebc",
+    "slug": "pcty-1009",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1621 Kaumoli Street Pearl City HI 96782"
+    },
+    "new": {
+      "street": "1621 Kaumoli Street",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "35f72dee-a119-4ac4-a452-905e7606d09a",
+    "slug": "wphu-1014",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-949 Hiapo St."
+    },
+    "new": {
+      "street": "94-949 Hiapo St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "73cc0203-b994-4e08-8caa-f108edaaafbe",
+    "slug": "wphu-1078",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-430 Kahualoa Place Waipahu"
+    },
+    "new": {
+      "street": "94-430 Kahualoa Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "705679c6-c1c0-42ad-952f-6d3b41c6ae82",
+    "slug": "ewab-1016",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-823 Moneha Place"
+    },
+    "new": {
+      "street": "91-823 Moneha Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "8922c692-ba0d-48ea-8a54-c5e3d6560558",
+    "slug": "ewab-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1009 Pailani St."
+    },
+    "new": {
+      "street": "91-1009 Pailani St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "714e1912-6725-496c-a56b-a6ba789c5a40",
+    "slug": "slake-1028",
+    "old": {
+      "zip": "96818",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "street": "4014 Salt Lake Blvd.  Honolulu"
+    },
+    "new": {
+      "street": "4014 Salt Lake Blvd. Honolulu",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "ed5b7edc-c2d8-4f07-a7df-cc9a1d52c4ba",
+    "slug": "wphu-gemma-alvia",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-915 Kumuao Street"
+    },
+    "new": {
+      "street": "94-915 Kumuao Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "38b56e81-06f8-4ed3-9c7b-405813b2a42f",
+    "slug": "ewab-1006",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-572 Akua St."
+    },
+    "new": {
+      "street": "91-572 Akua St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4f34cf0c-2ac5-493e-bc6e-10cc1e7818cc",
+    "slug": "ewab-1009",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-927 Pailani St."
+    },
+    "new": {
+      "street": "91-927 Pailani St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "b72d67fe-6ba6-4564-a773-ca983366e317",
+    "slug": "klhi-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1417C Middle St."
+    },
+    "new": {
+      "street": "1417C Middle St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "aeeeaa37-ef94-418a-a463-e76994dd824a",
+    "slug": "pcty-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1619 Hoolehua St."
+    },
+    "new": {
+      "street": "1619 Hoolehua St",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "b4473ab7-eecd-4513-a279-85258c6261cd",
+    "slug": "ewab-1031",
+    "old": {
+      "zip": "",
+      "city": "HI 96706",
+      "state": "",
+      "street": "91-659 Kilaha St. Ewa Beach"
+    },
+    "new": {
+      "street": "91-659 Kilaha St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "eef755db-0e48-4d12-ae3a-b3b8fc9d463b",
+    "slug": "klhi-1017",
+    "old": {
+      "zip": "96817",
+      "city": "Honolulu",
+      "state": "HI",
+      "street": "1730 Kilohi Street"
+    },
+    "new": {
+      "street": "1730 Kilohi Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96817"
+    }
+  },
+  {
+    "id": "c2125b94-4962-4279-afee-3b2eaed49e7b",
+    "slug": "kple-1006",
+    "old": {
+      "zip": "",
+      "city": "Kapolei HI 96707",
+      "state": "",
+      "street": "91-1580 Wahane Street"
+    },
+    "new": {
+      "street": "91-1580 Wahane Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": "96707"
+    }
+  },
+  {
+    "id": "ebe0207a-4a8c-41db-a9d9-28a09da5d960",
+    "slug": "klhi-1022",
+    "old": {
+      "zip": "",
+      "city": "HI 96817",
+      "state": "",
+      "street": "1428 Konia Street Honolulu"
+    },
+    "new": {
+      "street": "1428 Konia Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96817"
+    }
+  },
+  {
+    "id": "b4897e0b-1762-4a28-a448-c0a8ad489e6f",
+    "slug": "wphu-vp-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-414 Opeha Street Waipahu"
+    },
+    "new": {
+      "street": "94-414 Opeha Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "cf91f2c8-6b25-43fd-a835-f9d116c33dad",
+    "slug": "wphu-1036",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-116 Haaa Streeet Waipahu"
+    },
+    "new": {
+      "street": "94-116 Haaa Streeet",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "acddc0ec-3331-4b5f-849b-e37c9fbba66d",
+    "slug": "ewab-1030",
+    "old": {
+      "zip": "",
+      "city": "Ewa Beach HI 96706",
+      "state": "",
+      "street": "91-323 Hoalauna Place"
+    },
+    "new": {
+      "street": "91-323 Hoalauna Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "e17d3089-b914-483a-93ab-aeec77276cb8",
+    "slug": "ewab-1011",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-953 Hanakahi St."
+    },
+    "new": {
+      "street": "91-953 Hanakahi St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0ec766ae-6afb-47af-ac5b-3db56617c86d",
+    "slug": "pcty-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1159 Kuokoa St."
+    },
+    "new": {
+      "street": "1159 Kuokoa St",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4b203b53-9370-4223-87b9-ce9af59f5029",
+    "slug": "slake-1015",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3554 Likini St. \tHonolulu\t96818"
+    },
+    "new": {
+      "street": "3554 Likini St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "119f9bab-3072-4d39-b8e3-894ae50e19c8",
+    "slug": "klhi-1029",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1108 Gulick Avenue Honolulu"
+    },
+    "new": {
+      "street": "1108 Gulick Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "dd425f4b-c146-4dc9-bc18-275c9da77a2d",
+    "slug": "wphu-1029",
+    "old": {
+      "zip": "",
+      "city": "Waipahu HI 96797",
+      "state": "",
+      "street": "94-441 A Kiau Place"
+    },
+    "new": {
+      "street": "94-441 A Kiau Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "5fb58743-c2c1-4600-bab2-fe17c83ec81b",
+    "slug": "aina-haina-1002",
+    "old": {
+      "zip": "",
+      "city": "HI 96821",
+      "state": "",
+      "street": "187 Nenue Street Honolulu"
+    },
+    "new": {
+      "street": "187 Nenue Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96821"
+    }
+  },
+  {
+    "id": "a73a9783-a627-4271-86e1-e8cb6a53718f",
+    "slug": "kaimuki-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3374A Maunaloa Avenue Hon. HI 96816"
+    },
+    "new": {
+      "street": "3374A Maunaloa Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96816"
+    }
+  },
+  {
+    "id": "bcfeea61-53c9-40a4-9d20-ce2c95e066c6",
+    "slug": "ewab-1010",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91 558 Onelua St."
+    },
+    "new": {
+      "street": "91 558 Onelua St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6f8d0319-43b3-42bc-bb68-98a725dd7bd5",
+    "slug": "wphu-1035",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-407 Kahualena Street Waipahu"
+    },
+    "new": {
+      "street": "94-407 Kahualena Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "df3cbe32-c05e-4c41-ab45-aa01b0a1276f",
+    "slug": "wphu-1009",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-556 Hiaku Place"
+    },
+    "new": {
+      "street": "94-556 Hiaku Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "bf388e2c-a506-4047-9d58-5538edc3a71c",
+    "slug": "wphu-1011",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-538A Koaleo St."
+    },
+    "new": {
+      "street": "94-538A Koaleo St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0bab7b9d-1405-4270-ae47-2b6126dd31e8",
+    "slug": "ewab-1026",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "91-102  Pahau Place Ewa Beach"
+    },
+    "new": {
+      "street": "91-102 Pahau Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "830d679d-1be3-4330-9d64-7352503e974f",
+    "slug": "kple-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "92-655 Aahualii Street. Kapolei 96707"
+    },
+    "new": {
+      "street": "92-655 Aahualii Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": "96707"
+    }
+  },
+  {
+    "id": "8927ec26-068f-407c-a413-5c1e7d763f31",
+    "slug": "ewab-1032",
+    "old": {
+      "zip": "96706",
+      "city": "Ewa Beach",
+      "state": "HI",
+      "street": "91-851 Kapana Place"
+    },
+    "new": {
+      "street": "91-851 Kapana Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "b5c8d7e8-be8a-455b-8466-a5d3403314f9",
+    "slug": "pcty-1006",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "2344 Aumakua St\tPearl City"
+    },
+    "new": {
+      "street": "2344 Aumakua St",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "cff2be01-b21c-47c0-9b2b-86497ded5f4b",
+    "slug": "wphu-1010",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-478 Kipou St."
+    },
+    "new": {
+      "street": "94-478 Kipou St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "20366d43-1151-4d14-b81c-721e70594e1b",
+    "slug": "klhi-1021",
+    "old": {
+      "zip": "",
+      "city": "HI 96819",
+      "state": "",
+      "street": "1917 Hani Lane Honolulu"
+    },
+    "new": {
+      "street": "1917 Hani Lane",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96819"
+    }
+  },
+  {
+    "id": "47267fde-be76-4230-b639-5ea1341748b9",
+    "slug": "wphu-1081",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-628 Loaa Street Waip.."
+    },
+    "new": {
+      "street": "94-628 Loaa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "33743052-52e7-4153-9bc1-12e027919d7e",
+    "slug": "ewab-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1076 Kuhina St."
+    },
+    "new": {
+      "street": "91-1076 Kuhina St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c0f72708-0eee-4c21-b4ef-676f0151df4e",
+    "slug": "ewab-1014",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1088 Kaunolu St."
+    },
+    "new": {
+      "street": "91-1088 Kaunolu St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "8974b4f9-5933-4b97-b037-7e36ae4d8bd0",
+    "slug": "wphuvp-1054",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-695 Kaaka St. Waip HI"
+    },
+    "new": {
+      "street": "94-695 Kaaka St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "cd9f2794-3f63-418e-96cb-c8ab40af7d99",
+    "slug": "wphu-1006",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-250 Kipou St. waip. hi 96797"
+    },
+    "new": {
+      "street": "94-250 Kipou St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "de6b6e87-38ec-42eb-aa69-61324db715e0",
+    "slug": "knhe-1009",
+    "old": {
+      "zip": "",
+      "city": "HI 96744",
+      "state": "",
+      "street": "45-1122 Cobb-Adams Road Kaneohe"
+    },
+    "new": {
+      "street": "45-1122 Cobb-Adams Road",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": "96744"
+    }
+  },
+  {
+    "id": "3b842f98-9751-4e21-9d12-02d81f92ceab",
+    "slug": "fvlg-1003-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3648 Likini St."
+    },
+    "new": {
+      "street": "3648 Likini St",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "74db1c13-3f35-4d69-b552-f66b36f1f891",
+    "slug": "klhi-1012",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2435 Kula Kolea Hon HI 96819"
+    },
+    "new": {
+      "street": "2435 Kula Kolea",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96819"
+    }
+  },
+  {
+    "id": "e130834a-f15d-4c8d-86e8-d0dbc947d0fa",
+    "slug": "mlani-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "95-307 Auhaele Mililani HI"
+    },
+    "new": {
+      "street": "95-307 Auhaele",
+      "city": "Mililani",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "2a68b6af-deb8-4f33-890a-baf4cd38ee44",
+    "slug": "wphu-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-706 Kalae St."
+    },
+    "new": {
+      "street": "94-706 Kalae St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "430c3a13-f6ca-4431-a231-2e4abe6a2de4",
+    "slug": "kahala-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96816",
+      "state": "",
+      "street": "604 Hunalewa Street Honolulu"
+    },
+    "new": {
+      "street": "604 Hunalewa Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96816"
+    }
+  },
+  {
+    "id": "e43905a9-a1c4-4001-9cdd-cbd7044c5136",
+    "slug": "ewab-1020",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-507 Papipi Road"
+    },
+    "new": {
+      "street": "91-507 Papipi Road",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a9a5bb2a-6a95-44f4-94eb-4fba314a44fa",
+    "slug": "aiea-1012",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-150 Holo Place Aiea HI 96701"
+    },
+    "new": {
+      "street": "99-150 Holo Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "a34f4a81-2400-4599-ba19-1dd9b44e2b2d",
+    "slug": "ewab-1013",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1003 Opaehuna St."
+    },
+    "new": {
+      "street": "91-1003 Opaehuna St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "51e8bfc2-228f-4e3b-9d93-103eea05249d",
+    "slug": "wphu-1021-2",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-780 Koniaka Place Waipahu"
+    },
+    "new": {
+      "street": "94-780 Koniaka Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "695012c3-09b0-4b49-bf62-1b58bd5864e9",
+    "slug": "wphu-1024",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-440 Kahualena Street"
+    },
+    "new": {
+      "street": "94-440 Kahualena Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "b3f450e1-e032-472d-b781-5dfb5fe85baf",
+    "slug": "knhe-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "45-582 Paleka Road Kaneohe"
+    },
+    "new": {
+      "street": "45-582 Paleka Road",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "407f9e7e-1e72-41f2-ada9-09b4041b0ca0",
+    "slug": "aiea-1003-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-042 Ieie Place"
+    },
+    "new": {
+      "street": "99-042 Ieie Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "fb0e3ee8-7bbc-4559-b5aa-3b133a4f40db",
+    "slug": "ewab-1015",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1429 Maliko St."
+    },
+    "new": {
+      "street": "91-1429 Maliko St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c480407d-fe3a-4ffa-851a-a1345a7be7aa",
+    "slug": "kailua-1001-03",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "381 Wanaao Road Kailua"
+    },
+    "new": {
+      "street": "381 Wanaao Road",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "1f9533b8-2683-4aa8-b22e-707d9d07bbba",
+    "slug": "ewab-1022",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-866 Hahanui Street"
+    },
+    "new": {
+      "street": "91-866 Hahanui Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "585f8b95-fa4b-4d84-a4bd-a5455eaea6fa",
+    "slug": "wphu-1040-01",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1591 Waipahu Street Waipahu"
+    },
+    "new": {
+      "street": "94-1591 Waipahu Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "7e0ac886-0433-44a2-8b69-44e7ebe77bc6",
+    "slug": "kailua-1002-02sp",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1305 Mokapu Blvd. Kailua"
+    },
+    "new": {
+      "street": "1305 Mokapu Blvd",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "abfb0f39-4a56-4ff7-baf9-73450e2b0988",
+    "slug": "wphu-1044",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1254 Kahuaaina St. Waip. HI"
+    },
+    "new": {
+      "street": "94-1254 Kahuaaina St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "65b169a9-f006-4cef-b6b4-28bdbf2e1c50",
+    "slug": "pcty-1003-02",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1754 Komo Mai Drive Pearl City"
+    },
+    "new": {
+      "street": "1754 Komo Mai Drive",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "aed9ef04-f500-4477-bc25-a8bce6efac4e",
+    "slug": "slake-1004",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "3835 Likini Street (Salt Lake) Hon."
+    },
+    "new": {
+      "street": "3835 Likini Street (Salt Lake)",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "87c39604-3f33-4960-aac0-5a92e8d0401c",
+    "slug": "wphu-1031",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-123 Awai Street Waipahu 96797"
+    },
+    "new": {
+      "street": "94-123 Awai Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "e621d0e9-f2fc-4c72-945f-f68f03ad6078",
+    "slug": "wphu-1049",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-293 Hiwahiwa Place Waip HI 96797"
+    },
+    "new": {
+      "street": "94-293 Hiwahiwa Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "033fa4d2-4a39-4ec7-b5a5-75e45ecaba3e",
+    "slug": "klhi-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1051B Kopke St."
+    },
+    "new": {
+      "street": "1051B Kopke St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4e7b5a76-8aa5-4912-8e62-f973d9ba0d9c",
+    "slug": "klhi-1007",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1552 Kalaepa'a Drive Honolulu"
+    },
+    "new": {
+      "street": "1552 Kalaepa'a Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "dc1d63db-fe09-4699-a305-f184b3229991",
+    "slug": "wphu-1027",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1103 Hoomakoa Street Waipahu"
+    },
+    "new": {
+      "street": "94-1103 Hoomakoa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "d5ba27b3-ef61-451d-b60e-52455f3ed604",
+    "slug": "whwa-1002",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "470 Iliwai Drive Wahiawa"
+    },
+    "new": {
+      "street": "470 Iliwai Drive",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a6b3ccb2-0044-4e8b-bf8b-3c685fd97c0a",
+    "slug": "klhi-1004",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1542 Iao Lane"
+    },
+    "new": {
+      "street": "1542 Iao Lane",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "f0a2baf4-9e16-4708-aed7-ad38bad7e1fc",
+    "slug": "wphu-1026",
+    "old": {
+      "zip": "",
+      "city": "hI (VLG park)",
+      "state": "",
+      "street": "94-586 Palai Street Waipahu"
+    },
+    "new": {
+      "street": "94-586 Palai Street Waipahu, hI (VLG park)",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6582421c-36de-4d23-87e6-34f1e34d34ca",
+    "slug": "pcty-1003-01",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1754 Komo Mai Drive Pearl City"
+    },
+    "new": {
+      "street": "1754 Komo Mai Drive",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "d3262546-7e86-41e8-a800-c45ced12d5e9",
+    "slug": "aiea-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "98-259B Hekaha St. Aiea"
+    },
+    "new": {
+      "street": "98-259B Hekaha St",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "af1f5f8e-cb11-40bf-b70e-2d8c98be89c3",
+    "slug": "aiea-1020",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "99-626 Halawa Drive Aiea"
+    },
+    "new": {
+      "street": "99-626 Halawa Drive",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "b55753a6-7ea0-46a1-aabf-0f32615d4d2f",
+    "slug": "aiea-1009",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "98-874 Kaamilo Street Aiea"
+    },
+    "new": {
+      "street": "98-874 Kaamilo Street",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "f1846f54-9f73-49f1-8904-c75e0baaa7b5",
+    "slug": "hkai-1001-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1261 Lunalilo Road (HI KAI)Honolulu"
+    },
+    "new": {
+      "street": "1261 Lunalilo Road (HI KAI)",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "53a31040-c3b5-4511-a47f-bb77657df8cb",
+    "slug": "ewab-1023",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-154 Hailipo Street"
+    },
+    "new": {
+      "street": "91-154 Hailipo Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "79620e1e-1d2b-4fb8-8ada-34a866d01f15",
+    "slug": "wphuvp-1006",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-406 Opeha Street Waip."
+    },
+    "new": {
+      "street": "94-406 Opeha Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0d2b2eb2-702a-40e1-9e13-c8bc1696994d",
+    "slug": "wphu-1033",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-472 Alapine Street Waipahu"
+    },
+    "new": {
+      "street": "94-472 Alapine Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "abc51a2d-9be0-4a62-ab2d-edfeca9f7de4",
+    "slug": "wphuvp-1039",
+    "old": {
+      "zip": "",
+      "city": "HI(VLG Park)",
+      "state": "",
+      "street": "94-616 Kahakea Street Waipahu"
+    },
+    "new": {
+      "street": "94-616 Kahakea Street Waipahu, HI(VLG Park)",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "cc601010-c078-4d8d-aca2-2f94b68a1266",
+    "slug": "ewab-1027",
+    "old": {
+      "zip": "",
+      "city": "HI 96706",
+      "state": "",
+      "street": "91-112 Haloko Place Ewa Beach"
+    },
+    "new": {
+      "street": "91-112 Haloko Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "bea96f4c-f12f-4841-a2d1-904151933147",
+    "slug": "wphu-1077",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-282A Ana Lane Waipahu"
+    },
+    "new": {
+      "street": "94-282A Ana Lane",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "31bbd3ad-1cef-4345-adfa-336d79b989b3",
+    "slug": "kailua-1001-04",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "381 Wanaao Road Kailua"
+    },
+    "new": {
+      "street": "381 Wanaao Road",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "eb6aeb70-a078-4aad-bc6d-c03dfcde1949",
+    "slug": "ewab-1038",
+    "old": {
+      "zip": "",
+      "city": "HI 96706",
+      "state": "",
+      "street": "91-1052 Anaunau Street Ewa Beach"
+    },
+    "new": {
+      "street": "91-1052 Anaunau Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "d2f2684a-b90e-4655-bb11-ebb559fb4602",
+    "slug": "aiea-1010",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "98-550 Kaamilo Street Aiea"
+    },
+    "new": {
+      "street": "98-550 Kaamilo Street",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "2ae466d0-07c2-48d6-86d2-310027fb064c",
+    "slug": "aiea-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-631 Ulune St."
+    },
+    "new": {
+      "street": "99-631 Ulune St",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "3aed86ab-fc77-4f07-9245-b6a5925b4926",
+    "slug": "klhi-1010",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "2010 Puaala Lane Honolulu"
+    },
+    "new": {
+      "street": "2010 Puaala Lane",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "083b2cd1-2d09-4b60-ae8a-8abd4bb64e25",
+    "slug": "kaimuki-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1419A 16th Avenue"
+    },
+    "new": {
+      "street": "1419A 16th Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "90b93d26-297a-4fbb-b562-d6b6667e544b",
+    "slug": "koe-01-01",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "KOE 45-225 William Henty road"
+    },
+    "new": {
+      "street": "KOE 45-225 William Henty road",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a62c409c-086c-4b41-8eee-f5a5dd42f249",
+    "slug": "kailua-1001-02",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "381 Wanaao Road Kailua"
+    },
+    "new": {
+      "street": "381 Wanaao Road",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "fa613d49-bb94-45ca-9583-aed0c76c813e",
+    "slug": "slake-1007-01p",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1543 Haloa Drive Hon 96818"
+    },
+    "new": {
+      "street": "1543 Haloa Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "330a363c-3c2d-4067-b6b8-2d5001fb586b",
+    "slug": "aiea-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-042 Ieie Place"
+    },
+    "new": {
+      "street": "99-042 Ieie Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "9f1186a5-9b90-407d-9bea-8cac906e015c",
+    "slug": "wphu-1008",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1048 Awalai St."
+    },
+    "new": {
+      "street": "94-1048 Awalai St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "af2d54d3-79c6-4fdc-9548-e5fef59f4112",
+    "slug": "wphu-1007",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-771 Koniaka St."
+    },
+    "new": {
+      "street": "94-771 Koniaka St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "126c01f2-32dc-402f-babd-975b3e1c0690",
+    "slug": "wphu-1080",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-527 Hiahia Loop Waipahu"
+    },
+    "new": {
+      "street": "94-527 Hiahia Loop",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c22ba79f-0a09-468e-9b47-6d5d167bd2ba",
+    "slug": "klhi-1014-2",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1328 Kamehameha  IV Road Hon  96819"
+    },
+    "new": {
+      "street": "1328 Kamehameha IV Road Hon 96819",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "20673d5b-e46e-4443-b1fc-7fa44c231df5",
+    "slug": "slake-1009",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1303 Wawe Place Hon HI 96818"
+    },
+    "new": {
+      "street": "1303 Wawe Place",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "dba65b1f-95b3-4b2f-a014-00fef482c007",
+    "slug": "klhi-1015",
+    "old": {
+      "zip": "",
+      "city": "HI 96819",
+      "state": "",
+      "street": "2529 Rose Street Honolulu"
+    },
+    "new": {
+      "street": "2529 Rose Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96819"
+    }
+  },
+  {
+    "id": "afbc67a8-cb37-478e-a933-6ff367128565",
+    "slug": "slake-1006-02p",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1352 Molehu Dr. Hon HI 96818"
+    },
+    "new": {
+      "street": "1352 Molehu Dr",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "79f54377-3d1a-4a36-8ce3-f80a641b4be1",
+    "slug": "pcty-1018",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1344 Hoolaulea Pearl City"
+    },
+    "new": {
+      "street": "1344 Hoolaulea",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "9f627df3-dcf9-47ec-b975-55b65265ee74",
+    "slug": "hkai-1002-01p",
+    "old": {
+      "zip": "",
+      "city": "HI 96821",
+      "state": "",
+      "street": "308 Kuliouou Road Honolulu"
+    },
+    "new": {
+      "street": "308 Kuliouou Road",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96821"
+    }
+  },
+  {
+    "id": "ae3cc09c-fc4b-45c0-9b70-4a3835610b14",
+    "slug": "pcty-1007",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "1662 Hookani Street PC"
+    },
+    "new": {
+      "street": "1662 Hookani Street PC",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "3a0b0afe-5e6a-41f2-b9f7-5a273f7e7910",
+    "slug": "koe-02-01",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "KOE 45-225 William Henry road"
+    },
+    "new": {
+      "street": "KOE 45-225 William Henry road",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4d9ccc0c-8985-4e8b-b929-43457d236feb",
+    "slug": "klhi-1003-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1051B Kopke Street Hon. HI 96819"
+    },
+    "new": {
+      "street": "1051B Kopke Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96819"
+    }
+  },
+  {
+    "id": "5110823d-9b7b-4e69-b4f4-17e335656c94",
+    "slug": "wphu-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-242 Pupukoae St."
+    },
+    "new": {
+      "street": "94-242 Pupukoae St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "f37ca0d6-be82-40eb-a1e6-78be2e57ee6d",
+    "slug": "wphu-1106",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1258 Kahuaina Street Waipahu"
+    },
+    "new": {
+      "street": "94-1258 Kahuaina Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "af0504c8-67b4-4067-a95a-8928eaa422c1",
+    "slug": "ewab-1028",
+    "old": {
+      "zip": "",
+      "city": "HI 96706",
+      "state": "",
+      "street": "91-1080 Hoowalea Street Ewa Beach"
+    },
+    "new": {
+      "street": "91-1080 Hoowalea Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "a6cc9497-152c-4e0b-a726-9f77cdb34af4",
+    "slug": "wphu-1037",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-241 Haaa Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-241 Haaa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "406f699a-6a57-48f2-abbe-706eb0e59c67",
+    "slug": "wphu-1040-03p",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1591 Waipahu Street Waipahu"
+    },
+    "new": {
+      "street": "94-1591 Waipahu Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "407d83bf-d1ca-44d5-ac20-55d121f14987",
+    "slug": "wphu-1050",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-947 Lumihoahu Street Waip HI 96797"
+    },
+    "new": {
+      "street": "94-947 Lumihoahu Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "e6ef584b-a33c-49bc-b0aa-84950c3ebee6",
+    "slug": "klhi-1016",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1617 Machado Street Honolulu HI 96819"
+    },
+    "new": {
+      "street": "1617 Machado Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96819"
+    }
+  },
+  {
+    "id": "084adf85-987e-419d-8e69-cf82083cfa61",
+    "slug": "wphu-1051",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1286 Huakai Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-1286 Huakai Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "1dffb98f-282b-4e57-8565-233fb22105ea",
+    "slug": "wphu-1013-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-409 Hene street waip HI"
+    },
+    "new": {
+      "street": "94-409 Hene street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ede28a9e-5efc-4434-8825-c6bbcd0520d6",
+    "slug": "kaimuki-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "4019 Maunaloa Avenue Hon HI"
+    },
+    "new": {
+      "street": "4019 Maunaloa Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "91d4367f-f5f0-43af-a2b1-303accd0375d",
+    "slug": "mlani-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "95-253 Kehepue Loop Mililani 96789"
+    },
+    "new": {
+      "street": "95-253 Kehepue Loop",
+      "city": "Mililani",
+      "state": "Hawaii",
+      "zip": "96789"
+    }
+  },
+  {
+    "id": "4cb503c0-6132-4b73-bad1-4a8b6dac5b88",
+    "slug": "wphu-1048",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-942 Kuhaulua St."
+    },
+    "new": {
+      "street": "94-942 Kuhaulua St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6bccc8ad-857f-459b-9762-94d31bbeac87",
+    "slug": "aiea-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-588 Ulune Street"
+    },
+    "new": {
+      "street": "99-588 Ulune Street",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "24e83567-e4ca-4484-a84e-29da72af977a",
+    "slug": "wphu-vp-1002",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-833 Kalaiaha Place Waipahu"
+    },
+    "new": {
+      "street": "94-833 Kalaiaha Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "1dc36091-8f26-4f2b-b2ff-e82fa7685607",
+    "slug": "wphu-1038",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-234 Waikele Road Waip HI 97897"
+    },
+    "new": {
+      "street": "94-234 Waikele Road",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "97897"
+    }
+  },
+  {
+    "id": "2cfea039-579c-44c8-9cd6-71db6acf081f",
+    "slug": "wphuvp-1052",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-109 Palai Place waip hi 96797"
+    },
+    "new": {
+      "street": "94-109 Palai Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "89c9a88d-633b-4b21-9218-4642806668c0",
+    "slug": "whwa-cristine-wilson",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "470 Iliwai Drive Wahiawa"
+    },
+    "new": {
+      "street": "470 Iliwai Drive",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "89771b4b-b5d6-4e14-8d94-fc9cb0f6332a",
+    "slug": "kailua-1004",
+    "old": {
+      "zip": "",
+      "city": "HI 96734",
+      "state": "",
+      "street": "1653 Ulueo St. Kailua"
+    },
+    "new": {
+      "street": "1653 Ulueo St",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": "96734"
+    }
+  },
+  {
+    "id": "97633951-cd2e-40e8-bdc1-94307ec3793c",
+    "slug": "wphu-1103",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1099 Waipahu St. Waip"
+    },
+    "new": {
+      "street": "94-1099 Waipahu St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "32ba1a74-0d77-47a2-981f-30619ac93c58",
+    "slug": "manoa-cottage",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2035 Kamehameha Avenue Hon. HI 96822"
+    },
+    "new": {
+      "street": "2035 Kamehameha Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96822"
+    }
+  },
+  {
+    "id": "14a2d380-faa0-4284-bf4f-81ad5cde45a8",
+    "slug": "wphu-1053",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-502 Kahualena street Waipahu"
+    },
+    "new": {
+      "street": "94-502 Kahualena street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "f334a760-5302-4bfd-b75a-755e64059ea4",
+    "slug": "ewab-1029",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1053 Kuhina Street Ewa beach HI 96706"
+    },
+    "new": {
+      "street": "91-1053 Kuhina Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": "96706"
+    }
+  },
+  {
+    "id": "f7d81935-0eb4-4a50-a920-0bc98f448fc7",
+    "slug": "ewab-1019",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1009 Pa St."
+    },
+    "new": {
+      "street": "91-1009 Pa St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c2948433-1dd9-4f18-ad44-fe2fb22fb45e",
+    "slug": "slake-1013",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1447 Uila Street Honolulu"
+    },
+    "new": {
+      "street": "1447 Uila Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "d89e1f20-278a-41f7-a0db-45fa084c8653",
+    "slug": "wphu-1046",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-359 Honowai Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-359 Honowai Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "84eb10e2-c105-4209-a12b-f46a37967f74",
+    "slug": "wphu-1012",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-252 Kipou St."
+    },
+    "new": {
+      "street": "94-252 Kipou St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "b07be710-e06b-4b41-9e4a-084a792afa38",
+    "slug": "slake-1014",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1193 Ala Napunani Street Honolulu"
+    },
+    "new": {
+      "street": "1193 Ala Napunani Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "48878a23-c399-4697-9133-1ce8c9a1e25d",
+    "slug": "aina-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "237 East Hind Drive"
+    },
+    "new": {
+      "street": "237 East Hind Drive",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4981eefd-1c74-42ba-876e-b6d26576449b",
+    "slug": "klhi-1001-02",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1439 Middle St."
+    },
+    "new": {
+      "street": "1439 Middle St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "1ac907fd-2976-433d-b3fb-9fd4c9570505",
+    "slug": "khts-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1020 Hala Drive"
+    },
+    "new": {
+      "street": "1020 Hala Drive",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "355b70de-01d0-4467-b592-a5747d9687ce",
+    "slug": "klhi-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2255 Hiu St."
+    },
+    "new": {
+      "street": "2255 Hiu St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4f11c64f-8d92-4c9c-be08-bb4010bc389b",
+    "slug": "kailua-1002-01p",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1305 Mokapu Blvd. Kailua"
+    },
+    "new": {
+      "street": "1305 Mokapu Blvd",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "01e0ca6c-11f0-4e30-a43b-b82ab73c6cfd",
+    "slug": "slake-1022",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1467 Haloa Drive Honolulu"
+    },
+    "new": {
+      "street": "1467 Haloa Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "571b78a1-af39-40a5-9e6a-b43028a58a44",
+    "slug": "knhe-1008",
+    "old": {
+      "zip": "",
+      "city": "HI 96744",
+      "state": "",
+      "street": "45-525 Duncan Drive Kaneohe"
+    },
+    "new": {
+      "street": "45-525 Duncan Drive",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": "96744"
+    }
+  },
+  {
+    "id": "98f32b51-e4b9-42eb-82d0-fbe57b0f0f1c",
+    "slug": "slake-1005",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1547 Haloa Drive Honolulu"
+    },
+    "new": {
+      "street": "1547 Haloa Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "48bfd6d7-1d17-4b25-9689-adc47bc53704",
+    "slug": "slake-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "4033 Keaka Drive"
+    },
+    "new": {
+      "street": "4033 Keaka Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6ba71528-e221-47ff-9a30-6203a4504b14",
+    "slug": "waianae-1001",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "86-401 Kawili Street Waianae"
+    },
+    "new": {
+      "street": "86-401 Kawili Street",
+      "city": "Waianae",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "78cfb3d4-01f8-44c1-b04f-567a38f3e631",
+    "slug": "kaimuki-1004",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1050 18TH AVENUE HON HI 96816"
+    },
+    "new": {
+      "street": "1050 18TH AVENUE",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96816"
+    }
+  },
+  {
+    "id": "d32be5f1-caba-4430-bf3d-0cf4998dcd80",
+    "slug": "wphu-1066",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1017B Kahuailani St. Waipahu"
+    },
+    "new": {
+      "street": "94-1017B Kahuailani St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "1bb20133-ea63-4d6d-9693-6a5c64282858",
+    "slug": "slake-1016",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "4229 Keaka Drive Honolulu"
+    },
+    "new": {
+      "street": "4229 Keaka Drive",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "68aa762c-1607-4e9b-b035-126650008ce6",
+    "slug": "wphu-1065",
+    "old": {
+      "zip": "96797",
+      "city": "Waipahu",
+      "state": "HI.",
+      "street": "94-1108 Hilihua Place"
+    },
+    "new": {
+      "street": "94-1108 Hilihua Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "de3b3059-3bb3-4f02-964c-84f8d274590a",
+    "slug": "waipio-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-860 Lumiiki Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-860 Lumiiki Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "120b93f2-f0f7-4f2f-8e00-f6603a3bbb33",
+    "slug": "wphu-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1273 Peke Place"
+    },
+    "new": {
+      "street": "1273 Peke Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4e4fc110-a77e-4bc9-bb6d-71b0127f79a0",
+    "slug": "klhi-1010-02-sp-2",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "2010 Puaala Lane Honolulu"
+    },
+    "new": {
+      "street": "2010 Puaala Lane",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a836ff76-bd27-4600-9bd8-fee1d0a0a332",
+    "slug": "wphu-1061",
+    "old": {
+      "zip": "",
+      "city": "Waipahu HI 96797",
+      "state": "",
+      "street": "94-571 B Ana-Aina Place"
+    },
+    "new": {
+      "street": "94-571 B Ana-Aina Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "2cf22b3b-169b-473d-a612-11d954b4c7e4",
+    "slug": "wphu-1085",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-564 Anaaina Pllace Waipahu"
+    },
+    "new": {
+      "street": "94-564 Anaaina Pllace",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "998bd529-6078-44a4-a47f-4e3f78dbe8fd",
+    "slug": "waikele-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1002 B Kikepa Street Waipahu"
+    },
+    "new": {
+      "street": "94-1002 B Kikepa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "d9fb525f-39f8-425a-bfbc-673d6b11ad3c",
+    "slug": "pcty-1004",
+    "old": {
+      "zip": "",
+      "city": "HI 967822",
+      "state": "",
+      "street": "990 Paaaina St. Pearl City"
+    },
+    "new": {
+      "street": "990 Paaaina St. Pearl City, HI 967822",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "fb02c1e1-6f0c-4a04-a6c8-d4a4bd09c6b9",
+    "slug": "kunia-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-534 Hakea Place Waipahu"
+    },
+    "new": {
+      "street": "94-534 Hakea Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "7c2e8a41-07da-401c-86f7-a2f934af0e57",
+    "slug": "whwa-1005",
+    "old": {
+      "zip": "",
+      "city": "HI 96786",
+      "state": "",
+      "street": "83 Kilani Avenue Wahiawa"
+    },
+    "new": {
+      "street": "83 Kilani Avenue",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": "96786"
+    }
+  },
+  {
+    "id": "48c23bb8-59b7-4808-8893-a8ff8f11b51d",
+    "slug": "wphu-1071",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-242 Pupukoae Street Waipahu"
+    },
+    "new": {
+      "street": "94-242 Pupukoae Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "a01b2ae7-79f7-4fd5-9702-4feeb747c6c8",
+    "slug": "wphu-1032",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-1403 Hiapo Street Waip."
+    },
+    "new": {
+      "street": "94-1403 Hiapo Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "78196e91-5397-4d8f-bac0-7497d8a16465",
+    "slug": "wphu-vp-1007",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1039 Hohola Street Waipahu"
+    },
+    "new": {
+      "street": "94-1039 Hohola Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "fa505c51-bcb5-47cc-903e-40b90a6fb8eb",
+    "slug": "wphu-1059",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1120 Kahuamo Street Waipahu"
+    },
+    "new": {
+      "street": "94-1120 Kahuamo Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "c8ee26cb-9b6d-42da-937b-15da48290951",
+    "slug": "slake-1008",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1033 Ala Lilikoi Street Honolulu"
+    },
+    "new": {
+      "street": "1033 Ala Lilikoi Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "1fa908df-6e73-46a7-9884-58c7e5bcd0cc",
+    "slug": "klhi-1013",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2777 Kalihi St. Hon. HI"
+    },
+    "new": {
+      "street": "2777 Kalihi St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0b98f624-cec8-47f5-b707-31aa6d99da03",
+    "slug": "wphuvp-1063",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-736 Kaaka St. Waipahu 96797"
+    },
+    "new": {
+      "street": "94-736 Kaaka St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "64253c3a-99eb-417b-8d1e-8999a9662e30",
+    "slug": "wphu-1072",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-403 Kipou Street Waipahu"
+    },
+    "new": {
+      "street": "94-403 Kipou Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "ee706daa-622b-4348-b8c9-d6de32951dcf",
+    "slug": "wphu-vp-1011",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-745 Kalae Street Waip. HI"
+    },
+    "new": {
+      "street": "94-745 Kalae Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "af7dc3b4-3e9a-45ae-a62e-9b853a675140",
+    "slug": "slake-1026",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1010C Wanaka Street Hon. HI"
+    },
+    "new": {
+      "street": "1010C Wanaka Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4c0f3299-c361-4b00-8b66-191444a4695e",
+    "slug": "wphu-1068",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-232 Lehoula Place waip"
+    },
+    "new": {
+      "street": "94-232 Lehoula Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "19376faa-3543-4811-911b-1b0b1d55dcb5",
+    "slug": "whwa-1008",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "137 Hoopiha Place Wahiawa"
+    },
+    "new": {
+      "street": "137 Hoopiha Place",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4c529903-5fe4-4f03-b09b-185c1d86a530",
+    "slug": "wphu-1084",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-912 Kumuao Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-912 Kumuao Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "acfc31cd-3032-4bb7-9fd9-f07d8cb7cb60",
+    "slug": "slake-1006-02p-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1352 Molehu Dr. Hon HI 96818"
+    },
+    "new": {
+      "street": "1352 Molehu Dr",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "e3ab93d4-64a0-4b26-af15-11f41b4c3af9",
+    "slug": "knhe-1002",
+    "old": {
+      "zip": "",
+      "city": "HI 96744",
+      "state": "",
+      "street": "dba Malamaimua Care Home: 47-508 Haanopu Way Kaneohe"
+    },
+    "new": {
+      "street": "dba Malamaimua Care Home: 47-508 Haanopu Way",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": "96744"
+    }
+  },
+  {
+    "id": "8223685f-c866-4e7d-a789-de2a480b6e4f",
+    "slug": "pcty-1016",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1615 Hoolana Street Pearl City HI"
+    },
+    "new": {
+      "street": "1615 Hoolana Street",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6ae05288-044c-4d8e-9133-0e062a04ede7",
+    "slug": "koe-05-01",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "KOE 1360 Kuloaa Place Kailua"
+    },
+    "new": {
+      "street": "KOE 1360 Kuloaa Place",
+      "city": "Kailua",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4cecd49b-df0f-497f-8182-cc5f4f976344",
+    "slug": "slake-1019",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1067 Ala Lilikoi Honolulu"
+    },
+    "new": {
+      "street": "1067 Ala Lilikoi",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "94371f34-69d5-4b30-a014-bd08e6266054",
+    "slug": "wphu-1082",
+    "old": {
+      "zip": "",
+      "city": "HI 96707",
+      "state": "",
+      "street": "94-917 Kuhaulua Street Waipahu"
+    },
+    "new": {
+      "street": "94-917 Kuhaulua Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96707"
+    }
+  },
+  {
+    "id": "2b9ed1cd-ad0c-4c89-827d-9e7b7b0fad4f",
+    "slug": "knhe-1007",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "45-220 Namoku Street Kaneohe"
+    },
+    "new": {
+      "street": "45-220 Namoku Street",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ca181980-cce0-4fd8-b68e-75daa0e3f552",
+    "slug": "klhi-1039",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "2837 Numanu Road Honolulu"
+    },
+    "new": {
+      "street": "2837 Numanu Road",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ac68ebe4-7656-4f82-869d-bd73f6f269df",
+    "slug": "kple-1009-2",
+    "old": {
+      "zip": "",
+      "city": "HI 96707",
+      "state": "",
+      "street": "92-560 Pilipono Street Kapolei"
+    },
+    "new": {
+      "street": "92-560 Pilipono Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": "96707"
+    }
+  },
+  {
+    "id": "7bc14e62-c112-4add-842f-61599106ec0c",
+    "slug": "kple-1002-01p-2",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "92-1336 Pueonani Street"
+    },
+    "new": {
+      "street": "92-1336 Pueonani Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "e9855b3e-7fc8-4fe8-805e-1635616ba0f2",
+    "slug": "palolo-kch",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "2565 Waiamao Road Hon."
+    },
+    "new": {
+      "street": "2565 Waiamao Road",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "397c4374-8ef2-4641-9230-116137e2df96",
+    "slug": "wphu-vp-1004",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-458 Alapine Street Waipahu"
+    },
+    "new": {
+      "street": "94-458 Alapine Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "7777dc60-32ef-4485-8f06-8e20d6e570ab",
+    "slug": "aiea-1028",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "98-241 Hale momi Place  Aiea"
+    },
+    "new": {
+      "street": "98-241 Hale momi Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "0940871d-e209-4630-b495-3e755f42a7af",
+    "slug": "wphu-1019",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-341 Kahuahele Street"
+    },
+    "new": {
+      "street": "94-341 Kahuahele Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "f3b1df41-3ecd-4186-aeae-ef579f1f8c7b",
+    "slug": "aina-1001-02",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "237 East Hind Drive"
+    },
+    "new": {
+      "street": "237 East Hind Drive",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "4acbfd2e-dcff-4cdd-a8fc-1f216fbc0d92",
+    "slug": "ewab-1012",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-953 Hanaloa Street"
+    },
+    "new": {
+      "street": "91-953 Hanaloa Street",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c02f4a48-a9fa-4e4a-93ea-b0c681686fbe",
+    "slug": "ewab-1008",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1093 Kauiki St."
+    },
+    "new": {
+      "street": "91-1093 Kauiki St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "8d567a89-9cec-4075-add3-29e6f8bb3fe7",
+    "slug": "aiea-1004",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "99-056 Ieie Place"
+    },
+    "new": {
+      "street": "99-056 Ieie Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "bfef6b91-20c6-43f0-a9e6-6ea36ab8c211",
+    "slug": "wphu-1021",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-205 Haaa Street"
+    },
+    "new": {
+      "street": "94-205 Haaa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a10b1b15-a926-4c7a-a5cc-bd0f0c7ffc70",
+    "slug": "wphu-vp-1013",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1080 Haalau Street Waipahu"
+    },
+    "new": {
+      "street": "94-1080 Haalau Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "ec72d160-1a4a-4b1d-a582-b91fafece515",
+    "slug": "aiea-1008",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "98-248A  Aiea Kai Place Aiea"
+    },
+    "new": {
+      "street": "98-248A Aiea Kai Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "e8a318b5-3e52-4282-a5db-e50b6c745852",
+    "slug": "ewab-1018",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1019 Pailani St."
+    },
+    "new": {
+      "street": "91-1019 Pailani St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "349670db-76a6-4ac0-a9bb-a9a30d9ee5bd",
+    "slug": "ewab-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1011 Pailani St."
+    },
+    "new": {
+      "street": "91-1011 Pailani St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "488f1799-c67a-4606-9bc7-b6dad66f991d",
+    "slug": "koe-04-01",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "KOE-04 45-338 Makalani Street Kaneohe"
+    },
+    "new": {
+      "street": "KOE-04 45-338 Makalani Street",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ecf4381f-f7a3-4075-b76e-2b19eb690a3c",
+    "slug": "wlae-1001-02l",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3846 Noeau St."
+    },
+    "new": {
+      "street": "3846 Noeau St",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "239dc9ad-a380-4c56-9fea-7d7f9d83ae46",
+    "slug": "fvlg-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1016 Laakea Place"
+    },
+    "new": {
+      "street": "1016 Laakea Place",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "2c441644-ad31-4623-9787-6a1bb5bfa46f",
+    "slug": "ewab-1017",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1041 Hanakahi St."
+    },
+    "new": {
+      "street": "91-1041 Hanakahi St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "25d3f4cb-d2d3-47fe-adea-91299486d9a4",
+    "slug": "wphu-1060",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1091 Hapalima Place Waip. HI"
+    },
+    "new": {
+      "street": "94-1091 Hapalima Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "33278e60-c750-47cf-9400-fabbef05c242",
+    "slug": "slake-1002",
+    "old": {
+      "zip": "",
+      "city": "96818",
+      "state": "",
+      "street": "4318 Laakea St. Honolulu"
+    },
+    "new": {
+      "street": "4318 Laakea St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "2d40f002-07df-4dc6-a87b-0fbff602536d",
+    "slug": "klhi-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1439 Middle St."
+    },
+    "new": {
+      "street": "1439 Middle St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "c99f09e2-8f4f-47fd-b13f-10c3b63dfcf8",
+    "slug": "wphu-1067",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-880 Lumiiki Street Waipahu"
+    },
+    "new": {
+      "street": "94-880 Lumiiki Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "4021677d-bca3-433b-aa5f-5ff478d483a6",
+    "slug": "fvlg-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3648 Likini St."
+    },
+    "new": {
+      "street": "3648 Likini St",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "00ef14f5-e6d9-42c1-a0c7-494055193461",
+    "slug": "wphu-1040-02",
+    "old": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-1591 Waipahu Street Waipahu"
+    },
+    "new": {
+      "street": "94-1591 Waipahu Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "40cf9560-54e0-4bac-8e1a-79d95b5faf8c",
+    "slug": "wphu-1045",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-1210 Hinaea St. Waip."
+    },
+    "new": {
+      "street": "94-1210 Hinaea St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "1a6639e0-a385-4607-ada1-7aca03eb7b1e",
+    "slug": "wphuvp-1042",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-835 Kaaholo St."
+    },
+    "new": {
+      "street": "94-835 Kaaholo St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "277f7d53-f216-499f-81a1-66a68c3fb2d3",
+    "slug": "kple-1003",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "92-790 Paakai Street Kapolei"
+    },
+    "new": {
+      "street": "92-790 Paakai Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ecd60432-dc68-48bd-ab2e-d442ff03af6d",
+    "slug": "waianae-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "86-218 Leihoku Street Waianae HI 96792"
+    },
+    "new": {
+      "street": "86-218 Leihoku Street",
+      "city": "Waianae",
+      "state": "Hawaii",
+      "zip": "96792"
+    }
+  },
+  {
+    "id": "4931cb78-bd44-431e-904a-3b5e52382ae2",
+    "slug": "wphu-1008-01sp",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1048 Awalai St."
+    },
+    "new": {
+      "street": "94-1048 Awalai St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "3d927d1e-b375-4d9e-9379-1c6dd64c32c6",
+    "slug": "wlae-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3846 Noeau St."
+    },
+    "new": {
+      "street": "3846 Noeau St",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "cf2fdd75-b6cf-43f2-836f-7ddeeb9f5122",
+    "slug": "klhi-1011",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1348 Gulick Avenue"
+    },
+    "new": {
+      "street": "1348 Gulick Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "ae2f087a-c5f2-4f5a-ac93-be58ed5f4bf4",
+    "slug": "kplm-1002",
+    "old": {
+      "zip": "",
+      "city": "HI 96817",
+      "state": "",
+      "street": "1805 Aupuni Street Honolulu"
+    },
+    "new": {
+      "street": "1805 Aupuni Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96817"
+    }
+  },
+  {
+    "id": "5a9481cd-fe0c-4c19-aea3-bfa32e242d7b",
+    "slug": "slake-1010",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "charity arch-1563 Molina Street Hon hi 96818"
+    },
+    "new": {
+      "street": "charity arch-1563 Molina Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "e021a590-fc55-40f8-a226-ad04c05c21e5",
+    "slug": "nuuanu-1001",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "36 Bates Unit A1 Honolulu"
+    },
+    "new": {
+      "street": "36 Bates Unit A1",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "e6e4ae44-68ba-4304-b9ba-8850a5dc3c21",
+    "slug": "wphu-1043",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-232 Moena Place Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-232 Moena Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "208f2644-7b91-4f2f-810c-adb62c0dc071",
+    "slug": "pcty-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "98-1488A Hoomahie Loop"
+    },
+    "new": {
+      "street": "98-1488A Hoomahie Loop",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "040633d9-9219-43d2-a2f2-980233d02a2f",
+    "slug": "slake-1003",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3611 Aliamanu Street Hon(Salt Lake) 96818"
+    },
+    "new": {
+      "street": "3611 Aliamanu Street Hon(Salt Lake)",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "6a1015bd-3667-401d-881a-f26a2c727b2f",
+    "slug": "slake-1006-01p",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1352 Molehu Dr. Hon HI 96818"
+    },
+    "new": {
+      "street": "1352 Molehu Dr",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "ddf88917-1de5-440b-bd4f-14070a72a3e3",
+    "slug": "pcty-1010",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "739 Hoopai Street Pearl City"
+    },
+    "new": {
+      "street": "739 Hoopai Street",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "634fef8a-604c-4101-bb34-9112bc082d7e",
+    "slug": "ewab-1024",
+    "old": {
+      "zip": "",
+      "city": "HI (West loch)",
+      "state": "",
+      "street": "94-1057 Aeae Street Ewa Beach"
+    },
+    "new": {
+      "street": "94-1057 Aeae Street Ewa Beach, HI (West loch)",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "70f58ed1-80df-4b64-b3e5-85048230f1c9",
+    "slug": "aiea-1006",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "98-111 Lania Way"
+    },
+    "new": {
+      "street": "98-111 Lania Way",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "7adb987f-2845-4dcd-bb45-e6a0bba02125",
+    "slug": "wphu-1062",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-607 Kipou Street Waip. HI 96797"
+    },
+    "new": {
+      "street": "94-607 Kipou Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "bbdaa258-c400-457b-a6f0-7074f52bc1f8",
+    "slug": "wphu-1079",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-560 Koaleo Street Waip HI"
+    },
+    "new": {
+      "street": "94-560 Koaleo Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "89570e22-e42e-4f6d-ac64-18a51c039192",
+    "slug": "knhe-1003-2",
+    "old": {
+      "zip": "",
+      "city": "HI 96744",
+      "state": "",
+      "street": "45-1117 Cobb-Adams Road #A Kaneohe"
+    },
+    "new": {
+      "street": "45-1117 Cobb-Adams Road #A",
+      "city": "Kaneohe",
+      "state": "Hawaii",
+      "zip": "96744"
+    }
+  },
+  {
+    "id": "6fbe5863-43f2-4f35-9f7d-b9e2e4d7d20e",
+    "slug": "wphu-1047",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-585 Pilimai St. Waipahu 96797"
+    },
+    "new": {
+      "street": "94-585 Pilimai St",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "c4279954-4c3b-40f9-a329-9e4677bd2510",
+    "slug": "pcty-1008",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "98-137 Kaluamoi Place Pearl City"
+    },
+    "new": {
+      "street": "98-137 Kaluamoi Place",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "9dba5d59-f5b1-45dd-91b1-ec645795c593",
+    "slug": "wphuvp-1017",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-404 Kuahi Street Waip HI 96797"
+    },
+    "new": {
+      "street": "94-404 Kuahi Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "ce868c47-eb99-46d0-943f-5beda53786bc",
+    "slug": "slake-1023",
+    "old": {
+      "zip": "",
+      "city": "HI 968",
+      "state": "",
+      "street": "3408 Kahi Kolu Way Honolulu"
+    },
+    "new": {
+      "street": "3408 Kahi Kolu Way Honolulu, HI 968",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "8269f139-8948-4f2d-8565-01535156e8e0",
+    "slug": "slake-1025",
+    "old": {
+      "zip": "",
+      "city": "HI 96818",
+      "state": "",
+      "street": "1311 Olino Street Honolulu"
+    },
+    "new": {
+      "street": "1311 Olino Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "c586756a-f4cb-4d6c-88fc-8dc2c046ad17",
+    "slug": "whwa-1003",
+    "old": {
+      "zip": "",
+      "city": "HI 96786",
+      "state": "",
+      "street": "224 Lanialii Street Wahiawa"
+    },
+    "new": {
+      "street": "224 Lanialii Street",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": "96786"
+    }
+  },
+  {
+    "id": "5e6a7e49-940b-4f44-88f0-e284ca43875f",
+    "slug": "wphu-vp-1005",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1041 Kaaholo Street Waip. HI"
+    },
+    "new": {
+      "street": "94-1041 Kaaholo Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "54b1cef2-10f8-4b57-b846-47d1ea7dcf77",
+    "slug": "manoa-1001",
+    "old": {
+      "zip": "",
+      "city": "HI 96822",
+      "state": "",
+      "street": "2625 Ferdinand Avenue Honolulu"
+    },
+    "new": {
+      "street": "2625 Ferdinand Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96822"
+    }
+  },
+  {
+    "id": "ae00ec83-fea7-462e-8766-a7b68e6f36db",
+    "slug": "wphu-1002-02sp",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1273 Peke Place"
+    },
+    "new": {
+      "street": "1273 Peke Place",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "bb53e359-3550-4e60-b13a-9173a4e00423",
+    "slug": "ewab-1002",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1307 Maliko St."
+    },
+    "new": {
+      "street": "91-1307 Maliko St",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "9505c4af-f3f0-4ad8-939e-c538e50e3483",
+    "slug": "fvlg-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "4496 Luapele Place"
+    },
+    "new": {
+      "street": "4496 Luapele Place",
+      "city": "",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a9edacd1-ceb7-4af5-9728-173d38475b84",
+    "slug": "ewab-1033",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "91-804 Apoke Place ewa beach"
+    },
+    "new": {
+      "street": "91-804 Apoke Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "965e8972-84c1-4ac8-8484-7be42476d127",
+    "slug": "klhi-1033",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2417 Wilson Street Honolulu"
+    },
+    "new": {
+      "street": "2417 Wilson Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0343883a-54a4-4508-a772-14b98e98cfef",
+    "slug": "wphu-1124",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-1052 Kuhaulua Street Waipahu"
+    },
+    "new": {
+      "street": "94-1052 Kuhaulua Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "9d914e39-2d83-47d3-a1ad-98d2a0100960",
+    "slug": "aiea-1011",
+    "old": {
+      "zip": "",
+      "city": "HI 96701",
+      "state": "",
+      "street": "99-314A Eke Place Aiea"
+    },
+    "new": {
+      "street": "99-314A Eke Place",
+      "city": "Aiea",
+      "state": "Hawaii",
+      "zip": "96701"
+    }
+  },
+  {
+    "id": "93f00160-5408-4ebe-aabf-c2972fb34cb5",
+    "slug": "ewab-1004",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-275 Kaieleele Place"
+    },
+    "new": {
+      "street": "91-275 Kaieleele Place",
+      "city": "Ewa Beach",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "18ceb342-b7eb-43e1-ba1b-33e5739e8e5f",
+    "slug": "klhi-1019",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1310 Palama Street Honolulu HI 96817"
+    },
+    "new": {
+      "street": "1310 Palama Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96817"
+    }
+  },
+  {
+    "id": "00a3a8b9-c6f1-4b9d-8fbc-036905dbc75e",
+    "slug": "kple-1002-01p",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "92-1336 Pueonani Street"
+    },
+    "new": {
+      "street": "92-1336 Pueonani Street",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "d7908be6-39ab-4c4e-aa95-388a40137af9",
+    "slug": "pcty-1017",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "98-022 Kuleana Place Pearl City"
+    },
+    "new": {
+      "street": "98-022 Kuleana Place",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "5ec7c6ed-b1b9-40ea-918e-395ff63d34ad",
+    "slug": "slake-1012",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1453 Uila Street Hon. HI 96818 (Salt lake)"
+    },
+    "new": {
+      "street": "1453 Uila Street Hon. HI 96818 (Salt lake)",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "6b9121ed-5dea-40e2-86a4-7e570e44b206",
+    "slug": "kaimuki-1006",
+    "old": {
+      "zip": "",
+      "city": "HI 96816",
+      "state": "",
+      "street": "1348 17th Avenue Hon."
+    },
+    "new": {
+      "street": "1348 17th Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96816"
+    }
+  },
+  {
+    "id": "6a24ea35-3b95-4e17-b84c-f6bb5837ca9b",
+    "slug": "klhi-1008",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1141 Kaili Street Hon. (Kalhii)"
+    },
+    "new": {
+      "street": "1141 Kaili Street Hon. (Kalhii)",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "cec8d66f-f8cd-479e-bd76-e1d849549725",
+    "slug": "whwa-1004",
+    "old": {
+      "zip": "",
+      "city": "HI 96786",
+      "state": "",
+      "street": "123 Uakanikoo place Wahiawa"
+    },
+    "new": {
+      "street": "123 Uakanikoo place",
+      "city": "Wahiawa",
+      "state": "Hawaii",
+      "zip": "96786"
+    }
+  },
+  {
+    "id": "00761786-b093-4d98-b732-2ba47b7024b5",
+    "slug": "klhi-1020",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1854 Kamehameha IV Road Hon."
+    },
+    "new": {
+      "street": "1854 Kamehameha IV Road",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "b9e60784-74b7-4bc9-be9c-a9d816398284",
+    "slug": "pcty-1012",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "751 Puu Kala Street PC"
+    },
+    "new": {
+      "street": "751 Puu Kala Street PC",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "8b0bba7f-f444-480d-8a61-0a9d21345e21",
+    "slug": "slake-1024",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1108 Kukila Place Hon. HI 96818"
+    },
+    "new": {
+      "street": "1108 Kukila Place",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "37cf9c05-274b-4a64-b2cf-fec001d29916",
+    "slug": "wphu-1025",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-322 Haaa Street Waipahu HI 96797"
+    },
+    "new": {
+      "street": "94-322 Haaa Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": "96797"
+    }
+  },
+  {
+    "id": "127c0088-61b0-4d03-bf3c-7c7097c594dd",
+    "slug": "kaimuki-1003-01sp",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1419A 16th Avenue"
+    },
+    "new": {
+      "street": "1419A 16th Avenue",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "0a762cd1-e14c-4355-b2b2-f42248816c1a",
+    "slug": "pcty-1013",
+    "old": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "2256 Akeukeu Street Pearl City"
+    },
+    "new": {
+      "street": "2256 Akeukeu Street",
+      "city": "Pearl City",
+      "state": "Hawaii",
+      "zip": "96782"
+    }
+  },
+  {
+    "id": "d5b5a095-3d4d-47a2-9551-c41bba96d458",
+    "slug": "slake-1006-04p",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1352 Molehu Dr. Hon HI 96818"
+    },
+    "new": {
+      "street": "1352 Molehu Dr",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  },
+  {
+    "id": "32f25440-8f88-4218-9053-29b423cc200f",
+    "slug": "wphu-1001",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-342 Kipou Street"
+    },
+    "new": {
+      "street": "94-342 Kipou Street",
+      "city": "Waipahu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "2884e070-1973-4b2e-872e-1f86a1603e90",
+    "slug": "klhi-1010-02-sp",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "2010 Puaala Lane Honolulu"
+    },
+    "new": {
+      "street": "2010 Puaala Lane",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "7945256d-3ae0-471d-8af6-a4dbb9792d03",
+    "slug": "kple-1001",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "92-611 Aoloko Street Kapolei(Makakilo)"
+    },
+    "new": {
+      "street": "92-611 Aoloko Street Kapolei(Makakilo)",
+      "city": "Kapolei",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "a7aa654b-b3db-4093-b18c-5d1106477329",
+    "slug": "moanalua-1001",
+    "old": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1339 Ala Aolani St. Honolulu"
+    },
+    "new": {
+      "street": "1339 Ala Aolani St",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": ""
+    }
+  },
+  {
+    "id": "beac7e2d-53f1-4aed-946a-21550209233d",
+    "slug": "slake-1011",
+    "old": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "5119B Likini  Street Hon. HI 96818"
+    },
+    "new": {
+      "street": "5119B Likini Street",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "zip": "96818"
+    }
+  }
+]

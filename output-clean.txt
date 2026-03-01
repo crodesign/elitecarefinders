@@ -1,0 +1,83 @@
+﻿Reading XML from C:\Clients\`Git Repository\elitecarefinders\wp-homes-export.xml...
+Parsing XML...
+Found 266 'homes' items in XML.
+
+Starting spot check for 5 homes...
+
+======================================================
+Spot Check: SLAKE-1026 (slake-1026)
+======================================================
+[Field]             | [Wordpress XML]                    | [Supabase DB]
+--------------------|------------------------------------|------------------------------------
+Title               | SLAKE-1026                         | SLAKE-1026                        
+Slug                | slake-1026                         | slake-1026                        
+Status              | publish                            | published                         
+Capacity            | N/A                                | N/A                               
+Provider Name       | N/A                                | N/A                               
+Address             | N/A                                | N/A                               
+Phone               | N/A                                | N/A                               
+
+[Taxonomies]
+WP Home Types:      None
+WP Facility Tags:   None
+DB Taxonomy IDs:    9bf1a545-6ff1-4d0f-9b04-6a0d6a41ecb1, 94811a0d-1018-4603-b4f0-7f31a8a1aab8
+
+======================================================
+Spot Check: SLAKE-1007 (slake-1007-01p)
+======================================================
+[Field]             | [Wordpress XML]                    | [Supabase DB]
+--------------------|------------------------------------|------------------------------------
+Title               | SLAKE-1007                         | SLAKE-1007                        
+Slug                | slake-1007-01p                     | slake-1007-01p                    
+Status              | publish                            | published                         
+Capacity            | N/A                                | N/A                               
+Provider Name       | N/A                                | N/A                               
+Address             | N/A                                | N/A                               
+Phone               | N/A                                | N/A                               
+
+[Taxonomies]
+WP Home Types:      None
+WP Facility Tags:   None
+DB Taxonomy IDs:    9bf1a545-6ff1-4d0f-9b04-6a0d6a41ecb1, 1972d7dd-203f-49f9-91e7-cf95a2d88dd3
+
+======================================================
+Spot Check: PCTY-1006 ()
+======================================================
+[Error] Could not find home in Supabase: JSON object requested, multiple (or no) rows returned
+
+======================================================
+Spot Check: MANOA-1001 (manoa-1001)
+======================================================
+[Field]             | [Wordpress XML]                    | [Supabase DB]
+--------------------|------------------------------------|------------------------------------
+Title               | MANOA-1001                         | MANOA-1001                        
+Slug                | manoa-1001                         | manoa-1001                        
+Status              | publish                            | published                         
+Capacity            | N/A                                | N/A                               
+Provider Name       | N/A                                | N/A                               
+Address             | N/A                                | N/A                               
+Phone               | N/A                                | N/A                               
+
+[Taxonomies]
+WP Home Types:      None
+WP Facility Tags:   None
+DB Taxonomy IDs:    472ffdb8-def9-4961-a5ed-fd4a7e66d56c, 8edd407e-91dd-49e1-9ec2-64aa491025e3
+
+======================================================
+Spot Check: WPHU-1067 (wphu-1067)
+======================================================
+[Field]             | [Wordpress XML]                    | [Supabase DB]
+--------------------|------------------------------------|------------------------------------
+Title               | WPHU-1067                          | WPHU-1067                         
+Slug                | wphu-1067                          | wphu-1067                         
+Status              | publish                            | published                         
+Capacity            | N/A                                | N/A                               
+Provider Name       | N/A                                | N/A                               
+Address             | N/A                                | N/A                               
+Phone               | N/A                                | N/A                               
+
+[Taxonomies]
+WP Home Types:      None
+WP Facility Tags:   None
+DB Taxonomy IDs:    472ffdb8-def9-4961-a5ed-fd4a7e66d56c, c7daefe3-f6d6-4171-9f0f-edb61593e13d
+

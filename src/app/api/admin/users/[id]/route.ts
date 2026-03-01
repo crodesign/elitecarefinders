@@ -57,6 +57,11 @@ export async function GET(request: Request, { params }: { params: { id: string }
         .select('location_id')
         .eq('user_id', id);
 
+    const { data: entityAssignments } = await supabaseAdmin
+        .from('user_entity_assignments')
+        .select('id, entity_id, entity_type')
+        .eq('user_id', id);
+
     const { data: { user }, error: authError } = await supabaseAdmin.auth.admin.getUserById(id);
 
     if (authError || !user) {
@@ -92,6 +97,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         role: safeRole,
         profile: safeProfile,
         location_ids: locations?.map(l => l.location_id) || [],
+        entity_assignments: entityAssignments || [],
         manager_id: safeProfile.manager_id,
         manager_name: managerName
     });
@@ -115,7 +121,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     const body = await request.json();
-    const { role, profile, location_ids, password, manager_id } = body;
+    const { role, profile, location_ids, entity_assignments, password, manager_id } = body;
 
     try {
         // Update password if provided
@@ -157,7 +163,6 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         }
 
         if (location_ids !== undefined) {
-            // Delete existing
             await supabaseAdmin
                 .from('user_location_assignments')
                 .delete()
@@ -172,6 +177,25 @@ export async function PATCH(request: Request, { params }: { params: { id: string
                     .from('user_location_assignments')
                     .insert(inserts);
                 if (locError) throw locError;
+            }
+        }
+
+        if (entity_assignments !== undefined) {
+            await supabaseAdmin
+                .from('user_entity_assignments')
+                .delete()
+                .eq('user_id', id);
+
+            if (entity_assignments.length > 0) {
+                const inserts = entity_assignments.map((ea: { entity_id: string; entity_type: string }) => ({
+                    user_id: id,
+                    entity_id: ea.entity_id,
+                    entity_type: ea.entity_type
+                }));
+                const { error: entityError } = await supabaseAdmin
+                    .from('user_entity_assignments')
+                    .insert(inserts);
+                if (entityError) throw entityError;
             }
         }
 

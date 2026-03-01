@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 import dynamic from "next/dynamic";
-import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown } from "lucide-react";
+import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type { Facility, Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -105,11 +105,11 @@ export function FacilityInformationTab({
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
             {/* Col B — Name + Description (order-2, wide) */}
             <div className="order-2 lg:col-span-2 flex flex-col">
-                <div className="bg-surface-input rounded-lg p-4 space-y-4 flex flex-col flex-1">
+                <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1">
                     {/* Facility Name & Slug */}
                     <div className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5">
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 Facility Name
                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                             </label>
@@ -138,7 +138,7 @@ export function FacilityInformationTab({
 
                     {/* Description */}
                     <div className="flex flex-col flex-1 gap-2">
-                        <label className="text-base font-medium text-content-primary">
+                        <label className="text-base font-medium text-content-primary pl-[5px]">
                             Description
                         </label>
                         <RichTextEditor
@@ -158,11 +158,11 @@ export function FacilityInformationTab({
 
 
             {/* Col A — Classification + Location + Contact (order-1) */}
-            <div className="order-1 space-y-6">
+            <div className="order-1 space-y-[10px]">
                 {/* Classification Section */}
                 {availableTaxonomies.length > 0 && (
-                    <div className="bg-surface-input rounded-lg p-4 space-y-4">
-                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-3">
+                    <div className="bg-surface-input rounded-lg p-[5px]">
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                             <Tags className="h-4 w-4 text-accent" />
                             Classification
                         </h3>
@@ -179,8 +179,8 @@ export function FacilityInformationTab({
                                     findEntryInTree(taxonomy.entries, id)
                                 ) || "";
                                 return (
-                                    <div key={taxonomy.id} className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                        <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5">
+                                    <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
                                             {taxonomy.singularName}
                                             {(taxonomy.singularName === "Facility Type" || taxonomy.singularName === "Location") && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
@@ -220,15 +220,15 @@ export function FacilityInformationTab({
                 )}
 
                 {/* Location Section */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-4">
-                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-3">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                         <MapPin className="h-4 w-4 text-accent" />
                         Location
                     </h3>
 
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Street</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                             <input
                                 type="text"
                                 value={street}
@@ -240,8 +240,8 @@ export function FacilityInformationTab({
                                 placeholder="Street address"
                             />
                         </div>
-                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">City</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">City</label>
                             <input
                                 type="text"
                                 value={city}
@@ -254,8 +254,8 @@ export function FacilityInformationTab({
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all flex-1">
-                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">State</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all flex-1">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
                                 <SimpleSelect
                                     value={state}
                                     onChange={(val) => { setState(val); setIsDirty(true); }}
@@ -264,8 +264,8 @@ export function FacilityInformationTab({
                                     className="w-32 h-8 flex items-center justify-between px-2 text-sm text-left"
                                 />
                             </div>
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Zip</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
                                 <input
                                     type="text"
                                     value={zip}
@@ -282,14 +282,14 @@ export function FacilityInformationTab({
                 </div>
 
                 {/* Contact Section */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-3">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                         <Phone className="h-4 w-4 text-accent" />
                         Contact
                     </h3>
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Phone</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
                             <input
                                 type="tel"
                                 value={phone}
@@ -301,8 +301,8 @@ export function FacilityInformationTab({
                                 placeholder="(555) 123-4567"
                             />
                         </div>
-                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Email</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
                             <input
                                 type="email"
                                 value={email}
@@ -319,15 +319,18 @@ export function FacilityInformationTab({
             </div>
 
             {/* Col C — Status + Classification + Promotions (order-3) */}
-            <div className="order-3 space-y-6">
+            <div className="order-3 space-y-[10px]">
 
 
                 {/* Promotions */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                     {/* Featured Facility */}
                     <div className="bg-surface-hover rounded-lg transition-all">
-                        <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Featured Facility</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px]">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                <Star className={`h-3.5 w-3.5 flex-shrink-0 ${isFeatured ? 'text-accent fill-accent' : 'text-content-secondary'}`} />
+                                Featured Facility
+                            </label>
                             <Switch
                                 checked={isFeatured}
                                 onCheckedChange={(checked) => {
@@ -344,8 +347,8 @@ export function FacilityInformationTab({
                             />
                         </div>
                         {isFeatured && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 border-ui-border animate-in fade-in slide-in-from-top-1 duration-150">
-                                <label className="text-xs font-medium text-content-muted whitespace-nowrap">Featured Label</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] border-ui-border animate-in fade-in slide-in-from-top-1 duration-150">
+                                <label className="text-xs font-medium text-content-muted whitespace-nowrap pl-[5px]">Featured Label</label>
                                 <div className="flex items-center gap-1.5">
                                     {isCustomLabelMode ? (
                                         <>
@@ -424,8 +427,11 @@ export function FacilityInformationTab({
                     </div>
 
                     {/* Featured Video */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Featured Video</label>
+                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                            <Video className={`h-3.5 w-3.5 flex-shrink-0 ${hasFeaturedVideo ? 'text-accent' : 'text-content-secondary'}`} />
+                            Featured Video
+                        </label>
                         <Switch
                             checked={hasFeaturedVideo}
                             onCheckedChange={(checked) => { setHasFeaturedVideo(checked); setIsDirty(true); }}
@@ -435,8 +441,11 @@ export function FacilityInformationTab({
 
                     {/* Facility of the Month */}
                     <div className="bg-surface-hover rounded-lg transition-all">
-                        <div className="flex items-center justify-between gap-2 py-2 pr-3 pl-3.5">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Facility of Month</label>
+                        <div className="flex items-center justify-between gap-2 p-[5px]">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                <Trophy className={`h-3.5 w-3.5 flex-shrink-0 ${isFacilityOfMonth ? 'text-accent' : 'text-content-secondary'}`} />
+                                Facility of Month
+                            </label>
                             <Switch
                                 checked={isFacilityOfMonth}
                                 onCheckedChange={(checked) => { setIsFacilityOfMonth(checked); setIsDirty(true); }}
@@ -444,8 +453,8 @@ export function FacilityInformationTab({
                             />
                         </div>
                         {isFacilityOfMonth && (
-                            <div className="flex items-start justify-between gap-2 py-2 pr-2 pl-3.5 border-ui-border animate-in fade-in slide-in-from-top-1 duration-150">
-                                <label className="text-xs font-medium text-content-muted whitespace-nowrap pt-1">Description</label>
+                            <div className="flex flex-col gap-1.5 p-[5px] animate-in fade-in slide-in-from-top-1 duration-150">
+                                <label className="text-xs font-medium text-content-muted pl-[5px]">Description</label>
                                 <textarea
                                     ref={(el) => { if (el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; } }}
                                     value={facilityOfMonthDescription}
@@ -453,7 +462,7 @@ export function FacilityInformationTab({
                                     onInput={(e) => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }}
                                     placeholder="Why this facility is featured..."
                                     rows={3}
-                                    className="w-48 bg-surface-input rounded-md py-1 px-2 text-xs text-content-primary focus:outline-none resize-none overflow-hidden hover:bg-surface-hover focus:bg-surface-hover transition-colors"
+                                    className="w-full bg-surface-input rounded-md py-1 px-2 text-xs text-content-primary focus:outline-none resize-none overflow-hidden hover:bg-surface-hover focus:bg-surface-hover transition-colors"
                                 />
                             </div>
                         )}

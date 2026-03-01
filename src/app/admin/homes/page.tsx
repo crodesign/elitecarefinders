@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock } from "lucide-react";
+import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy } from "lucide-react";
 import type { Home, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
@@ -251,6 +251,11 @@ export default function HomesPage() {
                     onClick={() => handleOpenEdit(home)}
                     className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
                 >
+                    <span className="hidden md:flex flex-col items-center gap-1 mr-2 flex-shrink-0">
+                        <Star className={`h-3 w-3 ${home.isFeatured ? 'text-accent fill-accent' : 'text-content-muted opacity-50'}`} />
+                        <Video className={`h-3 w-3 ${home.hasFeaturedVideo ? 'text-accent' : 'text-content-muted opacity-50'}`} />
+                        <Trophy className={`h-3 w-3 ${home.isHomeOfMonth ? 'text-accent' : 'text-content-muted opacity-50'}`} />
+                    </span>
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         {home.images && home.images.length > 0 ? (
                             <img

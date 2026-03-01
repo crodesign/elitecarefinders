@@ -1,0 +1,452 @@
+[
+  {
+    "slug": "kailua-1001-01p",
+    "address": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "381 Wanaao Road Kailua"
+    }
+  },
+  {
+    "slug": "wphu-1055",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1118 Kahuanui Street Waip. HI 96797"
+    }
+  },
+  {
+    "slug": "ewab-1007",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1372 Kamahoi St."
+    }
+  },
+  {
+    "slug": "wphu-1004",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1116 Hina St."
+    }
+  },
+  {
+    "slug": "wphu-vp-1003",
+    "address": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-715 Kaaka Street Waipahu"
+    }
+  },
+  {
+    "slug": "wphu-1013",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-1215 Kahuaina St."
+    }
+  },
+  {
+    "slug": "pcty-1009",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1621 Kaumoli Street Pearl City HI 96782"
+    }
+  },
+  {
+    "slug": "wphu-1014",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-949 Hiapo St."
+    }
+  },
+  {
+    "slug": "hunt-000012393",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": ""
+    }
+  },
+  {
+    "slug": "wphu-1078",
+    "address": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-430 Kahualoa Place Waipahu"
+    }
+  },
+  {
+    "slug": "ewab-1016",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-823 Moneha Place"
+    }
+  },
+  {
+    "slug": "ewab-1005",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1009 Pailani St."
+    }
+  },
+  {
+    "slug": "slake-1028",
+    "address": {
+      "zip": "96818",
+      "city": "Honolulu",
+      "state": "Hawaii",
+      "street": "4014 Salt Lake Blvd.  Honolulu"
+    }
+  },
+  {
+    "slug": "wphu-gemma-alvia",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-915 Kumuao Street"
+    }
+  },
+  {
+    "slug": "ewab-1006",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-572 Akua St."
+    }
+  },
+  {
+    "slug": "ewab-1009",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-927 Pailani St."
+    }
+  },
+  {
+    "slug": "klhi-1002",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1417C Middle St."
+    }
+  },
+  {
+    "slug": "pcty-1001",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1619 Hoolehua St."
+    }
+  },
+  {
+    "slug": "ewab-1031",
+    "address": {
+      "zip": "",
+      "city": "HI 96706",
+      "state": "",
+      "street": "91-659 Kilaha St. Ewa Beach"
+    }
+  },
+  {
+    "slug": "klhi-1017",
+    "address": {
+      "zip": "96817",
+      "city": "Honolulu",
+      "state": "HI",
+      "street": "1730 Kilohi Street"
+    }
+  },
+  {
+    "slug": "kple-1006",
+    "address": {
+      "zip": "",
+      "city": "Kapolei HI 96707",
+      "state": "",
+      "street": "91-1580 Wahane Street"
+    }
+  },
+  {
+    "slug": "klhi-1022",
+    "address": {
+      "zip": "",
+      "city": "HI 96817",
+      "state": "",
+      "street": "1428 Konia Street Honolulu"
+    }
+  },
+  {
+    "slug": "wphu-vp-1001",
+    "address": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-414 Opeha Street Waipahu"
+    }
+  },
+  {
+    "slug": "wphu-1036",
+    "address": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-116 Haaa Streeet Waipahu"
+    }
+  },
+  {
+    "slug": "ewab-1030",
+    "address": {
+      "zip": "",
+      "city": "Ewa Beach HI 96706",
+      "state": "",
+      "street": "91-323 Hoalauna Place"
+    }
+  },
+  {
+    "slug": "ewab-1011",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-953 Hanakahi St."
+    }
+  },
+  {
+    "slug": "pcty-1002",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "1159 Kuokoa St."
+    }
+  },
+  {
+    "slug": "slake-1015",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3554 Likini St. \tHonolulu\t96818"
+    }
+  },
+  {
+    "slug": "klhi-1029",
+    "address": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "1108 Gulick Avenue Honolulu"
+    }
+  },
+  {
+    "slug": "wphu-1029",
+    "address": {
+      "zip": "",
+      "city": "Waipahu HI 96797",
+      "state": "",
+      "street": "94-441 A Kiau Place"
+    }
+  },
+  {
+    "slug": "aina-haina-1002",
+    "address": {
+      "zip": "",
+      "city": "HI 96821",
+      "state": "",
+      "street": "187 Nenue Street Honolulu"
+    }
+  },
+  {
+    "slug": "kaimuki-1002",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3374A Maunaloa Avenue Hon. HI 96816"
+    }
+  },
+  {
+    "slug": "ewab-1010",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91 558 Onelua St."
+    }
+  },
+  {
+    "slug": "wphu-1035",
+    "address": {
+      "zip": "",
+      "city": "HI 96797",
+      "state": "",
+      "street": "94-407 Kahualena Street Waipahu"
+    }
+  },
+  {
+    "slug": "wphu-1009",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-556 Hiaku Place"
+    }
+  },
+  {
+    "slug": "wphu-1011",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-538A Koaleo St."
+    }
+  },
+  {
+    "slug": "ewab-1026",
+    "address": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "91-102  Pahau Place Ewa Beach"
+    }
+  },
+  {
+    "slug": "kple-1005",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "92-655 Aahualii Street. Kapolei 96707"
+    }
+  },
+  {
+    "slug": "ewab-1032",
+    "address": {
+      "zip": "96706",
+      "city": "Ewa Beach",
+      "state": "HI",
+      "street": "91-851 Kapana Place"
+    }
+  },
+  {
+    "slug": "pcty-1006",
+    "address": {
+      "zip": "",
+      "city": "HI 96782",
+      "state": "",
+      "street": "2344 Aumakua St\tPearl City"
+    }
+  },
+  {
+    "slug": "wphu-1010",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-478 Kipou St."
+    }
+  },
+  {
+    "slug": "klhi-1021",
+    "address": {
+      "zip": "",
+      "city": "HI 96819",
+      "state": "",
+      "street": "1917 Hani Lane Honolulu"
+    }
+  },
+  {
+    "slug": "wphu-1081",
+    "address": {
+      "zip": "",
+      "city": "HI",
+      "state": "",
+      "street": "94-628 Loaa Street Waip.."
+    }
+  },
+  {
+    "slug": "ewab-1003",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1076 Kuhina St."
+    }
+  },
+  {
+    "slug": "ewab-1014",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "91-1088 Kaunolu St."
+    }
+  },
+  {
+    "slug": "wphuvp-1054",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-695 Kaaka St. Waip HI"
+    }
+  },
+  {
+    "slug": "wphu-1006",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "94-250 Kipou St. waip. hi 96797"
+    }
+  },
+  {
+    "slug": "knhe-1009",
+    "address": {
+      "zip": "",
+      "city": "HI 96744",
+      "state": "",
+      "street": "45-1122 Cobb-Adams Road Kaneohe"
+    }
+  },
+  {
+    "slug": "fvlg-1003-2",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "3648 Likini St."
+    }
+  },
+  {
+    "slug": "klhi-1012",
+    "address": {
+      "zip": "",
+      "city": "",
+      "state": "",
+      "street": "2435 Kula Kolea Hon HI 96819"
+    }
+  }
+]

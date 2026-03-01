@@ -266,7 +266,8 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                         {user?.role?.role === 'super_admin' ? 'Super Admin' :
                                             user?.role?.role === 'system_admin' ? 'System Admin' :
                                                 user?.role?.role === 'regional_manager' ? 'Regional Manager' :
-                                                    user?.role?.role === 'local_user' ? 'Local User' : 'Online'}
+                                                    user?.role?.role === 'location_manager' ? 'Location Manager' :
+                                                        user?.role?.role === 'local_user' ? 'Local User' : 'Online'}
                                     </span>
                                 </div>
                             </div>

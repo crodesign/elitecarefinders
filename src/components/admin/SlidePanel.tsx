@@ -145,7 +145,10 @@ export function SlidePanel({
                     }
                 `}</style>
                     {/* Header */}
-                    <div className={`flex-none relative z-20 w-full shrink-0 px-6 pt-6 ${headerChildren ? 'pb-0' : 'pb-6'}`}>
+                    <div
+                        className={`flex-none relative z-20 w-full shrink-0 px-6 pt-6 ${headerChildren ? 'pb-0' : 'pb-6 border-b-[6px]'}`}
+                        style={!headerChildren ? { borderColor: 'var(--surface-tab-border)' } : undefined}
+                    >
                         <div className="flex items-start justify-between">
                             <div>
                                 <h2 className="text-xl font-bold text-content-primary">{title}</h2>
@@ -157,7 +160,7 @@ export function SlidePanel({
                                 {actions}
                                 <button
                                     onClick={() => handleAction(onClose)}
-                                    className="p-2 rounded-lg text-content-secondary hover:text-content-primary hover:bg-surface-hover transition-colors"
+                                    className="p-2 rounded-lg bg-surface-input text-content-secondary hover:bg-accent hover:text-white transition-colors"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>

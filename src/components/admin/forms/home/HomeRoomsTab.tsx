@@ -30,16 +30,17 @@ export function HomeRoomsTab({
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {/* Column 1: General Info & Col 1 Categories */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {/* Fixed Fields Section (General Room Info) */}
-                <div className="bg-surface-input rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    <div className="flex items-center gap-2 pl-[5px]">
                         <Bed className="h-4 w-4 text-accent" />
-                        <h3 className="text-base font-medium text-content-primary">General Info</h3>
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pb-[5px]">General Info</h3>
                     </div>
+                    <div className="space-y-2">
                     {/* Room Price */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                        <label className="text-sm font-medium text-content-secondary">Room Price</label>
+                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <label className="text-sm font-medium text-content-secondary pl-[5px]">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-content-secondary" : "text-content-muted"}`}>$</span>
                             <input
@@ -90,8 +91,8 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bedroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['bedroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bedroomType'];
                                 return <Icon className="h-4 w-4 text-content-secondary" />;
@@ -114,8 +115,8 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['bathroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bathroomType'];
                                 return <Icon className="h-4 w-4 text-content-secondary" />;
@@ -138,8 +139,8 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['showerType'] && (() => {
                                 const Icon = fixedFieldIcons['showerType'];
                                 return <Icon className="h-4 w-4 text-content-secondary" />;
@@ -160,13 +161,14 @@ export function HomeRoomsTab({
                             className="w-36 text-sm text-right"
                         />
                     </div>
+                    </div>
                 </div>
 
                 {/* Languages */}
-                <div className="bg-surface-hover rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="bg-surface-hover rounded-lg p-[5px]">
+                    <div className="flex items-center gap-2 pl-[5px]">
                         <Languages className="h-4 w-4 text-accent" />
-                        <h3 className="text-base font-medium text-content-primary">Languages Spoken</h3>
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pb-[5px]">Languages Spoken</h3>
                     </div>
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                         {fixedFieldOptions.filter(o => o.fieldType === 'language').map((opt) => {
@@ -187,7 +189,7 @@ export function HomeRoomsTab({
                                             return { ...prev, languages: newLangs };
                                         });
                                     }}
-                                    className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                    className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
                                         ? "bg-surface-input text-content-primary"
                                         : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                         }`}
@@ -223,7 +225,7 @@ export function HomeRoomsTab({
             </div>
 
             {/* Column 2 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 2 && c.section === 'room_details')
                     .map(category => (
@@ -241,7 +243,7 @@ export function HomeRoomsTab({
             </div>
 
             {/* Column 3 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 3 && c.section === 'room_details')
                     .map(category => (
@@ -259,7 +261,7 @@ export function HomeRoomsTab({
             </div>
 
             {/* Column 4 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.columnNumber === 4 && c.section === 'room_details')
                     .map(category => (

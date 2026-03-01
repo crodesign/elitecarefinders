@@ -416,24 +416,15 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
             width={1200} // Expanded to accommodate a 3-column layout
             stackLevel={stackLevel}
             offsetSidebar={offsetSidebar}
-            headerChildren={
-                <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                    <div className="flex items-start overflow-visible gap-1 pt-2 px-2" />
-                    <div className="flex items-center gap-2 mb-2">
-                        <button
-                            type="button"
-                            onClick={handleSave}
-                            disabled={isSaving || !isDirty}
-                            className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
-                        >
-                            {isSaving ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                "Update Profile"
-                            )}
-                        </button>
-                    </div>
-                </div>
+            actions={
+                <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={isSaving || !isDirty}
+                    className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                >
+                    {isSaving ? "Saving..." : "Update Profile"}
+                </button>
             }
         >
             {isLoading || authLoading ? (
@@ -442,9 +433,9 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                 </div>
             ) : (
                 <>
-                    <div className="space-y-6">
+                    <div className="space-y-[10px]">
                         {/* Profile Photo & Basic Info Card */}
-                        <div className="bg-surface-input rounded-lg p-6">
+                        <div className="bg-surface-input rounded-lg p-[10px]">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {/* Left: Photo + Name & Role */}
                                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 col-span-1 md:col-span-1 border-b md:border-b-0 md:border-r border-white/10 pb-6 md:pb-0 pr-0 md:pr-6">
@@ -573,11 +564,11 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                     </div>
                                 </div>
 
-                                {/* Right: Assigned Locations */}
+                                {/* Right: My Locations */}
                                 <div className="md:col-span-2">
                                     <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-3">
                                         <MapPin className="h-4 w-4 text-accent" />
-                                        Assigned Locations
+                                        My Locations
                                     </h3>
                                     {assignedLocations.length === 0 ? (
                                         <p className="text-sm text-content-muted italic">No locations assigned</p>
@@ -648,15 +639,15 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                         <div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {/* Left Column: Personal Fields */}
-                                <div className="space-y-6">
+                                <div className="space-y-[10px]">
                                     <div>
-                                        <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
                                             <User className="h-4 w-4 text-accent" />
                                             Personal Information
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-4 space-y-2">
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1 min-w-[85px]">
+                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1 min-w-[85px] pl-[5px]">
                                                     Full Name
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                                                 </label>
@@ -668,8 +659,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     placeholder="Jane Doe"
                                                 />
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[85px]">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[85px] pl-[5px]">
                                                     Nickname
                                                 </label>
                                                 <input
@@ -681,8 +672,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px]">
+                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px] pl-[5px]">
                                                         <Mail className="h-3.5 w-3.5" />
                                                         Email
                                                     </label>
@@ -698,8 +689,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     You can log in using either your email or nickname.
                                                 </p>
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px]">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px] pl-[5px]">
                                                     <Phone className="h-3.5 w-3.5" />
                                                     Phone
                                                 </label>
@@ -717,15 +708,15 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                 </div>
 
                                 {/* Middle Column: Password */}
-                                <div className="space-y-6">
+                                <div className="space-y-[10px]">
                                     <div className="pt-2">
-                                        <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
                                             <Lock className="h-4 w-4 text-accent" />
                                             Update Password
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-4 space-y-2">
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all relative">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[100px]">
+                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all relative">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[100px] pl-[5px]">
                                                     <Lock className="h-3.5 w-3.5" />
                                                     Current
                                                 </label>
@@ -746,8 +737,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all relative">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[100px]">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all relative">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[100px] pl-[5px]">
                                                     New
                                                 </label>
                                                 <div className="relative flex-1 min-w-0 flex items-center">
@@ -767,9 +758,9 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className={`flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all relative ${confirmPassword && confirmPassword !== newPassword ? 'bg-red-500/10' : 'bg-surface-hover'
+                                            <div className={`flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all relative ${confirmPassword && confirmPassword !== newPassword ? 'bg-red-500/10' : 'bg-surface-hover'
                                                 }`}>
-                                                <label className={`text-sm font-medium whitespace-nowrap min-w-[100px] ${confirmPassword && confirmPassword !== newPassword ? 'text-red-400' : 'text-content-secondary'
+                                                <label className={`text-sm font-medium whitespace-nowrap min-w-[100px] pl-[5px] ${confirmPassword && confirmPassword !== newPassword ? 'text-red-400' : 'text-content-secondary'
                                                     }`}>
                                                     Confirm
                                                 </label>
@@ -779,7 +770,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         value={confirmPassword}
                                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                                         className={`bg-surface-input border text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3 pr-10 ${confirmPassword && confirmPassword !== newPassword
-                                                            ? "border-red-500/30 text-red-50"
+                                                            ? "border-red-500/30 text-red-400"
                                                             : "border-transparent text-content-primary"
                                                             }`}
                                                         placeholder="••••••••"
@@ -803,8 +794,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     disabled={isChangingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword}
                                                     className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors font-medium
                                                     ${isChangingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword
-                                                            ? "bg-white/10 text-white/50 cursor-not-allowed border border-white/5"
-                                                            : "bg-surface-hover text-content-primary hover:bg-white/10 border border-white/10"
+                                                            ? "bg-surface-hover text-content-muted cursor-not-allowed border border-ui-border opacity-50"
+                                                            : "bg-surface-hover text-content-primary hover:bg-surface-primary border border-ui-border"
                                                         }`}
                                                 >
                                                     {isChangingPassword ? (
@@ -820,15 +811,15 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                 </div>
 
                                 {/* Right Column: Address */}
-                                <div className="space-y-6">
+                                <div className="space-y-[10px]">
                                     <div>
-                                        <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
                                             <MapPin className="h-4 w-4 text-accent" />
                                             Address
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-4 space-y-2">
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px]">
+                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px] pl-[5px]">
                                                     Street
                                                 </label>
                                                 <input
@@ -839,8 +830,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     placeholder="123 Main St"
                                                 />
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px]">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px] pl-[5px]">
                                                     City
                                                 </label>
                                                 <input
@@ -852,8 +843,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-2">
-                                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px]">
+                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px] pl-[5px]">
                                                         State
                                                     </label>
                                                     <input
@@ -864,8 +855,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         placeholder="State"
                                                     />
                                                 </div>
-                                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px]">
+                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px] pl-[5px]">
                                                         ZIP
                                                     </label>
                                                     <input

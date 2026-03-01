@@ -47,15 +47,15 @@ export function FacilityLocationTab({
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
             {/* Column 1: Levels of Care (Fixed) */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 <div className="space-y-4">
-                    <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+                    <div className="bg-surface-hover rounded-lg p-[5px]">
                         {(() => {
                             const Icon = fixedFieldIcons["levelOfCare"] ? ICON_MAP[fixedFieldIcons["levelOfCare"]] : null;
                             return (
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2">
                                     {Icon && <Icon className="h-5 w-5 text-accent" />}
-                                    <label className="text-base font-medium text-content-secondary block">Levels of Care</label>
+                                    <label className="text-sm font-medium text-content-secondary block pt-[5px] pl-[5px] pb-[5px]">Levels of Care</label>
                                 </div>
                             );
                         })()}
@@ -79,7 +79,7 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
@@ -100,13 +100,13 @@ export function FacilityLocationTab({
 
                 {/* Languages Spoken (Fixed) */}
                 <div className="space-y-4">
-                    <div className="bg-surface-hover rounded-lg p-3 space-y-3">
+                    <div className="bg-surface-hover rounded-lg p-[5px]">
                         {(() => {
                             const Icon = fixedFieldIcons["language"] ? ICON_MAP[fixedFieldIcons["language"]] : null;
                             return (
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2">
                                     {Icon && <Icon className="h-5 w-5 text-accent" />}
-                                    <label className="text-base font-medium text-content-secondary block">Languages Spoken</label>
+                                    <label className="text-sm font-medium text-content-secondary block pt-[5px] pl-[5px] pb-[5px]">Languages Spoken</label>
                                 </div>
                             );
                         })()}
@@ -130,7 +130,7 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
@@ -166,7 +166,7 @@ export function FacilityLocationTab({
             </div>
 
             {/* Column 2 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.section === 'location_details' && c.columnNumber === 2)
                     .map(category => (
@@ -184,7 +184,7 @@ export function FacilityLocationTab({
             </div>
 
             {/* Column 3 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.section === 'location_details' && c.columnNumber === 3)
                     .map(category => (
@@ -202,7 +202,7 @@ export function FacilityLocationTab({
             </div>
 
             {/* Column 4 */}
-            <div className="space-y-6">
+            <div className="space-y-[10px]">
                 {roomCategories
                     .filter(c => c.section === 'location_details' && c.columnNumber === 4)
                     .map(category => (

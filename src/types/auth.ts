@@ -1,12 +1,12 @@
 export interface UserRoleRecord {
     user_id: string;
-    role: 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user' | 'invoice_manager';
+    role: 'super_admin' | 'system_admin' | 'regional_manager' | 'location_manager' | 'local_user' | 'invoice_manager';
     display_name?: string;
     created_at: string;
     updated_at: string;
 }
 
-export type UserRole = 'super_admin' | 'system_admin' | 'regional_manager' | 'local_user' | 'invoice_manager';
+export type UserRole = 'super_admin' | 'system_admin' | 'regional_manager' | 'location_manager' | 'local_user' | 'invoice_manager';
 
 export interface LocationAssignment {
     id: string;
@@ -34,10 +34,19 @@ export interface UserProfile {
     manager_name?: string; // For display
 }
 
+export interface EntityAssignment {
+    id: string;
+    user_id: string;
+    entity_id: string;
+    entity_type: 'home' | 'facility';
+    created_at: string;
+}
+
 export interface AuthUser {
     id: string;
     email?: string;
     role?: UserRoleRecord;
     locationAssignments?: LocationAssignment[];
+    entityAssignments?: EntityAssignment[];
     profile?: UserProfile;
 }

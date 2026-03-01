@@ -3,10 +3,10 @@ import { Label } from "@/components/ui/label";
 
 const HealthMobilitySection = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-[10px]">
       {/* Medical Conditions */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">MEDICAL CONDITIONS</h3>
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-muted-foreground pt-[5px] pl-[5px] pb-[5px]">MEDICAL CONDITIONS</h3>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center space-x-2">
             <Checkbox id="diabetes" />
@@ -36,8 +36,8 @@ const HealthMobilitySection = () => {
       </div>
 
       {/* Level of Mobility */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">LEVEL OF MOBILITY</h3>
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-muted-foreground pt-[5px] pl-[5px] pb-[5px]">LEVEL OF MOBILITY</h3>
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center space-x-2">
             <Checkbox id="ambulatory" />

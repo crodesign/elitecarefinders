@@ -42,22 +42,22 @@ export function HomeFieldCategory({
     };
 
     return (
-        <div className="bg-surface-input rounded-lg p-4">
-            <h3 className="text-base font-medium text-content-primary mb-4 flex items-center gap-2">
+        <div className="bg-surface-input rounded-lg p-[5px]">
+            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 {category.icon && ICON_MAP[category.icon] && (() => { const CatIcon = ICON_MAP[category.icon!]; return <CatIcon className="h-4 w-4 text-accent" />; })()}
                 {category.name}
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
                 {categoryFields.map(field => (
                     <div key={field.id} className="space-y-1">
                         {field.type !== 'boolean' && field.type !== 'single' && field.type !== 'multi' && field.type !== 'dropdown' && field.type !== 'text' && field.type !== 'textarea' && field.type !== 'number' && field.type !== 'phone' && field.type !== 'email' && field.type !== 'currency' && (
-                            <label className="text-sm font-medium text-content-secondary">{field.name}</label>
+                            <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                         )}
 
                         {/* Boolean Field */}
                         {field.type === 'boolean' && (
-                            <div className="bg-surface-hover rounded-lg p-3 flex items-center justify-between gap-3">
-                                <span className="font-medium text-sm text-content-secondary">{field.name}</span>
+                            <div className="bg-surface-hover rounded-lg p-[5px] flex items-center justify-between gap-3">
+                                <span className="font-medium text-sm text-content-secondary pl-[5px]">{field.name}</span>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -79,7 +79,7 @@ export function HomeFieldCategory({
                                             return { ...prev, customFields: newCustomFields };
                                         });
                                     }}
-                                    className={`h-8 px-3 rounded-full flex items-center gap-2 transition-all ${roomDetails.customFields[field.id] === true
+                                    className={`h-8 px-3 rounded-md flex items-center gap-2 transition-all ${roomDetails.customFields[field.id] === true
                                         ? "bg-accent text-white shadow-lg shadow-accent/20"
                                         : roomDetails.customFields[field.id] === false
                                             ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
@@ -108,8 +108,8 @@ export function HomeFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-                                <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => (
                                         <button
@@ -125,7 +125,7 @@ export function HomeFieldCategory({
                                                 }
                                                 return { ...prev, customFields: newCustomFields };
                                             })}
-                                            className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
+                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
@@ -146,8 +146,8 @@ export function HomeFieldCategory({
                         )}
 
                         {field.type === 'dropdown' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 rounded-lg transition-all bg-surface-hover">
-                                <span className="font-medium text-sm text-content-secondary">{field.name}</span>
+                            <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                                <span className="font-medium text-sm text-content-secondary pl-[5px]">{field.name}</span>
                                 <SimpleSelect
                                     value={roomDetails.customFields[field.id] as string || ""}
                                     onChange={(val) => {
@@ -166,8 +166,8 @@ export function HomeFieldCategory({
 
                         {/* Text Field */}
                         {field.type === 'text' && (
-                            <div className="bg-surface-hover rounded-lg p-3 transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <input
                                     type="text"
                                     value={roomDetails.customFields[field.id] as string || ""}
@@ -186,8 +186,8 @@ export function HomeFieldCategory({
 
                         {/* Text Block (Textarea) */}
                         {field.type === 'textarea' && (
-                            <div className="bg-surface-hover rounded-lg p-3 transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <textarea
                                     value={roomDetails.customFields[field.id] as string || ""}
                                     onChange={(e) => {
@@ -205,8 +205,8 @@ export function HomeFieldCategory({
 
                         {/* Number Field */}
                         {field.type === 'number' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                <label className="text-sm font-medium text-content-secondary">{field.name}</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                                 <div className="relative w-32">
                                     <input
                                         type="number"
@@ -257,8 +257,8 @@ export function HomeFieldCategory({
 
                         {/* Phone Field */}
                         {field.type === 'phone' && (
-                            <div className="bg-surface-hover rounded-lg p-3 transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <div className="relative">
                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                     <input
@@ -280,9 +280,9 @@ export function HomeFieldCategory({
 
                         {/* Email Field */}
                         {field.type === 'email' && (
-                            <div className={`bg-surface-hover rounded-lg p-3 transition-all space-y-2 ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
+                            <div className={`bg-surface-hover rounded-lg p-[5px] transition-all space-y-2 ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
                                 <div className="flex items-center justify-between">
-                                    <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                                    <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                     {invalidEmailFields.has(field.id) && (
                                         <span className="text-[10px] text-red-400 font-medium px-1.5 py-0.5 bg-red-500/10 rounded">Invalid format</span>
                                     )}
@@ -322,8 +322,8 @@ export function HomeFieldCategory({
 
                         {/* Currency Field */}
                         {field.type === 'currency' && (
-                            <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                <label className="text-sm font-medium text-content-secondary">{field.name}</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                                 <div className="relative w-32">
                                     <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.customFields[field.id] ? "text-content-secondary" : "text-content-muted"}`}>$</span>
                                     <input
@@ -389,7 +389,7 @@ export function HomeFieldCategory({
                                                         customFields: { ...prev.customFields, [field.id]: updated }
                                                     }));
                                                 }}
-                                                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                                className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
                                                     ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
                                                     : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
                                                     }`}
@@ -406,8 +406,8 @@ export function HomeFieldCategory({
                                     })}
                                 </div>
                             ) : (
-                                <div className="bg-surface-hover rounded-lg p-3 space-y-3">
-                                    <label className="text-sm font-medium text-content-secondary block">{field.name}</label>
+                                <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
+                                    <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                         {field.options?.map((opt) => {
                                             const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
@@ -425,7 +425,7 @@ export function HomeFieldCategory({
                                                             customFields: { ...prev.customFields, [field.id]: updated }
                                                         }));
                                                     }}
-                                                    className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all ${isSelected
+                                                    className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
                                                         ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
                                                         : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
                                                         }`}

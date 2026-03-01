@@ -350,10 +350,18 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 title={post ? "Edit Post" : "New Post"}
                 subtitle="Manage articles, resources, news, and recipes"
                 fullScreen
-                actions={null}
+                actions={
+                    <button
+                        onClick={handleSubmit}
+                        disabled={!isDirty || isSubmitting}
+                        className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                    >
+                        {isSubmitting ? "Saving..." : (post ? "Save Changes" : "Create Post")}
+                    </button>
+                }
                 headerChildren={
                     <div className="flex justify-end items-center gap-2 px-6 pt-2 pb-3 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex bg-surface-input p-1 rounded-lg mr-2 hidden md:flex">
+                        <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex">
                             <button
                                 type="button"
                                 onClick={() => setStatus('published')}
@@ -368,26 +376,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             >
                                 Draft
                             </button>
-
                         </div>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={!isDirty || isSubmitting}
-                            className={`px-6 py-1.5 text-sm font-medium rounded-lg flex items-center justify-center gap-2 transition-all duration-200
-                                ${(!isDirty || isSubmitting)
-                                    ? "bg-surface-hover text-content-muted cursor-not-allowed shadow-none border border-ui-border"
-                                    : "bg-accent text-white hover:bg-accent-light shadow-lg shadow-black/20 border border-transparent"}
-                            `}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                                    Saving...
-                                </>
-                            ) : (
-                                post ? "Save Changes" : "Create Post"
-                            )}
-                        </button>
                     </div>
                 }
             >

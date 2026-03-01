@@ -927,6 +927,16 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 subtitle={isEditing ? (title || "Update home details and settings") : "Add a new residential care home"}
                 fullScreen
                 contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                actions={
+                    <button
+                        type="submit"
+                        form="home-form"
+                        disabled={isEditing ? (!isDirty || isSubmitting) : (!canCreate || isSubmitting)}
+                        className="px-6 py-1.5 text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
+                    >
+                        {isSubmitting ? "Saving..." : (isEditing ? "Update Home" : "Create Home")}
+                    </button>
+                }
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
@@ -984,7 +994,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                             })}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex bg-surface-input p-1 rounded-lg mr-2 hidden md:flex">
+                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex">
                                 <button
                                     type="button"
                                     onClick={() => { setStatus('published'); setIsDirty(true); }}
@@ -999,23 +1009,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                                 >
                                     Draft
                                 </button>
-
                             </div>
-                            <button
-                                type="submit"
-                                form="home-form"
-                                disabled={isEditing ? (!isDirty || isSubmitting) : (!canCreate || isSubmitting)}
-                                className="ml-4 mr-2 md:mr-0 p-[5px] md:w-auto md:h-auto md:px-6 md:py-1.5 flex items-center justify-center text-sm font-medium rounded-lg bg-accent text-white hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"
-                            >
-                                {isSubmitting ? (
-                                    "Saving..."
-                                ) : (
-                                    <>
-                                        <span className="hidden md:inline">{isEditing ? "Update Home" : "Create Home"}</span>
-                                        <Save className="h-7 w-7 md:hidden" />
-                                    </>
-                                )}
-                            </button>
                         </div>
                     </div>
                 }

@@ -16,6 +16,7 @@ export interface CreateUserData {
         };
     };
     location_ids?: string[];
+    entity_assignments?: { entity_id: string; entity_type: 'home' | 'facility' }[];
     manager_id?: string;
 }
 
@@ -23,6 +24,7 @@ export interface UpdateUserData {
     profile?: Partial<UserProfile>;
     role?: UserRole;
     location_ids?: string[];
+    entity_assignments?: { entity_id: string; entity_type: 'home' | 'facility' }[];
     manager_id?: string;
 }
 
@@ -32,6 +34,8 @@ export interface UserListItem {
     role: UserRoleRecord;
     profile: UserProfile | null;
     location_count: number;
+    entity_assignments?: { id: string; entity_id: string; entity_type: 'home' | 'facility' }[];
+    entity_count?: number;
     manager_id?: string;
     manager_name?: string;
 }
@@ -143,5 +147,12 @@ export async function deleteUser(userId: string): Promise<{ data: any; error: an
  */
 export async function assignLocations(userId: string, locationIds: string[]): Promise<{ data: any; error: any }> {
     return updateUser(userId, { location_ids: locationIds });
+}
+
+/**
+ * Assign entities (homes/facilities) to a user (Wrapper for updateUser)
+ */
+export async function assignEntities(userId: string, assignments: { entity_id: string; entity_type: 'home' | 'facility' }[]): Promise<{ data: any; error: any }> {
+    return updateUser(userId, { entity_assignments: assignments });
 }
 
