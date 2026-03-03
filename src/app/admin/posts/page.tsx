@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Plus, FileText, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
+import { Plus, FileText, Pencil, Trash2, Search, Loader2, X } from "lucide-react";
 import type { Post } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
-import { getPosts, deletePost, createPost, updatePost } from "@/lib/services/postService";
+import { getPosts, deletePost, createPost, updatePost, searchPosts } from "@/lib/services/postService";
 import Link from "next/link";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -47,15 +48,21 @@ export default function PostsPage() {
     const { showNotification } = useNotification();
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResultSet, setSearchResultSet] = useState<Post[] | null>(null);
     const [postToDelete, setPostToDelete] = useState<Post | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingPost, setEditingPost] = useState<Post | null>(null);
+
+    // Column filter state
+    const [nameFilter, setNameFilter] = useState('');
+    const [postTypeFilter, setPostTypeFilter] = useState<string[]>([]);
 
     useEffect(() => {
         loadPosts();
@@ -121,6 +128,27 @@ export default function PostsPage() {
         }
     };
 
+    const handleSearch = async () => {
+        if (!searchQuery.trim()) {
+            setSearchResultSet(null);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const results = await searchPosts(searchQuery.trim());
+            setSearchResultSet(results);
+            setCurrentPage(1);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleClearSearch = () => {
+        setSearchQuery("");
+        setSearchResultSet(null);
+        setCurrentPage(1);
+    };
+
     const loadPosts = async () => {
         try {
             const data = await getPosts();
@@ -156,14 +184,25 @@ export default function PostsPage() {
         }
     };
 
-    const filteredPosts = useMemo(() =>
-        posts.filter(
-            (p) =>
-                p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.description.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        [posts, searchQuery]
-    );
+    const postTypeOptions = [
+        { value: 'general', label: 'General Post' },
+        { value: 'caregiver_resources', label: 'Caregiver Resources' },
+        { value: 'caregiving_for_caregivers', label: 'Caregiving for Caregivers' },
+        { value: 'resident_resources', label: 'Resident Resources' },
+        { value: 'news_events', label: 'News & Events' },
+        { value: 'recipes', label: 'Recipes' },
+    ];
+
+    const filteredPosts = useMemo(() => {
+        let result = searchResultSet ?? posts;
+        if (nameFilter) {
+            result = result.filter(p => p.title.toLowerCase().includes(nameFilter.toLowerCase()));
+        }
+        if (postTypeFilter.length > 0) {
+            result = result.filter(p => postTypeFilter.includes(p.postType));
+        }
+        return result;
+    }, [posts, searchResultSet, nameFilter, postTypeFilter]);
 
     const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
     const paginatedPosts = filteredPosts.slice(
@@ -187,7 +226,28 @@ export default function PostsPage() {
     const columns: ColumnDef<Post>[] = [
         {
             key: "title",
-            header: "Post",
+            headerLabel: "Post",
+            header: (
+                <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-content-muted pointer-events-none" />
+                    <input
+                        type="text"
+                        value={nameFilter}
+                        onChange={e => { setNameFilter(e.target.value); setCurrentPage(1); }}
+                        placeholder="Post"
+                        className={`form-input w-60 pl-7 pr-7 py-2 text-xs${nameFilter ? ' ring-2 ring-accent' : ''}`}
+                    />
+                    {nameFilter && (
+                        <button
+                            type="button"
+                            onClick={() => { setNameFilter(''); setCurrentPage(1); }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-content-muted hover:text-content-primary transition-colors z-10"
+                        >
+                            <X className="h-3 w-3" />
+                        </button>
+                    )}
+                </div>
+            ),
             render: (post) => (
                 <button
                     type="button"
@@ -216,7 +276,20 @@ export default function PostsPage() {
         },
         {
             key: "type",
-            header: "Post Type",
+            header: (
+                <EnhancedSelect
+                    multiValue={postTypeFilter}
+                    onMultiChange={setPostTypeFilter}
+                    options={postTypeOptions}
+                    placeholder="Post Type"
+                    textSize="text-xs"
+                    isActive={postTypeFilter.length > 0}
+                    onClear={() => setPostTypeFilter([])}
+                    multiLabel="types"
+                    className="w-40"
+                />
+            ),
+            headerLabel: "Post Type",
             render: (post) => (
                 <span className="text-sm text-content-secondary">
                     {getPostTypeLabel(post.postType)}
@@ -293,16 +366,40 @@ export default function PostsPage() {
                     </button>
                 </div>
 
-                <div className="relative w-56">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
-                    <input
-                        type="text"
-                        placeholder="Search posts..."
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                        className="search-field pl-8"
-                    />
+                <div className="flex items-center gap-2">
+                    <div className="relative w-80">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
+                        <input
+                            type="text"
+                            placeholder="Search posts..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                            disabled={isSearching}
+                            className="search-field pl-8 pr-8"
+                        />
+                        {searchResultSet !== null && (
+                            <button
+                                type="button"
+                                onClick={handleClearSearch}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-primary transition-colors"
+                                title="Clear search"
+                            >
+                                ×
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleSearch}
+                        disabled={isSearching}
+                        className="p-1.5 rounded-lg transition-colors text-content-secondary hover:bg-surface-hover hover:text-content-primary disabled:opacity-50"
+                        title="Search"
+                    >
+                        {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    </button>
                 </div>
+
             </div>
 
             {/* Scrollable Table Section */}
@@ -315,7 +412,7 @@ export default function PostsPage() {
                             keyField="id"
                             actions={renderActions}
                             primaryColumn="title"
-                            emptyMessage={searchQuery ? "No posts match your search." : "No posts yet."}
+                            emptyMessage={searchResultSet !== null || nameFilter || postTypeFilter.length > 0 ? "No posts match your filters." : "No posts yet."}
                         />
                     </div>
 

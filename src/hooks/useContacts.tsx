@@ -16,7 +16,7 @@ export interface Contact {
   phone?: string;
   email?: string;
   date_of_birth?: string;
-  manual_age?: number;
+  manual_age?: number | null;
   care_level?: string;
   dietary_needs?: string[];
   medication_management?: string[];
@@ -48,13 +48,13 @@ export interface Contact {
   zip_code?: string;
   ethnicity?: string;
   gender?: string;
-  height_feet?: number;
-  height_inches?: number;
-  weight?: number;
+  height_feet?: number | null;
+  height_inches?: number | null;
+  weight?: number | null;
   preferred_island?: string;
   preferred_neighborhood?: string;
-  minimum_budget?: number;
-  maximum_budget?: number;
+  minimum_budget?: number | null;
+  maximum_budget?: number | null;
   pcp_name?: string;
   pcp_email?: string;
   pcp_phone?: string;
@@ -108,9 +108,9 @@ export interface Contact {
   // Referral information fields
   referral_location?: string;
   referral_location_address?: string;
-  referral_monthly_rate?: number;
-  referral_fee_percentage?: number;
-  referral_tax?: number;
+  referral_monthly_rate?: number | null;
+  referral_fee_percentage?: number | null;
+  referral_tax?: number | null;
   // Invoice fields
   invoice_sent?: boolean;
   invoice_sent_date?: string;

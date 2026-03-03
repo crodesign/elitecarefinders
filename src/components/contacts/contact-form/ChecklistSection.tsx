@@ -82,7 +82,7 @@ function CheckRow({ id, label, checked, onChange, disabled }: { id: string; labe
         }`}
     >
       <span className={`text-sm font-medium ${checked ? "text-content-primary" : "text-content-secondary"}`}>{label}</span>
-      <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${checked ? "border border-accent bg-accent" : "bg-surface-secondary"
+      <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${checked ? "border border-emerald-500 bg-emerald-500" : "bg-surface-secondary"
         }`}>
         {checked
           ? <Check className="h-3 w-3 text-white" />
@@ -523,7 +523,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
                   <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
                     {/* Chest X-Ray toggle inline with label */}
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium text-content-secondary">Chest X-Ray <span className="text-content-muted">("No Active TB")</span></span>
+                      <span className="text-sm font-medium text-content-secondary">Chest X-Ray <span className="text-content-muted">(&ldquo;No Active TB&rdquo;)</span></span>
                       <Switch
                         id="chest-xray"
                         checked={formData?.chestXray || false}

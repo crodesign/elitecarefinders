@@ -232,7 +232,7 @@ export function IconPicker({ value, onChange }: IconPickerProps) {
                         })}
                         {filtered.length === 0 && (
                             <div className="col-span-8 text-center text-content-muted text-xs py-4">
-                                No icons match "{search}"
+                                No icons match &ldquo;{search}&rdquo;
                             </div>
                         )}
                     </div>

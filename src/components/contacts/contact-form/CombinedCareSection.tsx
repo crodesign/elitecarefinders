@@ -1,7 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { HeartPulse, Thermometer, Footprints, Brain, Pill, StickyNote } from "lucide-react";
+import { HeartPulse, Thermometer, Footprints, Brain, Pill, StickyNote, Check, X } from "lucide-react";
 
 interface CombinedCareSectionProps {
   formData?: any;
@@ -19,23 +16,49 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
     if (handleChange) handleChange(updater);
   };
 
-  const updateArrayField = (field: string, item: string, checked: boolean) => {
+  const toggleArrayItem = (field: string, item: string) => {
+    if (readOnly) return;
     const updater = (prev: any) => {
-      const currentArray = prev[field] || [];
-      const newArray = checked
-        ? [...currentArray, item]
-        : currentArray.filter((i: string) => i !== item);
-      return { ...prev, [field]: newArray };
+      const arr: string[] = prev[field] || [];
+      const next = arr.includes(item) ? arr.filter((i: string) => i !== item) : [...arr, item];
+      return { ...prev, [field]: next };
     };
     if (setFormData) setFormData(updater);
     if (handleChange) handleChange(updater);
   };
+
+  const CheckRow = ({ field, option }: { field: string; option: string }) => {
+    const isSelected = (formData?.[field] || []).includes(option);
+    return (
+      <button
+        type="button"
+        onClick={() => toggleArrayItem(field, option)}
+        disabled={readOnly}
+        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${
+          isSelected
+            ? "bg-surface-input text-content-primary"
+            : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+        }`}
+      >
+        <span className="text-sm font-medium">{option}</span>
+        <div
+          className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
+          style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+        >
+          {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+        </div>
+      </button>
+    );
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Column 1: Care Needs + Medical Conditions */}
       <div className="space-y-[10px]">
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><HeartPulse className="h-4 w-4 text-accent" />Care Needs</label>
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+            <HeartPulse className="h-4 w-4 text-accent" />Care Needs
+          </label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "No Care", "Memory Care", "Complete personal care", "Feeding Assistance",
@@ -43,38 +66,22 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
               "Mobility Assistance", "Personal Hygiene Assistance", "Bathing Assistance",
               "Dressing Assistance", "Soft Foods"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-surface-hover border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-content-secondary">{option}</span>
-                <Checkbox
-                  id={`cn-${option.toLowerCase().replace(/\s+/g, '-')}`}
-                  checked={formData?.careNeeds?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('careNeeds', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+              <CheckRow key={option} field="careNeeds" option={option} />
             ))}
           </div>
         </div>
 
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Thermometer className="h-4 w-4 text-accent" />Medical Conditions</label>
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+            <Thermometer className="h-4 w-4 text-accent" />Medical Conditions
+          </label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Blood Sugar Monitoring", "Sliding Scale Injections", "Insulin Injections",
               "Low Sugar Diet", "Diabetes", "Soft Pureed Diet", "Hypertension",
               "Heart Condition", "Stroke", "Arthritis", "Cancer", "Kidney Disease"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-surface-hover border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-content-secondary">{option}</span>
-                <Checkbox
-                  id={`mc-${option.toLowerCase().replace(/\s+/g, '-')}`}
-                  checked={formData?.medicalConditions?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('medicalConditions', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+              <CheckRow key={option} field="medicalConditions" option={option} />
             ))}
           </div>
         </div>
@@ -83,28 +90,23 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
       {/* Column 2: Level of Mobility + Mental Health */}
       <div className="space-y-[10px]">
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Footprints className="h-4 w-4 text-accent" />Level of Mobility</label>
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+            <Footprints className="h-4 w-4 text-accent" />Level of Mobility
+          </label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Hoyer Lift", "Non Ambulatory", "Wheelchair", "Cane",
               "1-Person Transfer", "Walker", "2-Person Transfer", "Independent"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-surface-hover border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-content-secondary">{option}</span>
-                <Checkbox
-                  id={`mob-${option.toLowerCase().replace(/\s+/g, '-')}`}
-                  checked={formData?.mobilityLevel?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('mobilityLevel', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+              <CheckRow key={option} field="mobilityLevel" option={option} />
             ))}
           </div>
         </div>
 
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Brain className="h-4 w-4 text-accent" />Mental Health</label>
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+            <Brain className="h-4 w-4 text-accent" />Mental Health
+          </label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Memory Issues", "Hallucinations", "Wandering", "Aggressiveness towards Others",
@@ -112,16 +114,7 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
               "Mild Cognitive Impairment (MCI)", "Alzheimer's", "Sundowning", "Combativeness",
               "Doesn't Sleep Through Night"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-surface-hover border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-content-secondary">{option}</span>
-                <Checkbox
-                  id={`mh-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.mentalHealth?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('mentalHealth', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+              <CheckRow key={option} field="mentalHealth" option={option} />
             ))}
           </div>
         </div>
@@ -130,22 +123,15 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
       {/* Column 3: Medication Management */}
       <div className="space-y-[10px]">
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]"><Pill className="h-4 w-4 text-accent" />Medication Management</label>
+          <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+            <Pill className="h-4 w-4 text-accent" />Medication Management
+          </label>
           <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {[
               "Independent", "Reminders Only", "Setup Assistance", "Full Assistance",
               "Pill Crushing", "Injection Assistance", "24/7 Supervision", "Bubble Pack Management"
             ].map((option) => (
-              <div key={option} className="w-full flex items-center justify-between p-3 rounded-lg border bg-surface-hover border-transparent transition-all hover:bg-white/15">
-                <span className="text-sm font-medium text-content-secondary">{option}</span>
-                <Checkbox
-                  id={`med-${option.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  checked={formData?.medicationManagement?.includes(option) || false}
-                  onCheckedChange={(checked) => updateArrayField('medicationManagement', option, !!checked)}
-                  disabled={readOnly}
-                  className="border-ui-border data-[state=checked]:bg-accent data-[state=checked]:border-accent"
-                />
-              </div>
+              <CheckRow key={option} field="medicationManagement" option={option} />
             ))}
           </div>
         </div>
@@ -173,4 +159,3 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
 };
 
 export default CombinedCareSection;
-

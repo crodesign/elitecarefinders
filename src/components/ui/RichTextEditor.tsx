@@ -315,10 +315,10 @@ function Toolbar() {
                 </button>
                 {showHeadingMenu && (
                     <div className="absolute top-full left-0 mt-1 bg-surface-primary border border-ui-border rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
-                        {([["paragraph", <Type className="w-4 h-4" />, "Normal"],
-                        ["h2", <Heading2 className="w-4 h-4" />, "Heading 2"],
-                        ["h3", <Heading3 className="w-4 h-4" />, "Heading 3"],
-                        ["h4", <Heading4 className="w-4 h-4" />, "Heading 4"]] as const).map(([tag, icon, label]) => (
+                        {([["paragraph", <Type key="para" className="w-4 h-4" />, "Normal"],
+                        ["h2", <Heading2 key="h2" className="w-4 h-4" />, "Heading 2"],
+                        ["h3", <Heading3 key="h3" className="w-4 h-4" />, "Heading 3"],
+                        ["h4", <Heading4 key="h4" className="w-4 h-4" />, "Heading 4"]] as const).map(([tag, icon, label]) => (
                             <button key={tag} type="button"
                                 className={`${dropdownBtn} ${blockType === tag ? "text-accent" : "text-content-muted"}`}
                                 onClick={() => formatHeading(tag as any)}>
@@ -355,10 +355,10 @@ function Toolbar() {
                 </button>
                 {showAlignMenu && (
                     <div className="absolute top-full left-0 mt-1 bg-surface-primary border border-ui-border rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[120px]">
-                        {([["left", <AlignLeft className="w-4 h-4" />, "Left"],
-                        ["center", <AlignCenter className="w-4 h-4" />, "Center"],
-                        ["right", <AlignRight className="w-4 h-4" />, "Right"],
-                        ["justify", <AlignJustify className="w-4 h-4" />, "Justify"]] as const).map(([align, icon, label]) => (
+                        {([["left", <AlignLeft key="left" className="w-4 h-4" />, "Left"],
+                        ["center", <AlignCenter key="center" className="w-4 h-4" />, "Center"],
+                        ["right", <AlignRight key="right" className="w-4 h-4" />, "Right"],
+                        ["justify", <AlignJustify key="justify" className="w-4 h-4" />, "Justify"]] as const).map(([align, icon, label]) => (
                             <button key={align} type="button"
                                 className={`${dropdownBtn} text-content-muted`}
                                 onClick={() => {

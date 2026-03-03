@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Phone, Mail, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, CalendarIcon, X, UserCheck, Compass, Stethoscope, ShieldCheck, Activity, Info, User } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -22,6 +22,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
   const [pcpEmailError, setPcpEmailError] = useState<string | null>(null);
 
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarCloseRef = useRef<HTMLButtonElement>(null);
   const [calendarMonth, setCalendarMonth] = useState<Date>(
     formData?.date_of_birth ? (parseHawaiiDate(formData.date_of_birth) || new Date()) : new Date()
   );
@@ -134,21 +135,13 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
               <div className="flex items-center gap-2">
                 <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all flex-1">
                   <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
-                  <input
-                    type="text"
-                    list="states-list-resident"
+                  <SimpleSelect
                     value={formData?.state || ""}
-                    onChange={(e) => {
-                      updateField('state', e.target.value);
-                    }}
-                    className="form-input text-sm text-left w-32 h-8 rounded-md px-3"
+                    onChange={(val) => updateField('state', val)}
+                    options={stateOptions}
                     placeholder="State"
+                    className="w-32 text-sm text-left"
                   />
-                  <datalist id="states-list-resident">
-                    {stateOptions.map((s) => (
-                      <option key={s} value={s} />
-                    ))}
-                  </datalist>
                 </div>
                 <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
                   <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
@@ -176,10 +169,11 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           {/* Date of Birth */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Date of Birth</label>
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <Popover onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
+                  disabled={readOnly}
                   className={cn(
                     "form-input w-full flex items-center justify-start text-left font-normal px-3 py-1.5 text-sm h-8",
                     formData?.date_of_birth ? "text-content-primary" : "text-content-muted"
@@ -204,17 +198,19 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                 className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
                 align="start"
               >
+                <PopoverClose ref={calendarCloseRef} className="hidden" />
                 {/* Custom header: close button + month/year nav */}
                 <div className="p-3 pb-1 space-y-2">
                   {/* Close button */}
                   <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setCalendarOpen(false)}
-                      className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
+                    <PopoverClose asChild>
+                      <button
+                        type="button"
+                        className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </PopoverClose>
                   </div>
                   {/* Month/Year navigation row */}
                   <div className="flex items-center justify-between gap-2">
@@ -279,7 +275,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                   selected={formData?.date_of_birth ? (parseHawaiiDate(formData.date_of_birth) || undefined) : undefined}
                   onSelect={(date) => {
                     updateField('date_of_birth', date ? formatDateForHawaii(date) : null);
-                    if (date) setCalendarOpen(false);
+                    if (date) calendarCloseRef.current?.click();
                   }}
                   disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                   className="p-3 pt-0 pointer-events-auto"
@@ -304,7 +300,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
 
           {/* Gender */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <span className="font-medium text-sm text-content-secondary">Gender</span>
+            <span className="font-medium text-sm text-content-secondary pl-[5px]">Gender</span>
             <SimpleSelect
               value={formData?.gender || ""}
               onChange={(val) => updateField('gender', val)}
@@ -316,7 +312,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
 
           {/* Ethnicity */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <span className="font-medium text-sm text-content-secondary">Ethnicity</span>
+            <span className="font-medium text-sm text-content-secondary pl-[5px]">Ethnicity</span>
             <SimpleSelect
               value={formData?.ethnicity || ""}
               onChange={(val) => updateField('ethnicity', val)}
@@ -329,7 +325,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           {/* Height & Weight */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
             <div className="flex items-center gap-1.5">
-              <label className="text-sm font-medium text-content-secondary">Height</label>
+              <label className="text-sm font-medium text-content-secondary pl-[5px]">Height</label>
               <div className="relative w-14">
                 <input
                   type="number"
@@ -384,7 +380,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
           </h3>
           {/* Island - Inline dropdown */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <span className="font-medium text-sm text-content-secondary">Island</span>
+            <span className="font-medium text-sm text-content-secondary pl-[5px]">Island</span>
             <SimpleSelect
               value={formData?.preferred_island || ""}
               onChange={(val) => {
@@ -399,7 +395,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
 
           {/* Neighborhood - Inline dropdown */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <span className="font-medium text-sm text-content-secondary">Neighborhood</span>
+            <span className="font-medium text-sm text-content-secondary pl-[5px]">Neighborhood</span>
             <SimpleSelect
               value={formData?.preferred_neighborhood || ""}
               onChange={(val) => updateField('preferred_neighborhood', val)}
@@ -411,7 +407,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
 
           {/* Min Budget - Currency field */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <label className="text-sm font-medium text-content-secondary">Min Budget</label>
+            <label className="text-sm font-medium text-content-secondary pl-[5px]">Min Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.minimum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
               <input
@@ -450,7 +446,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
 
           {/* Max Budget - Currency field */}
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <label className="text-sm font-medium text-content-secondary">Max Budget</label>
+            <label className="text-sm font-medium text-content-secondary pl-[5px]">Max Budget</label>
             <div className="relative w-32">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${formData?.maximum_budget ? "text-content-secondary" : "text-content-muted"}`}>$</span>
               <input

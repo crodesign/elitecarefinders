@@ -80,7 +80,7 @@ export function HomeFieldCategory({
                                         });
                                     }}
                                     className={`h-8 px-3 rounded-md flex items-center gap-2 transition-all ${roomDetails.customFields[field.id] === true
-                                        ? "bg-accent text-white shadow-lg shadow-accent/20"
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                                         : roomDetails.customFields[field.id] === false
                                             ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
                                             : "bg-surface-input text-content-muted hover:bg-surface-hover"
@@ -132,7 +132,7 @@ export function HomeFieldCategory({
                                         >
                                             <span className="text-sm font-medium">{opt}</span>
                                             <div
-                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt ? "border border-accent bg-accent text-white" : ""}`}
+                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                 style={roomDetails.customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                             >
                                                 {roomDetails.customFields[field.id] === opt
@@ -166,8 +166,8 @@ export function HomeFieldCategory({
 
                         {/* Text Field */}
                         {field.type === 'text' && (
-                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
                                 <input
                                     type="text"
                                     value={roomDetails.customFields[field.id] as string || ""}
@@ -178,8 +178,8 @@ export function HomeFieldCategory({
                                             customFields: { ...prev.customFields, [field.id]: e.target.value }
                                         }));
                                     }}
-                                    className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
-                                    placeholder={`Enter ${field.name.toLowerCase()}...`}
+                                    className="w-40 rounded-md px-3 py-1 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                    placeholder={`Enter...`}
                                 />
                             </div>
                         )}
@@ -257,9 +257,9 @@ export function HomeFieldCategory({
 
                         {/* Phone Field */}
                         {field.type === 'phone' && (
-                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
-                                <div className="relative">
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
+                                <div className="relative w-40">
                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                                     <input
                                         type="tel"
@@ -271,7 +271,7 @@ export function HomeFieldCategory({
                                                 customFields: { ...prev.customFields, [field.id]: formatted }
                                             }));
                                         }}
-                                        className="w-full rounded-md pl-9 pr-3 py-2 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                        className="w-full rounded-md pl-9 pr-3 py-1 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                         placeholder="(555) 555-5555"
                                     />
                                 </div>
@@ -280,14 +280,14 @@ export function HomeFieldCategory({
 
                         {/* Email Field */}
                         {field.type === 'email' && (
-                            <div className={`bg-surface-hover rounded-lg p-[5px] transition-all space-y-2 ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
+                            <div className={`flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
                                     {invalidEmailFields.has(field.id) && (
-                                        <span className="text-[10px] text-red-400 font-medium px-1.5 py-0.5 bg-red-500/10 rounded">Invalid format</span>
+                                        <span className="text-[10px] text-red-400 font-medium px-1.5 py-0.5 bg-red-500/10 rounded">Invalid</span>
                                     )}
                                 </div>
-                                <div className="relative">
+                                <div className="relative w-40">
                                     <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${invalidEmailFields.has(field.id) ? 'text-red-400' : 'text-content-muted'}`} />
                                     <input
                                         type="email"
@@ -299,7 +299,6 @@ export function HomeFieldCategory({
                                                 customFields: { ...prev.customFields, [field.id]: val }
                                             }));
 
-                                            // Check format
                                             if (val && (!val.includes('@') || val.indexOf('.', val.indexOf('@')) === -1)) {
                                                 setInvalidEmailFields(prev => new Set(prev).add(field.id));
                                             } else {
@@ -310,7 +309,7 @@ export function HomeFieldCategory({
                                                 });
                                             }
                                         }}
-                                        className={`w-full rounded-md pl-9 pr-3 py-2 text-left text-sm focus:outline-none transition-colors ${invalidEmailFields.has(field.id)
+                                        className={`w-full rounded-md pl-9 pr-3 py-1 text-left text-sm focus:outline-none transition-colors ${invalidEmailFields.has(field.id)
                                             ? "bg-red-500/10 text-white placeholder-red-300/50 focus:bg-red-500/20"
                                             : "bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
                                             }`}
@@ -396,7 +395,7 @@ export function HomeFieldCategory({
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
                                                 <div
-                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                     style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                                 >
                                                     {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
@@ -432,7 +431,7 @@ export function HomeFieldCategory({
                                                 >
                                                     <span className="text-sm font-medium">{opt}</span>
                                                     <div
-                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                         style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                                     >
                                                         {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}

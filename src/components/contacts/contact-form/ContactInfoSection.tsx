@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SignaturePadEnhanced, SignaturePadEnhancedRef } from "@/components/ui/signature-pad-enhanced";
@@ -47,6 +47,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
 
   // Referral date calendar state
   const [referralCalendarOpen, setReferralCalendarOpen] = useState(false);
+  const referralCalendarCloseRef = useRef<HTMLButtonElement>(null);
   const [referralCalendarMonth, setReferralCalendarMonth] = useState<Date>(
     formData?.referralDate ? (parseHawaiiDate(formData.referralDate) || new Date()) : new Date()
   );
@@ -529,7 +530,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
         {/* Secondary Contact */}
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
+            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pl-[5px]">
               <UserPlus className="h-4 w-4 text-accent" />
               Secondary Contact
             </h3>
@@ -597,7 +598,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
       < div className="space-y-[10px]" >
         <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-            <span className="font-medium text-sm text-content-secondary">Looking For</span>
+            <span className="font-medium text-sm text-content-secondary pl-[5px]">Looking For</span>
             <SimpleSelect
               value={formData?.lookingFor || ""}
               onChange={(val) => updateField('lookingFor', val)}
@@ -618,7 +619,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
               <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Referral Date</label>
-              <Popover open={referralCalendarOpen} onOpenChange={setReferralCalendarOpen}>
+              <Popover onOpenChange={setReferralCalendarOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -641,17 +642,19 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                   className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
                   align="start"
                 >
+                  <PopoverClose ref={referralCalendarCloseRef} className="hidden" />
                   {/* Custom header: close button + month/year nav */}
                   <div className="p-3 pb-1 space-y-2">
                     {/* Close button */}
                     <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setReferralCalendarOpen(false)}
-                        className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
+                      <PopoverClose asChild>
+                        <button
+                          type="button"
+                          className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </PopoverClose>
                     </div>
                     {/* Month/Year navigation row */}
                     <div className="flex items-center justify-between gap-2">
@@ -716,7 +719,7 @@ const ContactInfoSection = ({ formData, setFormData, handleChange: handleChangeP
                     selected={formData?.referralDate ? (parseHawaiiDate(formData.referralDate) || undefined) : undefined}
                     onSelect={(date) => {
                       updateField('referralDate', date ? formatDateForHawaii(date) : null);
-                      if (date) setReferralCalendarOpen(false);
+                      if (date) referralCalendarCloseRef.current?.click();
                     }}
                     className="p-3 pt-0 pointer-events-auto"
                     classNames={{
@@ -787,7 +790,7 @@ In consideration of the opportunity to obtain the Services, I hereby RELEASE, WA
 
 This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by facsimile, email, or other electronic medium. Such signature shall be treated in all respects as having the same force and effect as original handwritten signatures.`}
             onChange={(e) => updateField('waiverText', e.target.value)}
-            className="h-[160px] text-xs leading-relaxed bg-surface-hover border-0 text-content-secondary resize-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
+            className="h-[calc(100vh-690px)] min-h-[100px] text-xs leading-relaxed bg-surface-hover border-0 text-content-secondary resize-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-lg custom-scrollbar whitespace-pre-wrap p-3"
             readOnly
           />
 
@@ -834,7 +837,7 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-content-secondary">Digital Signature</label>
+          <label className="text-sm font-medium text-content-secondary block text-center">Digital Signature</label>
           <div className="mt-2">
             <SignaturePadEnhanced
               ref={signaturePadRef}
@@ -901,7 +904,7 @@ This ACKNOWLEDGMENT AND WAIVER may be electronically signed and/or delivered by 
           <AlertDialogHeader>
             <AlertDialogTitle>Change Contact Status</AlertDialogTitle>
             <AlertDialogDescription className="text-content-muted">
-              Are you sure you want to change this contact's status to "{pendingStatus}"?
+              Are you sure you want to change this contact&apos;s status to &ldquo;{pendingStatus}&rdquo;?
               {pendingStatus === "Active" && " This will reactivate the contact and make all form fields editable."}
               {pendingStatus === "Paused" && " This will make all form fields read-only until the status is changed back to Active."}
               {pendingStatus === "Disabled" && " This will disable all form fields and the contact will be marked as disabled."}

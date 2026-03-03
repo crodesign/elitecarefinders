@@ -333,7 +333,7 @@ button.form-input:focus {
   }
 
   .search-field::placeholder {
-    color: var(--content-muted);
+    color: var(--content-secondary);
   }
 
   .search-field:focus {
@@ -347,6 +347,10 @@ button.form-input:focus {
   .table-header {
     @apply text-xs font-semibold uppercase tracking-wider text-content-secondary;
     background: color-mix(in srgb, var(--surface-card) 90%, white);
+  }
+
+  .table-header button.form-input {
+    border-color: transparent;
   }
 
   [data-theme="light"] .table-header {

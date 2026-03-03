@@ -82,7 +82,7 @@ export function FacilityFieldCategory({
                                         });
                                     }}
                                     className={`h-8 px-3 rounded-md flex items-center gap-2 transition-all ${customFields[field.id] === true
-                                        ? "bg-accent text-white shadow-lg shadow-accent/20"
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                                         : customFields[field.id] === false
                                             ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
                                             : "bg-surface-input text-content-muted hover:bg-surface-hover"
@@ -135,7 +135,7 @@ export function FacilityFieldCategory({
                                         >
                                             <span className="text-sm font-medium">{opt}</span>
                                             <div
-                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${customFields[field.id] === opt ? "border border-accent bg-accent text-white" : ""}`}
+                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${customFields[field.id] === opt ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                 style={customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                             >
                                                 {customFields[field.id] === opt
@@ -407,7 +407,7 @@ export function FacilityFieldCategory({
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
                                                 <div
-                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                     style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                                 >
                                                     {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}

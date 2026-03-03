@@ -27,6 +27,22 @@ export async function getPosts(): Promise<Post[]> {
     }));
 }
 
+export async function searchPosts(query: string): Promise<Post[]> {
+    const { data, error } = await supabase.rpc('search_posts', { keyword: query });
+    if (error) throw new Error(error.message);
+    return (data || []).map((post: any) => ({
+        ...post,
+        images: post.images || [],
+        featuredImageUrl: post.images && post.images.length > 0 ? post.images[0] : null,
+        videoUrl: post.video_url || null,
+        authorId: post.author_id,
+        postType: post.post_type,
+        publishedAt: post.published_at,
+        createdAt: post.created_at,
+        updatedAt: post.updated_at,
+    }));
+}
+
 export async function getPost(id: string): Promise<Post | null> {
     const { data, error } = await supabase
         .from("posts")

@@ -114,7 +114,7 @@ export function FacilityRoomsTab({
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div
-                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-accent bg-accent text-white" : ""}`}
+                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                             style={!selected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                         >
                                             {selected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
@@ -177,7 +177,7 @@ export function FacilityRoomsTab({
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div
-                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-accent bg-accent text-white" : ""}`}
+                                            className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                             style={!selected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                         >
                                             {selected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}

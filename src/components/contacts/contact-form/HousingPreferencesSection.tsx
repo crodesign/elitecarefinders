@@ -1,4 +1,3 @@
-import { Textarea } from "@/components/ui/textarea";
 import { CalendarClock, Home, BedDouble, Bath, ShowerHead, Heart, StickyNote, Check, X } from "lucide-react";
 import { SimpleSelect } from "../../admin/SimpleSelect";
 
@@ -14,9 +13,7 @@ interface HousingPreferencesSectionProps {
 const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOnly = false }: HousingPreferencesSectionProps) => {
   const updateField = (field: string, value: any) => {
     const updater = (prev: any) => ({ ...prev, [field]: value });
-    // Always update UI state directly for instant feedback
     if (setFormData) setFormData(updater);
-    // Also notify auto-save wrapper (if both provided, it fires after direct update)
     if (handleChange) handleChange(updater);
   };
 
@@ -31,7 +28,6 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
     if (handleChange) handleChange(updater);
   };
 
-  // Reusable clickable checkbox row matching HomeFieldCategory multi pattern
   const CheckRow = ({ field, option }: { field: string; option: string }) => {
     const isSelected = (formData?.[field] || []).includes(option);
     return (
@@ -39,12 +35,17 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
         type="button"
         onClick={() => toggleArrayItem(field, option)}
         disabled={readOnly}
-        className={`w-full flex items-center justify-between p-3 rounded-lg border border-transparent transition-all ${isSelected ? "bg-surface-hover" : "bg-surface-hover hover:bg-black/20"
-          }`}
+        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${
+          isSelected
+            ? "bg-surface-input text-content-primary"
+            : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+        }`}
       >
-        <span className={`text-sm font-medium ${isSelected ? "text-content-primary" : "text-content-secondary"}`}>{option}</span>
-        <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${isSelected ? "border border-accent bg-accent" : "bg-surface-secondary"
-          }`}>
+        <span className="text-sm font-medium">{option}</span>
+        <div
+          className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
+          style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+        >
           {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
         </div>
       </button>
@@ -56,9 +57,9 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
       {/* Column 1: Move-in Dates + Housing Type */}
       <div className="space-y-[10px]">
         {/* Move-in Timeframe */}
-        <div className="bg-surface-hover rounded-lg">
+        <div className="bg-surface-input rounded-lg">
           <div className="flex items-center justify-between gap-2 p-[5px]">
-            <span className="font-medium text-sm text-content-secondary whitespace-nowrap flex items-center gap-2">
+            <span className="font-medium text-sm text-content-secondary whitespace-nowrap flex items-center gap-2 pl-[5px]">
               <CalendarClock className="h-4 w-4 text-accent" />
               Move-in Date
             </span>
@@ -73,7 +74,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
         </div>
 
         {/* Housing Type */}
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Home className="h-4 w-4 text-accent" />Housing Type
           </label>
@@ -109,7 +110,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
 
       {/* Column 2: Room Type + Bathroom Type */}
       <div className="space-y-[10px]">
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <BedDouble className="h-4 w-4 text-accent" />Room Type
           </label>
@@ -120,7 +121,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
           </div>
         </div>
 
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Bath className="h-4 w-4 text-accent" />Bathroom Type
           </label>
@@ -134,7 +135,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
 
       {/* Column 3: Shower Type + Interests */}
       <div className="space-y-[10px]">
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <ShowerHead className="h-4 w-4 text-accent" />Shower Type
           </label>
@@ -145,7 +146,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
           </div>
         </div>
 
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <Heart className="h-4 w-4 text-accent" />Interests
           </label>
@@ -163,7 +164,7 @@ const HousingPreferencesSection = ({ formData, setFormData, handleChange, readOn
 
       {/* Column 4: Additional Notes */}
       <div className="space-y-[10px]">
-        <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
           <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
             <StickyNote className="h-4 w-4 text-accent" />
             Additional Notes

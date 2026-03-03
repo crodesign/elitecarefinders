@@ -196,7 +196,7 @@ export function HomeRoomsTab({
                                 >
                                     <span className="text-sm font-medium">{lang}</span>
                                     <div
-                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-accent bg-accent text-white" : ""}`}
+                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                         style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                     >
                                         {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}

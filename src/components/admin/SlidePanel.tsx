@@ -153,7 +153,7 @@ export function SlidePanel({
                             <div>
                                 <h2 className="text-xl font-bold text-content-primary">{title}</h2>
                                 {subtitle && (
-                                    <p className="text-sm text-content-secondary mt-1">{subtitle}</p>
+                                    <div className="text-sm text-content-secondary mt-1">{subtitle}</div>
                                 )}
                             </div>
                             <div className="flex items-center gap-2">

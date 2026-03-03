@@ -32,6 +32,28 @@ export async function getHomes(): Promise<Home[]> {
     }));
 }
 
+export async function searchHomes(query: string): Promise<Home[]> {
+    const { data, error } = await supabase.rpc('search_homes', { keyword: query });
+    if (error) throw new Error(error.message);
+    return (data || []).map((home: any) => ({
+        ...home,
+        address: home.address || { street: "", city: "", state: "", zip: "" },
+        displayReferenceNumber: home.display_reference_number,
+        showAddress: home.show_address,
+        taxonomyEntryIds: home.taxonomy_entry_ids || [],
+        isFeatured: home.is_featured,
+        hasFeaturedVideo: home.has_featured_video,
+        isHomeOfMonth: home.is_home_of_month,
+        featuredLabel: home.featured_label,
+        homeOfMonthDescription: home.home_of_month_description,
+        images: home.images || [],
+        teamImages: home.team_images || [],
+        videos: home.videos || [],
+        roomDetails: { customFields: {}, ...(home.room_details || {}) },
+        updatedAt: home.updated_at,
+    }));
+}
+
 export async function getHome(id: string): Promise<Home | null> {
     const { data, error } = await supabase
         .from("homes")

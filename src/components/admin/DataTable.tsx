@@ -8,6 +8,7 @@ export interface ColumnDef<T> {
     headerLabel?: string; // plain text label for mobile card rows
     render: (item: T) => ReactNode;
     hideOnMobile?: boolean;
+    width?: string;
 }
 
 interface DataTableProps<T> {
@@ -43,16 +44,16 @@ export function DataTable<T>({
         <>
             {/* Desktop Table */}
             <div className="hidden md:block">
-                <table className="min-w-full">
+                <table className="w-full table-fixed">
                     <thead className="table-header sticky top-0 z-10">
                         <tr>
                             {columns.map((col) => (
-                                <th key={col.key} className="px-6 py-3 text-left">
+                                <th key={col.key} className="px-6 py-3 text-left" style={col.width ? { width: col.width } : undefined}>
                                     {col.header}
                                 </th>
                             ))}
                             {actions && (
-                                <th className="px-6 py-3 text-right border-l border-ui-border w-1 whitespace-nowrap">Actions</th>
+                                <th className="px-3 py-3 border-l border-ui-border" style={{ width: '92px' }}></th>
                             )}
                         </tr>
                     </thead>
@@ -65,7 +66,7 @@ export function DataTable<T>({
                                     </td>
                                 ))}
                                 {actions && (
-                                    <td className="px-6 py-2 border-l border-ui-border w-1 whitespace-nowrap">
+                                    <td className="px-3 py-2 border-l border-ui-border whitespace-nowrap">
                                         <div className="flex justify-end gap-1">
                                             {actions(item)}
                                         </div>

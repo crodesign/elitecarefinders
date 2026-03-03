@@ -25,6 +25,22 @@ export async function getFacilities(): Promise<Facility[]> {
     }));
 }
 
+export async function searchFacilities(query: string): Promise<Facility[]> {
+    const { data, error } = await supabase.rpc('search_facilities', { keyword: query });
+    if (error) throw new Error(error.message);
+    return (data || []).map((facility: any) => ({
+        ...facility,
+        address: facility.address || { street: "", city: "", state: "", zip: "" },
+        licenseNumber: facility.license_number,
+        taxonomyIds: facility.taxonomy_ids || [],
+        images: facility.images || [],
+        teamImages: facility.team_images || [],
+        videos: facility.videos || [],
+        roomDetails: facility.room_details || { customFields: {} },
+        updatedAt: facility.updated_at,
+    }));
+}
+
 export async function getFacility(id: string): Promise<Facility | null> {
     const { data, error } = await supabase
         .from("facilities")

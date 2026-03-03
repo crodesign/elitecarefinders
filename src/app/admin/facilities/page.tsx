@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy } from "lucide-react";
+import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy, X } from "lucide-react";
 import type { Facility, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import { FacilityForm } from "@/components/admin/FacilityForm";
-import { getFacilities, createFacility, updateFacility, deleteFacility, type CreateFacilityInput } from "@/lib/services/facilityService";
+import { getFacilities, createFacility, updateFacility, deleteFacility, searchFacilities, type CreateFacilityInput } from "@/lib/services/facilityService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
+import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -47,6 +48,11 @@ export default function FacilitiesPage() {
     const [sortAsc, setSortAsc] = useState(true);
     const [sortByRecent, setSortByRecent] = useState(false);
 
+    // Column filter state
+    const [nameFilter, setNameFilter] = useState('');
+    const [locationFilter, setLocationFilter] = useState('');
+    const [typeFilter, setTypeFilter] = useState<string[]>([]);
+
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
@@ -60,6 +66,10 @@ export default function FacilitiesPage() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Facility | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResultSet, setSearchResultSet] = useState<Facility[] | null>(null);
 
     const { showNotification } = useNotification();
 
@@ -104,6 +114,51 @@ export default function FacilitiesPage() {
         }
     }, []);
 
+    const locationOptions = useMemo(() => {
+        const tax = taxonomies.find(t =>
+            t.singularName?.toLowerCase() === 'location' || t.pluralName?.toLowerCase() === 'locations'
+        );
+        if (!tax) return [];
+
+        const usedIds = new Set<string>();
+        facilities.forEach(f => {
+            f.taxonomyIds?.forEach(id => {
+                if (taxonomyEntries[id]?.taxonomyId === tax.id) usedIds.add(id);
+            });
+        });
+
+        const allLoc = Object.values(taxonomyEntries).filter(e => e.taxonomyId === tax.id);
+        const locIdSet = new Set(allLoc.map(e => e.id));
+        const roots = allLoc
+            .filter(e => !e.parentId || !locIdSet.has(e.parentId))
+            .sort((a, b) => a.displayOrder - b.displayOrder);
+
+        const hasUsed = (entry: TaxonomyEntry): boolean => {
+            if (usedIds.has(entry.id)) return true;
+            return (entry.children ?? []).some(c => hasUsed(c));
+        };
+
+        const result: Array<{ value: string; label: string; depth: number; isGroupHeader: boolean }> = [];
+        const traverse = (entry: TaxonomyEntry, depth: number) => {
+            if (!hasUsed(entry)) return;
+            result.push({ value: entry.id, label: entry.name, depth, isGroupHeader: !usedIds.has(entry.id) });
+            (entry.children ?? []).forEach(c => traverse(c, depth + 1));
+        };
+        roots.forEach(r => traverse(r, 0));
+        return result;
+    }, [taxonomies, taxonomyEntries, facilities]);
+
+    const typeOptions = useMemo(() => {
+        const tax = taxonomies.find(t =>
+            t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
+        );
+        if (!tax) return [];
+        return Object.values(taxonomyEntries)
+            .filter(e => e.taxonomyId === tax.id)
+            .map(e => ({ value: e.id, label: e.name }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }, [taxonomies, taxonomyEntries]);
+
     useEffect(() => {
         fetchFacilities();
         fetchTaxonomies();
@@ -133,27 +188,53 @@ export default function FacilitiesPage() {
     }, [searchParams, router, facilities]);
 
 
-    // Search + sort Filtering
+    // Sort and filter
     useEffect(() => {
-        const query = searchQuery.toLowerCase();
-        let filtered = facilities.filter((f) =>
-            f.title.toLowerCase().includes(query) ||
-            f.slug.toLowerCase().includes(query) ||
-            (f.address?.city || "").toLowerCase().includes(query) ||
-            (f.licenseNumber || "").toLowerCase().includes(query)
-        );
+        const activeSet = searchResultSet ?? facilities;
+        let filtered = [...activeSet];
+        if (nameFilter) {
+            filtered = filtered.filter(f => f.title.toLowerCase().includes(nameFilter.toLowerCase()));
+        }
+        if (locationFilter) {
+            filtered = filtered.filter(f => f.taxonomyIds?.includes(locationFilter));
+        }
+        if (typeFilter.length > 0) {
+            filtered = filtered.filter(f => f.taxonomyIds?.some(id => typeFilter.includes(id)));
+        }
         if (sortByRecent) {
-            filtered = filtered.sort((a, b) =>
+            filtered.sort((a, b) =>
                 new Date(b.updatedAt || b.slug).getTime() - new Date(a.updatedAt || a.slug).getTime()
             );
         } else {
-            filtered = filtered.sort((a, b) =>
+            filtered.sort((a, b) =>
                 sortAsc ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
             );
         }
         setFilteredFacilities(filtered);
         setCurrentPage(1);
-    }, [searchQuery, facilities, sortAsc, sortByRecent]);
+    }, [facilities, searchResultSet, nameFilter, sortAsc, sortByRecent, locationFilter, typeFilter]);
+
+
+    const handleSearch = useCallback(async () => {
+        if (!searchQuery.trim()) {
+            setSearchResultSet(null);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const results = await searchFacilities(searchQuery.trim());
+            setSearchResultSet(results);
+            setCurrentPage(1);
+        } finally {
+            setIsSearching(false);
+        }
+    }, [searchQuery]);
+
+    const handleClearSearch = useCallback(() => {
+        setSearchQuery("");
+        setSearchResultSet(null);
+        setCurrentPage(1);
+    }, []);
 
     const handleOpenCreate = () => {
         setEditingFacility(null);
@@ -242,7 +323,47 @@ export default function FacilitiesPage() {
     const columns: ColumnDef<Facility>[] = [
         {
             key: "title",
-            header: "Facility",
+            width: "35%",
+            headerLabel: "Facility",
+            header: (
+                <div className="flex items-center gap-1">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-content-muted pointer-events-none" />
+                        <input
+                            type="text"
+                            value={nameFilter}
+                            onChange={e => setNameFilter(e.target.value)}
+                            placeholder="Facility"
+                            className={`form-input w-60 pl-7 pr-7 py-2 text-xs${nameFilter ? ' ring-2 ring-accent' : ''}`}
+                        />
+                        {nameFilter && (
+                            <button
+                                type="button"
+                                onClick={() => setNameFilter('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-content-muted hover:text-content-primary transition-colors z-10"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => { setSortByRecent(false); setSortAsc(prev => sortByRecent ? true : !prev); }}
+                        title={sortByRecent ? "Sort A–Z" : (sortAsc ? "Sort Z–A" : "Sort A–Z")}
+                        className={`p-1.5 rounded-lg transition-colors ${!sortByRecent ? "bg-accent text-white" : "bg-surface-input text-content-secondary hover:bg-surface-hover hover:text-content-primary"}`}
+                    >
+                        {(!sortByRecent && !sortAsc) ? <ArrowDownAZ className="h-4 w-4" /> : <ArrowUpAZ className="h-4 w-4" />}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setSortByRecent(true)}
+                        title="Sort by most recent"
+                        className={`p-1.5 rounded-lg transition-colors ${sortByRecent ? "bg-accent text-white" : "bg-surface-input text-content-secondary hover:bg-surface-hover hover:text-content-primary"}`}
+                    >
+                        <Clock className="h-4 w-4" />
+                    </button>
+                </div>
+            ),
             render: (facility) => (
                 <button
                     type="button"
@@ -276,7 +397,20 @@ export default function FacilitiesPage() {
         },
         {
             key: "location-classification",
-            header: "Location",
+            width: "24%",
+            header: (
+                <EnhancedSelect
+                    value={locationFilter}
+                    onChange={setLocationFilter}
+                    options={locationOptions}
+                    placeholder="Location"
+                    textSize="text-xs"
+                    isActive={locationFilter !== ''}
+                    onClear={() => setLocationFilter('')}
+                    className="w-40"
+                />
+            ),
+            headerLabel: "Location",
             render: (facility) => {
                 const locationTaxonomy = taxonomies.find(t =>
                     t.singularName?.toLowerCase() === 'location' || t.pluralName?.toLowerCase() === 'locations'
@@ -311,7 +445,21 @@ export default function FacilitiesPage() {
         },
         {
             key: "type",
-            header: "Type",
+            width: "22%",
+            header: (
+                <EnhancedSelect
+                    multiValue={typeFilter}
+                    onMultiChange={setTypeFilter}
+                    options={typeOptions}
+                    placeholder="Type"
+                    textSize="text-xs"
+                    isActive={typeFilter.length > 0}
+                    onClear={() => setTypeFilter([])}
+                    multiLabel="types"
+                    className="w-32"
+                />
+            ),
+            headerLabel: "Type",
             render: (facility) => {
                 const typeTaxonomy = taxonomies.find(t =>
                     t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
@@ -383,41 +531,36 @@ export default function FacilitiesPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="relative w-56">
+                    <div className="relative w-80">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-content-muted" />
                         <input
                             type="text"
                             placeholder="Search facilities..."
                             value={searchQuery}
-                            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                            className="search-field pl-8"
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                            disabled={isSearching}
+                            className="search-field pl-8 pr-8"
                         />
+                        {searchResultSet !== null && (
+                            <button
+                                type="button"
+                                onClick={handleClearSearch}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-primary transition-colors"
+                                title="Clear search"
+                            >
+                                ×
+                            </button>
+                        )}
                     </div>
-                    {/* Sort: A-Z / Z-A toggle */}
                     <button
                         type="button"
-                        onClick={() => { setSortByRecent(false); setSortAsc(prev => sortByRecent ? true : !prev); }}
-                        title={sortByRecent ? "Sort A–Z" : (sortAsc ? "Sort Z–A" : "Sort A–Z")}
-                        className={`p-1.5 rounded-lg transition-colors ${!sortByRecent
-                            ? "bg-accent text-white"
-                            : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                            }`}
+                        onClick={handleSearch}
+                        disabled={isSearching}
+                        className="p-1.5 rounded-lg transition-colors text-content-secondary hover:bg-surface-hover hover:text-content-primary disabled:opacity-50"
+                        title="Search"
                     >
-                        {(!sortByRecent && !sortAsc)
-                            ? <ArrowDownAZ className="h-4 w-4" />
-                            : <ArrowUpAZ className="h-4 w-4" />}
-                    </button>
-                    {/* Sort: Most Recent */}
-                    <button
-                        type="button"
-                        onClick={() => setSortByRecent(true)}
-                        title="Sort by most recent"
-                        className={`p-1.5 rounded-lg transition-colors ${sortByRecent
-                            ? "bg-accent text-white"
-                            : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                            }`}
-                    >
-                        <Clock className="h-4 w-4" />
+                        {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                     </button>
                 </div>
             </div>
@@ -432,7 +575,7 @@ export default function FacilitiesPage() {
                             keyField="id"
                             actions={renderActions}
                             primaryColumn="title"
-                            emptyMessage={searchQuery ? "No facilities match your search." : "No facilities yet."}
+                            emptyMessage={searchResultSet !== null || nameFilter || locationFilter || typeFilter.length > 0 ? "No facilities match your filters." : "No facilities yet."}
                         />
                     </div>
 

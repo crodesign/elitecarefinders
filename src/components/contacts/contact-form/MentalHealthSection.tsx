@@ -117,7 +117,7 @@ const MentalHealthSection = ({ formData, setFormData, readOnly = false }: Mental
               onCheckedChange={(checked) => handleMentalHealthChange("Alzheimer's", checked)}
               disabled={readOnly}
             />
-            <Label htmlFor="alzheimers">Alzheimer's</Label>
+            <Label htmlFor="alzheimers">Alzheimer&apos;s</Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox 
@@ -144,7 +144,7 @@ const MentalHealthSection = ({ formData, setFormData, readOnly = false }: Mental
               onCheckedChange={(checked) => handleMentalHealthChange("Doesn't Sleep Through Night", checked)}
               disabled={readOnly}
             />
-            <Label htmlFor="sleep-issues">Doesn't Sleep Through Night</Label>
+            <Label htmlFor="sleep-issues">Doesn&apos;t Sleep Through Night</Label>
           </div>
         </div>
       </div>

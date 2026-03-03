@@ -57,12 +57,14 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        Chevron: ({ orientation, ...rest }) =>
+          orientation === "right"
+            ? <ChevronRight className="h-4 w-4" {...rest} />
+            : <ChevronLeft className="h-4 w-4" {...rest} />,
       }}
       captionLayout="dropdown"
-      fromYear={1900}
-      toYear={2030}
+      startMonth={new Date(1900, 0)}
+      endMonth={new Date(2030, 11)}
       {...props}
     />
   );

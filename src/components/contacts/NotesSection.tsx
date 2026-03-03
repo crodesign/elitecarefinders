@@ -7,6 +7,7 @@ import { Plus, Minus, Calendar, Trash2, Edit2, Check, X, Download } from "lucide
 import { useNotes } from "@/hooks/useNotes";
 import { useNoteEdits } from "@/hooks/useNoteEdits";
 import { format } from "date-fns";
+import { ContactDocumentsGallery } from "./ContactDocumentsGallery";
 
 
 interface NotesSectionProps {
@@ -117,32 +118,34 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   }
 
   return (
-    <div className="h-full flex flex-col min-h-0">
+    <div className="h-full flex flex-col min-h-0 gap-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
-        {/* Column 1: Add New Note — fixed content, no scroll needed */}
-        <div className="overflow-y-auto">
+        {/* Column 1: Documents Gallery + Add New Note */}
+        <div className="flex flex-col gap-4 min-h-0">
+          <div className="bg-surface-input rounded-lg p-[5px] flex-1 min-h-0 overflow-y-auto">
+            <ContactDocumentsGallery contactId={contactId} readOnly={readOnly} />
+          </div>
           {!readOnly && (
             <Card className="bg-surface-input border-transparent">
-              <CardHeader>
+              <CardHeader className="p-[5px] pl-[15px]">
                 <CardTitle className="flex items-center justify-between text-content-primary">
                   <div className="flex items-center gap-2">
                     <Plus className="h-5 w-5" />
                     Add New Note
                   </div>
-                  <Button
-                    size="sm"
+                  <button
+                    type="button"
                     onClick={handleDownloadNotes}
                     disabled={notes.length === 0}
-                    className="flex items-center gap-2 bg-accent text-white hover:bg-accent-light"
+                    className="p-1.5 rounded-lg bg-white dark:bg-black text-content-secondary hover:bg-accent hover:text-white transition-colors disabled:opacity-30"
                   >
                     <Download className="h-4 w-4" />
-                    <span className="hidden sm:inline">Download Notes</span>
-                  </Button>
+                  </button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-[5px] space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="new-note" className="text-content-muted">Note Content</Label>
+                  <Label htmlFor="new-note" className="text-content-muted pl-[10px]">Note Content</Label>
                   <textarea
                     id="new-note"
                     placeholder="Enter your note here..."

@@ -3,13 +3,16 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { ReactNode } from "react";
 
+export const TooltipContent = TooltipPrimitive.Content;
+export const TooltipTrigger = TooltipPrimitive.Trigger;
+
 export function TooltipProvider({ children, ...props }: TooltipPrimitive.TooltipProviderProps) {
     return <TooltipPrimitive.Provider {...props}>{children}</TooltipPrimitive.Provider>;
 }
 
 interface TooltipProps {
     children: ReactNode;
-    content: ReactNode;
+    content?: ReactNode;
     side?: "top" | "right" | "bottom" | "left";
     delayDuration?: number;
 }
