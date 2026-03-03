@@ -16,8 +16,7 @@ import {
 } from "@/lib/services/taxonomyService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
-
-const ITEMS_PER_PAGE = 10;
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 export default function TaxonomiesPage() {
     const router = useRouter();
@@ -41,7 +40,7 @@ export default function TaxonomiesPage() {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
 
     const { showNotification } = useNotification();
 

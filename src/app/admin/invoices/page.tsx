@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { parseHawaiiDate } from "@/lib/hawaiiDate";
-
-const ITEMS_PER_PAGE = 10;
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 type InvoiceStatus = 'pending' | 'sent' | 'paid';
 
@@ -79,7 +78,7 @@ export default function InvoicesPage() {
     const [sortAsc, setSortAsc] = useState(false);
     const [sortByRecent, setSortByRecent] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
 
     // Panel state
     const [panelContact, setPanelContact] = useState<Contact | null>(null);

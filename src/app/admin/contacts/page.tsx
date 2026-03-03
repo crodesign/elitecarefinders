@@ -11,8 +11,7 @@ import { Pagination } from "@/components/admin/Pagination";
 import { ContactForm } from "@/components/admin/ContactForm";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { formatPhone } from "@/lib/formatPhone";
-
-const ITEMS_PER_PAGE = 10;
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 export default function ContactsPage() {
     const router = useRouter();
@@ -28,7 +27,7 @@ export default function ContactsPage() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
 
     // Form State
     const [isFormOpen, setIsFormOpen] = useState(false);

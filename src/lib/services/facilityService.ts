@@ -19,6 +19,7 @@ export async function getFacilities(): Promise<Facility[]> {
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
         teamImages: facility.team_images || [],
+        cuisineImages: facility.cuisine_images || [],
         videos: facility.videos || [],
         roomDetails: facility.room_details || { customFields: {} },
         updatedAt: facility.updated_at,
@@ -35,6 +36,7 @@ export async function searchFacilities(query: string): Promise<Facility[]> {
         taxonomyIds: facility.taxonomy_ids || [],
         images: facility.images || [],
         teamImages: facility.team_images || [],
+        cuisineImages: facility.cuisine_images || [],
         videos: facility.videos || [],
         roomDetails: facility.room_details || { customFields: {} },
         updatedAt: facility.updated_at,
@@ -60,13 +62,14 @@ export async function getFacility(id: string): Promise<Facility | null> {
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
     };
 }
 
-export type CreateFacilityInput = Omit<Facility, "id" | "createdAt" | "updatedAt" | "images" | "teamImages"> & { images?: string[], teamImages?: string[] };
+export type CreateFacilityInput = Omit<Facility, "id" | "createdAt" | "updatedAt" | "images" | "teamImages" | "cuisineImages"> & { images?: string[], teamImages?: string[], cuisineImages?: string[] };
 
 export async function createFacility(facility: CreateFacilityInput): Promise<Facility> {
     const { data: { user } } = await supabase.auth.getUser();
@@ -82,6 +85,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         status: facility.status || 'draft',
         images: facility.images || [],
         team_images: facility.teamImages || [],
+        cuisine_images: facility.cuisineImages || [],
         videos: facility.videos || [],
         room_details: (facility as any).roomDetails || {},
         created_by: user?.id,
@@ -105,6 +109,7 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
@@ -124,6 +129,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
+    if (updates.cuisineImages !== undefined) dbUpdates.cuisine_images = updates.cuisineImages;
     if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if ((updates as any).roomDetails !== undefined) dbUpdates.room_details = (updates as any).roomDetails;
 
@@ -146,6 +152,7 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         taxonomyIds: data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,

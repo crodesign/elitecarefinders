@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 import dynamic from "next/dynamic";
-import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy } from "lucide-react";
+import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type { Facility, Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -138,9 +138,10 @@ export function FacilityInformationTab({
 
                     {/* Description */}
                     <div className="flex flex-col flex-1 gap-2">
-                        <label className="text-base font-medium text-content-primary pl-[5px]">
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                            <AlignLeft className="h-4 w-4 text-accent" />
                             Description
-                        </label>
+                        </h3>
                         <RichTextEditor
                             value={description}
                             onChange={(val) => {

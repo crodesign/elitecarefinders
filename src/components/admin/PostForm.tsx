@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube } from "lucide-react";
+import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
@@ -58,6 +58,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
     const [prepTime, setPrepTime] = useState<string>("");
     const [cookTime, setCookTime] = useState<string>("");
     const [recipeYield, setRecipeYield] = useState<string>("");
+    const [sourceUrl, setSourceUrl] = useState<string>("");
     const [stepImageSelectorOpen, setStepImageSelectorOpen] = useState<number | null>(null);
     const [folderMediaUrls, setFolderMediaUrls] = useState<string[]>([]);
 
@@ -125,6 +126,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setPrepTime(meta.prepTime?.toString() || "");
                 setCookTime(meta.cookTime?.toString() || "");
                 setRecipeYield(meta.yield || "");
+                setSourceUrl(meta.sourceUrl || "");
             } else {
                 setTitle("");
                 setSlug("");
@@ -141,6 +143,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setPrepTime("");
                 setCookTime("");
                 setRecipeYield("");
+                setSourceUrl("");
             }
 
             setTimeout(() => {
@@ -175,7 +178,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 if (title || slug || content || excerpt || videoUrl || postType) return true;
                 if (status !== 'draft') return true;
                 if (postImages.length > 0) return true;
-                if (links.length > 0 || ingredients.length > 0 || instructions.length > 0 || prepTime || cookTime || recipeYield) return true;
+                if (links.length > 0 || ingredients.length > 0 || instructions.length > 0 || prepTime || cookTime || recipeYield || sourceUrl) return true;
                 return false;
             }
 
@@ -196,6 +199,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
             if (prepTime !== (meta.prepTime?.toString() || "")) return true;
             if (cookTime !== (meta.cookTime?.toString() || "")) return true;
             if (recipeYield !== (meta.yield || "")) return true;
+            if (sourceUrl !== (meta.sourceUrl || "")) return true;
 
             return false;
         };
@@ -203,7 +207,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
         setIsDirty(checkIsDirty());
     }, [
         title, slug, content, excerpt, videoUrl, status, postType, postImages,
-        links, ingredients, instructions, prepTime, cookTime, recipeYield,
+        links, ingredients, instructions, prepTime, cookTime, recipeYield, sourceUrl,
         isOpen, post, setIsDirty
     ]);
 
@@ -312,12 +316,14 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
             const metadata: PostMetadata = {};
             if (postType === 'news_events') {
                 metadata.links = links.filter(l => l.text.trim() || l.url.trim());
+                if (sourceUrl.trim()) metadata.sourceUrl = sourceUrl.trim();
             } else if (postType === 'recipes') {
                 metadata.ingredients = ingredients.filter(i => i.amount.trim() || i.name.trim());
                 metadata.instructions = instructions.filter(i => i.text.trim() || i.image);
                 metadata.prepTime = prepTime ? parseInt(prepTime) : undefined;
                 metadata.cookTime = cookTime ? parseInt(cookTime) : undefined;
                 metadata.yield = recipeYield;
+                if (sourceUrl.trim()) metadata.sourceUrl = sourceUrl.trim();
             }
 
             const payload: Partial<Post> = {
@@ -384,14 +390,14 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                     <div className={`grid grid-cols-1 gap-6 flex-1 min-h-0 ${postType === 'recipes' ? 'lg:grid-cols-4' : 'lg:grid-cols-2'}`}>
                         {/* Column 1: Core Details & Dynamic Content */}
                         <div className={`flex flex-col gap-6 min-h-0 h-full ${postType === 'recipes' ? 'lg:col-span-2 lg:row-span-2' : ''}`}>
-                            <div className="bg-surface-input rounded-lg p-4 flex flex-col gap-3 flex-1 min-h-0">
-                                <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+                            <div className="bg-surface-input rounded-lg p-[5px] flex flex-col gap-3 flex-1 min-h-0">
+                                <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                     <FileText className="h-4 w-4 text-accent" />
                                     Post Details
                                 </h3>
 
-                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap">
+                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                         Title
                                         <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
                                     </label>
@@ -461,8 +467,8 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5">
+                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                         <Youtube className="h-4 w-4 text-red-500" />
                                         YouTube URL
                                     </label>
@@ -475,10 +481,70 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                     />
                                 </div>
 
+                                {(postType === 'recipes' || postType === 'news_events') && (
+                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                            <Link className="h-4 w-4 text-accent" />
+                                            Source URL
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={sourceUrl}
+                                            onChange={(e) => setSourceUrl(e.target.value)}
+                                            className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
+                                            placeholder="https://example.com/original-recipe"
+                                        />
+                                    </div>
+                                )}
+
                                 <div className="flex flex-col flex-1 gap-2 pt-2 min-h-0">
-                                    <label className="text-sm font-medium text-content-secondary pl-1 flex justify-between items-center shrink-0">
-                                        <span>Content</span>
-                                    </label>
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                        <AlignLeft className="h-4 w-4 text-accent" />
+                                        Content
+                                    </h3>
+
+                                    {postType === 'recipes' && (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Prep Time</label>
+                                                <div className="relative w-28 shrink-0">
+                                                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                                    <input
+                                                        type="number"
+                                                        value={prepTime}
+                                                        onChange={(e) => setPrepTime(e.target.value)}
+                                                        className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
+                                                        placeholder="15"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                        <button type="button" onClick={() => setPrepTime(String((parseInt(prepTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
+                                                        <button type="button" onClick={() => setPrepTime(String(Math.max(0, (parseInt(prepTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Cook Time</label>
+                                                <div className="relative w-28 shrink-0">
+                                                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                                    <input
+                                                        type="number"
+                                                        value={cookTime}
+                                                        onChange={(e) => setCookTime(e.target.value)}
+                                                        className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
+                                                        placeholder="45"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                        <button type="button" onClick={() => setCookTime(String((parseInt(cookTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
+                                                        <button type="button" onClick={() => setCookTime(String(Math.max(0, (parseInt(cookTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Yield</label>
+                                                <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
+                                            </div>
+                                        </div>
+                                    )}
                                     <RichTextEditor
                                         value={content}
                                         onChange={setContent}
@@ -491,8 +557,8 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
                             {/* Dynamic Sections Based on Type */}
                             {postType === 'news_events' && (
-                                <div className="bg-surface-input rounded-lg p-4 space-y-3 border-l-4 border-l-blue-500">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pb-1">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-3 border-l-4 border-l-blue-500">
+                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <Hash className="h-4 w-4 text-accent" />
                                         News & Events Links
                                     </h3>
@@ -530,84 +596,17 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                 </div>
                             )}
 
-                            {postType === 'recipes' && (
-                                <div className="bg-surface-input rounded-lg p-4">
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Prep Time</label>
-                                            <div className="relative w-28 shrink-0">
-                                                <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
-                                                <input
-                                                    type="number"
-                                                    value={prepTime}
-                                                    onChange={(e) => setPrepTime(e.target.value)}
-                                                    className="w-full rounded-md pl-7 pr-7 py-1 h-8 text-sm text-left focus:outline-none transition-colors overflow-hidden [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
-                                                    placeholder="15"
-                                                />
-                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setPrepTime(String((parseInt(prepTime) || 0) + 1))}
-                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
-                                                    >
-                                                        <ChevronUp className="h-2 w-2" />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setPrepTime(String(Math.max(0, (parseInt(prepTime) || 0) - 1)))}
-                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
-                                                    >
-                                                        <ChevronDown className="h-2 w-2" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg transition-all">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Cook Time</label>
-                                            <div className="relative w-28 shrink-0">
-                                                <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
-                                                <input
-                                                    type="number"
-                                                    value={cookTime}
-                                                    onChange={(e) => setCookTime(e.target.value)}
-                                                    className="w-full rounded-md pl-7 pr-7 py-1 h-8 text-sm text-left focus:outline-none transition-colors overflow-hidden [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
-                                                    placeholder="45"
-                                                />
-                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setCookTime(String((parseInt(cookTime) || 0) + 1))}
-                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
-                                                    >
-                                                        <ChevronUp className="h-2 w-2" />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setCookTime(String(Math.max(0, (parseInt(cookTime) || 0) - 1)))}
-                                                        className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"
-                                                    >
-                                                        <ChevronDown className="h-2 w-2" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-2 py-2 pr-2 pl-3.5 bg-surface-hover rounded-lg">
-                                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap">Yield</label>
-                                            <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
-                                        </div>
-                                    </div>
-
-                                </div>
-                            )}
                         </div>
 
                         {/* Column 2: Recipe Ingredients (Only for Recipes) */}
                         {postType === 'recipes' && (
                             <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                                <div className="bg-surface-input rounded-lg p-4 gap-4 flex flex-col min-h-0 h-full">
+                                <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
                                     <div className="flex-1 min-h-0 flex flex-col">
-                                        <label className="text-sm font-medium text-content-secondary mb-2 block shrink-0">Ingredients</label>
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                            <Utensils className="h-4 w-4 text-accent" />
+                                            Ingredients
+                                        </h3>
                                         <div className="overflow-y-auto flex-1 pr-1">
                                             {ingredients.map((ing, idx) => (
                                                 <div key={idx} className="group flex items-center gap-2 px-2 py-1 rounded-lg bg-surface-input transition-colors mb-1">
@@ -660,9 +659,12 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         {/* Column 3: Recipe Steps (Only for Recipes) */}
                         {postType === 'recipes' && (
                             <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                                <div className="bg-surface-input rounded-lg p-4 gap-4 flex flex-col min-h-0 h-full">
+                                <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
                                     <div className="flex-1 min-h-0 flex flex-col">
-                                        <label className="text-sm font-medium text-content-secondary mb-2 block shrink-0">Steps</label>
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                            <ListOrdered className="h-4 w-4 text-accent" />
+                                            Steps
+                                        </h3>
                                         <div className="space-y-3 overflow-y-auto flex-1 pr-1">
                                             {instructions.map((inst, idx) => (
                                                 <div key={idx} className="group flex items-start gap-2 px-2 py-2 rounded-lg bg-surface-input transition-colors mb-2">
@@ -751,10 +753,10 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                     folderId={mediaFolderId}
                                     title={postType === 'recipes' ? (
                                         <div className="flex flex-col">
-                                            <span>Post Images</span>
+                                            <span>{title || "Post"} Image Library</span>
                                             <span className="text-xs text-content-muted font-normal mt-0.5">Select an image to be the Featured Image</span>
                                         </div>
-                                    ) : "Post Images"}
+                                    ) : `${title || "Post"} Image Library`}
                                     dropzoneText="this post"
                                     className="flex-1 min-h-0"
                                     galleries={postType === 'recipes' ? undefined : [

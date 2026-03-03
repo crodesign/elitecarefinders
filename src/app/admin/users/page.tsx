@@ -10,8 +10,7 @@ import { Pagination } from '@/components/admin/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { UserForm, type UserFormData } from '@/components/admin/UserForm';
 import { useNotification } from '@/contexts/NotificationContext';
-
-const ITEMS_PER_PAGE = 10;
+import { usePersistedPageSize } from '@/hooks/usePersistedPageSize';
 
 export default function UsersPage() {
     const { isSystemAdmin, isSuperAdmin, loading: authLoading } = useAuth();
@@ -25,7 +24,7 @@ export default function UsersPage() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
 
     // Delete state
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);

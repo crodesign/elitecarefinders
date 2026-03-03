@@ -26,6 +26,7 @@ export async function getHomes(): Promise<Home[]> {
         homeOfMonthDescription: home.home_of_month_description,
         images: home.images || [],
         teamImages: home.team_images || [],
+        cuisineImages: home.cuisine_images || [],
         videos: home.videos || [],
         roomDetails: { customFields: {}, ...(home.room_details || {}) },
         updatedAt: home.updated_at,
@@ -48,6 +49,7 @@ export async function searchHomes(query: string): Promise<Home[]> {
         homeOfMonthDescription: home.home_of_month_description,
         images: home.images || [],
         teamImages: home.team_images || [],
+        cuisineImages: home.cuisine_images || [],
         videos: home.videos || [],
         roomDetails: { customFields: {}, ...(home.room_details || {}) },
         updatedAt: home.updated_at,
@@ -79,13 +81,14 @@ export async function getHome(id: string): Promise<Home | null> {
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
     };
 }
 
-export type CreateHomeInput = Omit<Home, "id" | "createdAt" | "updatedAt" | "images" | "teamImages"> & { images?: string[], teamImages?: string[] };
+export type CreateHomeInput = Omit<Home, "id" | "createdAt" | "updatedAt" | "images" | "teamImages" | "cuisineImages"> & { images?: string[], teamImages?: string[], cuisineImages?: string[] };
 
 export async function createHome(home: CreateHomeInput): Promise<Home> {
     const dbPayload = {
@@ -106,6 +109,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         home_of_month_description: home.homeOfMonthDescription,
         images: home.images || [],
         team_images: home.teamImages || [],
+        cuisine_images: home.cuisineImages || [],
         videos: home.videos || [],
         room_details: home.roomDetails || {},
     };
@@ -134,6 +138,7 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
@@ -160,6 +165,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
+    if (updates.cuisineImages !== undefined) dbUpdates.cuisine_images = updates.cuisineImages;
     if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
 
@@ -188,6 +194,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         homeOfMonthDescription: data.home_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
+        cuisineImages: data.cuisine_images || [],
         videos: data.videos || [],
         roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,

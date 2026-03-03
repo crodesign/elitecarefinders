@@ -1,15 +1,16 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { X } from "lucide-react";
+import { X, Star } from "lucide-react";
 
 interface SortableGalleryItemProps {
     url: string;
     onRemove: (url: string) => void;
     onError?: (url: string) => void;
+    isFeatured?: boolean;
 }
 
-export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryItemProps) {
+export function SortableGalleryItem({ url, onRemove, onError, isFeatured = false }: SortableGalleryItemProps) {
     const {
         attributes,
         listeners,
@@ -39,6 +40,11 @@ export function SortableGalleryItem({ url, onRemove, onError }: SortableGalleryI
                 className={`w-full h-full ${url.toLowerCase().endsWith('.svg') ? 'object-contain p-1' : 'object-cover'} pointer-events-none`}
                 onError={() => onError?.(url)}
             />
+            {isFeatured && (
+                <div className="absolute top-1 left-1 p-1 bg-amber-400/90 rounded-md backdrop-blur-sm pointer-events-none">
+                    <Star className="h-3 w-3 fill-white text-white" />
+                </div>
+            )}
             <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()} // Prevent drag start when clicking remove

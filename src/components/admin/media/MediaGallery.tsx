@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Plus, Loader2, RefreshCw, X } from "lucide-react";
+import { Upload, Loader2, RefreshCw, X, LayoutGrid } from "lucide-react";
 import { MediaItem, MediaFolder } from "@/types";
 import { getMediaItems, getMediaItemsByUrls, deleteMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
@@ -26,7 +26,7 @@ import {
 } from "@dnd-kit/sortable";
 
 export interface GalleryConfig {
-    id: "main" | "team";
+    id: "main" | "team" | "cuisine";
     title: string;
     shortLabel: string;
     urls: string[];
@@ -48,11 +48,11 @@ interface MediaGalleryProps {
 }
 
 export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap }: MediaGalleryProps) {
-    const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team">("main");
+    const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team" | "cuisine">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isUploaderOpen, setIsUploaderOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const { showNotification } = useNotification();
@@ -106,6 +106,12 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     useEffect(() => {
         loadMedia();
     }, [loadMedia]);
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length > 0) handleUpload(files);
+        e.target.value = "";
+    };
 
     const handleUpload = async (files: File[]) => {
         if (!folderId) return;
@@ -294,12 +300,13 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                     items={activeUrls}
                                     strategy={horizontalListSortingStrategy}
                                 >
-                                    {activeUrls.map((url) => (
+                                    {activeUrls.map((url, index) => (
                                         <SortableGalleryItem
                                             key={url}
                                             url={url}
                                             onRemove={(urlToRemove) => handleToggleSelection(urlToRemove)}
                                             onError={handleImageError}
+                                            isFeatured={activeGalleryId === "main" && index === 0}
                                         />
                                     ))}
                                 </SortableContext>
@@ -315,7 +322,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             )}
             <div className="flex items-center justify-between mt-2">
-                <h3 className="text-lg font-medium text-content-primary">{title}</h3>
+                <h3 className="flex items-center gap-2 text-lg font-medium text-content-primary"><LayoutGrid className="h-4 w-4 text-accent" />{title}</h3>
                 <div className="flex items-center gap-2">
                     <button
                         type="button"
@@ -325,28 +332,26 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                     </button>
                     {mediaItems.length > 0 && (
-                        <button
-                            type="button"
-                            onClick={() => setIsUploaderOpen(true)}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-light transition-colors shrink-0"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Add
-                        </button>
+                        <>
+                            <input
+                                ref={uploadInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*,video/*"
+                                className="hidden"
+                                onChange={handleFileSelect}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => uploadInputRef.current?.click()}
+                                className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors shrink-0"
+                            >
+                                <Upload className="h-4 w-4" />
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
-
-            {isUploaderOpen && (
-                <div className="mb-6">
-                    <MediaUploader
-                        isOpen={true}
-                        onClose={() => setIsUploaderOpen(false)}
-                        onUpload={handleUpload}
-                        folderName={dropzoneText || "this property"}
-                    />
-                </div>
-            )}
 
             {isLoading && !mediaItems.length ? (
                 <div className="flex items-center justify-center p-12">
@@ -363,7 +368,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             ) : (
                 <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+                    <div className="grid gap-4 grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
                         {mediaItems.map((item) => (
                             <div key={item.id}>
                                 <MediaTile

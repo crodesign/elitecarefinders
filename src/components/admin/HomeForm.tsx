@@ -164,6 +164,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
         let finalImages = images;
         let finalTeamImages = teamImages;
+        let finalCuisineImages = cuisineImages;
 
         try {
             // ── Transparent Rename Detection ──
@@ -196,6 +197,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                             setImages(finalImages);
                             finalTeamImages = teamImages.map(mapUrl);
                             setTeamImages(finalTeamImages);
+                            finalCuisineImages = cuisineImages.map(mapUrl);
+                            setCuisineImages(finalCuisineImages);
                         }
                     }
                 } catch (renameErr) {
@@ -226,6 +229,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 },
                 images: finalImages,
                 teamImages: finalTeamImages,
+                cuisineImages: finalCuisineImages,
                 videos,
                 roomDetails
             };
@@ -323,6 +327,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
+    const [cuisineImages, setCuisineImages] = useState<string[]>([]);
     const [videos, setVideos] = useState<VideoEntry[]>([]);
 
     // Fetch Gallery Folder - Only on initial load for EXISTING homes
@@ -544,6 +549,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 // Images & Videos
                 setImages(home.images || []);
                 setTeamImages(home.teamImages || []);
+                setCuisineImages(home.cuisineImages || []);
                 setVideos(home.videos || []);
 
                 // Explicitly clear dirty state when we finish populating from a prop
@@ -883,6 +889,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setImages={setImages}
                         teamImages={teamImages}
                         setTeamImages={setTeamImages}
+                        cuisineImages={cuisineImages}
+                        setCuisineImages={setCuisineImages}
                         galleryFolderId={galleryFolderId}
                         title={title}
                         setIsDirty={setIsDirty}

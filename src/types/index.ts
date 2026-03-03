@@ -36,6 +36,7 @@ export interface BaseEntity {
     description: string;
     images: string[];
     teamImages?: string[];
+    cuisineImages?: string[];
     videos?: VideoEntry[];
     createdAt: string;
     updatedAt: string;
@@ -107,6 +108,7 @@ export interface PostMetadata {
     prepTime?: number;
     cookTime?: number;
     yield?: string;
+    sourceUrl?: string;
 }
 
 export interface Post extends BaseEntity {

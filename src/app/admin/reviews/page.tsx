@@ -12,6 +12,7 @@ import { SlidePanel } from "@/components/admin/SlidePanel";
 import { createClientComponentClient as createClient } from "@/lib/supabase";
 import { useNotification } from "@/contexts/NotificationContext";
 import { Tooltip } from "@/components/ui/tooltip";
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 const GoogleIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -41,7 +42,7 @@ export default function ReviewsPage() {
     ];
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
     const [editingReview, setEditingReview] = useState<Partial<Review> | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

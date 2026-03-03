@@ -188,6 +188,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [teamImages, setTeamImages] = useState<string[]>([]);
+    const [cuisineImages, setCuisineImages] = useState<string[]>([]);
     const [videos, setVideos] = useState<VideoEntry[]>([]);
 
     // Fetch Gallery Folder - Only on initial load for EXISTING facilities
@@ -392,6 +393,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 // Images & Videos
                 setImages(facility.images || []);
                 setTeamImages(facility.teamImages || []);
+                setCuisineImages(facility.cuisineImages || []);
                 setVideos(facility.videos || []);
             } else {
                 // Reset
@@ -409,6 +411,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 // Images
                 setImages([]);
                 setTeamImages([]);
+                setCuisineImages([]);
                 setZip("");
                 setRoomDetails({ customFields: {} });
                 // Reset contact
@@ -451,6 +454,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 if (phone || email) return true;
                 if (images.length > 0) return true;
                 if (teamImages.length > 0) return true;
+                if (cuisineImages.length > 0) return true;
 
                 // Promotions
                 if (isFeatured || hasFeaturedVideo || isFacilityOfMonth || featuredLabel || facilityOfMonthDescription) return true;
@@ -476,6 +480,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             if (!arraysEqual(taxonomyIds, facility.taxonomyIds || [])) return true;
             if (!arraysEqual(images, facility.images || [])) return true;
             if (!arraysEqual(teamImages, (facility as any).teamImages || [])) return true;
+            if (!arraysEqual(cuisineImages, (facility as any).cuisineImages || [])) return true;
             if (JSON.stringify(videos) !== JSON.stringify(facility.videos || [])) return true;
 
             if (street !== (facility.address?.street || "")) return true;
@@ -527,7 +532,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     }, [
         isOpen, facility, setIsDirty,
         title, slug, description, licenseNumber, capacity,
-        status, taxonomyIds, images, teamImages, videos,
+        status, taxonomyIds, images, teamImages, cuisineImages, videos,
         street, city, state, zip, phone, email,
         isFeatured, hasFeaturedVideo, isFacilityOfMonth, featuredLabel, facilityOfMonthDescription,
         roomDetails
@@ -600,6 +605,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
         let finalImages = images;
         let finalTeamImages = teamImages;
+        let finalCuisineImages = cuisineImages;
 
         try {
             // ── Transparent Rename Detection ──
@@ -631,6 +637,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             setImages(finalImages);
                             finalTeamImages = teamImages.map(mapUrl);
                             setTeamImages(finalTeamImages);
+                            finalCuisineImages = cuisineImages.map(mapUrl);
+                            setCuisineImages(finalCuisineImages);
                         }
                     }
                 } catch (renameErr) {
@@ -667,6 +675,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 } as any),
                 images: finalImages,
                 teamImages: finalTeamImages,
+                cuisineImages: finalCuisineImages,
                 videos,
                 roomDetails,
             };
@@ -824,6 +833,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setImages={setImages}
                         teamImages={teamImages}
                         setTeamImages={setTeamImages}
+                        cuisineImages={cuisineImages}
+                        setCuisineImages={setCuisineImages}
                         setIsDirty={setIsDirty}
                         isDirty={isDirty}
                     />

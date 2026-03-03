@@ -13,8 +13,7 @@ import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
-
-const ITEMS_PER_PAGE = 10;
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 function timeAgo(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
@@ -55,7 +54,7 @@ export default function HomesPage() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
 
     // Form state
     const [isFormOpen, setIsFormOpen] = useState(false);

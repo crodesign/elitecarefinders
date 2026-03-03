@@ -12,6 +12,7 @@ import { useNotification } from "@/contexts/NotificationContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PostForm } from "@/components/admin/PostForm";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 
 function timeAgo(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
@@ -49,7 +50,7 @@ export default function PostsPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = usePersistedPageSize();
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);

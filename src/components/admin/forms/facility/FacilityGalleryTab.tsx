@@ -10,6 +10,8 @@ interface FacilityGalleryTabProps {
     setImages: Dispatch<SetStateAction<string[]>>;
     teamImages?: string[];
     setTeamImages?: Dispatch<SetStateAction<string[]>>;
+    cuisineImages?: string[];
+    setCuisineImages?: Dispatch<SetStateAction<string[]>>;
     setIsDirty: (value: boolean) => void;
     isDirty: boolean;
 }
@@ -21,6 +23,8 @@ export function FacilityGalleryTab({
     setImages,
     teamImages = [],
     setTeamImages,
+    cuisineImages = [],
+    setCuisineImages,
     setIsDirty,
     isDirty,
 }: FacilityGalleryTabProps) {
@@ -34,7 +38,7 @@ export function FacilityGalleryTab({
             ) : (
                 <MediaGallery
                     folderId={galleryFolderId}
-                    title={`${title} Gallery`}
+                    title={`${title} Image Library`}
                     className="flex-1 min-h-0"
                     isDirty={isDirty}
                     galleries={[
@@ -55,6 +59,16 @@ export function FacilityGalleryTab({
                             urls: teamImages,
                             onChange: (urls) => {
                                 setTeamImages?.(urls);
+                                setIsDirty(true);
+                            }
+                        },
+                        {
+                            id: "cuisine",
+                            title: "Cuisine Images",
+                            shortLabel: "Cuisine Images",
+                            urls: cuisineImages,
+                            onChange: (urls) => {
+                                setCuisineImages?.(urls);
                                 setIsDirty(true);
                             }
                         }
