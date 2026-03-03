@@ -195,7 +195,7 @@ const ResidentInfoSection = ({ formData, setFormData, handleChange: handleChange
                 </button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
+                className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary z-[200] [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
                 align="start"
               >
                 <PopoverClose ref={calendarCloseRef} className="hidden" />
