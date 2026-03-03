@@ -868,7 +868,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 title={isEditing ? "Editing Facility" : "Add New Facility"}
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
-                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : (activeTab === 'information') ? 'flex-1 overflow-y-auto p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 actions={
                     <button
                         type="submit"
@@ -964,7 +964,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 {/* Tab Content */}
                 <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0" onChange={handleFormChange}>
-                    <div className={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
+                    <div className={(activeTab === 'gallery' || activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
                         {renderTabContent()}
                     </div>
                 </form>

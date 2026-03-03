@@ -54,7 +54,7 @@ export function HomeRoomsTab({
                                         roomPrice: isNaN(val) ? undefined : val
                                     }));
                                 }}
-                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left form-input [&::-webkit-inner-spin-button]:appearance-none"
                                 placeholder="0"
                             />
                             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">

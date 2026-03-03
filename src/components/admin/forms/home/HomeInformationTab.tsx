@@ -105,7 +105,7 @@ export function HomeInformationTab({
                                         setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                         setIsDirty(true);
                                     }}
-                                    className="bg-surface-input text-content-primary text-sm placeholder-content-muted hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors rounded-md px-3 h-8 flex-1"
+                                    className="form-input px-3 h-8 flex-1"
                                     placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
                                 />
                                 {/* No./Name toggle */}
@@ -271,7 +271,7 @@ export function HomeInformationTab({
                                     setStreet(e.target.value);
                                     setIsDirty(true);
                                 }}
-                                className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                                className="form-input text-left w-48 h-8 rounded-md px-3"
                                 placeholder="Street address"
                             />
                         </div>
@@ -284,7 +284,7 @@ export function HomeInformationTab({
                                     setCity(e.target.value);
                                     setIsDirty(true);
                                 }}
-                                className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-48 h-8 rounded-md px-3"
+                                className="form-input text-left w-48 h-8 rounded-md px-3"
                                 placeholder="City"
                             />
                         </div>
@@ -308,7 +308,7 @@ export function HomeInformationTab({
                                         setZip(e.target.value);
                                         setIsDirty(true);
                                     }}
-                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-20 h-8 rounded-md px-2"
+                                    className="form-input text-left w-20 h-8 rounded-md px-2"
                                     placeholder="Zip"
                                 />
                             </div>
@@ -339,7 +339,7 @@ export function HomeInformationTab({
                                     setPhone(formatted);
                                     setIsDirty(true);
                                 }}
-                                className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-40 h-8 rounded-md px-3"
+                                className="form-input text-left w-40 h-8 rounded-md px-3"
                                 placeholder="(555) 123-4567"
                                 maxLength={14}
                             />
@@ -353,7 +353,7 @@ export function HomeInformationTab({
                                     setEmail(e.target.value);
                                     setIsDirty(true);
                                 }}
-                                className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-40 h-8 rounded-md px-3"
+                                className="form-input text-left w-40 h-8 rounded-md px-3"
                                 placeholder="contact@example.com"
                             />
                         </div>
@@ -400,7 +400,7 @@ export function HomeInformationTab({
                                                     if (e.key === "Enter" && featuredLabel.trim()) setIsCustomLabelMode(false);
                                                     if (e.key === "Escape") { setFeaturedLabel(""); setIsCustomLabelMode(false); }
                                                 }}
-                                                className="w-36 px-3 h-8 text-sm bg-surface-input rounded-md text-content-primary focus:outline-none"
+                                                className="form-input w-36 px-3 h-8 text-sm"
                                                 placeholder="Custom label..."
                                                 autoFocus
                                             />
@@ -424,7 +424,7 @@ export function HomeInformationTab({
                                                     onBlur={() => setTimeout(() => setShowLabelDropdown(false), 150)}
                                                     onKeyDown={(e) => { if (e.key === "Escape") { setShowLabelDropdown(false); (e.target as HTMLInputElement).blur(); } }}
                                                     placeholder="Select..."
-                                                    className="w-36 pl-3 pr-8 h-8 text-sm bg-surface-input rounded-md text-content-primary focus:outline-none"
+                                                    className="form-input w-36 pl-3 pr-8 h-8 text-sm"
                                                 />
                                                 <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-content-muted pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
                                                 {showLabelDropdown && (
@@ -502,7 +502,7 @@ export function HomeInformationTab({
                                     onInput={(e) => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }}
                                     placeholder="Why this home is featured..."
                                     rows={3}
-                                    className="w-full bg-surface-input rounded-md py-1 px-2 text-xs text-content-primary focus:outline-none resize-none overflow-hidden hover:bg-surface-hover focus:bg-surface-hover transition-colors"
+                                    className="form-input w-full py-1 px-2 text-xs resize-none overflow-hidden"
                                 />
                             </div>
                         )}

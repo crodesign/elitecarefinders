@@ -290,7 +290,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
 
     // ... (rest of component)
-    const [displayReferenceNumber, setDisplayReferenceNumber] = useState(false);
+    const [displayReferenceNumber, setDisplayReferenceNumber] = useState(true);
     const [showAddress, setShowAddress] = useState(true);
 
     // Address State
@@ -520,7 +520,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setDescription(home.description);
                 setPhone(home.phone || "");
                 setEmail(home.email || "");
-                setDisplayReferenceNumber(home.displayReferenceNumber || false);
+                setDisplayReferenceNumber(home.displayReferenceNumber ?? true);
                 setShowAddress(home.showAddress !== false); // default true
                 setStatus(((home.status === 'archived' ? 'draft' : home.status) as 'published' | 'draft') || 'published');
                 setTaxonomyEntryIds(home.taxonomyEntryIds || []);
@@ -926,7 +926,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 title={isEditing ? "Edit Home" : "Add Home"}
                 subtitle={isEditing ? (title || "Update home details and settings") : "Add a new residential care home"}
                 fullScreen
-                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : (activeTab === 'information') ? 'flex-1 overflow-y-auto p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 actions={
                     <button
                         type="submit"
@@ -1015,7 +1015,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 }
             >
                 <form id="home-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-                    <div className={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex flex-col flex-1 min-h-0' : 'flex-1'}>{renderTabContent()}</div>
+                    <div className={(activeTab === 'gallery' || activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1'}>{renderTabContent()}</div>
                 </form>
 
             </SlidePanel>

@@ -402,7 +402,7 @@ button.form-input:focus {
   /* ── Form Input — light/dark compatible ─────────── */
   /* Replaces the bg-black/30 text-white placeholder-content-muted pattern */
   .form-input {
-    background-color: var(--surface-input);
+    background-color: color-mix(in srgb, var(--surface-secondary) 75%, var(--surface-hover));
     color: var(--content-primary);
     border: 1px solid var(--ui-border);
     border-radius: 6px;

@@ -110,7 +110,7 @@ export function HomeFieldCategory({
                         {field.type === 'single' && (
                             <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
                                 <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
-                                <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                     {field.options?.map((opt) => (
                                         <button
                                             key={opt}
@@ -178,7 +178,7 @@ export function HomeFieldCategory({
                                             customFields: { ...prev.customFields, [field.id]: e.target.value }
                                         }));
                                     }}
-                                    className="w-40 rounded-md px-3 py-1 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                    className="w-40 rounded-md px-3 py-1 text-left text-sm form-input"
                                     placeholder={`Enter...`}
                                 />
                             </div>
@@ -197,7 +197,7 @@ export function HomeFieldCategory({
                                             customFields: { ...prev.customFields, [field.id]: e.target.value }
                                         }));
                                     }}
-                                    className="w-full rounded-md px-3 py-2 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover min-h-[100px] resize-y"
+                                    className="w-full rounded-md px-3 py-2 text-left text-sm form-input min-h-[100px] resize-y"
                                     placeholder={`Enter ${field.name.toLowerCase()}...`}
                                 />
                             </div>
@@ -218,7 +218,7 @@ export function HomeFieldCategory({
                                                 customFields: { ...prev.customFields, [field.id]: e.target.value }
                                             }));
                                         }}
-                                        className="w-full rounded-md px-2 pl-3 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                        className="w-full rounded-md px-2 pl-3 pr-8 py-1 text-sm text-left form-input [&::-webkit-inner-spin-button]:appearance-none"
                                         placeholder="0"
                                     />
                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -271,7 +271,7 @@ export function HomeFieldCategory({
                                                 customFields: { ...prev.customFields, [field.id]: formatted }
                                             }));
                                         }}
-                                        className="w-full rounded-md pl-9 pr-3 py-1 text-left text-sm focus:outline-none transition-colors bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                        className="w-full rounded-md pl-9 pr-3 py-1 text-left text-sm form-input"
                                         placeholder="(555) 555-5555"
                                     />
                                 </div>
@@ -311,7 +311,7 @@ export function HomeFieldCategory({
                                         }}
                                         className={`w-full rounded-md pl-9 pr-3 py-1 text-left text-sm focus:outline-none transition-colors ${invalidEmailFields.has(field.id)
                                             ? "bg-red-500/10 text-white placeholder-red-300/50 focus:bg-red-500/20"
-                                            : "bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                            : "form-input"
                                             }`}
                                         placeholder="example@email.com"
                                     />
@@ -333,7 +333,7 @@ export function HomeFieldCategory({
                                             ...prev,
                                             customFields: { ...prev.customFields, [field.id]: e.target.value }
                                         }))}
-                                        className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left focus:outline-none transition-colors [&::-webkit-inner-spin-button]:appearance-none bg-surface-input text-content-primary hover:bg-surface-hover focus:bg-surface-hover"
+                                        className="w-full rounded-md px-2 pl-6 pr-8 py-1 text-sm text-left form-input [&::-webkit-inner-spin-button]:appearance-none"
                                         placeholder="0.00"
                                     />
                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
@@ -371,7 +371,7 @@ export function HomeFieldCategory({
                         {/* Multi Select */}
                         {field.type === 'multi' && (
                             categoryFields.length === 1 ? (
-                                <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                     {field.options?.map((opt) => {
                                         const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
                                         const isSelected = currentValues.includes(opt);
@@ -407,7 +407,7 @@ export function HomeFieldCategory({
                             ) : (
                                 <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
                                     <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
-                                    <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                    <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                         {field.options?.map((opt) => {
                                             const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
                                             const isSelected = currentValues.includes(opt);
