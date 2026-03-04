@@ -8,6 +8,31 @@ import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 // Folders that cannot have files uploaded directly to them (only subfolders allowed)
 const RESTRICTED_PARENT_FOLDERS = ["Home Images", "Facility Images"];
 
+const MIME_TO_EXT: Record<string, string> = {
+    "image/svg+xml": "svg",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/webp": "webp",
+    "image/bmp": "bmp",
+    "image/tiff": "tiff",
+    "image/avif": "avif",
+};
+
+function getFileExt(filename: string | null | undefined, mimeType: string | null | undefined): string {
+    if (filename) {
+        const dot = filename.lastIndexOf(".");
+        if (dot !== -1 && dot < filename.length - 1) {
+            return filename.slice(dot + 1).toLowerCase();
+        }
+    }
+    if (mimeType) {
+        return MIME_TO_EXT[mimeType] ?? mimeType.split("/").pop() ?? "";
+    }
+    return "";
+}
+
 // Check if current folder is restricted for uploads
 const isRestrictedFolder = (folder: MediaFolder | null): boolean => {
     if (!folder) return true; // Root is restricted
@@ -214,7 +239,7 @@ export function MediaTile({
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-content-muted">
-                        <span className="text-sm">{item.mimeType.split("/")[1]}</span>
+                        <span className="text-sm uppercase">{getFileExt(item.filename, item.mimeType) || "file"}</span>
                     </div>
                 )}
 
@@ -222,10 +247,10 @@ export function MediaTile({
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                     {showDimensions && (
                         <div className="px-1.5 py-0.5 rounded-lg bg-[var(--media-dim-label-bg)] text-[var(--media-dim-label-text)] shadow-sm text-[10px] flex items-center gap-1.5 backdrop-blur-md">
-                            {item.width && item.height && (
+                            {item.width != null && item.height != null && item.width > 0 && item.height > 0 && (
                                 <span>{item.width}×{item.height}</span>
                             )}
-                            <span className="uppercase font-medium">{item.mimeType.split("/")[1]}</span>
+                            <span className="uppercase font-medium">{getFileExt(item.filename, item.mimeType) || "img"}</span>
                         </div>
                     )}
                     {isFeaturedImage && (

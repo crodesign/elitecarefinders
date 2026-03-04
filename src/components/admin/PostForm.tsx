@@ -21,8 +21,8 @@ interface PostFormProps {
 }
 
 function toThumbUrl(url: string): string {
-    if (url.includes('/media/') && url.endsWith('.webp') && !/-\d+x\d+\.webp$/.test(url)) {
-        return url.replace(/\.webp$/, '-100x100.webp');
+    if (url.includes('/media/') && !url.toLowerCase().endsWith('.svg')) {
+        return url.replace(/(-\d+x\d+)?\.[^.]+$/, '-100x100.webp');
     }
     return url;
 }
@@ -683,7 +683,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                                             <div className="h-20 w-full rounded-md flex flex-col items-center justify-center overflow-hidden group/img relative bg-surface-primary transition-colors">
                                                                 {inst.image ? (
                                                                     <>
-                                                                        <img src={inst.image} alt={`Step ${idx + 1}`} className="w-full h-full object-cover cursor-pointer" onClick={() => setStepImageSelectorOpen(idx)} />
+                                                                        <img src={toThumbUrl(inst.image)} alt={`Step ${idx + 1}`} className="w-full h-full object-cover cursor-pointer" onClick={() => setStepImageSelectorOpen(idx)} />
                                                                         <button
                                                                             type="button"
                                                                             onClick={(e) => {

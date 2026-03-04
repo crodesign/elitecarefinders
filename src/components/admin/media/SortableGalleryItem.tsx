@@ -11,8 +11,8 @@ interface SortableGalleryItemProps {
 }
 
 function toThumbUrl(url: string): string {
-    if (url.includes('/media/') && url.endsWith('.webp') && !/-\d+x\d+\.webp$/.test(url)) {
-        return url.replace(/\.webp$/, '-100x100.webp');
+    if (url.includes('/media/') && !url.toLowerCase().endsWith('.svg')) {
+        return url.replace(/(-\d+x\d+)?\.[^.]+$/, '-100x100.webp');
     }
     return url;
 }

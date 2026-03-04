@@ -109,15 +109,16 @@ export async function POST(request: NextRequest) {
         let urlThumb: string | undefined;
 
         if (isImage) {
-            const img = sharp(buffer);
-            const meta = await img.metadata();
+            // Use separate sharp instance for metadata to avoid pipeline pollution
+            const meta = await sharp(buffer).metadata();
 
             const needsResize = (meta.width ?? 0) > 1940 || (meta.height ?? 0) > 1940;
-            const base = needsResize
-                ? img.resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
-                : img;
+            const origProcessor = sharp(buffer);
+            if (needsResize) {
+                origProcessor.resize(1940, 1940, { fit: "inside", withoutEnlargement: true });
+            }
 
-            const { data: origBuf, info: origInfo } = await base.clone().webp({ quality: 90 }).toBuffer({ resolveWithObject: true });
+            const { data: origBuf, info: origInfo } = await origProcessor.webp({ quality: 90 }).toBuffer({ resolveWithObject: true });
             width = origInfo.width;
             height = origInfo.height;
             await r2Upload(filename, origBuf, "image/webp");
@@ -128,9 +129,9 @@ export async function POST(request: NextRequest) {
             const thumbFilename  = `${stem}-100x100.webp`;
 
             const [largeBuf, mediumBuf, thumbBuf] = await Promise.all([
-                base.clone().resize(500, 500,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
-                base.clone().resize(200, 200,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
-                base.clone().resize(100, 100,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
+                sharp(buffer).resize(500, 500,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
+                sharp(buffer).resize(200, 200,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
+                sharp(buffer).resize(100, 100,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
             ]);
 
             await Promise.all([
