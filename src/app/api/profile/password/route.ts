@@ -1,21 +1,9 @@
-import { createClient as createServerSupabase } from '@/lib/supabase-server';
+import { createClient as createServerSupabase, createAdminClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Admin client needed for updateUserById
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
-);
 
 // POST /api/profile/password - Update current user's password
 export async function POST(request: Request) {
+    const supabaseAdmin = createAdminClient();
     const supabase = createServerSupabase();
 
     const { data: { session } } = await supabase.auth.getSession();

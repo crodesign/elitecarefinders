@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Server-side Supabase client with service role key (can access auth.users)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
-);
+import { createAdminClient } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
+    const supabaseAdmin = createAdminClient();
     try {
         const { nickname } = await request.json();
 

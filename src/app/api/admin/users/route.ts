@@ -1,22 +1,10 @@
 
-import { createClient as createServerSupabase } from '@/lib/supabase-server';
+import { createClient as createServerSupabase, createAdminClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-// Initialize admin client
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
-);
-
 export async function GET(request: Request) {
+    const supabaseAdmin = createAdminClient();
     const supabase = createServerSupabase();
 
     // Debug logging
@@ -133,6 +121,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+    const supabaseAdmin = createAdminClient();
     const supabase = createServerSupabase();
 
     // 1. Check auth & permissions
