@@ -402,9 +402,9 @@ export function AnalyticsDashboard() {
                 </div>
             )}
 
-            {/* Top Pages + Sources */}
-            {(charts.topPages || charts.sources) && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Top Pages + Sources + Keywords */}
+            {(charts.topPages || charts.sources || (keywords && keywords.length > 0)) && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {charts.topPages && topPages.length > 0 && (
                         <div className="card border-0 p-6">
                             <h3 className="text-sm font-semibold text-content-primary mb-4">Top Pages</h3>
@@ -430,6 +430,20 @@ export function AnalyticsDashboard() {
                             <div className="space-y-3">
                                 {sources.map((s, i) => (
                                     <RankedBar key={i} label={s.source || "Direct"} value={s.sessions} max={maxSessions} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {keywords && keywords.length > 0 && (
+                        <div className="card border-0 p-6">
+                            <h3 className="text-sm font-semibold text-content-primary mb-4">Top Keywords</h3>
+                            <div className="space-y-3">
+                                {keywords.map((k, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <span className="text-xs text-content-muted font-mono w-4 flex-shrink-0 text-right">{i + 1}</span>
+                                        <RankedBar label={k.keyword} value={k.sessions} max={maxKeyword} />
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -539,22 +553,6 @@ export function AnalyticsDashboard() {
                     </div>
                 )}
             </div>
-
-            {/* Keywords */}
-            {keywords && keywords.length > 0 && (
-                <div className="card border-0 p-6">
-                    <h3 className="text-sm font-semibold text-content-primary mb-1">Top Search Keywords</h3>
-                    <p className="text-[11px] text-content-muted mb-4">Site search terms tracked via GA4</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
-                        {keywords.map((k, i) => (
-                            <div key={i} className="flex items-center gap-3">
-                                <span className="text-xs text-content-muted font-mono w-4 flex-shrink-0 text-right">{i + 1}</span>
-                                <RankedBar label={k.keyword} value={k.sessions} max={maxKeyword} />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
         </div>
     );
