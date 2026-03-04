@@ -378,11 +378,11 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                 </div>
             )}
             <div className="flex items-center justify-between mt-2">
-                <h3 className="flex items-center gap-2 text-lg font-medium text-content-primary">
-                    <LayoutGrid className="h-4 w-4 text-accent" />
+                <h3 className="flex items-start gap-2 text-lg font-medium text-content-primary">
+                    <LayoutGrid className="h-4 w-4 text-accent shrink-0 mt-[6px]" />
                     {title}
                     {mediaItems.length > 0 && (
-                        <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-lg bg-accent text-white text-[11px] font-bold tabular-nums">
+                        <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-lg bg-accent text-white text-[11px] font-bold tabular-nums shrink-0 mt-[4px]">
                             {mediaItems.length}
                         </span>
                     )}
