@@ -420,6 +420,7 @@ export default function ReviewsPage() {
                     )}
                     <div className="md:ml-3 flex flex-col items-start w-full min-w-0">
                         <div className="font-medium text-content-primary flex items-center gap-2 group-hover:text-accent transition-colors truncate w-full">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${review.status === 'approved' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
                             <span className="truncate">{review.authorName}</span>
                             {review.source === 'google' && (
                                 <GoogleIcon className="h-3.5 w-3.5 flex-shrink-0" />

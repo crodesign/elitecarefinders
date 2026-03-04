@@ -269,7 +269,10 @@ export default function PostsPage() {
                         </div>
                     </span>
                     <div>
-                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors">{post.title}</div>
+                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${post.status === 'published' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
+                            {post.title}
+                        </div>
                         <div className="text-xs text-content-muted hidden md:block max-w-sm truncate">{post.excerpt || '—'}</div>
                     </div>
                 </button>

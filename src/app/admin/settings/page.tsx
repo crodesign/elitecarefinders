@@ -1,0 +1,187 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Save, Loader2, Plus, Trash2, Code } from "lucide-react";
+import { getInjectedScripts, saveInjectedScripts, ScriptEntry } from "@/lib/services/siteSettingsService";
+import { useNotification } from "@/contexts/NotificationContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+
+function generateId() {
+    return Math.random().toString(36).slice(2, 10);
+}
+
+export default function GeneralSettingsPage() {
+    const { isSuperAdmin, loading: authLoading } = useAuth();
+    const router = useRouter();
+    const { showNotification } = useNotification();
+
+    const [scripts, setScripts] = useState<ScriptEntry[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (authLoading) return;
+        if (!isSuperAdmin) {
+            router.replace("/admin");
+            return;
+        }
+        getInjectedScripts().then((entries) => {
+            setScripts(entries);
+            setIsLoading(false);
+        });
+    }, [authLoading, isSuperAdmin, router]);
+
+    const addScript = () => {
+        setScripts((prev) => [
+            ...prev,
+            { id: generateId(), name: "", code: "", enabled: true, location: "header" },
+        ]);
+    };
+
+    const updateScript = (id: string, patch: Partial<ScriptEntry>) => {
+        setScripts((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+    };
+
+    const removeScript = (id: string) => {
+        setScripts((prev) => prev.filter((s) => s.id !== id));
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await saveInjectedScripts(scripts);
+            showNotification("Saved", "Scripts updated.");
+        } catch {
+            showNotification("Error", "Failed to save settings.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (authLoading || isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-6 w-6 text-accent animate-spin" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-8 max-w-3xl space-y-8">
+            <div>
+                <h1 className="text-2xl font-bold text-content-primary">General Settings</h1>
+                <p className="text-sm text-content-secondary mt-1">Site-wide configuration</p>
+            </div>
+
+            {/* Injected Scripts Section */}
+            <div className="card border-0 p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                        <Code className="h-4 w-4 text-accent" />
+                        Injected Scripts
+                    </h2>
+                    <button
+                        type="button"
+                        onClick={addScript}
+                        className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
+                    >
+                        <Plus className="h-3.5 w-3.5" />
+                        Add Script
+                    </button>
+                </div>
+                <p className="text-sm text-content-muted">
+                    Code injected into the <code className="bg-surface-input px-1.5 py-0.5 rounded text-xs font-mono text-content-secondary">&lt;head&gt;</code> or <code className="bg-surface-input px-1.5 py-0.5 rounded text-xs font-mono text-content-secondary">&lt;body&gt;</code> of every page.
+                    Use for analytics, tag managers, verification tags, and similar integrations.
+                </p>
+
+                {scripts.length === 0 && (
+                    <p className="text-sm text-content-muted text-center py-6 border border-dashed border-ui-border rounded-lg">
+                        No scripts added yet. Click "Add Script" to get started.
+                    </p>
+                )}
+
+                <div className="space-y-4">
+                    {scripts.map((script, index) => (
+                        <div key={script.id} className="border border-ui-border rounded-lg overflow-hidden">
+                            {/* Script header row */}
+                            <div className="flex items-center gap-3 px-4 py-2.5 bg-surface-input border-b border-ui-border">
+                                <span className="text-xs text-content-muted font-mono w-5 flex-shrink-0">{index + 1}</span>
+                                <input
+                                    type="text"
+                                    value={script.name}
+                                    onChange={(e) => updateScript(script.id, { name: e.target.value })}
+                                    placeholder="Script name (e.g. Google Tag Manager)"
+                                    className="form-input flex-1 min-w-0 text-sm px-3 py-1"
+                                />
+                                {/* Location toggle */}
+                                <div className="flex items-center gap-0.5 bg-surface-secondary border border-ui-border rounded-md p-0.5 flex-shrink-0">
+                                    {(["header", "body", "footer"] as const).map((loc) => (
+                                        <button
+                                            key={loc}
+                                            type="button"
+                                            onClick={() => updateScript(script.id, { location: loc })}
+                                            className={`text-xs px-2.5 py-1 rounded capitalize transition-colors ${
+                                                script.location === loc
+                                                    ? "bg-accent text-white"
+                                                    : "text-content-muted hover:text-content-secondary"
+                                            }`}
+                                        >
+                                            {loc}
+                                        </button>
+                                    ))}
+                                </div>
+                                {/* Enabled toggle */}
+                                <button
+                                    type="button"
+                                    onClick={() => updateScript(script.id, { enabled: !script.enabled })}
+                                    className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+                                        script.enabled ? "bg-accent" : "bg-surface-secondary border border-ui-border"
+                                    }`}
+                                    role="switch"
+                                    aria-checked={script.enabled}
+                                >
+                                    <span
+                                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                                            script.enabled ? "translate-x-4" : "translate-x-0"
+                                        }`}
+                                    />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => removeScript(script.id)}
+                                    className="text-content-muted hover:text-red-500 transition-colors flex-shrink-0"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            </div>
+                            {/* Code textarea */}
+                            <textarea
+                                value={script.code}
+                                onChange={(e) => updateScript(script.id, { code: e.target.value })}
+                                placeholder={"<!-- Paste your script here -->\n<script>...</script>"}
+                                rows={6}
+                                spellCheck={false}
+                                className={`w-full font-mono text-xs bg-surface-primary p-4 text-content-primary placeholder-content-muted resize-y focus:outline-none focus:ring-1 focus:ring-inset focus:ring-accent/50 block transition-opacity ${
+                                    !script.enabled ? "opacity-40" : ""
+                                }`}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="btn-primary flex items-center gap-2"
+                    >
+                        {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}

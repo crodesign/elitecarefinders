@@ -388,7 +388,10 @@ export default function FacilitiesPage() {
                         )}
                     </span>
                     <div>
-                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors">{facility.title}</div>
+                        <div className="font-medium text-content-primary group-hover:text-accent transition-colors flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${facility.status === 'published' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
+                            {facility.title}
+                        </div>
                         <div className="text-xs text-content-muted hidden md:block">{facility.slug}</div>
                     </div>
                 </button>

@@ -61,12 +61,12 @@ export function DataTable<T>({
                         {data.map((item) => (
                             <tr key={String(item[keyField])} className="table-row">
                                 {columns.map((col) => (
-                                    <td key={col.key} className="px-6 py-2">
+                                    <td key={col.key} className="px-6 py-[5px]">
                                         {col.render(item)}
                                     </td>
                                 ))}
                                 {actions && (
-                                    <td className="px-3 py-2 border-l border-ui-border whitespace-nowrap">
+                                    <td className="px-3 py-[5px] border-l border-ui-border whitespace-nowrap">
                                         <div className="flex justify-end gap-1">
                                             {actions(item)}
                                         </div>

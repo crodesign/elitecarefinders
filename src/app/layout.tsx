@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { HeadInjector } from "@/components/HeadInjector";
 
 import { cookies } from "next/headers";
 
@@ -85,6 +86,7 @@ export default async function RootLayout({
         >
             <head />
             <body className={inter.className}>
+                <HeadInjector />
                 <AuthProvider>
                     {children}
                 </AuthProvider>
