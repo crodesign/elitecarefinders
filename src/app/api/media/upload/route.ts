@@ -110,15 +110,37 @@ export async function POST(request: NextRequest) {
 
         if (isImage) {
             const meta = await sharp(buffer).metadata();
-            const needsResize = (meta.width ?? 0) > 1940 || (meta.height ?? 0) > 1940;
+            const srcW = meta.width ?? 0;
+            const srcH = meta.height ?? 0;
+            const MAX = 1940;
 
-            const { data: origBuf, info: origInfo } = await (
-                needsResize
-                    ? sharp(buffer).resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
-                    : sharp(buffer)
-            ).webp({ quality: 90 }).toBuffer({ resolveWithObject: true });
-            width = origInfo.width;
-            height = origInfo.height;
+            let origBuf: Buffer;
+            let origW: number;
+            let origH: number;
+
+            if (srcW > MAX || srcH > MAX) {
+                const ratio = Math.min(MAX / srcW, MAX / srcH);
+                const targetW = Math.round(srcW * ratio);
+                const targetH = Math.round(srcH * ratio);
+                console.log(`[Upload] Resizing ${srcW}x${srcH} → ${targetW}x${targetH}`);
+                const result = await sharp(buffer)
+                    .resize(targetW, targetH)
+                    .webp({ quality: 90 })
+                    .toBuffer({ resolveWithObject: true });
+                origBuf = result.data;
+                origW = result.info.width;
+                origH = result.info.height;
+            } else {
+                const result = await sharp(buffer)
+                    .webp({ quality: 90 })
+                    .toBuffer({ resolveWithObject: true });
+                origBuf = result.data;
+                origW = result.info.width;
+                origH = result.info.height;
+            }
+
+            width = origW;
+            height = origH;
             await r2Upload(filename, origBuf, "image/webp");
 
             const stem = filename.replace(/\.[^.]+$/, '');
