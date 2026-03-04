@@ -519,6 +519,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
             // If home is provided, we populate. If it's missing, we reset.
             // Note: The parent component should ensure 'home' is fully loaded before setting isOpen=true for edits.
             if (home) {
+                setGalleryFolderId(null); // Reset so fetchFolder re-runs for this home
                 setTitle(home.title);
                 originalTitleRef.current = home.title;
                 setSlug(home.slug);
@@ -586,6 +587,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setRoomDetails({ customFields: {} });
 
                 // Reset Images
+                setGalleryFolderId(null);
                 setImages([]);
 
                 // Clear dirty state on reset
