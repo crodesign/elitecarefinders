@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
-import { Plus, FileText, Pencil, Trash2, Search, Loader2, X } from "lucide-react";
+import { Plus, FileText, Pencil, Trash2, Search, Loader2, X, ExternalLink } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Post } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
@@ -274,7 +274,15 @@ export default function PostsPage() {
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${post.status === 'published' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
                             {post.title}
                         </div>
-                        <div className="text-xs text-content-muted hidden md:block max-w-sm truncate">{post.excerpt || '—'}</div>
+                        <a
+                href={`/blog/${post.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="text-xs text-content-muted hidden md:inline-flex items-center gap-1 hover:text-accent transition-colors"
+            >
+                View this post <ExternalLink className="h-3 w-3" />
+            </a>
                     </div>
                 </button>
             ),

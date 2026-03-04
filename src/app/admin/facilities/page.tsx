@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy, X } from "lucide-react";
+import { Plus, Building2, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy, X, ExternalLink } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Facility, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
@@ -393,7 +393,15 @@ export default function FacilitiesPage() {
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${facility.status === 'published' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
                             {facility.title}
                         </div>
-                        <div className="text-xs text-content-muted hidden md:block">{facility.slug}</div>
+                        <a
+                href={`/facilities/${facility.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="text-xs text-content-muted hidden md:inline-flex items-center gap-1 hover:text-accent transition-colors"
+            >
+                View this facility <ExternalLink className="h-3 w-3" />
+            </a>
                     </div>
                 </button>
             ),
