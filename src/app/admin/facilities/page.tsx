@@ -378,7 +378,7 @@ export default function FacilitiesPage() {
                     <span className="mr-2 hidden md:block flex-shrink-0">
                         {facility.images && facility.images.length > 0 ? (
                             <img
-                                src={facility.images[0].startsWith('/images/media/') ? facility.images[0].replace(/(\.[^.]+)$/, '-100x100.webp') : facility.images[0]}
+                                src={facility.images[0].includes('/media/') ? facility.images[0].replace(/(\.[^.]+)$/, '-100x100.webp') : facility.images[0]}
                                 alt={facility.title}
                                 className="h-[60px] w-[60px] rounded object-cover"
                             />

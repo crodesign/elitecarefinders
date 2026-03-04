@@ -32,7 +32,7 @@ const POST_TYPE_LABELS: Record<string, string> = {
 };
 
 function thumbUrl(url?: string | null): string | null {
-    if (!url || !url.startsWith("/images/media/")) return null;
+    if (!url || !url.includes("/media/")) return null;
     return url.replace(/(\.[^.]+)$/, "-100x100.webp");
 }
 
