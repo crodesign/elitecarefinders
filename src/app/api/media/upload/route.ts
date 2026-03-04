@@ -109,16 +109,14 @@ export async function POST(request: NextRequest) {
         let urlThumb: string | undefined;
 
         if (isImage) {
-            // Use separate sharp instance for metadata to avoid pipeline pollution
             const meta = await sharp(buffer).metadata();
-
             const needsResize = (meta.width ?? 0) > 1940 || (meta.height ?? 0) > 1940;
-            const origProcessor = sharp(buffer);
-            if (needsResize) {
-                origProcessor.resize(1940, 1940, { fit: "inside", withoutEnlargement: true });
-            }
 
-            const { data: origBuf, info: origInfo } = await origProcessor.webp({ quality: 90 }).toBuffer({ resolveWithObject: true });
+            const { data: origBuf, info: origInfo } = await (
+                needsResize
+                    ? sharp(buffer).resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
+                    : sharp(buffer)
+            ).webp({ quality: 90 }).toBuffer({ resolveWithObject: true });
             width = origInfo.width;
             height = origInfo.height;
             await r2Upload(filename, origBuf, "image/webp");
@@ -156,7 +154,7 @@ export async function POST(request: NextRequest) {
                 filename,
                 original_filename: file.name,
                 title: file.name.replace(/\.[^/.]+$/, ""),
-                mime_type: file.type,
+                mime_type: isImage ? "image/webp" : file.type,
                 file_size: file.size,
                 width,
                 height,
