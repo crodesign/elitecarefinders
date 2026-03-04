@@ -25,6 +25,8 @@ interface PageData { page: string; views: number; bounceRate: number; }
 interface SourceData { source: string; sessions: number; }
 interface DeviceData { device: string; sessions: number; }
 interface CountryData { country: string; sessions: number; }
+interface CityData { city: string; sessions: number; }
+interface KeywordData { keyword: string; sessions: number; }
 interface NVRData { type: string; sessions: number; }
 interface AnalyticsData {
     summary: Summary;
@@ -33,6 +35,8 @@ interface AnalyticsData {
     sources: SourceData[];
     devices: DeviceData[];
     countries: CountryData[];
+    cities: CityData[];
+    keywords: KeywordData[];
     newVsReturning: NVRData[];
     charts: { traffic: boolean; topPages: boolean; sources: boolean; };
 }
@@ -318,7 +322,7 @@ export function AnalyticsDashboard() {
 
     // ── Derived values ─────────────────────────────────────────────────────────
 
-    const { summary, traffic, topPages, sources, devices, countries, newVsReturning, charts } = data;
+    const { summary, traffic, topPages, sources, devices, countries, cities, keywords, newVsReturning, charts } = data;
 
     const engagementRate = summary.sessions.value > 0
         ? (summary.engagedSessions.value / summary.sessions.value) * 100
@@ -344,6 +348,8 @@ export function AnalyticsDashboard() {
     const maxPageViews     = Math.max(...topPages.map(p => p.views), 1);
     const maxSessions      = Math.max(...sources.map(s => s.sessions), 1);
     const maxCountry       = Math.max(...countries.map(c => c.sessions), 1);
+    const maxCity          = Math.max(...(cities ?? []).map(c => c.sessions), 1);
+    const maxKeyword       = Math.max(...(keywords ?? []).map(k => k.sessions), 1);
 
     const newVisitors    = newVsReturning.find(r => r.type === "new")?.sessions ?? 0;
     const returnVisitors = newVsReturning.find(r => r.type === "returning")?.sessions ?? 0;
@@ -431,8 +437,8 @@ export function AnalyticsDashboard() {
                 </div>
             )}
 
-            {/* Devices + New vs Returning + Countries */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Devices + New vs Returning + Countries + Cities */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
                 {/* Devices */}
                 {devices.length > 0 && (
@@ -515,18 +521,40 @@ export function AnalyticsDashboard() {
                         </h3>
                         <div className="space-y-3">
                             {countries.slice(0, 6).map((c, i) => (
-                                <RankedBar
-                                    key={i}
-                                    label={c.country}
-                                    value={c.sessions}
-                                    max={maxCountry}
-                                    sub={`${((c.sessions / maxCountry) * 100).toFixed(0)}%`}
-                                />
+                                <RankedBar key={i} label={c.country} value={c.sessions} max={maxCountry} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Top Cities */}
+                {cities && cities.length > 0 && (
+                    <div className="card border-0 p-6">
+                        <h3 className="text-sm font-semibold text-content-primary mb-4">Top Cities</h3>
+                        <div className="space-y-3">
+                            {cities.slice(0, 6).map((c, i) => (
+                                <RankedBar key={i} label={c.city} value={c.sessions} max={maxCity} />
                             ))}
                         </div>
                     </div>
                 )}
             </div>
+
+            {/* Keywords */}
+            {keywords && keywords.length > 0 && (
+                <div className="card border-0 p-6">
+                    <h3 className="text-sm font-semibold text-content-primary mb-1">Top Search Keywords</h3>
+                    <p className="text-[11px] text-content-muted mb-4">Site search terms tracked via GA4</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+                        {keywords.map((k, i) => (
+                            <div key={i} className="flex items-center gap-3">
+                                <span className="text-xs text-content-muted font-mono w-4 flex-shrink-0 text-right">{i + 1}</span>
+                                <RankedBar label={k.keyword} value={k.sessions} max={maxKeyword} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
         </div>
     );

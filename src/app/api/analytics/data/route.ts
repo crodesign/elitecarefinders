@@ -94,6 +94,10 @@ export async function GET(request: NextRequest) {
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'country' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 } }),
             // [7] New vs Returning
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'newVsReturning' }], metrics: [{ name: 'sessions' }] } }),
+            // [8] Cities
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'city' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 } }),
+            // [9] Keywords (site search terms)
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'searchTerm' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 } }),
         ]);
 
         const cur = settled(results[0])?.rows?.[0];
@@ -141,7 +145,15 @@ export async function GET(request: NextRequest) {
             sessions: parseInt(r.metricValues?.[0]?.value || '0'),
         }));
 
-        return NextResponse.json({ summary, traffic, topPages, sources, devices, countries, newVsReturning, charts: settings.charts });
+        const cities = (settled(results[8])?.rows || [])
+            .map(r => ({ city: r.dimensionValues?.[0]?.value || 'Unknown', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
+            .filter(r => r.city !== '(not set)');
+
+        const keywords = (settled(results[9])?.rows || [])
+            .map(r => ({ keyword: r.dimensionValues?.[0]?.value || '', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
+            .filter(r => r.keyword && r.keyword !== '(not set)');
+
+        return NextResponse.json({ summary, traffic, topPages, sources, devices, countries, newVsReturning, cities, keywords, charts: settings.charts });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'GA4 API error';
         return NextResponse.json({ error: message }, { status: 500 });
