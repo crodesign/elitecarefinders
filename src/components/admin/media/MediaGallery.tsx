@@ -54,7 +54,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const uploadInputRef = useRef<HTMLInputElement>(null);
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const { showNotification } = useNotification();
@@ -128,14 +129,9 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         loadMedia();
     }, [loadMedia]);
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length > 0) handleUpload(files);
-        e.target.value = "";
-    };
-
     const handleUpload = async (files: File[]) => {
         if (!folderId) return;
+        setIsUploading(true);
         try {
             const namePrefix = entityName
                 ? entityName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -146,6 +142,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         } catch (err) {
             console.error("Upload failed:", err);
             showNotification("Upload failed", "Some files could not be uploaded.");
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -245,6 +243,39 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
     return (
         <div className={`flex flex-col gap-4 ${className}`}>
+            {/* Upload Modal */}
+            {showUploadModal && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center"
+                    onClick={() => { if (!isUploading) setShowUploadModal(false); }}
+                >
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+                    <div
+                        className="relative z-10 w-full max-w-lg mx-4 bg-surface-primary rounded-2xl shadow-2xl overflow-hidden"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-ui-border">
+                            <h3 className="text-base font-semibold text-content-primary">Upload Images</h3>
+                            <button
+                                type="button"
+                                onClick={() => setShowUploadModal(false)}
+                                disabled={isUploading}
+                                className="p-1.5 rounded-lg text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <MediaUploader
+                            isOpen={true}
+                            onClose={() => setShowUploadModal(false)}
+                            onUpload={handleUpload}
+                            folderName={dropzoneText || entityName || "this folder"}
+                            hideCloseButton={true}
+                        />
+                    </div>
+                </div>
+            )}
+
             {/* Broken Images Modal */}
             <ConfirmationModal
                 isOpen={brokenImageUrls.length > 0}
@@ -356,23 +387,13 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                     </button>
                     {mediaItems.length > 0 && (
-                        <>
-                            <input
-                                ref={uploadInputRef}
-                                type="file"
-                                multiple
-                                accept="image/*,video/*"
-                                className="hidden"
-                                onChange={handleFileSelect}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => uploadInputRef.current?.click()}
-                                className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors shrink-0"
-                            >
-                                <Upload className="h-4 w-4" />
-                            </button>
-                        </>
+                        <button
+                            type="button"
+                            onClick={() => setShowUploadModal(true)}
+                            className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors shrink-0"
+                        >
+                            <Upload className="h-4 w-4" />
+                        </button>
                     )}
                 </div>
             </div>
