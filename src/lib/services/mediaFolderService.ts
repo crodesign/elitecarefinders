@@ -120,57 +120,21 @@ export async function ensureLocationFolders(
 }
 
 /**
- * Ensures that the folder structure exists for a given post.
- * Structure: Post Images -> [Post Type] -> [Post Title]
- * 
- * @param postTitle - Title of the post
- * @param postType - The routing slug/type of the post (e.g., 'recipes', 'news_events')
- * @returns The UUID of the post title folder
+ * Returns the ID of the shared "posts" media folder, creating it if needed.
+ * All post images are stored flat in this single folder regardless of post type.
  */
 export async function ensurePostFolder(
-    postTitle: string,
-    postType: string
+    _postTitle: string,
+    _postType: string
 ): Promise<string | null> {
     try {
-        console.log(`Ensuring folder for post: ${postTitle} under type: ${postType}`);
-
-        // 1. Find or Create "Post Images" Folder (at Root)
-        const rootFolderName = 'Post Images';
-        let rootFolder = await findFolderByName(rootFolderName, null);
-        if (!rootFolder) {
-            rootFolder = await createFolder(rootFolderName, null);
+        let folder = await findFolderByName('posts', null);
+        if (!folder) {
+            folder = await createFolder('posts', null);
         }
-        if (!rootFolder) throw new Error(`Could not find or create root folder: ${rootFolderName}`);
-
-        // 2. Determine Human-Readable Category Name
-        const categoryMap: Record<string, string> = {
-            'general': 'General Posts',
-            'caregiver_resources': 'Caregiver Resources',
-            'caregiving_for_caregivers': 'Caregiving for Caregivers',
-            'resident_resources': 'Resident Resources',
-            'news_events': 'News & Events',
-            'recipes': 'Recipes',
-        };
-        const categoryName = categoryMap[postType] || postType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-        // 3. Find or Create Type Directory
-        let typeFolder = await findFolderByName(categoryName, rootFolder.id);
-        if (!typeFolder) {
-            typeFolder = await createFolder(categoryName, rootFolder.id);
-        }
-        if (!typeFolder) throw new Error(`Could not find or create category folder: ${categoryName}`);
-
-        // 4. Find or Create Post Directory
-        let postFolder = await findFolderByName(postTitle, typeFolder.id);
-        if (!postFolder) {
-            postFolder = await createFolder(postTitle, typeFolder.id);
-        }
-        if (!postFolder) throw new Error(`Could not find or create post folder: ${postTitle}`);
-
-        return postFolder.id;
-
+        return folder?.id ?? null;
     } catch (error) {
-        console.error("Error ensuring post folders:", error);
+        console.error("Error ensuring posts folder:", error);
         throw error;
     }
 }

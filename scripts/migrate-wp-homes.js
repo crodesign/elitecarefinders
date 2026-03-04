@@ -74,6 +74,7 @@ const LOCATION_ENTRY_MAP = {
     'manoa':          '8edd407e-91dd-49e1-9ec2-64aa491025e3',
     'mililani':       'bbd289d7-bf99-4db3-8970-c507a52df56c',
     'pearl-city':     '71d786ef-463f-4503-a995-7272cd740c3f',
+    'hilo':           '53cc882f-6c53-4743-a3ab-d6d28db93943',
     // null = missing, will be created under Oahu in setup:
     'aina-haina':     null,
     'foster-village': null,
@@ -533,10 +534,25 @@ async function main() {
         const wpStatus = getTag(item, 'wp:status');
         const slug = rawSlug || slugify(title);
         const status = (wpStatus === 'publish' || wpStatus === 'pending') ? 'published' : 'draft';
-        wpHomes.push({ title, slug, status, meta: getAllPostmeta(item), cats: getCategories(item) });
+        // Skip auto-slug drafts: no WP post_name assigned = empty placeholder entry
+        if (!rawSlug && status === 'draft') { console.log(`  Skipping placeholder draft (no slug): ${title}`); continue; }
+        const meta = getAllPostmeta(item);
+        // Skip empty drafts: no address and no gallery images = content-less placeholder
+        const hasContent = meta['facility_address'] || meta['gallery_image_1'] || meta['facility_description'];
+        if (status === 'draft' && !hasContent) { console.log(`  Skipping empty draft: ${title} (${slug})`); continue; }
+        wpHomes.push({ title, slug, status, meta, cats: getCategories(item) });
     }
 
-    const homesToProcess = LIMIT ? wpHomes.slice(0, LIMIT) : wpHomes;
+    // Deduplicate by slug: prefer published over draft
+    const seenSlugs = new Map();
+    for (const h of wpHomes) {
+        const existing = seenSlugs.get(h.slug);
+        if (!existing || h.status === 'published') seenSlugs.set(h.slug, h);
+    }
+    const deduped = [...seenSlugs.values()];
+    if (deduped.length < wpHomes.length) console.log(`  Deduped ${wpHomes.length - deduped.length} duplicate slug(s).`);
+
+    const homesToProcess = LIMIT ? deduped.slice(0, LIMIT) : deduped;
     console.log(`\nHomes to process: ${homesToProcess.length}`);
     for (const h of homesToProcess) console.log(`  [${h.status.padEnd(9)}] ${h.title}`);
 

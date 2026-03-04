@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import fs from "fs/promises";
-import path from "path";
+import { r2Rename, toPublicUrl } from "@/lib/r2";
 
 export async function POST(request: NextRequest) {
     try {
@@ -64,20 +63,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // FLAT STORAGE: Rename files in flat directory (caption-preserving slug swap)
+        // Rename files in R2 (caption-preserving slug swap)
         const { data: mediaItems } = await supabase
             .from("media_items")
             .select("id, filename, url, storage_path")
             .eq("folder_id", folderId);
-
-        const mediaRoot = path.join(process.cwd(), "public", "images", "media");
 
         if (mediaItems && mediaItems.length > 0) {
             for (const item of mediaItems) {
                 const oldFilename = item.filename as string;
 
                 // Extract suffix: old-slug-living-room.jpg → suffix = "living-room"
-                // Or: old-slug-1.jpg → suffix = "1"
                 const escapedOldSlug = oldSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const suffixMatch = oldFilename.match(new RegExp(`^${escapedOldSlug}-(.+)$`));
 
@@ -85,25 +81,37 @@ export async function POST(request: NextRequest) {
                     const suffix = suffixMatch[1]; // "living-room.jpg" or "1.jpg"
                     const newFilename = `${newSlug}-${suffix}`;
 
-                    // Rename physical file
-                    const oldFilePath = path.join(mediaRoot, oldFilename);
-                    const newFilePath = path.join(mediaRoot, newFilename);
+                    // Rename main file in R2
+                    await r2Rename(oldFilename, newFilename).catch(() => {
+                        console.log(`[Folder Rename] Could not rename file ${oldFilename} in R2`);
+                    });
 
-                    try {
-                        await fs.access(oldFilePath);
-                        await fs.rename(oldFilePath, newFilePath);
-                    } catch {
-                        console.log(`[Folder Rename] Could not rename file ${oldFilename}:`, "file may not exist");
+                    const newUrl = toPublicUrl(newFilename);
+                    const variantUpdates: Record<string, string> = {};
+
+                    // Rename variant files in R2
+                    const oldStem = oldFilename.replace(/\.[^.]+$/, '');
+                    const newStem = newFilename.replace(/\.[^.]+$/, '');
+                    const variantDefs = [
+                        { suffix: "-500x500.webp", col: "url_large" },
+                        { suffix: "-200x200.webp", col: "url_medium" },
+                        { suffix: "-100x100.webp", col: "url_thumb" },
+                    ];
+                    for (const { suffix: varSuffix, col } of variantDefs) {
+                        const oldVariant = `${oldStem}${varSuffix}`;
+                        const newVariant = `${newStem}${varSuffix}`;
+                        await r2Rename(oldVariant, newVariant).catch(() => {});
+                        variantUpdates[col] = toPublicUrl(newVariant);
                     }
 
-                    // Update media_items record (flat URL)
-                    const newUrl = `/images/media/${newFilename}`;
+                    // Update media_items record
                     await supabase
                         .from("media_items")
                         .update({
                             filename: newFilename,
                             url: newUrl,
                             storage_path: newUrl,
+                            ...variantUpdates,
                         })
                         .eq("id", item.id);
                 }

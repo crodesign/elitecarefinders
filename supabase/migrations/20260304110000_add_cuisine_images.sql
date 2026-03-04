@@ -1,0 +1,2 @@
+ALTER TABLE homes ADD COLUMN IF NOT EXISTS cuisine_images TEXT[] DEFAULT '{}';
+ALTER TABLE facilities ADD COLUMN IF NOT EXISTS cuisine_images TEXT[] DEFAULT '{}';

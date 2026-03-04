@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rename } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import { createClient } from "@/lib/supabase-server";
+import { r2Rename, toPublicUrl } from "@/lib/r2";
 
 export async function POST(request: NextRequest) {
     try {
@@ -95,33 +93,39 @@ export async function POST(request: NextRequest) {
                 if (newFilename !== currentFilename) {
                     console.log("[Media Update] Caption rename:", { currentFilename, newFilename });
 
-                    // FLAT STORAGE: files are directly in public/images/media/
-                    const mediaRoot = path.join(process.cwd(), "public", "images", "media");
-                    const oldFilePath = path.join(mediaRoot, currentFilename);
-                    const newFilePath = path.join(mediaRoot, newFilename);
+                    // Rename main file in R2
+                    try {
+                        await r2Rename(currentFilename, newFilename);
+                        console.log("[Media Update] File renamed successfully");
+                    } catch (renameErr) {
+                        console.error("[Media Update] Failed to rename file in R2:", renameErr);
+                        // Continue without renaming if file rename fails
+                    }
 
-                    // Rename physical file
-                    if (existsSync(oldFilePath)) {
-                        try {
-                            await rename(oldFilePath, newFilePath);
-                            console.log("[Media Update] File renamed successfully");
+                    const newUrl = toPublicUrl(newFilename);
+                    updates.filename = newFilename;
+                    updates.url = newUrl;
+                    updates.storage_path = newUrl;
 
-                            // Update database fields (flat URL)
-                            updates.filename = newFilename;
-                            updates.url = `/images/media/${newFilename}`;
-                            updates.storage_path = `/images/media/${newFilename}`;
-                        } catch (renameErr) {
-                            console.error("[Media Update] Failed to rename file:", renameErr);
-                            // Continue without renaming if file rename fails
-                        }
-                    } else {
-                        console.warn("[Media Update] File not found for rename:", oldFilePath);
+                    // Rename variant files in R2 and update variant URL columns
+                    const oldStem = currentFilename.replace(/\.[^.]+$/, '');
+                    const newStem = newFilename.replace(/\.[^.]+$/, '');
+                    const variantDefs = [
+                        { suffix: "-500x500.webp", col: "url_large" },
+                        { suffix: "-200x200.webp", col: "url_medium" },
+                        { suffix: "-100x100.webp", col: "url_thumb" },
+                    ];
+                    for (const { suffix, col } of variantDefs) {
+                        const oldVariant = `${oldStem}${suffix}`;
+                        const newVariant = `${newStem}${suffix}`;
+                        await r2Rename(oldVariant, newVariant).catch(() => {});
+                        updates[col] = toPublicUrl(newVariant);
                     }
                 }
             }
         }
 
-        // Handle folder change (DB-only in flat storage — no physical file move)
+        // Handle folder change (DB-only — no physical file move in flat storage)
         if (newFolderId !== undefined && newFolderId !== mediaItem.folder_id) {
             console.log("[Media Update] Folder change detected:", {
                 oldFolderId: mediaItem.folder_id,

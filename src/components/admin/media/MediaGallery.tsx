@@ -59,6 +59,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const { showNotification } = useNotification();
     const galleriesRef = useRef(galleries);
     useEffect(() => { galleriesRef.current = galleries; }, [galleries]);
+    const featuredImageUrlRef = useRef(featuredImageUrl);
+    useEffect(() => { featuredImageUrlRef.current = featuredImageUrl; }, [featuredImageUrl]);
+    const stepImageMapRef = useRef(stepImageMap);
+    useEffect(() => { stepImageMapRef.current = stepImageMap; }, [stepImageMap]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -89,10 +93,21 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         setError(null);
         try {
             let items = await getMediaItems(folderId);
-            if (items.length === 0 && galleriesRef.current) {
-                const allGalleryUrls = galleriesRef.current.flatMap(g => g.urls);
-                if (allGalleryUrls.length > 0) {
-                    items = await getMediaItemsByUrls(allGalleryUrls);
+            if (items.length === 0) {
+                let fallbackUrls: string[] = [];
+                if (galleriesRef.current) {
+                    fallbackUrls = galleriesRef.current.flatMap(g => g.urls);
+                } else {
+                    // No galleries (e.g. recipe posts): use featured image and step images as fallback
+                    if (featuredImageUrlRef.current) fallbackUrls.push(featuredImageUrlRef.current);
+                    if (stepImageMapRef.current) {
+                        Object.keys(stepImageMapRef.current).forEach(url => {
+                            if (!fallbackUrls.includes(url)) fallbackUrls.push(url);
+                        });
+                    }
+                }
+                if (fallbackUrls.length > 0) {
+                    items = await getMediaItemsByUrls(fallbackUrls);
                 }
             }
             setMediaItems(items);
