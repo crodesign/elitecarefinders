@@ -109,16 +109,17 @@ export async function POST(request: NextRequest) {
         let urlThumb: string | undefined;
 
         if (isImage) {
-            // Always cap at 1940px; withoutEnlargement leaves smaller images untouched.
-            // Do NOT use metadata() first — it returns undefined width/height on Vercel.
-            const { data: origBuf, info: origInfo } = await sharp(buffer)
+            // Step 1: resize (capped at 1940px) + convert to webp
+            const origBuf = await sharp(buffer)
                 .resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
                 .webp({ quality: 90 })
-                .toBuffer({ resolveWithObject: true });
+                .toBuffer();
 
-            width = origInfo.width;
-            height = origInfo.height;
-            console.log(`[Upload] Original: ${width}x${height}`);
+            // Step 2: sample dimensions from the OUTPUT buffer — ground truth
+            const outMeta = await sharp(origBuf).metadata();
+            width = outMeta.width;
+            height = outMeta.height;
+            console.log(`[Upload] Stored: ${width}x${height}`);
             await r2Upload(filename, origBuf, "image/webp");
 
             const stem = filename.replace(/\.[^.]+$/, '');
