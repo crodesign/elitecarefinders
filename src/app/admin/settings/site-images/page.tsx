@@ -74,8 +74,8 @@ export default function SiteImagesPage() {
 
                 setFolders(folderData);
 
-                // Find "Images" folder (slug: images) and set as default
-                const imagesFolder = folderData.find(f => f.slug === "images");
+                // Find "site" folder and set as default
+                const imagesFolder = folderData.find(f => f.slug === "site");
                 if (imagesFolder) {
                     setSelectedFolder(imagesFolder);
                 } else {
