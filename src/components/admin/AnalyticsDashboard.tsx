@@ -5,7 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { Loader2, TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -175,6 +175,30 @@ function RankedBar({ label, value, max, sub }: { label: string; value: number; m
     );
 }
 
+// ─── HeartLoader ─────────────────────────────────────────────────────────────
+
+function HeartLoader() {
+    return (
+        <>
+            <style>{`
+                @keyframes heartTrace {
+                    0%   { stroke-dashoffset: 1; opacity: 0.15; }
+                    50%  { stroke-dashoffset: 0; opacity: 1;    }
+                    100% { stroke-dashoffset: 1; opacity: 0.15; }
+                }
+            `}</style>
+            <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path
+                    pathLength="1"
+                    strokeDasharray="1"
+                    style={{ animation: "heartTrace 2s ease-in-out infinite" }}
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                />
+            </svg>
+        </>
+    );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function AnalyticsDashboard() {
@@ -316,7 +340,7 @@ export function AnalyticsDashboard() {
             <div className="space-y-4">
                 <div className="flex justify-end">{toolbar}</div>
                 <div className="flex items-center justify-center h-48">
-                    <Loader2 className="h-5 w-5 text-accent animate-spin" />
+                    <HeartLoader />
                 </div>
             </div>
         );
