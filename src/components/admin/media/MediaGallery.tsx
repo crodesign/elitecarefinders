@@ -93,22 +93,26 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         setError(null);
         try {
             let items = await getMediaItems(folderId);
-            if (items.length === 0) {
-                let fallbackUrls: string[] = [];
-                if (galleriesRef.current) {
-                    fallbackUrls = galleriesRef.current.flatMap(g => g.urls);
-                } else {
-                    // No galleries (e.g. recipe posts): use featured image and step images as fallback
-                    if (featuredImageUrlRef.current) fallbackUrls.push(featuredImageUrlRef.current);
-                    if (stepImageMapRef.current) {
-                        Object.keys(stepImageMapRef.current).forEach(url => {
-                            if (!fallbackUrls.includes(url)) fallbackUrls.push(url);
-                        });
-                    }
+
+            // Always include gallery-selected images even if stored in a different folder
+            const folderUrls = new Set(items.map(i => i.url));
+            let extraUrls: string[] = [];
+            if (galleriesRef.current) {
+                extraUrls = galleriesRef.current.flatMap(g => g.urls).filter(u => u && !folderUrls.has(u));
+            } else {
+                // No galleries (e.g. recipe posts): use featured image and step images
+                if (featuredImageUrlRef.current && !folderUrls.has(featuredImageUrlRef.current)) {
+                    extraUrls.push(featuredImageUrlRef.current);
                 }
-                if (fallbackUrls.length > 0) {
-                    items = await getMediaItemsByUrls(fallbackUrls);
+                if (stepImageMapRef.current) {
+                    Object.keys(stepImageMapRef.current).forEach(url => {
+                        if (url && !folderUrls.has(url) && !extraUrls.includes(url)) extraUrls.push(url);
+                    });
                 }
+            }
+            if (extraUrls.length > 0) {
+                const extraItems = await getMediaItemsByUrls(extraUrls);
+                items = [...items, ...extraItems];
             }
             setMediaItems(items);
         } catch (err) {
