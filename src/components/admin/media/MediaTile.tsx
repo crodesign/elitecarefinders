@@ -86,6 +86,7 @@ export function MediaTile({
     const [caption, setCaption] = useState(item.altText || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
     const [isSaving, setIsSaving] = useState(false);
+    const [liveDims, setLiveDims] = useState<{ w: number; h: number } | null>(null);
     const [folderSearch, setFolderSearch] = useState("");
     const [showFolderDropdown, setShowFolderDropdown] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -232,11 +233,21 @@ export function MediaTile({
             {/* Image container */}
             <div className="relative w-full aspect-square bg-surface-input rounded-t-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
-                    <img
-                        src={item.urlMedium || item.url}
-                        alt={item.altText || item.filename}
-                        className={`w-full h-full ${item.mimeType === 'image/svg+xml' ? 'object-contain p-1' : 'object-cover'} transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
-                    />
+                    <>
+                        <img
+                            src={item.urlMedium || item.url}
+                            alt={item.altText || item.filename}
+                            className={`w-full h-full ${item.mimeType === 'image/svg+xml' ? 'object-contain p-1' : 'object-cover'} transition-opacity ${isSelected && onMediaSelect ? "opacity-50" : "opacity-100"}`}
+                        />
+                        {item.mimeType !== 'image/svg+xml' && (item.width == null || item.height == null) && (
+                            <img
+                                src={item.url}
+                                alt=""
+                                className="hidden"
+                                onLoad={(e) => setLiveDims({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
+                            />
+                        )}
+                    </>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-content-muted">
                         <span className="text-sm uppercase">{getFileExt(item.filename, item.mimeType) || "file"}</span>
@@ -247,9 +258,13 @@ export function MediaTile({
                 <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                     {showDimensions && (
                         <div className="px-1.5 py-0.5 rounded-lg bg-[var(--media-dim-label-bg)] text-[var(--media-dim-label-text)] shadow-sm text-[10px] flex items-center gap-1.5 backdrop-blur-md">
-                            {item.width != null && item.height != null && item.width > 0 && item.height > 0 && (
-                                <span>{item.width}×{item.height}</span>
-                            )}
+                            {(() => {
+                                const w = liveDims?.w ?? item.width;
+                                const h = liveDims?.h ?? item.height;
+                                return w != null && h != null && w > 0 && h > 0
+                                    ? <span>{w}×{h}</span>
+                                    : null;
+                            })()}
                             <span className="uppercase font-medium">{getFileExt(item.filename, item.mimeType) || "img"}</span>
                         </div>
                     )}
