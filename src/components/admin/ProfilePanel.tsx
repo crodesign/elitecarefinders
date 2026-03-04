@@ -26,6 +26,8 @@ import { supabase } from "@/lib/supabase";
 
 import { SlidePanel } from "@/components/admin/SlidePanel";
 import { useTheme } from "@/contexts/ThemeContext";
+import { uploadMedia } from "@/lib/services/mediaService";
+import { getFolderBySlug } from "@/lib/services/mediaFolderService";
 
 const COLOR_PALETTE = [
     { name: 'Red', hex: '#ef4444' },
@@ -60,6 +62,10 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [profilesFolderId, setProfilesFolderId] = useState<string | null>(null);
+    useEffect(() => {
+        getFolderBySlug('profiles', 'site').then(f => setProfilesFolderId(f?.id ?? null));
+    }, []);
     const [selectedImageUrl, setSelectedImageUrl] = useState('');
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
@@ -314,23 +320,13 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
         if (!user) return;
         setIsSaving(true);
         try {
-            // If photo was changed (data URL from cropper), upload it first
+            // If photo was changed (data URL from cropper), upload it to R2
             let finalPhotoUrl = photoUrl;
             if (photoUrl && photoUrl.startsWith('data:')) {
                 const blob = await (await fetch(photoUrl)).blob();
-                const path = `profile-photos/${user.id}.jpg`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('media')
-                    .upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
-
-                if (uploadError) throw uploadError;
-
-                const { data: urlData } = supabase.storage
-                    .from('media')
-                    .getPublicUrl(path);
-
-                finalPhotoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+                const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
+                const item = await uploadMedia(file, profilesFolderId);
+                finalPhotoUrl = item.url;
                 setPhotoUrl(finalPhotoUrl);
             }
 

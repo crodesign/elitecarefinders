@@ -198,3 +198,33 @@ async function createFolder(name: string, parentId: string | null): Promise<Medi
         throw error;
     }
 }
+
+/**
+ * Find a folder by slug. Pass parentSlug to restrict to a specific parent folder.
+ * If no parentSlug is given, only root-level folders are searched.
+ */
+export async function getFolderBySlug(slug: string, parentSlug?: string): Promise<MediaFolder | null> {
+    let parentId: string | null = null;
+
+    if (parentSlug) {
+        const { data: parent } = await supabase
+            .from('media_folders')
+            .select('id')
+            .eq('slug', parentSlug)
+            .is('parent_id', null)
+            .limit(1)
+            .maybeSingle();
+        if (!parent) return null;
+        parentId = parent.id;
+    }
+
+    let query = supabase.from('media_folders').select('*').eq('slug', slug);
+    if (parentId) {
+        query = query.eq('parent_id', parentId);
+    } else {
+        query = query.is('parent_id', null);
+    }
+
+    const { data } = await query.limit(1).maybeSingle();
+    return data as MediaFolder | null;
+}

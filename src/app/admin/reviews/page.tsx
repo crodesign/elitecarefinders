@@ -14,6 +14,8 @@ import { createClientComponentClient as createClient } from "@/lib/supabase";
 import { useNotification } from "@/contexts/NotificationContext";
 import { Tooltip } from "@/components/ui/tooltip";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
+import { uploadMedia } from "@/lib/services/mediaService";
+import { getFolderBySlug } from "@/lib/services/mediaFolderService";
 
 const GoogleIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -50,6 +52,12 @@ export default function ReviewsPage() {
     const [isSyncing, setIsSyncing] = useState(false);
     const [isUploadingGallery, setIsUploadingGallery] = useState(false);
     const galleryInputRef = useRef<HTMLInputElement>(null);
+
+    // Reviews media folder
+    const [reviewsFolderId, setReviewsFolderId] = useState<string | null>(null);
+    useEffect(() => {
+        getFolderBySlug('reviews').then(f => setReviewsFolderId(f?.id ?? null));
+    }, []);
 
     // Photo upload state
     const [selectedImageUrl, setSelectedImageUrl] = useState('');
@@ -188,24 +196,12 @@ export default function ReviewsPage() {
 
             let finalPhotoUrl = editingReview.authorPhotoUrl;
 
-            // If photo was changed (data URL from cropper), upload it first
+            // If photo was changed (data URL from cropper), upload it to R2
             if (finalPhotoUrl && finalPhotoUrl.startsWith('data:')) {
-                // Ensure we have a valid ID for the path
-                const idForPath = editingReview.id || crypto.randomUUID();
                 const blob = await (await fetch(finalPhotoUrl)).blob();
-                const path = `review-images/authors/${idForPath}.jpg`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('media')
-                    .upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
-
-                if (uploadError) throw uploadError;
-
-                const { data: urlData } = supabase.storage
-                    .from('media')
-                    .getPublicUrl(path);
-
-                finalPhotoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+                const file = new File([blob], 'review-author.jpg', { type: 'image/jpeg' });
+                const item = await uploadMedia(file, reviewsFolderId);
+                finalPhotoUrl = item.url;
             }
 
             const reviewData = {
@@ -291,21 +287,8 @@ export default function ReviewsPage() {
             const newImages = [...(editingReview.images || [])];
 
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const fileName = `${Date.now()}-${file.name}`;
-                const path = `review-images/gallery/${editingReview.id}/${fileName}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('media')
-                    .upload(path, file, { contentType: file.type });
-
-                if (uploadError) throw uploadError;
-
-                const { data: urlData } = supabase.storage
-                    .from('media')
-                    .getPublicUrl(path);
-
-                newImages.push(urlData.publicUrl);
+                const item = await uploadMedia(files[i], reviewsFolderId);
+                newImages.push(item.url);
             }
 
             setEditingReview({ ...editingReview, images: newImages });
