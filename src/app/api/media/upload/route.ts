@@ -109,38 +109,16 @@ export async function POST(request: NextRequest) {
         let urlThumb: string | undefined;
 
         if (isImage) {
-            const meta = await sharp(buffer).metadata();
-            const srcW = meta.width ?? 0;
-            const srcH = meta.height ?? 0;
-            const MAX = 1940;
+            // Always cap at 1940px; withoutEnlargement leaves smaller images untouched.
+            // Do NOT use metadata() first — it returns undefined width/height on Vercel.
+            const { data: origBuf, info: origInfo } = await sharp(buffer)
+                .resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
+                .webp({ quality: 90 })
+                .toBuffer({ resolveWithObject: true });
 
-            let origBuf: Buffer;
-            let origW: number;
-            let origH: number;
-
-            if (srcW > MAX || srcH > MAX) {
-                const ratio = Math.min(MAX / srcW, MAX / srcH);
-                const targetW = Math.round(srcW * ratio);
-                const targetH = Math.round(srcH * ratio);
-                console.log(`[Upload] Resizing ${srcW}x${srcH} → ${targetW}x${targetH}`);
-                const result = await sharp(buffer)
-                    .resize(targetW, targetH)
-                    .webp({ quality: 90 })
-                    .toBuffer({ resolveWithObject: true });
-                origBuf = result.data;
-                origW = result.info.width;
-                origH = result.info.height;
-            } else {
-                const result = await sharp(buffer)
-                    .webp({ quality: 90 })
-                    .toBuffer({ resolveWithObject: true });
-                origBuf = result.data;
-                origW = result.info.width;
-                origH = result.info.height;
-            }
-
-            width = origW;
-            height = origH;
+            width = origInfo.width;
+            height = origInfo.height;
+            console.log(`[Upload] Original: ${width}x${height}`);
             await r2Upload(filename, origBuf, "image/webp");
 
             const stem = filename.replace(/\.[^.]+$/, '');
