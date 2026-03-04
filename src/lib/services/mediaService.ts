@@ -433,27 +433,8 @@ export async function uploadMedia(
 
     const result = await response.json();
 
-    // Get image dimensions on client side
-    let width: number | undefined;
-    let height: number | undefined;
-    if (file.type.startsWith("image/")) {
-        const dimensions = await getImageDimensions(file);
-        width = dimensions.width;
-        height = dimensions.height;
-
-        // Update the record with dimensions
-        if (width && height) {
-            await supabase
-                .from("media_items")
-                .update({ width, height })
-                .eq("id", result.item.id);
-        }
-    }
-
     return {
         ...result.item,
-        width,
-        height,
         updatedAt: result.item.createdAt,
     };
 }
@@ -471,21 +452,6 @@ export async function bulkUploadMedia(
         onProgress?.(i + 1, files.length);
     }
     return results;
-}
-
-// Helper functions
-function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-            resolve({ width: img.width, height: img.height });
-            URL.revokeObjectURL(img.src);
-        };
-        img.onerror = () => {
-            resolve({ width: 0, height: 0 });
-        };
-        img.src = URL.createObjectURL(file);
-    });
 }
 
 // Transform database row to MediaFolder interface
