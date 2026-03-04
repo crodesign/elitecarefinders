@@ -96,8 +96,12 @@ export async function GET(request: NextRequest) {
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'newVsReturning' }], metrics: [{ name: 'sessions' }] } }),
             // [8] Cities
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'city' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 } }),
-            // [9] Keywords (site search terms)
+            // [9] Site search terms
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'searchTerm' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 } }),
+            // [10] Paid keywords (Google Ads)
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'sessionGoogleAdsKeyword' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 } }),
+            // [11] Mobile OS breakdown (iOS vs Android)
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'operatingSystem' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 6 } }),
         ]);
 
         const cur = settled(results[0])?.rows?.[0];
@@ -149,11 +153,28 @@ export async function GET(request: NextRequest) {
             .map(r => ({ city: r.dimensionValues?.[0]?.value || 'Unknown', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
             .filter(r => r.city !== '(not set)');
 
-        const keywords = (settled(results[9])?.rows || [])
+        const JUNK = new Set(['(not set)', '(not provided)', '']);
+        const siteSearch = (settled(results[9])?.rows || [])
             .map(r => ({ keyword: r.dimensionValues?.[0]?.value || '', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
-            .filter(r => r.keyword && r.keyword !== '(not set)');
+            .filter(r => !JUNK.has(r.keyword));
+        const paidKeywords = (settled(results[10])?.rows || [])
+            .map(r => ({ keyword: r.dimensionValues?.[0]?.value || '', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
+            .filter(r => !JUNK.has(r.keyword));
+        // Merge: sum sessions for duplicate terms, sort by sessions desc, take top 10
+        const kwMap = new Map<string, number>();
+        [...siteSearch, ...paidKeywords].forEach(({ keyword, sessions }) => {
+            kwMap.set(keyword, (kwMap.get(keyword) ?? 0) + sessions);
+        });
+        const keywords = [...kwMap.entries()]
+            .map(([keyword, sessions]) => ({ keyword, sessions }))
+            .sort((a, b) => b.sessions - a.sessions)
+            .slice(0, 10);
 
-        return NextResponse.json({ summary, traffic, topPages, sources, devices, countries, newVsReturning, cities, keywords, charts: settings.charts });
+        const mobileOS = (settled(results[11])?.rows || [])
+            .map(r => ({ os: r.dimensionValues?.[0]?.value || 'Unknown', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
+            .filter(r => r.os !== '(not set)');
+
+        return NextResponse.json({ summary, traffic, topPages, sources, devices, mobileOS, countries, newVsReturning, cities, keywords, charts: settings.charts });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'GA4 API error';
         return NextResponse.json({ error: message }, { status: 500 });

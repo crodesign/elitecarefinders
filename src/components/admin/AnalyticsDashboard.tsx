@@ -24,6 +24,7 @@ interface TrafficPoint { date: string; sessions: number; pageviews: number; }
 interface PageData { page: string; views: number; bounceRate: number; }
 interface SourceData { source: string; sessions: number; }
 interface DeviceData { device: string; sessions: number; }
+interface MobileOSData { os: string; sessions: number; }
 interface CountryData { country: string; sessions: number; }
 interface CityData { city: string; sessions: number; }
 interface KeywordData { keyword: string; sessions: number; }
@@ -34,6 +35,7 @@ interface AnalyticsData {
     topPages: PageData[];
     sources: SourceData[];
     devices: DeviceData[];
+    mobileOS: MobileOSData[];
     countries: CountryData[];
     cities: CityData[];
     keywords: KeywordData[];
@@ -322,7 +324,7 @@ export function AnalyticsDashboard() {
 
     // ── Derived values ─────────────────────────────────────────────────────────
 
-    const { summary, traffic, topPages, sources, devices, countries, cities, keywords, newVsReturning, charts } = data;
+    const { summary, traffic, topPages, sources, devices, mobileOS, countries, cities, keywords, newVsReturning, charts } = data;
 
     const engagementRate = summary.sessions.value > 0
         ? (summary.engagedSessions.value / summary.sessions.value) * 100
@@ -355,6 +357,9 @@ export function AnalyticsDashboard() {
     const returnVisitors = newVsReturning.find(r => r.type === "returning")?.sessions ?? 0;
     const nvrTotal       = newVisitors + returnVisitors || 1;
     const totalDevices   = devices.reduce((s, d) => s + d.sessions, 0) || 1;
+    const mobileSessions = devices.find(d => d.device.toLowerCase() === "mobile")?.sessions ?? 0;
+    const mobileOSFiltered = (mobileOS ?? []).filter(r => ["ios", "android"].includes(r.os.toLowerCase()));
+    const totalMobileOS  = mobileOSFiltered.reduce((s, r) => s + r.sessions, 0) || 1;
 
     return (
         <div className="space-y-4">
@@ -403,7 +408,7 @@ export function AnalyticsDashboard() {
             )}
 
             {/* Top Pages + Sources + Keywords */}
-            {(charts.topPages || charts.sources || (keywords && keywords.length > 0)) && (
+            {(charts.topPages || charts.sources) && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {charts.topPages && topPages.length > 0 && (
                         <div className="card border-0 p-6">
@@ -435,9 +440,9 @@ export function AnalyticsDashboard() {
                         </div>
                     )}
 
-                    {keywords && keywords.length > 0 && (
-                        <div className="card border-0 p-6">
-                            <h3 className="text-sm font-semibold text-content-primary mb-4">Top Keywords</h3>
+                    <div className="card border-0 p-6">
+                        <h3 className="text-sm font-semibold text-content-primary mb-4">Top Keywords</h3>
+                        {keywords && keywords.length > 0 ? (
                             <div className="space-y-3">
                                 {keywords.map((k, i) => (
                                     <div key={i} className="flex items-center gap-3">
@@ -446,8 +451,14 @@ export function AnalyticsDashboard() {
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    )}
+                        ) : (
+                            <p className="text-xs text-content-muted leading-relaxed">
+                                No keyword data available. Enable{" "}
+                                <a href="https://support.google.com/analytics/answer/1012264" target="_blank" rel="noreferrer" className="text-accent hover:underline">site search tracking</a>{" "}
+                                in GA4 or link a Google Ads account to populate this section.
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -469,16 +480,32 @@ export function AnalyticsDashboard() {
                                     <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v.toLocaleString(), "Sessions"]} />
                                 </PieChart>
                             </ResponsiveContainer>
-                            <div className="flex-1 space-y-2.5">
+                            <div className="flex-1 space-y-2">
                                 {devices.map((d, i) => {
                                     const Icon = DEVICE_ICONS[d.device.toLowerCase()] ?? Monitor;
                                     const pct = ((d.sessions / totalDevices) * 100).toFixed(1);
+                                    const isMobile = d.device.toLowerCase() === "mobile";
                                     return (
-                                        <div key={i} className="flex items-center gap-2">
-                                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: DEVICE_COLORS[i % DEVICE_COLORS.length] }} />
-                                            <Icon className="h-3.5 w-3.5 text-content-muted flex-shrink-0" />
-                                            <span className="text-xs text-content-secondary capitalize flex-1">{d.device}</span>
-                                            <span className="text-xs text-content-muted tabular-nums">{pct}%</span>
+                                        <div key={i}>
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: DEVICE_COLORS[i % DEVICE_COLORS.length] }} />
+                                                <Icon className="h-3.5 w-3.5 text-content-muted flex-shrink-0" />
+                                                <span className="text-xs text-content-secondary capitalize flex-1">{d.device}</span>
+                                                <span className="text-xs text-content-muted tabular-nums">{pct}%</span>
+                                            </div>
+                                            {isMobile && mobileOSFiltered.length > 0 && (
+                                                <div className="ml-6 mt-1 space-y-1">
+                                                    {mobileOSFiltered.map((r, j) => (
+                                                        <div key={j} className="flex items-center gap-1.5">
+                                                            <span className="w-1 h-1 rounded-full bg-content-muted/40 flex-shrink-0" />
+                                                            <span className="text-[11px] text-content-muted flex-1">{r.os}</span>
+                                                            <span className="text-[11px] text-content-muted tabular-nums">
+                                                                {mobileSessions > 0 ? `${((r.sessions / totalMobileOS) * 100).toFixed(0)}%` : "—"}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
