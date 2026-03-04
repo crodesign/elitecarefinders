@@ -253,7 +253,7 @@ export function AnalyticsDashboard() {
                     {periodLabel} · updated {lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                 </span>
             )}
-            <div className="flex items-center bg-surface-input border border-ui-border rounded-lg p-0.5 gap-0.5">
+            <div className="flex items-center bg-surface-input rounded-lg p-0.5 gap-0.5">
                 {PRESETS.map(p => (
                     <button
                         key={p.label}
@@ -293,7 +293,7 @@ export function AnalyticsDashboard() {
                 type="button"
                 onClick={handleRefresh}
                 disabled={loading || refreshing}
-                className="p-1.5 rounded-md bg-surface-input border border-ui-border text-content-muted hover:text-content-secondary transition-colors disabled:opacity-40"
+                className="p-1.5 rounded-md bg-surface-input text-content-muted hover:text-content-secondary transition-colors disabled:opacity-40"
                 title="Refresh"
             >
                 <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
@@ -306,10 +306,7 @@ export function AnalyticsDashboard() {
     if (loading) {
         return (
             <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                    <span className="text-sm font-semibold text-content-primary">Analytics</span>
-                    {toolbar}
-                </div>
+                <div className="flex justify-end">{toolbar}</div>
                 <div className="flex items-center justify-center h-48">
                     <Loader2 className="h-5 w-5 text-accent animate-spin" />
                 </div>
@@ -356,11 +353,8 @@ export function AnalyticsDashboard() {
     return (
         <div className="space-y-4">
 
-            {/* Header + toolbar */}
-            <div className="flex items-center justify-between flex-wrap gap-3">
-                <span className="text-sm font-semibold text-content-primary">Analytics</span>
-                {toolbar}
-            </div>
+            {/* Toolbar */}
+            <div className="flex justify-end flex-wrap gap-3">{toolbar}</div>
 
             {/* Stat cards — 4 columns on md, 8 on xl */}
             <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
