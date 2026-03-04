@@ -102,6 +102,8 @@ export async function GET(request: NextRequest) {
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'sessionGoogleAdsKeyword' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 } }),
             // [11] Mobile OS breakdown (iOS vs Android)
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'operatingSystem' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 6 } }),
+            // [12] Source detail: channel + source
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'sessionDefaultChannelGroup' }, { name: 'sessionSource' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 30 } }),
         ]);
 
         const cur = settled(results[0])?.rows?.[0];
@@ -174,7 +176,13 @@ export async function GET(request: NextRequest) {
             .map(r => ({ os: r.dimensionValues?.[0]?.value || 'Unknown', sessions: parseInt(r.metricValues?.[0]?.value || '0') }))
             .filter(r => r.os !== '(not set)');
 
-        return NextResponse.json({ summary, traffic, topPages, sources, devices, mobileOS, countries, newVsReturning, cities, keywords, charts: settings.charts });
+        const sourceDetail = (settled(results[12])?.rows || []).map(r => ({
+            channel: r.dimensionValues?.[0]?.value || 'Direct',
+            source:  r.dimensionValues?.[1]?.value || '(direct)',
+            sessions: parseInt(r.metricValues?.[0]?.value || '0'),
+        }));
+
+        return NextResponse.json({ summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, newVsReturning, cities, keywords, charts: settings.charts });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'GA4 API error';
         return NextResponse.json({ error: message }, { status: 500 });

@@ -23,6 +23,7 @@ interface Summary {
 interface TrafficPoint { date: string; sessions: number; pageviews: number; }
 interface PageData { page: string; views: number; bounceRate: number; }
 interface SourceData { source: string; sessions: number; }
+interface SourceDetailData { channel: string; source: string; sessions: number; }
 interface DeviceData { device: string; sessions: number; }
 interface MobileOSData { os: string; sessions: number; }
 interface CountryData { country: string; sessions: number; }
@@ -34,6 +35,7 @@ interface AnalyticsData {
     traffic: TrafficPoint[];
     topPages: PageData[];
     sources: SourceData[];
+    sourceDetail: SourceDetailData[];
     devices: DeviceData[];
     mobileOS: MobileOSData[];
     countries: CountryData[];
@@ -324,7 +326,7 @@ export function AnalyticsDashboard() {
 
     // ── Derived values ─────────────────────────────────────────────────────────
 
-    const { summary, traffic, topPages, sources, devices, mobileOS, countries, cities, keywords, newVsReturning, charts } = data;
+    const { summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, cities, keywords, newVsReturning, charts } = data;
 
     const engagementRate = summary.sessions.value > 0
         ? (summary.engagedSessions.value / summary.sessions.value) * 100
@@ -433,9 +435,26 @@ export function AnalyticsDashboard() {
                         <div className="card border-0 p-6">
                             <h3 className="text-sm font-semibold text-content-primary mb-4">Traffic Sources</h3>
                             <div className="space-y-3">
-                                {sources.map((s, i) => (
-                                    <RankedBar key={i} label={s.source || "Direct"} value={s.sessions} max={maxSessions} />
-                                ))}
+                                {sources.map((s, i) => {
+                                    const subs = (sourceDetail ?? [])
+                                        .filter(d => d.channel === s.source)
+                                        .slice(0, 4);
+                                    return (
+                                        <div key={i}>
+                                            <RankedBar label={s.source || "Direct"} value={s.sessions} max={maxSessions} />
+                                            {subs.length > 0 && (
+                                                <div className="ml-2 mt-1.5 space-y-1 pl-2 border-l border-ui-border">
+                                                    {subs.map((d, j) => (
+                                                        <div key={j} className="flex items-center justify-between gap-2">
+                                                            <span className="text-[11px] text-content-muted truncate">{d.source}</span>
+                                                            <span className="text-[11px] text-content-muted tabular-nums flex-shrink-0">{d.sessions.toLocaleString()}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
