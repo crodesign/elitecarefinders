@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         const file = formData.get("file") as File;
         const folderId = formData.get("folderId") as string | null;
+        // Optional slug prefix override — e.g. post title slug so files are named
+        // "sugar-cookies-1.webp" instead of "posts-1.webp"
+        const namePrefix = (formData.get("namePrefix") as string | null)?.trim() || null;
 
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -84,14 +87,15 @@ export async function POST(request: NextRequest) {
                 query.is("folder_id", null);
             }
             const { data: filteredFiles } = await query;
-            const pattern = new RegExp(`^${folderSlug}-(\\d+)`, 'i');
+            const namingBase = namePrefix || folderSlug;
+            const pattern = new RegExp(`^${namingBase}-(\\d+)`, 'i');
             const numbers = (filteredFiles || []).map(f => {
                 const match = (f.filename as string).match(pattern);
                 return match ? parseInt(match[1]) : 0;
             }) || [];
             const nextNumber = Math.max(0, ...numbers) + 1;
-            filename = `${folderSlug}-${nextNumber}.${outputExt}`;
-            console.log("[Upload] Auto-generated filename:", filename, "from folder:", folderSlug);
+            filename = `${namingBase}-${nextNumber}.${outputExt}`;
+            console.log("[Upload] Auto-generated filename:", filename, "from naming base:", namingBase);
         }
 
         const bytes = await file.arrayBuffer();

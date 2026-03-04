@@ -46,9 +46,10 @@ interface MediaGalleryProps {
     dropzoneText?: string;
     featuredImageUrl?: string;
     stepImageMap?: Record<string, number>;
+    entityName?: string;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap, entityName }: MediaGalleryProps) {
     const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team" | "cuisine">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -136,7 +137,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const handleUpload = async (files: File[]) => {
         if (!folderId) return;
         try {
-            await bulkUploadMedia(files, folderId || undefined);
+            const namePrefix = entityName
+                ? entityName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+                : undefined;
+            await bulkUploadMedia(files, folderId || undefined, undefined, namePrefix);
             showNotification("Upload complete", `${files.length} file(s) uploaded.`);
             await loadMedia();
         } catch (err) {

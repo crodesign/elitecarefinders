@@ -407,13 +407,17 @@ export async function deleteMediaItem(id: string): Promise<{ filename: string }>
 export async function uploadMedia(
     file: File,
     folderId?: string | null,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
+    namePrefix?: string | null
 ): Promise<MediaItem> {
     // Create form data for API upload
     const formData = new FormData();
     formData.append("file", file);
     if (folderId) {
         formData.append("folderId", folderId);
+    }
+    if (namePrefix) {
+        formData.append("namePrefix", namePrefix);
     }
 
     // Upload to local server via API route
@@ -457,11 +461,12 @@ export async function uploadMedia(
 export async function bulkUploadMedia(
     files: File[],
     folderId?: string | null,
-    onProgress?: (completed: number, total: number) => void
+    onProgress?: (completed: number, total: number) => void,
+    namePrefix?: string | null
 ): Promise<MediaItem[]> {
     const results: MediaItem[] = [];
     for (let i = 0; i < files.length; i++) {
-        const item = await uploadMedia(files[i], folderId);
+        const item = await uploadMedia(files[i], folderId, undefined, namePrefix);
         results.push(item);
         onProgress?.(i + 1, files.length);
     }

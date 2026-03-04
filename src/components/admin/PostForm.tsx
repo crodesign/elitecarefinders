@@ -20,6 +20,13 @@ interface PostFormProps {
     post?: Post | null;
 }
 
+function toThumbUrl(url: string): string {
+    if (url.includes('/media/') && url.endsWith('.webp') && !/-\d+x\d+\.webp$/.test(url)) {
+        return url.replace(/\.webp$/, '-100x100.webp');
+    }
+    return url;
+}
+
 const POST_TYPES: { value: PostType; label: string }[] = [
     { value: 'general', label: 'General Post' },
     { value: 'caregiver_resources', label: 'Caregiver Resources' },
@@ -783,6 +790,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         }
                                     }}
                                     isDirty={isDirty}
+                                    entityName={title || undefined}
                                     featuredImageUrl={postType === 'recipes' && postImages.length > 0 ? postImages[0] : undefined}
                                     stepImageMap={postType === 'recipes' ? stepImageMap : undefined}
                                 />
@@ -845,7 +853,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${isSelected ? "border-accent" : "border-transparent hover:border-ui-border"}`}
                                             >
                                                 <img
-                                                    src={url}
+                                                    src={toThumbUrl(url)}
                                                     alt="Gallery image"
                                                     className={`w-full h-full object-cover transition-opacity ${isSelected || isAssignedElsewhere ? "opacity-50 grayscale" : ""}`}
                                                 />

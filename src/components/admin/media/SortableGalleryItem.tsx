@@ -10,6 +10,13 @@ interface SortableGalleryItemProps {
     isFeatured?: boolean;
 }
 
+function toThumbUrl(url: string): string {
+    if (url.includes('/media/') && url.endsWith('.webp') && !/-\d+x\d+\.webp$/.test(url)) {
+        return url.replace(/\.webp$/, '-100x100.webp');
+    }
+    return url;
+}
+
 export function SortableGalleryItem({ url, onRemove, onError, isFeatured = false }: SortableGalleryItemProps) {
     const {
         attributes,
@@ -35,7 +42,7 @@ export function SortableGalleryItem({ url, onRemove, onError, isFeatured = false
             className="relative group flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-ui-border bg-surface-input cursor-grab active:cursor-grabbing touch-none"
         >
             <img
-                src={url}
+                src={toThumbUrl(url)}
                 alt=""
                 className={`w-full h-full ${url.toLowerCase().endsWith('.svg') ? 'object-contain p-1' : 'object-cover'} pointer-events-none`}
                 onError={() => onError?.(url)}
