@@ -129,7 +129,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                 >
                     {/* Dark mode hibiscus */}
                     <Image
-                        src="/images/hibiscus-bg.svg"
+                        src="/images/site/hibiscus-bg.svg"
                         alt=""
                         width={300}
                         height={300}
@@ -138,7 +138,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                     />
                     {/* Light mode hibiscus */}
                     <Image
-                        src="/images/hibiscus-bg-b.svg"
+                        src="/images/site/hibiscus-bg-b.svg"
                         alt=""
                         width={300}
                         height={300}

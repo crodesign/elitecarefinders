@@ -7,7 +7,7 @@ export function Logo({ className = "" }: { className?: string }) {
         <>
             {/* Dark logo — shown by default, hidden when data-theme="light" */}
             <Image
-                src="/images/Elite CareFinders Logo w-c.svg"
+                src="/images/site/ecf-logo-white.svg"
                 alt="Elite CareFinders"
                 width={220}
                 height={44}
@@ -16,7 +16,7 @@ export function Logo({ className = "" }: { className?: string }) {
             />
             {/* Light logo — hidden by default, shown when data-theme="light" */}
             <Image
-                src="/images/Elite CareFinders Logo b-c.svg"
+                src="/images/site/ecf-logo-black.svg"
                 alt="Elite CareFinders"
                 width={220}
                 height={44}
