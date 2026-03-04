@@ -183,7 +183,7 @@ function HeartLoader() {
             <style>{`
                 @keyframes heartSpin {
                     from { stroke-dashoffset: 0; }
-                    to   { stroke-dashoffset: -1; }
+                    to   { stroke-dashoffset: 1; }
                 }
             `}</style>
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
