@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { SlidePanel } from "./SlidePanel";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { ImageCropModal } from "./ImageCropModal";
-import { User, Mail, Phone, MapPin, Map, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Map, Shield, Info, ChevronDown, Check, Users, RotateCw, Upload, Eye, EyeOff, Globe, X, Search } from 'lucide-react';
+import { HeartLoader } from '@/components/ui/HeartLoader';
 import { createClientComponentClient } from "@/lib/supabase";
 import type { UserProfile, UserRole } from "@/types/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -592,7 +593,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
             >
                 {isLoading || !isFormPopulated ? (
                     <div className="flex h-full items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                        <HeartLoader />
                     </div>
                 ) : (
                     <form id="user-form" onSubmit={handleSubmit} className="flex flex-col h-full">

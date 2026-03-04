@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { UserForm, type UserFormData } from '@/components/admin/UserForm';
 import { getUserProfile, updateUser } from '@/lib/services/userService';
-import { Loader2 } from 'lucide-react';
+import { HeartLoader } from '@/components/ui/HeartLoader';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function EditUserPage() {
@@ -53,7 +53,7 @@ export default function EditUserPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

@@ -8,8 +8,9 @@ import { InvoicePanel } from "@/components/admin/InvoicePanel";
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import {
     Search, FileText, CheckCircle, Clock, DollarSign, Calendar,
-    ArrowUpAZ, ArrowDownAZ, Pencil, X, ChevronDown, Check, Loader2
+    ArrowUpAZ, ArrowDownAZ, Pencil, X, ChevronDown, Check
 } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { format } from "date-fns";
 import { parseHawaiiDate } from "@/lib/hawaiiDate";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
@@ -293,7 +294,7 @@ export default function InvoicesPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

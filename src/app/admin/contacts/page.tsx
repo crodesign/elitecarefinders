@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Search, MapPin, Pencil, Trash2, Mail, Phone, Calendar, Loader2, ArrowUpAZ, ArrowDownAZ, Clock, ChevronDown, Check, X } from "lucide-react";
+import { Plus, Search, MapPin, Pencil, Trash2, Mail, Phone, Calendar, ArrowUpAZ, ArrowDownAZ, Clock, ChevronDown, Check, X } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { useAuth } from "@/contexts/AuthContext";
 import { useContacts, Contact } from "@/hooks/useContacts";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -364,7 +365,7 @@ export default function ContactsPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

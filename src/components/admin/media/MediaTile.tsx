@@ -322,7 +322,7 @@ export function MediaTile({
                         onChange={(e) => setCaption(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Add caption..."
-                        className="flex-1 min-w-0 text-sm text-content-primary placeholder-content-muted dark:placeholder-content-secondary focus:outline-none focus:ring-1 focus:ring-accent rounded-md px-2 py-1.5 transition-colors bg-surface-input"
+                        className="form-input flex-1 min-w-0 text-sm rounded-md px-2 py-1.5"
                     />
                     {captionChanged && (
                         <button

@@ -175,7 +175,7 @@ export function MediaDetailPanel({
                             value={altText}
                             onChange={(e) => setAltText(e.target.value)}
                             placeholder="Describe the image (used for accessibility and captions)"
-                            className="w-full bg-surface-hover rounded-lg px-4 py-3 text-content-primary placeholder-content-muted focus:outline-none focus:border-accent/50"
+                            className="form-input w-full rounded-lg px-4 py-3"
                         />
                     </div>
 
@@ -185,7 +185,7 @@ export function MediaDetailPanel({
                         <select
                             value={folderId || ""}
                             onChange={(e) => setFolderId(e.target.value || undefined)}
-                            className="w-full bg-surface-hover rounded-lg px-4 py-3 text-content-primary focus:outline-none focus:border-accent/50"
+                            className="form-input w-full rounded-lg px-4 py-3"
                         >
                             <option value="" className="bg-surface-secondary">No folder</option>
                             {flatFolders.map(({ folder, depth }) => (

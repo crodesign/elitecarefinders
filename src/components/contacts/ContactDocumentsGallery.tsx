@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { Upload, Trash2, FileText, Loader2 } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     ContactDocument,
     getContactDocuments,
@@ -77,9 +78,8 @@ export function ContactDocumentsGallery({ contactId, readOnly = false }: Contact
 
     if (loading) {
         return (
-            <div className="flex items-center gap-2 py-3 text-content-muted text-sm">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Loading documents...
+            <div className="flex items-center justify-center py-3">
+                <HeartLoader size={6} />
             </div>
         );
     }

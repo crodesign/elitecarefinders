@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Plus, Home as HomeIcon, MapPin, Pencil, Trash2, Search, Loader2, Tag, ArrowUpAZ, ArrowDownAZ, Clock, Star, Video, Trophy, X } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Home, Taxonomy } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
@@ -45,7 +46,7 @@ export default function HomesPage() {
 
     // Sort state
     const [sortAsc, setSortAsc] = useState(true);
-    const [sortByRecent, setSortByRecent] = useState(false);
+    const [sortByRecent, setSortByRecent] = useState(true);
 
     // Column filter state
     const [nameFilter, setNameFilter] = useState('');
@@ -526,7 +527,7 @@ export default function HomesPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

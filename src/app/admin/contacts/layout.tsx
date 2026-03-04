@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useUserRole } from "@/hooks/useUserRole";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 
 export default function ContactsLayout({
     children,
@@ -21,7 +22,7 @@ export default function ContactsLayout({
     }, [isInvoiceOnly, loading, router]);
 
     if (loading) {
-        return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+        return <div className="flex items-center justify-center min-h-screen"><HeartLoader /></div>;
     }
 
     // Prevent flash of content if redirecting

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, Plus, Pencil, Trash2, Loader2, X, Check, ArrowDownAZ, ArrowUpZA, GripVertical } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -357,9 +358,8 @@ export function EntryTree({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-4 text-content-muted">
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Loading...
+            <div className="flex items-center justify-center py-4">
+                <HeartLoader size={6} />
             </div>
         );
     }

@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase-server";
-import { rename } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
+import { r2Rename, toPublicUrl } from "@/lib/r2";
 
 /**
  * Rename Entity API
- * 
+ *
  * When an entity's title changes, this API:
  * 1. Renames the entity's media folder (name, slug, path) in DB
- * 2. Renames all physical files in flat dir that start with the old slug
- * 3. Updates media_items records (filename, url, storage_path) 
+ * 2. Renames all R2 files that start with the old slug
+ * 3. Updates media_items records (filename, url, storage_path)
  * 4. Updates entity images[] / team_images[] / metadata with new URLs
  * 5. Updates child folder paths
  */
@@ -33,7 +31,6 @@ export async function POST(request: NextRequest) {
 
         const results: string[] = [];
 
-        // ── Helper: Generate slug from title ──
         const toSlug = (text: string): string =>
             text
                 .toLowerCase()
@@ -42,20 +39,18 @@ export async function POST(request: NextRequest) {
                 .replace(/-+/g, "-")
                 .replace(/^-|-$/g, "");
 
-        // ── Title Rename ──
         if (!oldTitle || !newTitle || oldTitle === newTitle) {
             return NextResponse.json({ success: true, results: ["No title change detected"] });
         }
 
         const oldSlug = toSlug(oldTitle);
         const newSlug = toSlug(newTitle);
-        const mediaRoot = path.join(process.cwd(), "public", "images", "media");
         const oldUrlToNew: Record<string, string> = {};
 
         console.log(`[Rename] Title: "${oldTitle}" → "${newTitle}" (slug: ${oldSlug} → ${newSlug})`);
 
         // ── Step 1: Rename folder in DB ──
-        let originalFolderSlug = oldSlug; // save for file renaming logic
+        let originalFolderSlug = oldSlug;
 
         if (folderId) {
             const { data: folder, error: folderErr } = await supabase
@@ -65,7 +60,7 @@ export async function POST(request: NextRequest) {
                 .single();
 
             if (folder && !folderErr) {
-                originalFolderSlug = folder.slug as string; // save the original slug for file renaming later!
+                originalFolderSlug = folder.slug as string;
 
                 const oldPath = folder.path as string;
                 const pathParts = oldPath.split("/");
@@ -84,7 +79,6 @@ export async function POST(request: NextRequest) {
                     results.push(`Folder renamed: ${folder.name} → ${newTitle}`);
                 }
 
-                // Update child folder paths
                 const { data: childFolders } = await supabase
                     .from("media_folders")
                     .select("id, path")
@@ -120,7 +114,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Entity not found", details: entityErr }, { status: 404 });
         }
 
-        // Collect ALL image URLs from the entity
         const allUrls: string[] = [];
         if (entity.images && Array.isArray(entity.images)) {
             allUrls.push(...entity.images);
@@ -129,7 +122,7 @@ export async function POST(request: NextRequest) {
             allUrls.push(...entity.team_images);
         }
         if (entity.metadata && typeof entity.metadata === 'object') {
-            const meta = entity.metadata as Record<string, any>;
+            const meta = entity.metadata as Record<string, unknown>;
             if (meta.instructions && Array.isArray(meta.instructions)) {
                 for (const step of meta.instructions) {
                     if (step.image) allUrls.push(step.image);
@@ -137,18 +130,14 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Deduplicate
         const uniqueUrls = Array.from(new Set(allUrls));
         console.log(`[Rename] Found ${uniqueUrls.length} unique image URLs on entity`);
 
-        // ── Step 3: Rename physical files and build URL mapping ──
-        // For each referenced URL, look up its media_items record and folder
-        // to find the actual filename prefix (folder slug), then swap it with newSlug
+        // ── Step 3: Rename files in R2 and build URL mapping ──
         for (const url of uniqueUrls) {
             const oldFilename = url.split('/').pop();
             if (!oldFilename) continue;
 
-            // Look up the media_items record by URL to find its folder
             const { data: mediaItem } = await supabase
                 .from("media_items")
                 .select("id, filename, folder_id")
@@ -160,14 +149,11 @@ export async function POST(request: NextRequest) {
                 continue;
             }
 
-            // Get the folder's slug to know what prefix the filename uses
-            let filePrefix = oldSlug; // fallback: try entity's old slug
+            let filePrefix = oldSlug;
             if (mediaItem.folder_id) {
-                // If it's the exact same folder we just renamed, use the cached original slug!
                 if (folderId && mediaItem.folder_id === folderId) {
                     filePrefix = originalFolderSlug;
                 } else {
-                    // Otherwise it's in a different folder, so looking it up dynamically is fine
                     const { data: itemFolder } = await supabase
                         .from("media_folders")
                         .select("slug")
@@ -192,54 +178,35 @@ export async function POST(request: NextRequest) {
                 continue;
             }
 
-            const suffix = suffixMatch[1]; // e.g., "dining-room.jpg" or "1-c6bf1b.jpg"
+            const suffix = suffixMatch[1];
             const newFilename = `${newSlug}-${suffix}`;
-            const newUrl = `/images/media/${newFilename}`;
+            const newUrl = toPublicUrl(newFilename);
 
-            // Rename physical file
-            const oldFilePath = path.join(mediaRoot, oldFilename);
-            const newFilePath = path.join(mediaRoot, newFilename);
-
-            // LOG TRACE
+            // Rename main file in R2
             try {
-                const traceLog = `Renaming: ${oldFilePath} -> ${newFilePath}\n`;
-                require('fs').appendFileSync(path.join(process.cwd(), 'tmp_api_trace.log'), traceLog);
-            } catch (e) { }
-
-            if (existsSync(oldFilePath)) {
-                try {
-                    await rename(oldFilePath, newFilePath);
-                    console.log(`[Rename] File: ${oldFilename} → ${newFilename}`);
-                } catch (err) {
-                    console.warn(`[Rename] Failed to rename ${oldFilename}:`, err);
-                }
-            } else {
-                console.log(`[Rename] File not on disk: ${oldFilename}`);
+                await r2Rename(oldFilename, newFilename);
+                console.log(`[Rename] File: ${oldFilename} → ${newFilename}`);
+            } catch (err) {
+                console.warn(`[Rename] Failed to rename ${oldFilename} in R2:`, err);
             }
 
             // Track URL mapping
             oldUrlToNew[url] = newUrl;
 
-            // Rename variant files and build variant URL updates
-            const oldStem = path.basename(oldFilename, path.extname(oldFilename));
-            const newStem = path.basename(newFilename, path.extname(newFilename));
+            // Rename variant files in R2
+            const oldStem = oldFilename.replace(/\.[^.]+$/, '');
+            const newStem = newFilename.replace(/\.[^.]+$/, '');
             const variantDefs = [
                 { suffix: "-500x500.webp", col: "url_large" },
                 { suffix: "-200x200.webp", col: "url_medium" },
                 { suffix: "-100x100.webp", col: "url_thumb" },
             ];
             const variantUpdates: Record<string, string> = {};
-            for (const { suffix, col } of variantDefs) {
-                const oldVariant = `${oldStem}${suffix}`;
-                const newVariant = `${newStem}${suffix}`;
-                const oldVariantPath = path.join(mediaRoot, oldVariant);
-                const newVariantPath = path.join(mediaRoot, newVariant);
-                if (existsSync(oldVariantPath)) {
-                    await rename(oldVariantPath, newVariantPath).catch((err) =>
-                        console.warn(`[Rename] Failed to rename variant ${oldVariant}:`, err)
-                    );
-                }
-                variantUpdates[col] = `/images/media/${newVariant}`;
+            for (const { suffix: varSuffix, col } of variantDefs) {
+                const oldVariant = `${oldStem}${varSuffix}`;
+                const newVariant = `${newStem}${varSuffix}`;
+                await r2Rename(oldVariant, newVariant).catch(() => {});
+                variantUpdates[col] = toPublicUrl(newVariant);
             }
 
             // Update media_items record
@@ -264,28 +231,25 @@ export async function POST(request: NextRequest) {
         }
 
         // ── Step 4: Update entity record ──
-        const entityUpdates: Record<string, any> = {
+        const entityUpdates: Record<string, unknown> = {
             title: newTitle,
             slug: newSlug,
         };
 
-        // Update images[]
         if (entity.images && Array.isArray(entity.images)) {
             entityUpdates.images = entity.images.map(
                 (url: string) => oldUrlToNew[url] || url
             );
         }
 
-        // Update team_images[]
         if (entity.team_images && Array.isArray(entity.team_images)) {
             entityUpdates.team_images = entity.team_images.map(
                 (url: string) => oldUrlToNew[url] || url
             );
         }
 
-        // Update recipe step images in metadata
         if (entity.metadata && typeof entity.metadata === 'object') {
-            const metadata = { ...(entity.metadata as Record<string, any>) };
+            const metadata = { ...(entity.metadata as Record<string, unknown>) };
             if (metadata.instructions && Array.isArray(metadata.instructions)) {
                 let metaChanged = false;
                 for (const step of metadata.instructions) {

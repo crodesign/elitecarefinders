@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, Building2, FileText, Star, Plus, ArrowRight, Heart, Facebook, ImageOff, User, ChevronRight, TrendingUp } from "lucide-react";
+import { Home, Building2, FileText, Star, Plus, ArrowRight, Heart, Facebook, ImageOff, User, ChevronRight } from "lucide-react";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import Link from "next/link";
 import { getFacilities } from "@/lib/services/facilityService";
 import { getHomes } from "@/lib/services/homeService";
@@ -48,7 +49,7 @@ interface RecentItem {
 }
 
 function RecentRows({ items, loading }: { items: RecentItem[]; loading: boolean }) {
-    if (loading) return <div className="px-4 py-3 text-sm text-content-muted">Loading...</div>;
+    if (loading) return <div className="flex justify-center py-3"><HeartLoader size={6} /></div>;
     if (items.length === 0) return <div className="px-4 py-3 text-sm text-content-muted">No entries yet.</div>;
     return (
         <>
@@ -312,13 +313,7 @@ export default function AdminDashboardPage() {
                 <ReviewsPanel loading={loading} reviews={reviews} items={recentReviews} />
             </div>
 
-            <div>
-                <h2 className="text-sm font-semibold text-content-secondary uppercase tracking-wider flex items-center gap-2 mb-4">
-                    <TrendingUp className="h-4 w-4 text-accent" />
-                    Analytics
-                </h2>
-                <AnalyticsDashboard />
-            </div>
+            <AnalyticsDashboard />
         </div>
     );
 }

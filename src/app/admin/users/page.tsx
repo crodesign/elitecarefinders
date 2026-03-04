@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { getUsers, getUserProfile, deleteUser, updateUser, createUser, UserListItem } from '@/lib/services/userService';
 import { Users as UsersIcon, Plus, Pencil, Trash2, MapPin, Map, Loader2, Search, User, Shield } from 'lucide-react';
+import { HeartLoader } from '@/components/ui/HeartLoader';
 import { DataTable, type ColumnDef } from '@/components/admin/DataTable';
 import { Pagination } from '@/components/admin/Pagination';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
@@ -277,7 +278,7 @@ export default function UsersPage() {
     if (authLoading || isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

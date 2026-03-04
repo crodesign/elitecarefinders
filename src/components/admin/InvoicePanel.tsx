@@ -6,6 +6,7 @@ import { useContacts, Contact } from "@/hooks/useContacts";
 import { useNotification } from "@/contexts/NotificationContext";
 import ChecklistSection from "@/components/contacts/contact-form/ChecklistSection";
 import { Loader2, Save } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 
 interface InvoicePanelProps {
     contact: Contact | null;
@@ -134,7 +135,7 @@ export function InvoicePanel({ contact, isOpen, onClose, onSaved }: InvoicePanel
                 />
             ) : (
                 <div className="flex items-center justify-center h-32">
-                    <Loader2 className="h-6 w-6 animate-spin text-accent" />
+                    <HeartLoader />
                 </div>
             )}
         </SlidePanel>

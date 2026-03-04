@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Trash2 } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { useContactEdits } from "@/hooks/useContactEdits";
 import { format } from "date-fns";
 
@@ -30,9 +31,8 @@ const ContactEditsSection = ({ contactId }: ContactEditsSectionProps) => {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Edit History</h3>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-sm text-muted-foreground">Loading edits...</p>
+        <div className="flex justify-center">
+          <HeartLoader size={6} />
         </div>
       </div>
     );

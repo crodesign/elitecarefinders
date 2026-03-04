@@ -18,6 +18,7 @@ import {
     Moon,
     Check
 } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
@@ -429,7 +430,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
         >
             {isLoading || authLoading ? (
                 <div className="flex h-full items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                    <HeartLoader />
                 </div>
             ) : (
                 <>

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { HeartLoader } from '@/components/ui/HeartLoader';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -44,7 +45,7 @@ export function ProtectedRoute({
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-content-secondary">Loading...</div>
+                <HeartLoader />
             </div>
         );
     }

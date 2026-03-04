@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ContactEditor from "@/components/contacts/ContactEditor";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { useContacts } from "@/hooks/useContacts";
 import { useParams } from "next/navigation";
 import { parseHawaiiDate } from "@/lib/hawaiiDate";
@@ -158,7 +159,7 @@ const EditContactPage = () => {
     }, [id, fetchContact]);
 
     if (loading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+        return <div className="flex justify-center items-center min-h-screen"><HeartLoader /></div>;
     }
 
     if (!contactData) {

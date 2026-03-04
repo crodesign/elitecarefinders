@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Tags, Pencil, Trash2, Loader2, Search } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Taxonomy } from "@/types";
 import { TaxonomyForm } from "@/components/admin/TaxonomyForm";
 import { Pagination } from "@/components/admin/Pagination";
@@ -215,7 +216,7 @@ export default function TaxonomiesPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

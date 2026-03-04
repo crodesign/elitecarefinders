@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Plus, Bed, Loader2, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign } from "lucide-react";
+import { Plus, Bed, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { RoomFieldCategory, RoomFieldDefinition, RoomFixedFieldOption, FixedFieldType, Taxonomy } from "@/types";
 import {
     getRoomFieldCategories,
@@ -1012,7 +1013,7 @@ export default function RoomFieldsPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }

@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -175,28 +176,7 @@ function RankedBar({ label, value, max, sub }: { label: string; value: number; m
     );
 }
 
-// ─── HeartLoader ─────────────────────────────────────────────────────────────
 
-function HeartLoader() {
-    return (
-        <>
-            <style>{`
-                @keyframes heartSpin {
-                    from { stroke-dashoffset: 0; }
-                    to   { stroke-dashoffset: 1; }
-                }
-            `}</style>
-            <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path
-                    pathLength="1"
-                    strokeDasharray="0.9 0.1"
-                    style={{ animation: "heartSpin 1.2s linear infinite" }}
-                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                />
-            </svg>
-        </>
-    );
-}
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -337,7 +317,13 @@ export function AnalyticsDashboard() {
     if (loading) {
         return (
             <div className="space-y-4">
-                <div className="flex justify-end">{toolbar}</div>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <h2 className="text-sm font-semibold text-content-secondary uppercase tracking-wider flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-accent" />
+                        Analytics
+                    </h2>
+                    {toolbar}
+                </div>
                 <div className="flex items-center justify-center h-48">
                     <HeartLoader />
                 </div>
@@ -389,8 +375,14 @@ export function AnalyticsDashboard() {
     return (
         <div className="space-y-4">
 
-            {/* Toolbar */}
-            <div className="flex justify-end flex-wrap gap-3">{toolbar}</div>
+            {/* Header + Toolbar */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+                <h2 className="text-sm font-semibold text-content-secondary uppercase tracking-wider flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-accent" />
+                    Analytics
+                </h2>
+                {toolbar}
+            </div>
 
             {/* Stat cards — 4 columns on md, 8 on xl */}
             <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
@@ -519,7 +511,7 @@ export function AnalyticsDashboard() {
                                             <Cell key={i} fill={DEVICE_COLORS[i % DEVICE_COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v.toLocaleString(), "Sessions"]} />
+                                    <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toLocaleString(), "Sessions"]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="flex-1 space-y-2">
@@ -573,7 +565,7 @@ export function AnalyticsDashboard() {
                                         <Cell fill="var(--accent)" />
                                         <Cell fill="#a78bfa" />
                                     </Pie>
-                                    <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v.toLocaleString(), "Sessions"]} />
+                                    <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toLocaleString(), "Sessions"]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="flex-1 space-y-3">

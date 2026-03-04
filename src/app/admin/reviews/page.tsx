@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import type { Review } from "@/types";
@@ -555,9 +556,8 @@ export default function ReviewsPage() {
                 <div className="bg-surface-card rounded-xl h-full flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 overflow-auto">
                         {isLoading ? (
-                            <div className="flex items-center justify-center p-12 text-content-muted">
-                                <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                                <span>Loading reviews...</span>
+                            <div className="flex items-center justify-center p-12">
+                                <HeartLoader />
                             </div>
                         ) : (
                             <DataTable

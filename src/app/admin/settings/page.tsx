@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     getInjectedScripts, saveInjectedScripts, ScriptEntry,
     getAnalyticsSettings, saveAnalyticsSettings, AnalyticsSettings,
@@ -117,7 +118,7 @@ export default function GeneralSettingsPage() {
     if (authLoading || isLoading) {
         return (
             <div className="flex items-center justify-center h-64">
-                <Loader2 className="h-6 w-6 text-accent animate-spin" />
+                <HeartLoader />
             </div>
         );
     }
@@ -150,7 +151,7 @@ export default function GeneralSettingsPage() {
 
                     {scripts.length === 0 && (
                         <p className="text-sm text-content-muted text-center py-6 border border-dashed border-ui-border rounded-lg">
-                            No scripts added yet. Click "Add Script" to get started.
+                            No scripts added yet. Click &ldquo;Add Script&rdquo; to get started.
                         </p>
                     )}
 
@@ -287,7 +288,7 @@ export default function GeneralSettingsPage() {
                             <p className="text-xs text-red-400">{propertiesError}</p>
                         )}
                         <p className="text-xs text-content-muted">
-                            Click "Browse properties" to auto-detect, or enter the numeric Property ID manually (GA4 Admin &rarr; Property Details).
+                            Click &ldquo;Browse properties&rdquo; to auto-detect, or enter the numeric Property ID manually (GA4 Admin &rarr; Property Details).
                         </p>
                     </div>
 

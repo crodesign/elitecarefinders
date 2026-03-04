@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Plus, ImageIcon, Loader2, X, Trash2, CheckSquare, Settings } from "lucide-react";
+import { Plus, ImageIcon, X, Trash2, CheckSquare, Settings } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { MediaFolder, MediaItem } from "@/types";
 
 import { supabase } from "@/lib/supabase";
@@ -220,7 +221,7 @@ export default function SiteImagesPage() {
     if (isLoading || authLoading) {
         return (
             <div className="flex h-full items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                <HeartLoader />
             </div>
         );
     }
@@ -339,7 +340,7 @@ export default function SiteImagesPage() {
                     <div ref={contentAreaRef} className="flex-1 overflow-auto p-4" onClick={() => setSelectedItemId(null)}>
                         {isLoadingMedia && mediaItems.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
-                                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                                <HeartLoader />
                             </div>
                         ) : mediaItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center py-20">

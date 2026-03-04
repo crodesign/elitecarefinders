@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unlink } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import { createClient } from "@/lib/supabase-server";
+import { r2Delete, filenameFromUrl } from "@/lib/r2";
 
 const VARIANT_SUFFIXES = ["-500x500.webp", "-200x200.webp", "-100x100.webp"];
 
@@ -16,7 +14,6 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Media ID is required" }, { status: 400 });
         }
 
-        // Get the media item to get file path
         const { data: mediaItem, error: fetchError } = await supabase
             .from("media_items")
             .select("*")
@@ -27,60 +24,20 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Media item not found" }, { status: 404 });
         }
 
-        const filename = mediaItem.filename as string;
-        const storagePath = mediaItem.storage_path as string;
-        const url = mediaItem.url as string;
+        const filename = (mediaItem.filename as string) || filenameFromUrl(mediaItem.url as string);
 
-        // Determine the physical file path
-        let filePath: string;
+        console.log("[Media Delete] Deleting:", { mediaId, filename });
 
-        if (storagePath && (storagePath.startsWith("/images/media/") || storagePath.startsWith("/images/"))) {
-            // storage_path is relative like /images/media/file.jpg or /images/file.jpg
-            filePath = path.join(process.cwd(), "public", storagePath);
-        } else if (storagePath && existsSync(storagePath)) {
-            // storage_path is absolute
-            filePath = storagePath;
-        } else if (url) {
-            // Fallback: derive from URL
-            filePath = path.join(process.cwd(), "public", url);
-        } else {
-            filePath = "";
-        }
-
-        console.log("[Media Delete] Deleting file:", {
-            mediaId,
-            filename,
-            storagePath,
-            url,
-            filePath,
-        });
-
-        // Delete the physical file
-        if (filePath && existsSync(filePath)) {
-            try {
-                await unlink(filePath);
-                console.log("[Media Delete] File deleted successfully:", filePath);
-            } catch (unlinkErr) {
-                console.error("[Media Delete] Failed to delete file:", unlinkErr);
-                // Continue with database deletion even if file deletion fails
-            }
-        } else {
-            console.warn("[Media Delete] File not found on disk:", filePath);
-        }
-
-        // Delete variant files (only for media-dir images)
-        if (storagePath && storagePath.startsWith("/images/media/")) {
-            const mediaDir = path.join(process.cwd(), "public", "images", "media");
-            const stem = path.basename(filename, path.extname(filename));
+        if (filename) {
+            await r2Delete(filename).catch((err) =>
+                console.warn("[Media Delete] R2 delete failed:", err)
+            );
+            const stem = filename.replace(/\.[^.]+$/, '');
             for (const suffix of VARIANT_SUFFIXES) {
-                const variantPath = path.join(mediaDir, `${stem}${suffix}`);
-                if (existsSync(variantPath)) {
-                    await unlink(variantPath).catch(() => {});
-                }
+                await r2Delete(`${stem}${suffix}`).catch(() => {});
             }
         }
 
-        // Delete from database
         const { error: deleteError } = await supabase
             .from("media_items")
             .delete()
@@ -90,10 +47,7 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: deleteError.message }, { status: 500 });
         }
 
-        return NextResponse.json({
-            success: true,
-            filename: filename
-        });
+        return NextResponse.json({ success: true, filename });
     } catch (error) {
         console.error("Media delete error:", error);
         return NextResponse.json(

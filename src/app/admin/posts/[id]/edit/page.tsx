@@ -6,7 +6,7 @@ import { PostForm } from "@/components/admin/PostForm";
 import { getPost, updatePost } from "@/lib/services/postService";
 import type { Post } from "@/types";
 import { useNotification } from "@/contexts/NotificationContext";
-import { Loader2 } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 
 export default function EditPostPage({ params }: { params: { id: string } }) {
     const router = useRouter();
@@ -53,7 +53,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     if (isLoading) {
         return (
             <div className="h-screen/2 w-full flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <HeartLoader />
             </div>
         );
     }

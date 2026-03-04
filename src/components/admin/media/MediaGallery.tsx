@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, Loader2, RefreshCw, X, LayoutGrid } from "lucide-react";
+import { Upload, RefreshCw, X, LayoutGrid } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { MediaItem, MediaFolder } from "@/types";
 import { getMediaItems, getMediaItemsByUrls, deleteMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
 import { MediaUploader } from "@/components/admin/media/MediaUploader";
@@ -355,7 +356,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
             {isLoading && !mediaItems.length ? (
                 <div className="flex items-center justify-center p-12">
-                    <Loader2 className="h-8 w-8 text-accent animate-spin" />
+                    <HeartLoader />
                 </div>
             ) : mediaItems.length === 0 ? (
                 <div className="space-y-4">

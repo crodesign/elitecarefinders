@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus, Minus, Calendar, Trash2, Edit2, Check, X, Download } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import { useNotes } from "@/hooks/useNotes";
 import { useNoteEdits } from "@/hooks/useNoteEdits";
 import { format } from "date-fns";
@@ -109,9 +110,8 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Loading notes...</p>
+        <div className="flex justify-center">
+          <HeartLoader />
         </div>
       </div>
     );

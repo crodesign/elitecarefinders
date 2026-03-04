@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import { Plus, FileText, Pencil, Trash2, Search, Loader2, X } from "lucide-react";
+import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Post } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
@@ -344,7 +345,7 @@ export default function PostsPage() {
     if (isLoading) {
         return (
             <div className="flex-1 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                <HeartLoader />
             </div>
         );
     }

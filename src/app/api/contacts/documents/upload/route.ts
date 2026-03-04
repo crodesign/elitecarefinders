@@ -106,7 +106,6 @@ export async function POST(request: NextRequest) {
                 const canvas = createCanvas(Math.round(scaledViewport.width), Math.round(scaledViewport.height));
                 const ctx = canvas.getContext("2d");
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await page.render({
                     canvasContext: ctx as unknown as CanvasRenderingContext2D,
                     viewport: scaledViewport,
