@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, Building2, FileText, Star, Plus, ArrowRight, Heart, Facebook, ImageOff, User, ChevronRight } from "lucide-react";
+import { Home, Building2, FileText, Star, Plus, ArrowRight, Heart, Facebook, ImageOff, User, ChevronRight, TrendingUp } from "lucide-react";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import Link from "next/link";
 import { getFacilities } from "@/lib/services/facilityService";
 import { getHomes } from "@/lib/services/homeService";
@@ -96,30 +97,22 @@ function EntityPanel({ name, manageHref, createHref, icon: Icon, published, unpu
 }) {
     return (
         <div className="card border-0 flex flex-col overflow-hidden">
-            <div className="p-5 flex flex-col gap-4">
-                <div className="flex items-start justify-between">
-                    <Icon className="h-7 w-7 text-accent" />
-                    <Link href={createHref} className="p-1.5 rounded-lg bg-surface-input hover:bg-accent hover:text-white text-content-secondary transition-colors" title={`New ${name.slice(0, -1)}`}>
-                        <Plus className="h-4 w-4" />
-                    </Link>
-                </div>
-                <div>
-                    <h3 className="text-content-primary font-semibold text-base">{name}</h3>
-                    {loading ? (
-                        <p className="text-sm text-content-muted mt-1">Loading...</p>
-                    ) : (
-                        <div className="flex items-center gap-3 mt-2">
-                            <span className="flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full bg-accent text-white">
-                                <span className="w-1.5 h-1.5 rounded-full bg-white inline-block" />
-                                {published} published
-                            </span>
-                            <span className="flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full bg-surface-input text-content-muted">
-                                <span className="w-1.5 h-1.5 rounded-full bg-content-muted inline-block" />
-                                {unpublished} draft
-                            </span>
-                        </div>
-                    )}
-                </div>
+            <div className="px-4 py-3 flex items-center gap-2.5 border-b border-ui-border">
+                <Icon className="h-5 w-5 text-accent flex-shrink-0" />
+                <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">{name}</h3>
+                {!loading && (
+                    <>
+                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full bg-accent text-white flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white/70 inline-block" />{published}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full bg-surface-input text-content-muted flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-content-muted/50 inline-block" />{unpublished}
+                        </span>
+                    </>
+                )}
+                <Link href={createHref} className="p-1 rounded-md bg-surface-input hover:bg-accent hover:text-white text-content-secondary transition-colors flex-shrink-0" title={`New ${name.slice(0, -1)}`}>
+                    <Plus className="h-3.5 w-3.5" />
+                </Link>
             </div>
             <RecentRows items={items} loading={loading} />
             <Link href={manageHref} className="flex items-center justify-between px-4 py-2.5 text-xs text-content-muted hover:text-accent border-t border-ui-border transition-colors mt-auto">
@@ -133,21 +126,15 @@ function EntityPanel({ name, manageHref, createHref, icon: Icon, published, unpu
 function BlogPanel({ loading, count, items }: { loading: boolean; count: number; items: RecentItem[] }) {
     return (
         <div className="card border-0 flex flex-col overflow-hidden">
-            <div className="p-5 flex flex-col gap-4">
-                <div className="flex items-start justify-between">
-                    <FileText className="h-7 w-7 text-accent" />
-                    <Link href="/admin/posts?action=create" className="p-1.5 rounded-lg bg-surface-input hover:bg-accent hover:text-white text-content-secondary transition-colors" title="New Post">
-                        <Plus className="h-4 w-4" />
-                    </Link>
-                </div>
-                <div>
-                    <h3 className="text-content-primary font-semibold text-base">Blog</h3>
-                    {loading ? (
-                        <p className="text-sm text-content-muted mt-1">Loading...</p>
-                    ) : (
-                        <p className="text-sm text-content-muted mt-1">{count} posts</p>
-                    )}
-                </div>
+            <div className="px-4 py-3 flex items-center gap-2.5 border-b border-ui-border">
+                <FileText className="h-5 w-5 text-accent flex-shrink-0" />
+                <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">Blog</h3>
+                {!loading && (
+                    <span className="text-xs text-content-muted flex-shrink-0">{count} posts</span>
+                )}
+                <Link href="/admin/posts?action=create" className="p-1 rounded-md bg-surface-input hover:bg-accent hover:text-white text-content-secondary transition-colors flex-shrink-0" title="New Post">
+                    <Plus className="h-3.5 w-3.5" />
+                </Link>
             </div>
             <RecentRows items={items} loading={loading} />
             <Link href="/admin/posts" className="flex items-center justify-between px-4 py-2.5 text-xs text-content-muted hover:text-accent border-t border-ui-border transition-colors mt-auto">
@@ -168,32 +155,22 @@ function ReviewsPanel({ loading, reviews, items }: { loading: boolean; reviews: 
 
     return (
         <div className="card border-0 flex flex-col overflow-hidden">
-            <div className="p-5 flex flex-col gap-4">
-                <div className="flex items-start justify-between">
-                    <Star className="h-7 w-7 text-accent" />
-                </div>
-                <div>
-                    <h3 className="text-content-primary font-semibold text-base">Reviews</h3>
-                    {loading ? (
-                        <p className="text-sm text-content-muted mt-1">Loading...</p>
-                    ) : (
-                        <div className="flex items-center gap-2 flex-wrap mt-2">
-                            <span className="flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full bg-accent text-white">
-                                <span className="w-1.5 h-1.5 rounded-full bg-white inline-block" />
-                                {approved} approved
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-2 py-0.5 rounded-full">
-                                <GoogleIcon className="h-3 w-3" />{bySource.google}
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-2 py-0.5 rounded-full">
-                                <Facebook className="h-3 w-3 text-[#1877F2]" />{bySource.facebook}
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-2 py-0.5 rounded-full">
-                                <Heart className="h-3 w-3 text-red-400" />{bySource.internal}
-                            </span>
-                        </div>
-                    )}
-                </div>
+            <div className="px-4 py-3 flex items-center gap-2 border-b border-ui-border">
+                <Star className="h-5 w-5 text-accent flex-shrink-0" />
+                <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">Reviews</h3>
+                {!loading && (
+                    <>
+                        <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-1.5 py-0.5 rounded-full flex-shrink-0">
+                            <GoogleIcon className="h-3 w-3" />{bySource.google}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-1.5 py-0.5 rounded-full flex-shrink-0">
+                            <Facebook className="h-3 w-3 text-[#1877F2]" />{bySource.facebook}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-content-muted bg-surface-input px-1.5 py-0.5 rounded-full flex-shrink-0">
+                            <Heart className="h-3 w-3 text-red-400" />{bySource.internal}
+                        </span>
+                    </>
+                )}
             </div>
             <RecentRows items={items} loading={loading} />
             <Link href="/admin/reviews" className="flex items-center justify-between px-4 py-2.5 text-xs text-content-muted hover:text-accent border-t border-ui-border transition-colors mt-auto">
@@ -333,6 +310,14 @@ export default function AdminDashboardPage() {
                 />
                 <BlogPanel loading={loading} count={posts.length} items={recentPosts} />
                 <ReviewsPanel loading={loading} reviews={reviews} items={recentReviews} />
+            </div>
+
+            <div>
+                <h2 className="text-sm font-semibold text-content-secondary uppercase tracking-wider flex items-center gap-2 mb-4">
+                    <TrendingUp className="h-4 w-4 text-accent" />
+                    Analytics
+                </h2>
+                <AnalyticsDashboard />
             </div>
         </div>
     );

@@ -10,6 +10,9 @@ ON CONFLICT (key) DO NOTHING;
 INSERT INTO site_settings (key, value) VALUES ('injected_scripts', '[]')
 ON CONFLICT (key) DO NOTHING;
 
+INSERT INTO site_settings (key, value) VALUES ('analytics_settings', '{}')
+ON CONFLICT (key) DO NOTHING;
+
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow authenticated read" ON site_settings
