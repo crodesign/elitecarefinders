@@ -139,6 +139,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
             await bulkUploadMedia(files, folderId || undefined, undefined, namePrefix);
             showNotification("Upload complete", `${files.length} file(s) uploaded.`);
             await loadMedia();
+            setTimeout(() => setShowUploadModal(false), 1200);
         } catch (err) {
             console.error("Upload failed:", err);
             showNotification("Upload failed", "Some files could not be uploaded.");
