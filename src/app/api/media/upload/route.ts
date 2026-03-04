@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         if (isImage) {
             // Step 1: resize (capped at 1940px) + convert to webp
             const origBuf = await sharp(buffer)
-                .resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
+                .resize(1940, 1940, { fit: "inside" })
                 .webp({ quality: 90 })
                 .toBuffer();
 
