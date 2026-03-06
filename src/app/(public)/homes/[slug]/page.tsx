@@ -436,6 +436,33 @@ export default async function HomeDetailPage({ params }: Props) {
                                 </div>
                             </div>
                         )}
+                        {/* Pagination */}
+                        {(adjacent.prev || adjacent.next) && (
+                            <div className="pt-1 pb-1 flex items-center justify-between gap-4">
+                                <div>
+                                    {adjacent.prev ? (
+                                        <Link href={`/homes/${adjacent.prev.slug}`} className="group flex items-center gap-2 text-left">
+                                            <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 text-[#239ddb] shrink-0" />
+                                            <div>
+                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-0.5">Previous Home</span>
+                                                <span className="text-sm font-bold text-[#239ddb] group-hover:underline line-clamp-1">{adjacent.prev.title}</span>
+                                            </div>
+                                        </Link>
+                                    ) : <div />}
+                                </div>
+                                <div className="text-right">
+                                    {adjacent.next ? (
+                                        <Link href={`/homes/${adjacent.next.slug}`} className="group flex items-center gap-2 text-right justify-end">
+                                            <div>
+                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-0.5">Next Home</span>
+                                                <span className="text-sm font-bold text-[#239ddb] group-hover:underline line-clamp-1">{adjacent.next.title}</span>
+                                            </div>
+                                            <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 text-[#239ddb] shrink-0" />
+                                        </Link>
+                                    ) : <div />}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Sidebar */}
@@ -514,34 +541,6 @@ export default async function HomeDetailPage({ params }: Props) {
                         </div>
                     </aside>
                 </div>
-
-                {/* Pagination */}
-                {(adjacent.prev || adjacent.next) && (
-                    <div className="mt-10 pt-1 pb-1 flex items-center justify-between gap-4">
-                        <div>
-                            {adjacent.prev ? (
-                                <Link href={`/homes/${adjacent.prev.slug}`} className="group flex items-center gap-2 text-left">
-                                    <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 text-[#239ddb] shrink-0" />
-                                    <div>
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-0.5">Previous Home</span>
-                                        <span className="text-sm font-bold text-[#239ddb] group-hover:underline line-clamp-1">{adjacent.prev.title}</span>
-                                    </div>
-                                </Link>
-                            ) : <div />}
-                        </div>
-                        <div className="text-right">
-                            {adjacent.next ? (
-                                <Link href={`/homes/${adjacent.next.slug}`} className="group flex items-center gap-2 text-right justify-end">
-                                    <div>
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-0.5">Next Home</span>
-                                        <span className="text-sm font-bold text-[#239ddb] group-hover:underline line-clamp-1">{adjacent.next.title}</span>
-                                    </div>
-                                    <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 text-[#239ddb] shrink-0" />
-                                </Link>
-                            ) : <div />}
-                        </div>
-                    </div>
-                )}
 
                 {/* Featured Homes */}
                 {featuredHomes.length > 0 && (
