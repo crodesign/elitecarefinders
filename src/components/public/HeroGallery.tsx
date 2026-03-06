@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faXmark, faBorderAll, faImage, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import type { VideoEntry } from '@/types';
@@ -41,14 +41,23 @@ function TileContent({ item, index, moreCount }: {
     index: number;
     moreCount?: number;
 }) {
+    const [loaded, setLoaded] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
+
+    useEffect(() => {
+        if (imgRef.current?.complete) setLoaded(true);
+    }, []);
+
     return (
         <div className="relative w-full h-full group-hover:[&_img]:scale-[1.03] overflow-hidden">
             {item.type === 'image' ? (
                 <img
+                    ref={imgRef}
                     src={item.url}
                     alt={item.alt || ''}
-                    className="w-full h-full object-cover transition-transform duration-500"
+                    className={`w-full h-full object-cover transition-[transform,opacity] duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
                     loading={index === 0 ? 'eager' : 'lazy'}
+                    onLoad={() => setLoaded(true)}
                 />
             ) : (
                 <>

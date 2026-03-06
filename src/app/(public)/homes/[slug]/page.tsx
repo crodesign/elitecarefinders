@@ -10,6 +10,8 @@ import { EntityCTAButtons } from '@/components/public/EntityCTAButtons';
 import { FavoriteButton } from '@/components/public/FavoriteButton';
 import { MySavedButton } from '@/components/public/MySavedButton';
 import { ShareButton } from '@/components/public/ShareButton';
+import { DiagonalReveal } from '@/components/public/DiagonalReveal';
+import { StickyEntityBar } from '@/components/public/StickyEntityBar';
 
 interface Props {
     params: { slug: string };
@@ -169,6 +171,7 @@ export default async function HomeDetailPage({ params }: Props) {
                     </div>
 
                 </header>
+                <StickyEntityBar title={home.title} entityName={home.title} entityType="home" subtitle={taxonomyEntries.filter(e => e.taxonomySlug !== 'location').map(e => e.name).join(', ')} />
                 </div>{/* end flex-col order wrapper */}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pt-0">
@@ -278,7 +281,8 @@ export default async function HomeDetailPage({ params }: Props) {
                             if (col1Items.length === 0 && !hasCol2 && languages.length === 0 && !teamImages.length) return null;
 
                             return (
-                                <div className="bg-[#f0f8fc] rounded-xl p-6">
+                                <DiagonalReveal color="#f0f8fc" className="rounded-xl">
+                                <div className="p-6">
                                     <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                         <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
                                             <FontAwesomeIcon icon={faHandHoldingHeart} className="h-4 w-4 text-white" />
@@ -367,6 +371,7 @@ export default async function HomeDetailPage({ params }: Props) {
                                         </div>
                                     )}
                                 </div>
+                                </DiagonalReveal>
                             );
                         })()}
 

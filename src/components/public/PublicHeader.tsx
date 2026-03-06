@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faHeart, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faHeart, faRightFromBracket, faComments } from '@fortawesome/free-solid-svg-icons';
 import { ConsultationModal } from './ConsultationModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
 
@@ -30,15 +30,16 @@ export function PublicHeader() {
 
     return (
         <>
-            <header className="border-b border-gray-100 bg-white/95 backdrop-blur-sm sticky top-0 z-40">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <header className="sticky top-0 z-40">
+                <div id="header-inner" className="max-w-6xl mx-auto px-[10px] rounded-b-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.075),0_2px_4px_-2px_rgba(0,0,0,0.075)]" style={{ background: 'linear-gradient(to bottom, #ffffff, #f5f5f5)' }}>
+                <div className="h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center">
                         <Image
                             src="/images/site/ecf-logo-black.svg"
                             alt="Elite CareFinders"
                             width={160}
                             height={40}
-                            className="h-8 w-auto"
+                            className="h-[42px] w-auto"
                             priority
                         />
                     </Link>
@@ -109,13 +110,19 @@ export function PublicHeader() {
                             )}
                         </div>
 
-                        <a
-                            href="tel:+1-800-000-0000"
-                            className="hidden sm:inline-flex items-center gap-2 bg-[#239ddb] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#1a7fb3] transition-colors"
+                        <button
+                            type="button"
+                            onClick={() => setShowConsultation(true)}
+                            className="hidden sm:inline-flex items-center gap-2.5 bg-[#239ddb] text-white px-4 py-2 rounded-lg hover:bg-[#1a7fb3] transition-colors leading-tight"
                         >
-                            Get Help Now
-                        </a>
+                            <FontAwesomeIcon icon={faComments} className="h-4 w-4 flex-shrink-0" />
+                            <span className="flex flex-col text-left">
+                                <span className="text-[11px] font-normal opacity-90">Request a free</span>
+                                <span className="text-sm font-semibold">Consultation</span>
+                            </span>
+                        </button>
                     </div>
+                </div>
                 </div>
             </header>
 

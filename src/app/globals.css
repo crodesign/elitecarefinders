@@ -534,6 +534,15 @@ select:-webkit-autofill:active {
   animation: modal-fade-in 0.33s ease both;
 }
 
+/* ── Diagonal reveal animation ───────────────────── */
+.diagonal-reveal-overlay {
+  clip-path: polygon(-5% -5%, -4% -5%, -5% -4%);
+  transition: clip-path 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.diagonal-reveal-active {
+  clip-path: polygon(-5% -5%, 205% -5%, -5% 205%);
+}
+
 /* ========================================= */
 /* MERGED LOVABLE UI STYLES                  */
 /* ========================================= */
