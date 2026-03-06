@@ -5,16 +5,36 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faHeart, faRightFromBracket, faComments } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faHeart, faRightFromBracket, faComments, faBars, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { ConsultationModal } from './ConsultationModal';
+import { BrowseModal } from './BrowseModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
+
+const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
+    facebook:  faFacebookF,
+    instagram: faInstagram,
+    x:         faXTwitter,
+    linkedin:  faLinkedinIn,
+    pinterest: faPinterestP,
+    youtube:   faYoutube,
+    tiktok:    faTiktok,
+    threads:   faThreads,
+};
 
 export function PublicHeader() {
     const [showConsultation, setShowConsultation] = useState(false);
+    const [showBrowse, setShowBrowse] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { user, openAuthModal, openSavedModal, signOut } = useFavorites();
     const pathname = usePathname();
+
+    useEffect(() => {
+        getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => !a.hidden)));
+    }, []);
     const iconClass = (active: boolean) =>
         `h-3.5 w-3.5 transition-colors ${active ? 'text-[#239ddb]' : 'text-gray-400 group-hover:text-[#239ddb]'}`;
 
@@ -32,8 +52,30 @@ export function PublicHeader() {
         <>
             <header className="sticky top-0 z-40">
                 <div id="header-inner" className="max-w-6xl mx-auto px-[10px] rounded-b-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.075),0_2px_4px_-2px_rgba(0,0,0,0.075)]" style={{ background: 'linear-gradient(to bottom, #ffffff, #f5f5f5)' }}>
-                <div className="h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center">
+                <div className="h-16 flex items-center justify-between relative">
+                    {/* Left: hamburger (mobile) | logo (desktop) */}
+                    <div className="flex items-center">
+                        <button
+                            type="button"
+                            onClick={() => setShowBrowse(true)}
+                            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border-2 border-gray-300 text-gray-500 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                            aria-label="Open navigation"
+                        >
+                            <FontAwesomeIcon icon={faBars} className="h-5 w-5" />
+                        </button>
+                        <Link href="/" className="hidden md:flex items-center">
+                            <Image
+                                src="/images/site/ecf-logo-black.svg"
+                                alt="Elite CareFinders"
+                                width={160}
+                                height={40}
+                                className="h-[42px] w-auto"
+                                priority
+                            />
+                        </Link>
+                    </div>
+                    {/* Logo centered on mobile */}
+                    <Link href="/" className="md:hidden absolute left-1/2 -translate-x-1/2 flex items-center">
                         <Image
                             src="/images/site/ecf-logo-black.svg"
                             alt="Elite CareFinders"
@@ -44,19 +86,31 @@ export function PublicHeader() {
                         />
                     </Link>
                     <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
-                        <Link href="/homes" className="hover:text-[#239ddb] transition-colors">Homes</Link>
-                        <Link href="/facilities" className="hover:text-[#239ddb] transition-colors">Facilities</Link>
-                        <Link href="/blog" className="hover:text-[#239ddb] transition-colors">Resources</Link>
-                        <Link href="/contact" className="hover:text-[#239ddb] transition-colors">Contact</Link>
-                        <button
-                            onClick={() => setShowConsultation(true)}
-                            className="text-[#239ddb] font-semibold hover:text-[#1a7fb3] transition-colors"
-                        >
-                            Request Consultation
+                        <button onClick={() => setShowBrowse(true)} className="flex items-center gap-1.5 hover:text-[#239ddb] transition-colors">
+                            Browse our Homes &amp; Communities
+                            <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 opacity-60" />
                         </button>
+                        <Link href="/blog" className="hover:text-[#239ddb] transition-colors">Resources</Link>
                     </nav>
 
                     <div className="flex items-center gap-2">
+                        {/* Social Media links */}
+                        {socialAccounts.length > 0 && (
+                            <div className="hidden sm:flex items-center gap-1 mr-1">
+                                {socialAccounts.map(account => (
+                                    <a
+                                        key={account.id}
+                                        href={account.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                        aria-label={account.platform}
+                                    >
+                                        <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                         {/* Profile / Auth icon */}
                         <div className="relative" ref={dropdownRef}>
                             {user ? (
@@ -126,6 +180,7 @@ export function PublicHeader() {
                 </div>
             </header>
 
+            {showBrowse && <BrowseModal onClose={() => setShowBrowse(false)} />}
             {showConsultation && (
                 <ConsultationModal onClose={() => setShowConsultation(false)} />
             )}

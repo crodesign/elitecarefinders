@@ -407,7 +407,7 @@ export default async function FacilityDetailPage({ params }: Props) {
 
                         {/* Description */}
                         {facility.description && (
-                            <section aria-labelledby="about-heading">
+                            <section aria-labelledby="about-heading" className="px-6">
                                 <h2 id="about-heading" className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                     <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
                                         <FontAwesomeIcon icon={faCircleInfo} className="h-4 w-4 text-white" />
@@ -452,7 +452,7 @@ export default async function FacilityDetailPage({ params }: Props) {
 
                         {/* Pagination */}
                         {(adjacent.prev || adjacent.next) && (
-                            <div className="pt-1 pb-1 flex items-center justify-between gap-4">
+                            <div className="rounded-b-xl bg-gradient-to-b from-white to-gray-100 px-5 py-4 flex items-center justify-between gap-4">
                                 <div>
                                     {adjacent.prev ? (
                                         <Link href={`/facilities/${adjacent.prev.slug}`} className="group flex items-center gap-2 text-left">
