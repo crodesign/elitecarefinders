@@ -70,3 +70,33 @@ export async function getAnalyticsSettings(): Promise<AnalyticsSettings> {
 export async function saveAnalyticsSettings(settings: AnalyticsSettings): Promise<void> {
     await saveSiteSetting("analytics_settings", JSON.stringify(settings));
 }
+
+export type SocialPlatform = 'facebook' | 'instagram' | 'x' | 'linkedin' | 'pinterest' | 'youtube' | 'tiktok' | 'threads';
+
+export const SOCIAL_PLATFORMS: { value: SocialPlatform; label: string }[] = [
+    { value: 'facebook',  label: 'Facebook' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'x',         label: 'X / Twitter' },
+    { value: 'linkedin',  label: 'LinkedIn' },
+    { value: 'pinterest', label: 'Pinterest' },
+    { value: 'youtube',   label: 'YouTube' },
+    { value: 'tiktok',    label: 'TikTok' },
+    { value: 'threads',   label: 'Threads' },
+];
+
+export interface SocialAccount {
+    id: string;
+    platform: SocialPlatform;
+    url: string;
+    hidden?: boolean;
+}
+
+export async function getSocialAccounts(): Promise<SocialAccount[]> {
+    const raw = await getSiteSetting("social_accounts");
+    if (!raw?.trim()) return [];
+    try { return JSON.parse(raw) as SocialAccount[]; } catch { return []; }
+}
+
+export async function saveSocialAccounts(accounts: SocialAccount[]): Promise<void> {
+    await saveSiteSetting("social_accounts", JSON.stringify(accounts));
+}

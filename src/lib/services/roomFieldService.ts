@@ -31,6 +31,7 @@ interface FieldDefinitionRow {
     category_id: string;
     display_order: number;
     is_active: boolean;
+    is_public: boolean;
     created_at: string;
 }
 
@@ -76,6 +77,7 @@ function toFieldDefinition(row: FieldDefinitionRow): RoomFieldDefinition {
         categoryId: row.category_id,
         displayOrder: row.display_order,
         isActive: row.is_active,
+        isPublic: row.is_public ?? true,
         createdAt: row.created_at,
     };
 }
@@ -284,6 +286,13 @@ export async function toggleRoomFieldDefinition(
         .from('room_field_definitions')
         .update({ is_active: isActive })
         .eq('id', id);
+
+    if (error) throw error;
+}
+
+export async function toggleRoomFieldPublic(id: string, isPublic: boolean): Promise<void> {
+    const { error } = await supabase
+        .rpc('set_field_public', { field_id: id, new_value: isPublic });
 
     if (error) throw error;
 }

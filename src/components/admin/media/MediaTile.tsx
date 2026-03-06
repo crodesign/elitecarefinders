@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Copy, Trash2, X, Pencil, CheckSquare, Square } from "lucide-react";
+import { Loader2, Copy, Trash2, X, CheckSquare, Square } from "lucide-react";
 import type { MediaFolder, MediaItem } from "@/types";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
@@ -59,7 +59,7 @@ interface MediaTileProps {
     isGalleryImage?: boolean;
     isFeaturedImage?: boolean;
     stepLabel?: string;
-    captionClassName?: string;
+
 }
 
 export function MediaTile({
@@ -81,7 +81,7 @@ export function MediaTile({
     isGalleryImage = false,
     isFeaturedImage = false,
     stepLabel,
-    captionClassName = 'bg-[var(--media-caption-bg)] text-[var(--text-primary)]',
+
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
@@ -229,9 +229,9 @@ export function MediaTile({
     const showEditPanel = isEditMode || (isSelected && !onMediaSelect);
 
     return (
-        <div className="flex flex-col rounded-xl overflow-hidden group">
+        <div className="rounded-xl overflow-hidden group">
             {/* Image container */}
-            <div className="relative w-full aspect-square bg-surface-input rounded-t-xl overflow-hidden">
+            <div className="relative w-full aspect-square bg-surface-input rounded-xl overflow-hidden">
                 {item.mimeType.startsWith("image/") ? (
                     <>
                         <img
@@ -333,9 +333,9 @@ export function MediaTile({
                     </button>
                 )}
 
-                {/* URL Overlay - Standard theme alignment (Soft glass look) */}
-                <div className="absolute bottom-0 left-0 right-0 p-1.5 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="flex items-center gap-1.5 px-2 py-1 overflow-hidden rounded ring-1 ring-black/5 dark:ring-white/5 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)]">
+                {/* URL Overlay */}
+                <div className="absolute bottom-10 left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--media-edit-btn-bg)]/50 text-[var(--media-edit-btn-text)]">
                         <span className="text-[9px] uppercase font-black opacity-30 shrink-0">URL</span>
                         <span className="flex-1 text-[10px] truncate font-mono font-medium opacity-60">{item.url}</span>
                         <button
@@ -350,59 +350,56 @@ export function MediaTile({
                         </button>
                     </div>
                 </div>
-            </div>
-
-            {/* Caption area */}
-            <div className={`p-1.5 ${captionClassName} space-y-1.5`}>
-                {/* Caption row */}
-                <div className="flex items-center gap-1.5">
-                    <input
-                        type="text"
-                        value={caption}
-                        onChange={(e) => setCaption(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Add caption..."
-                        className="form-input flex-1 min-w-0 text-sm rounded-md px-2 py-1.5"
-                    />
-                    {captionChanged && (
-                        <button
-                            type="button"
-                            onClick={handleSaveCaptionOnly}
-                            disabled={isSaving}
-                            className="flex-shrink-0 px-2.5 py-1.5 text-xs bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
-                        >
-                            {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
-                        </button>
-                    )}
+                {/* Caption overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <div className="relative rounded-lg ring-1 ring-black/10 dark:ring-white/10 focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                        <input
+                            type="text"
+                            value={caption}
+                            onChange={(e) => setCaption(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Add caption..."
+                            className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
+                        />
+                        {captionChanged && (
+                            <button
+                                type="button"
+                                onClick={handleSaveCaptionOnly}
+                                disabled={isSaving}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
+                            >
+                                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                            </button>
+                        )}
+                    </div>
                 </div>
-
-                {/* Deactivation/Delete Confirmation Modal */}
-                <ConfirmationModal
-                    isOpen={showDeleteModal}
-                    onClose={() => setShowDeleteModal(false)}
-                    onConfirm={() => { setShowDeleteModal(false); onDelete(item.id); }}
-                    title="Delete Image"
-                    message={
-                        <div className="space-y-3">
-                            <p>Are you sure you want to permanently delete <strong>&quot;{item.filename}&quot;</strong>? This will remove the physical file from the server and cannot be undone.</p>
-
-                            {(isGalleryImage || isFeaturedImage || stepLabel) && (
-                                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                                    <p className="text-red-200 text-sm font-medium flex items-center gap-2">
-                                        <span className="text-lg">⚠️</span> Warning: Image in Use
-                                    </p>
-                                    <p className="mt-1 text-red-300/80 text-xs pl-7">
-                                        This image is currently displayed in a gallery or featured slot. Deleting it will result in a broken image on the site.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    }
-                    confirmLabel="Delete Permanently"
-                    cancelLabel="Cancel"
-                    isDangerous={true}
-                />
             </div>
+
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={() => { setShowDeleteModal(false); onDelete(item.id); }}
+                title="Delete Image"
+                message={
+                    <div className="space-y-3">
+                        <p>Are you sure you want to permanently delete <strong>&quot;{item.filename}&quot;</strong>? This will remove the physical file from the server and cannot be undone.</p>
+
+                        {(isGalleryImage || isFeaturedImage || stepLabel) && (
+                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                <p className="text-red-200 text-sm font-medium flex items-center gap-2">
+                                    <span className="text-lg">⚠️</span> Warning: Image in Use
+                                </p>
+                                <p className="mt-1 text-red-300/80 text-xs pl-7">
+                                    This image is currently displayed in a gallery or featured slot. Deleting it will result in a broken image on the site.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                }
+                confirmLabel="Delete Permanently"
+                cancelLabel="Cancel"
+                isDangerous={true}
+            />
         </div>
     );
 }

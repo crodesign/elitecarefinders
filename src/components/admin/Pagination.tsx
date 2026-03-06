@@ -39,7 +39,7 @@ export function Pagination({
     }, []);
 
     return (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-ui-border bg-surface-card">
+        <div className="flex items-center justify-between px-4 pt-9 pb-3 border-t border-ui-border bg-surface-card">
             <div className="flex items-center gap-4">
                 {/* Desktop: Full description */}
                 <span className="hidden md:inline text-sm text-content-secondary">

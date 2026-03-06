@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown } from "lucide-react";
+import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Eye, EyeOff } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     getInjectedScripts, saveInjectedScripts, ScriptEntry,
     getAnalyticsSettings, saveAnalyticsSettings, AnalyticsSettings,
+    getSocialAccounts, saveSocialAccounts, SocialAccount, SocialPlatform, SOCIAL_PLATFORMS,
 } from "@/lib/services/siteSettingsService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 
 function generateId() {
     return Math.random().toString(36).slice(2, 10);
@@ -40,6 +42,9 @@ export default function GeneralSettingsPage() {
     const [loadingProperties, setLoadingProperties] = useState(false);
     const [propertiesError, setPropertiesError] = useState<string | null>(null);
 
+    const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [isSavingSocial, setIsSavingSocial] = useState(false);
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -48,9 +53,10 @@ export default function GeneralSettingsPage() {
             router.replace("/admin");
             return;
         }
-        Promise.all([getInjectedScripts(), getAnalyticsSettings()]).then(([scripts, analytics]) => {
+        Promise.all([getInjectedScripts(), getAnalyticsSettings(), getSocialAccounts()]).then(([scripts, analytics, social]) => {
             setScripts(scripts);
             setAnalytics(analytics);
+            setSocialAccounts(social);
             setIsLoading(false);
         });
     }, [authLoading, isSuperAdmin, router]);
@@ -93,6 +99,37 @@ export default function GeneralSettingsPage() {
         }
     };
 
+    // Social accounts handlers
+    const addSocial = () => {
+        setSocialAccounts(prev => [...prev, { id: generateId(), platform: 'facebook', url: '' }]);
+    };
+    const updateSocial = (id: string, patch: Partial<SocialAccount>) => {
+        setSocialAccounts(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+    };
+    const removeSocial = (id: string) => {
+        setSocialAccounts(prev => prev.filter(s => s.id !== id));
+    };
+    const moveSocial = (index: number, dir: -1 | 1) => {
+        setSocialAccounts(prev => {
+            const next = [...prev];
+            const swap = index + dir;
+            if (swap < 0 || swap >= next.length) return prev;
+            [next[index], next[swap]] = [next[swap], next[index]];
+            return next;
+        });
+    };
+    const handleSaveSocial = async () => {
+        setIsSavingSocial(true);
+        try {
+            await saveSocialAccounts(socialAccounts);
+            showNotification("Saved", "Social accounts updated.");
+        } catch {
+            showNotification("Error", "Failed to save social accounts.");
+        } finally {
+            setIsSavingSocial(false);
+        }
+    };
+
     const handleBrowseProperties = async () => {
         if (!analytics.serviceAccountJson.trim()) return;
         setLoadingProperties(true);
@@ -124,13 +161,13 @@ export default function GeneralSettingsPage() {
     }
 
     return (
-        <div className="p-8 max-w-7xl">
+        <div className="p-8">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-content-primary">General Settings</h1>
                 <p className="text-sm text-content-secondary mt-1">Site-wide configuration</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {/* Left: Injected Scripts */}
                 <div className="card border-0 p-6 space-y-4">
@@ -139,9 +176,8 @@ export default function GeneralSettingsPage() {
                             <Code className="h-4 w-4 text-accent" />
                             Injected Scripts
                         </h2>
-                        <button type="button" onClick={addScript} className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3">
-                            <Plus className="h-3.5 w-3.5" />
-                            Add Script
+                        <button type="button" onClick={addScript} className="h-7 w-7 flex items-center justify-center rounded bg-surface-input hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors">
+                            <Plus className="h-4 w-4" />
                         </button>
                     </div>
                     <p className="text-sm text-content-muted">
@@ -316,6 +352,94 @@ export default function GeneralSettingsPage() {
                     <div className="flex justify-end">
                         <button type="button" onClick={handleSaveAnalytics} disabled={isSavingAnalytics} className="btn-primary flex items-center gap-2">
                             {isSavingAnalytics ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            Save
+                        </button>
+                    </div>
+                </div>
+
+                {/* Third column: Social Media */}
+                <div className="card border-0 p-6 space-y-4 h-fit">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                            <Share2 className="h-4 w-4 text-accent" />
+                            Social Media
+                        </h2>
+                        <button type="button" onClick={addSocial} className="h-7 w-7 flex items-center justify-center rounded bg-surface-input hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors">
+                            <Plus className="h-4 w-4" />
+                        </button>
+                    </div>
+                    <p className="text-sm text-content-muted">
+                        Your organisation&apos;s social media profiles.
+                    </p>
+
+                    {socialAccounts.length === 0 && (
+                        <p className="text-sm text-content-muted text-center py-6 border border-dashed border-ui-border rounded-lg">
+                            No accounts added yet.
+                        </p>
+                    )}
+
+                    <div className="space-y-2">
+                        {socialAccounts.map((account, index) => (
+                            <div key={account.id} className="flex items-center gap-2 px-3 py-2 bg-surface-input rounded-lg">
+                                <div className="w-32 flex-shrink-0">
+                                    <EnhancedSelect
+                                        value={account.platform}
+                                        onChange={v => updateSocial(account.id, { platform: v as SocialPlatform })}
+                                        options={SOCIAL_PLATFORMS}
+                                        textSize="text-xs"
+                                        className="[&_button]:!bg-surface-secondary"
+                                    />
+                                </div>
+                                <input
+                                    type="url"
+                                    value={account.url}
+                                    onChange={e => updateSocial(account.id, { url: e.target.value })}
+                                    placeholder="https://"
+                                    className="form-input flex-1 min-w-0 text-xs px-2 py-1 !bg-surface-secondary"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => updateSocial(account.id, { hidden: !account.hidden })}
+                                    className={`p-1 rounded flex-shrink-0 transition-colors ${account.hidden ? 'text-content-muted opacity-40 hover:opacity-100' : 'text-content-muted hover:text-content-primary'}`}
+                                    aria-label={account.hidden ? "Show" : "Hide"}
+                                >
+                                    {account.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                                </button>
+                                <div className="flex items-center gap-0.5 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => moveSocial(index, -1)}
+                                        disabled={index === 0}
+                                        className="p-1 rounded text-content-muted hover:text-content-primary transition-colors disabled:opacity-25"
+                                        aria-label="Move up"
+                                    >
+                                        <ArrowUp className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => moveSocial(index, 1)}
+                                        disabled={index === socialAccounts.length - 1}
+                                        className="p-1 rounded text-content-muted hover:text-content-primary transition-colors disabled:opacity-25"
+                                        aria-label="Move down"
+                                    >
+                                        <ArrowDown className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeSocial(account.id)}
+                                        className="p-1 rounded text-content-muted hover:text-red-500 transition-colors"
+                                        aria-label="Remove"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-end">
+                        <button type="button" onClick={handleSaveSocial} disabled={isSavingSocial} className="btn-primary flex items-center gap-2">
+                            {isSavingSocial ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                             Save
                         </button>
                     </div>

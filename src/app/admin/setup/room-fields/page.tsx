@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Plus, Bed, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign } from "lucide-react";
+import { Plus, Bed, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign, Eye, EyeOff } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { RoomFieldCategory, RoomFieldDefinition, RoomFixedFieldOption, FixedFieldType, Taxonomy } from "@/types";
 import {
@@ -13,6 +13,7 @@ import {
     createRoomFieldDefinition,
     updateRoomFieldDefinition,
     deleteRoomFieldDefinition,
+    toggleRoomFieldPublic,
     getFixedFieldOptions,
     createFixedFieldOption,
     updateFixedFieldOption,
@@ -59,6 +60,7 @@ function SortableFieldItem({
     editingFieldId,
     startEditingField,
     handleDeleteField,
+    handleTogglePublic,
     editFieldName,
     setEditFieldName,
     editFieldType,
@@ -74,6 +76,7 @@ function SortableFieldItem({
     editingFieldId: string | null;
     startEditingField: (field: RoomFieldDefinition) => void;
     handleDeleteField: (id: string) => void;
+    handleTogglePublic: (id: string, isPublic: boolean) => void;
     editFieldName: string;
     setEditFieldName: (val: string) => void;
     editFieldType: "boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "dropdown";
@@ -233,6 +236,12 @@ function SortableFieldItem({
                 {field.targetType === 'both' && <Layers className="h-3 w-3" />}
                 <span className="capitalize">{field.targetType || 'both'}</span>
             </span>
+            <button
+                onClick={() => handleTogglePublic(field.id, !field.isPublic)}
+                className={`p-1 transition-colors ${field.isPublic ? "text-content-secondary hover:text-content-primary" : "text-content-muted hover:text-content-secondary"}`}
+            >
+                {field.isPublic ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </button>
             <button
                 onClick={() => startEditingField(field)}
                 className="p-1 text-content-muted hover:text-content-primary transition-opacity"
@@ -889,6 +898,17 @@ export default function RoomFieldsPage() {
         }
     };
 
+    const handleTogglePublic = async (id: string, isPublic: boolean) => {
+        setFieldDefinitions(prev => prev.map(f => f.id === id ? { ...f, isPublic } : f));
+        try {
+            await toggleRoomFieldPublic(id, isPublic);
+        } catch (err: any) {
+            setFieldDefinitions(prev => prev.map(f => f.id === id ? { ...f, isPublic: !isPublic } : f));
+            const msg = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+            showNotification("Failed to update visibility", msg);
+        }
+    };
+
     const handleDeleteField = async (id: string) => {
         const field = fieldDefinitions.find(f => f.id === id);
         setDeleteModal({
@@ -1237,6 +1257,7 @@ export default function RoomFieldsPage() {
                                                                                     editingFieldId={editingFieldId}
                                                                                     startEditingField={startEditingField}
                                                                                     handleDeleteField={handleDeleteField}
+                                                                                    handleTogglePublic={handleTogglePublic}
                                                                                     editFieldName={editFieldName}
                                                                                     setEditFieldName={setEditFieldName}
                                                                                     editFieldType={editFieldType}

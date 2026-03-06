@@ -183,6 +183,7 @@ export interface RoomFieldDefinition {
     categoryId: string;
     displayOrder: number;
     isActive: boolean;
+    isPublic: boolean;
     createdAt: string;
 }
 
@@ -209,5 +210,15 @@ export interface RoomDetails {
     customFields: {
         [fieldId: string]: boolean | string | string[];
     };
+}
+
+export interface Favorite {
+    id?: string;
+    type: 'home' | 'facility' | 'post';
+    entityId: string;
+    entitySlug: string;
+    entityTitle?: string;
+    entityImage?: string;
+    createdAt?: string;
 }
 

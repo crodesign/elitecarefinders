@@ -17,6 +17,11 @@ export async function getFacilities(): Promise<Facility[]> {
         address: facility.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: facility.license_number,
         taxonomyIds: facility.taxonomy_ids || [],
+        isFeatured: facility.is_featured,
+        hasFeaturedVideo: facility.has_featured_video,
+        isFacilityOfMonth: facility.is_facility_of_month,
+        featuredLabel: facility.featured_label,
+        facilityOfMonthDescription: facility.facility_of_month_description,
         images: facility.images || [],
         teamImages: facility.team_images || [],
         cuisineImages: facility.cuisine_images || [],
@@ -34,6 +39,11 @@ export async function searchFacilities(query: string): Promise<Facility[]> {
         address: facility.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: facility.license_number,
         taxonomyIds: facility.taxonomy_ids || [],
+        isFeatured: facility.is_featured,
+        hasFeaturedVideo: facility.has_featured_video,
+        isFacilityOfMonth: facility.is_facility_of_month,
+        featuredLabel: facility.featured_label,
+        facilityOfMonthDescription: facility.facility_of_month_description,
         images: facility.images || [],
         teamImages: facility.team_images || [],
         cuisineImages: facility.cuisine_images || [],
@@ -60,6 +70,11 @@ export async function getFacility(id: string): Promise<Facility | null> {
         address: data.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
+        isFeatured: data.is_featured,
+        hasFeaturedVideo: data.has_featured_video,
+        isFacilityOfMonth: data.is_facility_of_month,
+        featuredLabel: data.featured_label,
+        facilityOfMonthDescription: data.facility_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
         cuisineImages: data.cuisine_images || [],
@@ -83,6 +98,11 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         capacity: facility.capacity,
         taxonomy_ids: facility.taxonomyIds,
         status: facility.status || 'draft',
+        is_featured: (facility as any).isFeatured || false,
+        has_featured_video: (facility as any).hasFeaturedVideo || false,
+        is_facility_of_month: (facility as any).isFacilityOfMonth || false,
+        featured_label: (facility as any).featuredLabel || '',
+        facility_of_month_description: (facility as any).facilityOfMonthDescription || '',
         images: facility.images || [],
         team_images: facility.teamImages || [],
         cuisine_images: facility.cuisineImages || [],
@@ -107,6 +127,11 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         address: data.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
+        isFeatured: data.is_featured,
+        hasFeaturedVideo: data.has_featured_video,
+        isFacilityOfMonth: data.is_facility_of_month,
+        featuredLabel: data.featured_label,
+        facilityOfMonthDescription: data.facility_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
         cuisineImages: data.cuisine_images || [],
@@ -132,6 +157,11 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.cuisineImages !== undefined) dbUpdates.cuisine_images = updates.cuisineImages;
     if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if ((updates as any).roomDetails !== undefined) dbUpdates.room_details = (updates as any).roomDetails;
+    if ((updates as any).isFeatured !== undefined) dbUpdates.is_featured = (updates as any).isFeatured;
+    if ((updates as any).hasFeaturedVideo !== undefined) dbUpdates.has_featured_video = (updates as any).hasFeaturedVideo;
+    if ((updates as any).isFacilityOfMonth !== undefined) dbUpdates.is_facility_of_month = (updates as any).isFacilityOfMonth;
+    if ((updates as any).featuredLabel !== undefined) dbUpdates.featured_label = (updates as any).featuredLabel;
+    if ((updates as any).facilityOfMonthDescription !== undefined) dbUpdates.facility_of_month_description = (updates as any).facilityOfMonthDescription;
 
     const { data, error } = await supabase
         .from("facilities")
@@ -150,6 +180,11 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
         address: data.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: data.license_number,
         taxonomyIds: data.taxonomy_ids || [],
+        isFeatured: data.is_featured,
+        hasFeaturedVideo: data.has_featured_video,
+        isFacilityOfMonth: data.is_facility_of_month,
+        featuredLabel: data.featured_label,
+        facilityOfMonthDescription: data.facility_of_month_description,
         images: data.images || [],
         teamImages: data.team_images || [],
         cuisineImages: data.cuisine_images || [],
