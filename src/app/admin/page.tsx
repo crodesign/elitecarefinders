@@ -243,8 +243,6 @@ export default function AdminDashboardPage() {
         title: h.title,
         imageUrl: h.images?.[0] ?? null,
         isExternalImage: false,
-        badge: h.status === "published" ? "Published" : undefined,
-        badgeAccent: true,
         href: `/admin/homes?edit=${h.slug}`,
         prefix: statusDot(h.status === "published"),
     }));
@@ -254,8 +252,6 @@ export default function AdminDashboardPage() {
         title: f.title,
         imageUrl: f.images?.[0] ?? null,
         isExternalImage: false,
-        badge: f.status === "published" ? "Published" : undefined,
-        badgeAccent: true,
         href: `/admin/facilities?edit=${f.slug}`,
         prefix: statusDot(f.status === "published"),
     }));
