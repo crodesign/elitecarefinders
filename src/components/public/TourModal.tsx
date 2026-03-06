@@ -142,7 +142,7 @@ export function TourModal({ entityName, entityType, onClose }: TourModalProps) {
             </div>
 
             {/* Scrolling content */}
-            <div className="flex-1 overflow-y-auto w-full pb-6">
+            <div className="modal-content-slide-in flex-1 overflow-y-auto w-full pb-6">
                 <div className="max-w-[480px] mx-5 sm:mx-auto bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl" onClick={e => e.stopPropagation()}>
 
                     {status === 'success' ? (

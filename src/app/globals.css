@@ -505,6 +505,35 @@ select:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* ── Public modal slide-in animation ────────────── */
+@keyframes modal-slide-in {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+.modal-slide-in {
+  animation: modal-slide-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Content-only slide: starts off-screen, blue bar acts as mask */
+@keyframes modal-content-slide-in {
+  from { transform: translateY(-100vh); }
+  to   { transform: translateY(0); }
+}
+.modal-content-slide-in {
+  animation: modal-content-slide-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.modal-fade-in {
+  animation: modal-fade-in 1s ease both;
+}
+.modal-fade-in-fast {
+  animation: modal-fade-in 0.33s ease both;
+}
+
 /* ========================================= */
 /* MERGED LOVABLE UI STYLES                  */
 /* ========================================= */

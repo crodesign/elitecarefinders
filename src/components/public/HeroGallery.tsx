@@ -114,15 +114,15 @@ function LightboxModal({ items, startIndex, onClose }: {
     if (!current) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] bg-white flex flex-col">
+        <div className="modal-fade-in fixed inset-0 z-[200] bg-white flex flex-col">
             {/* Top bar */}
-            <div className="flex-shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-100">
-                <span className="text-sm text-gray-400 font-medium tabular-nums">
+            <div className="flex-shrink-0 h-14 bg-[#239ddb] flex items-center justify-between px-4 shadow-md">
+                <span className="text-sm text-white font-medium tabular-nums">
                     {pos + 1} / {imageItems.length}
                 </span>
                 <button
                     onClick={onClose}
-                    className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors"
+                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                     aria-label="Close"
                 >
                     <FontAwesomeIcon icon={faXmark} className="h-5 w-5" />
@@ -141,7 +141,7 @@ function LightboxModal({ items, startIndex, onClose }: {
                     </button>
                 )}
 
-                <div className="flex flex-col items-center gap-3 max-h-full max-w-full">
+                <div key={pos} className="modal-fade-in-fast flex flex-col items-center gap-3 max-h-full max-w-full">
                     <img
                         src={current.item.url}
                         alt={current.item.alt || ''}
@@ -208,7 +208,7 @@ function GalleryModal({ items, onClose, onImageClick }: {
             </div>
 
             {/* Scrolling Content */}
-            <div className="flex-1 overflow-y-auto w-full">
+            <div className="modal-content-slide-in flex-1 overflow-y-auto w-full">
                 <div className="max-w-[640px] mx-5 sm:mx-auto bg-white p-5 pb-0 space-y-8 shadow-2xl rounded-b-xl mb-[30px]" onClick={e => e.stopPropagation()}>
 
                     {/* Videos Section */}

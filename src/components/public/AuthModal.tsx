@@ -160,7 +160,7 @@ export function AuthModal({ onClose, defaultTab = 'signin' }: AuthModalProps) {
             </div>
 
             {/* Scrolling content */}
-            <div className="flex-1 overflow-y-auto w-full pb-6">
+            <div className="modal-content-slide-in flex-1 overflow-y-auto w-full pb-6">
                 <div className="max-w-[480px] mx-5 sm:mx-auto bg-white shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
                     {/* Tabs — hidden when in forgot password view */}
                     {view === 'main' && (
