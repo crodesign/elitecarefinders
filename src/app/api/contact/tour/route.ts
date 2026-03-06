@@ -1,8 +1,6 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 function formatTime(hour: string, minute: string) {
     const h = parseInt(hour);
     const suffix = h >= 12 ? 'PM' : 'AM';
@@ -17,6 +15,7 @@ function formatDate(dateStr: string) {
 }
 
 export async function POST(request: Request) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { fullName, email, phone, entityName, entityType, date, hour, minute } = await request.json();
 
     if (!fullName || !email || !phone || !date) {
