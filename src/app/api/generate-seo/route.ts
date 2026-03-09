@@ -89,7 +89,8 @@ export async function POST(request: Request) {
         const output = await generateSeoWithGemini(input);
         return NextResponse.json(output);
     } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
         console.error('[generate-seo] Gemini error:', err);
-        return NextResponse.json({ error: 'AI generation failed' }, { status: 500 });
+        return NextResponse.json({ error: 'AI generation failed', detail: msg }, { status: 500 });
     }
 }

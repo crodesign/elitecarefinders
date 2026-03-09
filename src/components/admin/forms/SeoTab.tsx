@@ -107,15 +107,15 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ recordId, contentType }),
             });
-            if (!res.ok) throw new Error('AI generation failed');
             const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || data.error || 'AI generation failed');
             if (data.metaTitle) { onChange('metaTitle', data.metaTitle); setIsDirty(true); }
             if (data.metaDescription) { onChange('metaDescription', data.metaDescription); setIsDirty(true); }
             if (data.ogTitle) { onChange('ogTitle', data.ogTitle); setIsDirty(true); }
             if (data.ogDescription) { onChange('ogDescription', data.ogDescription); setIsDirty(true); }
             if (Array.isArray(data.faqs) && data.faqs.length > 0) setAiFaqs(data.faqs);
-        } catch {
-            setAiError('AI generation failed. Please try again.');
+        } catch (err) {
+            setAiError(err instanceof Error ? err.message : 'AI generation failed. Please try again.');
         } finally {
             setAiLoading(false);
         }
