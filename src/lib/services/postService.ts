@@ -1,7 +1,49 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
-import type { Post, PostType, PostMetadata } from "@/types";
+import type { Post, PostType, PostMetadata, SeoFields } from "@/types";
+
+function mapSeoFromDb(row: any): SeoFields {
+    return {
+        metaTitle: row.meta_title ?? null,
+        metaDescription: row.meta_description ?? null,
+        canonicalUrl: row.canonical_url ?? null,
+        indexable: row.indexable ?? true,
+        ogTitle: row.og_title ?? null,
+        ogDescription: row.og_description ?? null,
+        ogImageUrl: row.og_image_url ?? null,
+        schemaJson: row.schema_json ?? null,
+    };
+}
+
+function mapSeoToDb(seo: SeoFields | undefined): Record<string, unknown> {
+    if (!seo) return {};
+    return {
+        meta_title: seo.metaTitle ?? null,
+        meta_description: seo.metaDescription ?? null,
+        canonical_url: seo.canonicalUrl ?? null,
+        indexable: seo.indexable ?? true,
+        og_title: seo.ogTitle ?? null,
+        og_description: seo.ogDescription ?? null,
+        og_image_url: seo.ogImageUrl ?? null,
+        schema_json: seo.schemaJson ?? null,
+    };
+}
+
+function transformPost(post: any): Post {
+    return {
+        ...post,
+        images: post.images || [],
+        featuredImageUrl: post.images && post.images.length > 0 ? post.images[0] : null,
+        videoUrl: post.video_url || null,
+        authorId: post.author_id,
+        postType: post.post_type as PostType,
+        publishedAt: post.published_at,
+        createdAt: post.created_at,
+        updatedAt: post.updated_at,
+        seo: mapSeoFromDb(post),
+    };
+}
 
 export async function getPosts(): Promise<Post[]> {
     const { data, error } = await supabase
@@ -14,33 +56,13 @@ export async function getPosts(): Promise<Post[]> {
         throw new Error(error.message);
     }
 
-    return (data || []).map((post: any) => ({
-        ...post,
-        images: post.images || [],
-        featuredImageUrl: post.images && post.images.length > 0 ? post.images[0] : null,
-        videoUrl: post.video_url || null,
-        authorId: post.author_id,
-        postType: post.post_type as PostType,
-        publishedAt: post.published_at,
-        createdAt: post.created_at,
-        updatedAt: post.updated_at,
-    }));
+    return (data || []).map(transformPost);
 }
 
 export async function searchPosts(query: string): Promise<Post[]> {
     const { data, error } = await supabase.rpc('search_posts', { keyword: query });
     if (error) throw new Error(error.message);
-    return (data || []).map((post: any) => ({
-        ...post,
-        images: post.images || [],
-        featuredImageUrl: post.images && post.images.length > 0 ? post.images[0] : null,
-        videoUrl: post.video_url || null,
-        authorId: post.author_id,
-        postType: post.post_type,
-        publishedAt: post.published_at,
-        createdAt: post.created_at,
-        updatedAt: post.updated_at,
-    }));
+    return (data || []).map(transformPost);
 }
 
 export async function getPost(id: string): Promise<Post | null> {
@@ -55,17 +77,7 @@ export async function getPost(id: string): Promise<Post | null> {
         return null;
     }
 
-    return {
-        ...data,
-        images: data.images || [],
-        featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
-        videoUrl: data.video_url || null,
-        authorId: data.author_id,
-        postType: data.post_type as PostType,
-        publishedAt: data.published_at,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
-    };
+    return transformPost(data);
 }
 
 export type CreatePostInput = Omit<Post, "id" | "createdAt" | "updatedAt">;
@@ -85,6 +97,7 @@ export async function createPost(post: CreatePostInput): Promise<Post> {
         status: post.status || 'draft',
         metadata: post.metadata || {},
         published_at: post.status === 'published' ? new Date().toISOString() : null,
+        ...mapSeoToDb(post.seo),
     };
 
     const { data, error } = await supabase
@@ -98,17 +111,7 @@ export async function createPost(post: CreatePostInput): Promise<Post> {
         throw new Error(error.message);
     }
 
-    return {
-        ...data,
-        images: data.images || [],
-        featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
-        videoUrl: data.video_url || null,
-        authorId: data.author_id,
-        postType: data.post_type as PostType,
-        publishedAt: data.published_at,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
-    };
+    return transformPost(data);
 }
 
 export async function updatePost(id: string, updates: Partial<Post>): Promise<Post> {
@@ -123,6 +126,7 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
     if (updates.postType !== undefined) dbUpdates.post_type = updates.postType;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.metadata !== undefined) dbUpdates.metadata = updates.metadata;
+    if (updates.seo !== undefined) Object.assign(dbUpdates, mapSeoToDb(updates.seo));
 
     if (updates.status === 'published' && updates.publishedAt === undefined) {
         dbUpdates.published_at = new Date().toISOString();
@@ -142,17 +146,7 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
         throw new Error(error.message);
     }
 
-    return {
-        ...data,
-        images: data.images || [],
-        featuredImageUrl: data.images && data.images.length > 0 ? data.images[0] : null,
-        videoUrl: data.video_url || null,
-        authorId: data.author_id,
-        postType: data.post_type as PostType,
-        publishedAt: data.published_at,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
-    };
+    return transformPost(data);
 }
 
 export async function deletePost(id: string, slug?: string): Promise<void> {

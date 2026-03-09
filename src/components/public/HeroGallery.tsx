@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faXmark, faBorderAll, faImage, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faXmark, faBorderAll, faImage, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import type { VideoEntry } from '@/types';
 
 type GalleryItem =
@@ -387,7 +387,8 @@ export function HeroGallery({ images, videos = [], title, featuredLabel }: HeroG
                 {/* ── Featured label — top-center ── */}
                 {featuredLabel && (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                        <div className="bg-green-600 text-white text-sm uppercase tracking-widest px-4 py-1 rounded-b-lg shadow-lg">
+                        <div className="flex items-center gap-1.5 bg-green-600 text-white text-sm uppercase tracking-widest px-4 py-1 rounded-b-lg shadow-lg">
+                            <FontAwesomeIcon icon={faStar} className="h-3 w-3" />
                             {featuredLabel}
                         </div>
                     </div>

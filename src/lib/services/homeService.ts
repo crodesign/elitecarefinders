@@ -1,5 +1,55 @@
 import { supabase } from "@/lib/supabase";
-import type { Home } from "@/types";
+import type { Home, SeoFields } from "@/types";
+
+function mapSeoFromDb(row: any): SeoFields {
+    return {
+        metaTitle: row.meta_title ?? null,
+        metaDescription: row.meta_description ?? null,
+        canonicalUrl: row.canonical_url ?? null,
+        indexable: row.indexable ?? true,
+        ogTitle: row.og_title ?? null,
+        ogDescription: row.og_description ?? null,
+        ogImageUrl: row.og_image_url ?? null,
+        schemaJson: row.schema_json ?? null,
+    };
+}
+
+function mapSeoToDb(seo: SeoFields | undefined): Record<string, unknown> {
+    if (!seo) return {};
+    return {
+        meta_title: seo.metaTitle ?? null,
+        meta_description: seo.metaDescription ?? null,
+        canonical_url: seo.canonicalUrl ?? null,
+        indexable: seo.indexable ?? true,
+        og_title: seo.ogTitle ?? null,
+        og_description: seo.ogDescription ?? null,
+        og_image_url: seo.ogImageUrl ?? null,
+        schema_json: seo.schemaJson ?? null,
+    };
+}
+
+function transformHome(home: any): Home {
+    return {
+        ...home,
+        address: home.address || { street: "", city: "", state: "", zip: "" },
+        displayReferenceNumber: home.display_reference_number,
+        showAddress: home.show_address,
+        taxonomyEntryIds: home.taxonomy_entry_ids || [],
+        isFeatured: home.is_featured,
+        hasFeaturedVideo: home.has_featured_video,
+        isHomeOfMonth: home.is_home_of_month,
+        featuredLabel: home.featured_label,
+        homeOfMonthDescription: home.home_of_month_description,
+        excerpt: home.excerpt || "",
+        images: home.images || [],
+        teamImages: home.team_images || [],
+        cuisineImages: home.cuisine_images || [],
+        videos: home.videos || [],
+        roomDetails: { customFields: {}, ...(home.room_details || {}) },
+        updatedAt: home.updated_at,
+        seo: mapSeoFromDb(home),
+    };
+}
 
 export async function getHomes(): Promise<Home[]> {
     const { data, error } = await supabase
@@ -12,48 +62,13 @@ export async function getHomes(): Promise<Home[]> {
         throw new Error(error.message);
     }
 
-    // Ensure address is properly typed (it comes as JSON)
-    return (data || []).map((home: any) => ({
-        ...home,
-        address: home.address || { street: "", city: "", state: "", zip: "" },
-        displayReferenceNumber: home.display_reference_number,
-        showAddress: home.show_address,
-        taxonomyEntryIds: home.taxonomy_entry_ids || [],
-        isFeatured: home.is_featured,
-        hasFeaturedVideo: home.has_featured_video,
-        isHomeOfMonth: home.is_home_of_month,
-        featuredLabel: home.featured_label,
-        homeOfMonthDescription: home.home_of_month_description,
-        images: home.images || [],
-        teamImages: home.team_images || [],
-        cuisineImages: home.cuisine_images || [],
-        videos: home.videos || [],
-        roomDetails: { customFields: {}, ...(home.room_details || {}) },
-        updatedAt: home.updated_at,
-    }));
+    return (data || []).map(transformHome);
 }
 
 export async function searchHomes(query: string): Promise<Home[]> {
     const { data, error } = await supabase.rpc('search_homes', { keyword: query });
     if (error) throw new Error(error.message);
-    return (data || []).map((home: any) => ({
-        ...home,
-        address: home.address || { street: "", city: "", state: "", zip: "" },
-        displayReferenceNumber: home.display_reference_number,
-        showAddress: home.show_address,
-        taxonomyEntryIds: home.taxonomy_entry_ids || [],
-        isFeatured: home.is_featured,
-        hasFeaturedVideo: home.has_featured_video,
-        isHomeOfMonth: home.is_home_of_month,
-        featuredLabel: home.featured_label,
-        homeOfMonthDescription: home.home_of_month_description,
-        images: home.images || [],
-        teamImages: home.team_images || [],
-        cuisineImages: home.cuisine_images || [],
-        videos: home.videos || [],
-        roomDetails: { customFields: {}, ...(home.room_details || {}) },
-        updatedAt: home.updated_at,
-    }));
+    return (data || []).map(transformHome);
 }
 
 export async function getHome(id: string): Promise<Home | null> {
@@ -68,24 +83,7 @@ export async function getHome(id: string): Promise<Home | null> {
         return null;
     }
 
-    return {
-        ...data,
-        address: data.address || { street: "", city: "", state: "", zip: "" },
-        displayReferenceNumber: data.display_reference_number,
-        showAddress: data.show_address,
-        taxonomyEntryIds: data.taxonomy_entry_ids || [],
-        isFeatured: data.is_featured,
-        hasFeaturedVideo: data.has_featured_video,
-        isHomeOfMonth: data.is_home_of_month,
-        featuredLabel: data.featured_label,
-        homeOfMonthDescription: data.home_of_month_description,
-        images: data.images || [],
-        teamImages: data.team_images || [],
-        cuisineImages: data.cuisine_images || [],
-        videos: data.videos || [],
-        roomDetails: { customFields: {}, ...(data.room_details || {}) },
-        updatedAt: data.updated_at,
-    };
+    return transformHome(data);
 }
 
 export type CreateHomeInput = Omit<Home, "id" | "createdAt" | "updatedAt" | "images" | "teamImages" | "cuisineImages"> & { images?: string[], teamImages?: string[], cuisineImages?: string[] };
@@ -107,11 +105,13 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         is_home_of_month: home.isHomeOfMonth,
         featured_label: home.featuredLabel,
         home_of_month_description: home.homeOfMonthDescription,
+        excerpt: home.excerpt || "",
         images: home.images || [],
         team_images: home.teamImages || [],
         cuisine_images: home.cuisineImages || [],
         videos: home.videos || [],
         room_details: home.roomDetails || {},
+        ...mapSeoToDb(home.seo),
     };
 
     const { data, error } = await supabase
@@ -125,28 +125,10 @@ export async function createHome(home: CreateHomeInput): Promise<Home> {
         throw new Error(error.message);
     }
 
-    return {
-        ...data,
-        address: data.address || { street: "", city: "", state: "", zip: "" },
-        displayReferenceNumber: data.display_reference_number,
-        showAddress: data.show_address,
-        taxonomyEntryIds: data.taxonomy_entry_ids || [],
-        isFeatured: data.is_featured,
-        hasFeaturedVideo: data.has_featured_video,
-        isHomeOfMonth: data.is_home_of_month,
-        featuredLabel: data.featured_label,
-        homeOfMonthDescription: data.home_of_month_description,
-        images: data.images || [],
-        teamImages: data.team_images || [],
-        cuisineImages: data.cuisine_images || [],
-        videos: data.videos || [],
-        roomDetails: { customFields: {}, ...(data.room_details || {}) },
-        updatedAt: data.updated_at,
-    };
+    return transformHome(data);
 }
 
 export async function updateHome(id: string, updates: Partial<Home>): Promise<Home> {
-    // Map updates to snake_case
     const dbUpdates: any = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.slug !== undefined) dbUpdates.slug = updates.slug;
@@ -163,11 +145,13 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.isHomeOfMonth !== undefined) dbUpdates.is_home_of_month = updates.isHomeOfMonth;
     if (updates.featuredLabel !== undefined) dbUpdates.featured_label = updates.featuredLabel;
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
+    if (updates.excerpt !== undefined) dbUpdates.excerpt = updates.excerpt;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;
     if (updates.cuisineImages !== undefined) dbUpdates.cuisine_images = updates.cuisineImages;
     if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
+    if (updates.seo !== undefined) Object.assign(dbUpdates, mapSeoToDb(updates.seo));
 
     const { data, error } = await supabase
         .from("homes")
@@ -181,24 +165,7 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
         throw new Error(error.message);
     }
 
-    return {
-        ...data,
-        address: data.address || { street: "", city: "", state: "", zip: "" },
-        displayReferenceNumber: data.display_reference_number,
-        showAddress: data.show_address,
-        taxonomyEntryIds: data.taxonomy_entry_ids || [],
-        isFeatured: data.is_featured,
-        hasFeaturedVideo: data.has_featured_video,
-        isHomeOfMonth: data.is_home_of_month,
-        featuredLabel: data.featured_label,
-        homeOfMonthDescription: data.home_of_month_description,
-        images: data.images || [],
-        teamImages: data.team_images || [],
-        cuisineImages: data.cuisine_images || [],
-        videos: data.videos || [],
-        roomDetails: { customFields: {}, ...(data.room_details || {}) },
-        updatedAt: data.updated_at,
-    };
+    return transformHome(data);
 }
 
 export async function deleteHome(id: string, slug?: string): Promise<void> {

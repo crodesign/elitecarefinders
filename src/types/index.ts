@@ -43,6 +43,7 @@ export interface BaseEntity {
 }
 
 export interface Home extends BaseEntity {
+    excerpt?: string;
     address: Address;
     displayReferenceNumber?: boolean;
     showAddress?: boolean;
@@ -56,14 +57,17 @@ export interface Home extends BaseEntity {
     featuredLabel?: string;
     homeOfMonthDescription?: string;
     roomDetails?: RoomDetails;
+    seo?: SeoFields;
 }
 
 export interface Facility extends BaseEntity {
+    excerpt?: string;
     address: Address;
     licenseNumber: string;
     capacity: number;
     taxonomyIds: string[]; // References to Taxonomies
     status: 'published' | 'draft';
+    seo?: SeoFields;
 }
 
 export interface Review {
@@ -122,6 +126,18 @@ export interface Post extends BaseEntity {
     status: 'draft' | 'published' | 'archived';
     metadata?: PostMetadata;
     publishedAt?: string;
+    seo?: SeoFields;
+}
+
+export interface SeoFields {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    indexable?: boolean;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImageUrl?: string | null;
+    schemaJson?: Record<string, unknown> | null;
 }
 
 // Media Manager Types

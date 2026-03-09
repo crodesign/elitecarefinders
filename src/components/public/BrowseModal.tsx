@@ -92,7 +92,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                             {homeTypes.map(type => (
                                 <li key={type.id}>
                                     <Link
-                                        href={`/homes?type=${type.slug}`}
+                                        href={`/homes/type/${type.slug}`}
                                         onClick={onClose}
                                         className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
                                     >
@@ -104,7 +104,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                 <Link
                                     href="/homes"
                                     onClick={onClose}
-                                    className="block text-sm font-semibold text-[#239ddb] hover:underline py-0.5 transition-colors"
+                                    className="block text-sm font-semibold text-gray-500 hover:text-[#239ddb] py-0.5 transition-colors"
                                 >
                                     View all Homes →
                                 </Link>
@@ -124,7 +124,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                             {facilityTypes.map(type => (
                                 <li key={type.id}>
                                     <Link
-                                        href={`/facilities?type=${type.slug}`}
+                                        href={`/facilities/type/${type.slug}`}
                                         onClick={onClose}
                                         className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
                                     >
@@ -136,7 +136,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                 <Link
                                     href="/facilities"
                                     onClick={onClose}
-                                    className="block text-sm font-semibold text-[#239ddb] hover:underline py-0.5 transition-colors"
+                                    className="block text-sm font-semibold text-gray-500 hover:text-[#239ddb] py-0.5 transition-colors"
                                 >
                                     View all Communities →
                                 </Link>

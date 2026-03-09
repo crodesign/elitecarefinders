@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShareNodes, faCheck, faHandHoldingHeart, faHouse, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faShareNodes, faCheck, faHandHoldingHeart, faHouse, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { getHomeBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getAdjacentHome, getFeaturedHomes } from '@/lib/public-db';
+import { generateSeoMetadataFromRecord, buildHomeJsonLd } from '@/lib/seo';
 import { HeroGallery } from '@/components/public/HeroGallery';
 import { RoomDetailsSection } from '@/components/public/RoomDetailsSection';
 import { EntityCTAButtons } from '@/components/public/EntityCTAButtons';
@@ -21,15 +22,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = params;
     const home = await getHomeBySlug(slug);
     if (!home) return { title: 'Not Found' };
-    return {
-        title: home.title,
-        description: home.description?.slice(0, 155),
-        openGraph: {
-            title: home.title,
-            description: home.description?.slice(0, 155),
-            images: home.images[0] ? [{ url: home.images[0] }] : [],
-        },
-    };
+    return generateSeoMetadataFromRecord({
+        slug,
+        pathPrefix: 'homes',
+        defaultTitle: home.title,
+        defaultDescription: home.description,
+        defaultImage: home.images[0] ?? null,
+        seo: home.seo,
+    });
 }
 
 export default async function HomeDetailPage({ params }: Props) {
@@ -48,6 +48,13 @@ export default async function HomeDetailPage({ params }: Props) {
         getFeaturedHomes(home.slug),
     ]);
     const featuredHomes = featuredRaw.sort(() => Math.random() - 0.5).slice(0, 4);
+    const featuredTaxIds = [...new Set(featuredHomes.flatMap(h => h.taxonomyEntryIds))];
+    const featuredTaxEntries = featuredTaxIds.length > 0 ? await getTaxonomyEntriesByIds(featuredTaxIds) : [];
+    const featuredTypeMap = new Map<string, string>();
+    featuredHomes.forEach(h => {
+        const te = h.taxonomyEntryIds.map(id => featuredTaxEntries.find(e => e.id === id)).find(e => e?.taxonomySlug !== 'location');
+        if (te) featuredTypeMap.set(h.slug, te.name.replace(/ies$/, 'y').replace(/([^s])s$/, '$1'));
+    });
     const { categories, definitions } = fieldData;
 
     const floorLevelDef = definitions.find(d => d.slug === 'floor-level');
@@ -69,25 +76,15 @@ export default async function HomeDetailPage({ params }: Props) {
     }));
 
     // JSON-LD structured data
-    const jsonLd = {
-        '@context': 'https://schema.org',
-        '@type': 'LodgingBusiness',
+    const jsonLd = buildHomeJsonLd({
         name: home.title,
         description: home.description,
-        url: `https://www.elitecarefinders.com/homes/${home.slug}`,
-        ...(home.images[0] && { image: home.images[0] }),
-        ...(hasAddress && {
-            address: {
-                '@type': 'PostalAddress',
-                streetAddress: addr.street,
-                addressLocality: addr.city,
-                addressRegion: addr.state,
-                postalCode: addr.zip,
-                addressCountry: 'US',
-            },
-        }),
-        ...(home.phone && { telephone: home.phone }),
-    };
+        slug: home.slug,
+        image: home.images[0] ?? null,
+        telephone: home.phone ?? null,
+        address: hasAddress ? addr : null,
+        schemaJsonOverride: home.seo?.schemaJson ?? null,
+    });
 
     return (
         <>
@@ -553,26 +550,38 @@ export default async function HomeDetailPage({ params }: Props) {
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {featuredHomes.map(item => (
-                                <Link key={item.slug} href={`/homes/${item.slug}`} className="group relative aspect-square bg-gray-100 rounded-xl overflow-hidden block">
-                                    {item.image && (
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                                            loading="lazy"
-                                        />
-                                    )}
-                                    {item.featuredLabel && (
-                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
-                                            <div className="bg-green-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-b-lg">
-                                                {item.featuredLabel}
+                                <Link key={item.slug} href={`/homes/${item.slug}`} className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-200 bg-gray-100">
+                                    <div className="relative w-full h-40 bg-gray-100 flex-shrink-0">
+                                        {item.image ? (
+                                            <img
+                                                src={item.image.startsWith('/images/media/') ? item.image.replace(/(\.[^.]+)$/, '-500x500.webp') : item.image}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                                                loading="lazy"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                                                <FontAwesomeIcon icon={faHouse} className="h-10 w-10" />
                                             </div>
-                                        </div>
-                                    )}
-                                    <div className="absolute bottom-0 left-0 right-0 px-[15px]">
-                                        <div className="rounded-t-md bg-white px-2 py-1 text-xs text-gray-800 font-medium text-center truncate">
+                                        )}
+                                        {item.featuredLabel && (
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+                                                <span className="flex items-center gap-1 bg-green-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-b-lg shadow">
+                                                    <FontAwesomeIcon icon={faStar} className="h-2.5 w-2.5" />
+                                                    {item.featuredLabel}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1 group-hover:text-[#239ddb] transition-colors line-clamp-2">
                                             {item.title}
-                                        </div>
+                                        </h3>
+                                        {featuredTypeMap.get(item.slug) && (
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#239ddb]">
+                                                {featuredTypeMap.get(item.slug)}
+                                            </p>
+                                        )}
                                     </div>
                                 </Link>
                             ))}

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Home, Facility, RoomFieldCategory, RoomFieldDefinition } from '@/types';
+import type { Home, Facility, RoomFieldCategory, RoomFieldDefinition, SeoFields } from '@/types';
 
 function getClient() {
     // Use service role key on the server to bypass RLS for public page reads.
@@ -9,6 +9,19 @@ function getClient() {
     return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
         auth: { persistSession: false },
     });
+}
+
+function mapSeoFromDb(row: any): SeoFields {
+    return {
+        metaTitle: row.meta_title ?? null,
+        metaDescription: row.meta_description ?? null,
+        canonicalUrl: row.canonical_url ?? null,
+        indexable: row.indexable ?? true,
+        ogTitle: row.og_title ?? null,
+        ogDescription: row.og_description ?? null,
+        ogImageUrl: row.og_image_url ?? null,
+        schemaJson: row.schema_json ?? null,
+    };
 }
 
 function transformHome(data: any): Home {
@@ -29,6 +42,7 @@ function transformHome(data: any): Home {
         videos: data.videos || [],
         roomDetails: { customFields: {}, ...(data.room_details || {}) },
         updatedAt: data.updated_at,
+        seo: mapSeoFromDb(data),
     };
 }
 
@@ -44,6 +58,7 @@ function transformFacility(data: any): Facility {
         videos: data.videos || [],
         roomDetails: data.room_details || { customFields: {} },
         updatedAt: data.updated_at,
+        seo: mapSeoFromDb(data),
     };
 }
 
@@ -203,11 +218,12 @@ export interface FeaturedCard {
     title: string;
     image: string | null;
     featuredLabel: string | null;
+    taxonomyEntryIds: string[];
 }
 
 export async function getFeaturedHomes(excludeSlug?: string): Promise<FeaturedCard[]> {
     const db = getClient();
-    let query = db.from('homes').select('slug, title, images, featured_label').eq('status', 'published').eq('is_featured', true).limit(20);
+    let query = db.from('homes').select('slug, title, images, featured_label, taxonomy_entry_ids').eq('status', 'published').eq('is_featured', true).limit(20);
     if (excludeSlug) query = query.neq('slug', excludeSlug);
     const { data } = await query;
     return (data || []).map((row: any) => ({
@@ -215,12 +231,13 @@ export async function getFeaturedHomes(excludeSlug?: string): Promise<FeaturedCa
         title: row.title,
         image: row.images?.[0] || null,
         featuredLabel: row.featured_label || null,
+        taxonomyEntryIds: row.taxonomy_entry_ids || [],
     }));
 }
 
 export async function getFeaturedFacilities(excludeSlug?: string): Promise<FeaturedCard[]> {
     const db = getClient();
-    let query = db.from('facilities').select('slug, title, images, featured_label').eq('status', 'published').eq('is_featured', true).limit(20);
+    let query = db.from('facilities').select('slug, title, images, featured_label, taxonomy_ids').eq('status', 'published').eq('is_featured', true).limit(20);
     if (excludeSlug) query = query.neq('slug', excludeSlug);
     const { data } = await query;
     return (data || []).map((row: any) => ({
@@ -228,7 +245,158 @@ export async function getFeaturedFacilities(excludeSlug?: string): Promise<Featu
         title: row.title,
         image: row.images?.[0] || null,
         featuredLabel: row.featured_label || null,
+        taxonomyEntryIds: row.taxonomy_ids || [],
     }));
+}
+
+export interface HomeListingCard {
+    id: string;
+    slug: string;
+    title: string;
+    image: string | null;
+    description: string;
+    taxonomyEntryIds: string[];
+    isFeatured: boolean;
+}
+
+export interface FacilityListingCard {
+    id: string;
+    slug: string;
+    title: string;
+    image: string | null;
+    description: string;
+    taxonomyIds: string[];
+    capacity: number | null;
+    isFeatured: boolean;
+}
+
+export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
+    const db = getClient();
+    const { typeEntryId, locationEntryIds, page = 1, limit = 24 } = opts;
+    const offset = (page - 1) * limit;
+    let query = db
+        .from('homes')
+        .select('id, slug, title, images, description, taxonomy_entry_ids, is_featured', { count: 'exact' })
+        .eq('status', 'published')
+        .order('title')
+        .range(offset, offset + limit - 1);
+    if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
+    else if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
+    const { data, count, error } = await query;
+    if (error || !data) return { items: [], total: 0 };
+    return {
+        items: data.map((row: any) => ({
+            id: row.id,
+            slug: row.slug,
+            title: row.title,
+            image: row.images?.[0] || null,
+            description: row.description || '',
+            taxonomyEntryIds: row.taxonomy_entry_ids || [],
+            isFeatured: row.is_featured || false,
+        })),
+        total: count ?? 0,
+    };
+}
+
+export async function getFacilityListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number } = {}): Promise<{ items: FacilityListingCard[]; total: number }> {
+    const db = getClient();
+    const { typeEntryId, locationEntryIds, page = 1, limit = 24 } = opts;
+    const offset = (page - 1) * limit;
+    let query = db
+        .from('facilities')
+        .select('id, slug, title, images, description, taxonomy_ids, capacity, is_featured', { count: 'exact' })
+        .eq('status', 'published')
+        .order('title')
+        .range(offset, offset + limit - 1);
+    if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_ids', locationEntryIds);
+    else if (typeEntryId) query = (query as any).filter('taxonomy_ids', 'cs', JSON.stringify([typeEntryId]));
+    const { data, count, error } = await query;
+    if (error || !data) return { items: [], total: 0 };
+    return {
+        items: data.map((row: any) => ({
+            id: row.id,
+            slug: row.slug,
+            title: row.title,
+            image: row.images?.[0] || null,
+            description: row.description || '',
+            taxonomyIds: row.taxonomy_ids || [],
+            capacity: row.capacity ?? null,
+            isFeatured: row.is_featured || false,
+        })),
+        total: count ?? 0,
+    };
+}
+
+// Fetch the given entry ID plus all descendant entry IDs (BFS, up to 4 levels).
+// Used for location filtering so that "Hawaii" also matches homes tagged with "Honolulu".
+export async function getLocationDescendantIds(rootId: string): Promise<string[]> {
+    const db = getClient();
+    const ids = [rootId];
+    let toFetch = [rootId];
+    for (let depth = 0; depth < 4 && toFetch.length; depth++) {
+        const { data } = await db.from('taxonomy_entries').select('id').in('parent_id', toFetch);
+        if (!data?.length) break;
+        const newIds = data.map((r: any) => r.id);
+        ids.push(...newIds);
+        toFetch = newIds;
+    }
+    return ids;
+}
+
+// When a short path (state + city) skips an intermediary level (e.g. island),
+// find the full path by searching direct children of the state for the city slug.
+export async function findFullLocationPath(stateSlug: string, citySlug: string): Promise<string[] | null> {
+    const db = getClient();
+    const { data: stateData } = await db.from('taxonomy_entries').select('id').eq('slug', stateSlug).maybeSingle();
+    if (!stateData) return null;
+    const { data: islands } = await db.from('taxonomy_entries').select('id, slug').eq('parent_id', stateData.id);
+    if (!islands?.length) return null;
+    for (const island of islands) {
+        const { data: city } = await db.from('taxonomy_entries').select('id').eq('slug', citySlug).eq('parent_id', island.id).maybeSingle();
+        if (city) return [stateSlug, island.slug, citySlug];
+    }
+    return null;
+}
+
+// Walk a hierarchy of slugs (e.g. ['hawaii', 'oahu', 'honolulu']) and return
+// the deepest matching taxonomy entry plus its ancestor names (root → parent).
+export async function getLocationEntryByPath(slugs: string[]): Promise<{
+    id: string;
+    name: string;
+    ancestors: string[]; // ordered root → direct parent, e.g. ['Hawaii', 'Oahu']
+} | null> {
+    if (!slugs.length) return null;
+    const db = getClient();
+    let parentId: string | null = null;
+    const names: string[] = [];
+    for (const slug of slugs) {
+        let query = db.from('taxonomy_entries').select('id, name').eq('slug', slug);
+        if (parentId) query = query.eq('parent_id', parentId);
+        const { data } = await query.maybeSingle();
+        if (!data) return null;
+        names.push(data.name);
+        parentId = data.id;
+    }
+    return {
+        id: parentId!,
+        name: names[names.length - 1],
+        ancestors: names.slice(0, -1),
+    };
+}
+
+export async function getTaxonomyEntryBySlug(slug: string): Promise<{ id: string; name: string; taxonomySlug: string } | null> {
+    const db = getClient();
+    const { data } = await db
+        .from('taxonomy_entries')
+        .select('id, name, taxonomies(slug)')
+        .eq('slug', slug)
+        .maybeSingle();
+    if (!data) return null;
+    return {
+        id: data.id,
+        name: data.name,
+        taxonomySlug: (data as any).taxonomies?.slug || '',
+    };
 }
 
 export async function getMediaCaptionsByUrls(urls: string[]): Promise<Record<string, string>> {
@@ -251,4 +419,23 @@ export async function getMediaCaptionsByUrls(urls: string[]): Promise<Record<str
         if (text) captions[row.url] = text;
     });
     return captions;
+}
+
+const HOME_TYPE_TAX_ID = '286967ff-a897-4529-9c25-6f452f77f0d7';
+const FACILITY_TYPE_TAX_ID = 'aaff7539-60ec-448d-ae56-5ee8763917f6';
+
+export interface BrowseNavEntry { id: string; name: string; slug: string; }
+
+export async function getBrowseNavTypes(): Promise<{ homeTypes: BrowseNavEntry[]; facilityTypes: BrowseNavEntry[] }> {
+    const db = getClient();
+    const { data } = await db
+        .from('taxonomy_entries')
+        .select('id, name, slug, taxonomy_id')
+        .in('taxonomy_id', [HOME_TYPE_TAX_ID, FACILITY_TYPE_TAX_ID])
+        .order('name');
+    if (!data) return { homeTypes: [], facilityTypes: [] };
+    return {
+        homeTypes: data.filter((e: any) => e.taxonomy_id === HOME_TYPE_TAX_ID).map((e: any) => ({ id: e.id, name: e.name, slug: e.slug })),
+        facilityTypes: data.filter((e: any) => e.taxonomy_id === FACILITY_TYPE_TAX_ID).map((e: any) => ({ id: e.id, name: e.name, slug: e.slug })),
+    };
 }

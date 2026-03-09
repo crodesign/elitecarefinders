@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft } from "lucide-react";
+import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft, Search } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
-import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction } from "@/types";
+import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction, SeoFields } from "@/types";
+import { SeoTab } from "./forms/SeoTab";
 import { MediaGallery } from "@/components/admin/media/MediaGallery";
 import { getFolders, createFolder, getMediaItems } from "@/lib/services/mediaService";
 import { ensurePostFolder } from "@/lib/services/mediaFolderService";
 import { supabase } from "@/lib/supabase";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 interface PostFormProps {
     isOpen: boolean;
@@ -57,6 +59,26 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isPostTypeDropdownOpen, setIsPostTypeDropdownOpen] = useState(false);
     const postTypeDropdownRef = useRef<HTMLDivElement>(null);
+
+    // SEO state
+    const [seo, setSeo] = useState<SeoFields>({ indexable: true });
+
+    // Tabs
+    type TabId = "information" | "images" | "seo";
+    const tabs = [
+        { id: "information" as TabId, label: "Post Information", icon: FileText },
+        { id: "images" as TabId, label: "Images", icon: ImageIcon },
+        { id: "seo" as TabId, label: "SEO & Metadata", icon: Search },
+    ];
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const activeTab = (searchParams.get("tab") as TabId) ?? "information";
+    function setActiveTab(tab: TabId) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("tab", tab);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
 
     // Metadata fields
     const [links, setLinks] = useState<{ text: string; url: string }[]>([]);
@@ -134,6 +156,9 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setCookTime(meta.cookTime?.toString() || "");
                 setRecipeYield(meta.yield || "");
                 setSourceUrl(meta.sourceUrl || "");
+
+                // SEO
+                setSeo(post.seo ?? { indexable: true });
             } else {
                 setTitle("");
                 setSlug("");
@@ -151,6 +176,9 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 setCookTime("");
                 setRecipeYield("");
                 setSourceUrl("");
+
+                // Reset SEO
+                setSeo({ indexable: true });
             }
 
             setTimeout(() => {
@@ -343,7 +371,8 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 status,
                 images: postImages,
                 featuredImageUrl: postImages.length > 0 ? postImages[0] : null,
-                metadata
+                metadata,
+                seo,
             };
 
             await onSave(payload);
@@ -354,6 +383,440 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
             setIsSubmitting(false);
         }
     };
+
+    function renderTabContent() {
+        if (activeTab === "images") {
+            return (
+                <div className="h-full flex flex-col">
+                    {mediaFolderId ? (
+                        <MediaGallery
+                            folderId={mediaFolderId}
+                            title={postType === 'recipes' ? (
+                                <div className="flex flex-col">
+                                    <span>{title || "Post"} Image Library</span>
+                                    <span className="text-xs text-content-muted font-normal mt-0.5">Select an image to be the Featured Image</span>
+                                </div>
+                            ) : `${title || "Post"} Image Library`}
+                            dropzoneText="this post"
+                            className="flex-1 min-h-0"
+                            galleries={postType === 'recipes' ? undefined : [
+                                {
+                                    id: "main",
+                                    title: "Post Gallery",
+                                    shortLabel: "Image Gallery",
+                                    emptyText: "Select an image below to add it to the Post Gallery.",
+                                    urls: postImages,
+                                    onChange: (urls: string[]) => {
+                                        setPostImages(urls);
+                                    }
+                                }
+                            ]}
+                            onMediaSelect={(item: { url: string }) => {
+                                if (postType === 'recipes') {
+                                    setPostImages([item.url]);
+                                } else {
+                                    if (postImages.includes(item.url)) {
+                                        setPostImages(postImages.filter(u => u !== item.url));
+                                    } else {
+                                        setPostImages([...postImages, item.url]);
+                                    }
+                                }
+                            }}
+                            isDirty={isDirty}
+                            entityName={title || undefined}
+                            featuredImageUrl={postType === 'recipes' && postImages.length > 0 ? postImages[0] : undefined}
+                            stepImageMap={postType === 'recipes' ? stepImageMap : undefined}
+                        />
+                    ) : (
+                        <div className="p-8 text-center border border-dashed border-ui-border rounded-xl">
+                            <p className="text-content-muted text-sm">Save this post first to upload images.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        if (activeTab === "seo") {
+            return (
+                <SeoTab
+                    seo={seo}
+                    onChange={(field, value) => setSeo(prev => ({ ...prev, [field]: value }))}
+                    setIsDirty={setIsDirty}
+                    defaults={{
+                        title: title || undefined,
+                        description: excerpt || undefined,
+                        ogImage: postImages[0] || undefined,
+                    }}
+                    recordId={post?.id}
+                    contentType="post"
+                />
+            );
+        }
+
+        // "information" tab
+        return (
+            <div className={`grid grid-cols-1 gap-6 ${postType === 'recipes' ? 'lg:grid-cols-4 flex-1 min-h-0' : ''}`}>
+                {/* Column 1: Core Details & Dynamic Content */}
+                <div className={`flex flex-col gap-6 ${postType === 'recipes' ? 'lg:col-span-2 h-full min-h-0 flex flex-col' : ''}`}>
+                    <div className={`bg-surface-input rounded-lg p-[5px] flex flex-col gap-3 ${postType === 'recipes' ? 'flex-1 min-h-0' : ''}`}>
+                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                            <FileText className="h-4 w-4 text-accent" />
+                            Post Details
+                        </h3>
+
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
+                                Title
+                                <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
+                            </label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => {
+                                    setTitle(e.target.value);
+                                    autoGenerateSlug(e.target.value);
+                                }}
+                                className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
+                                placeholder="Enter post title"
+                                required
+                            />
+                            <div className="flex items-center gap-2">
+                                <div className="relative w-48" ref={postTypeDropdownRef}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPostTypeDropdownOpen(!isPostTypeDropdownOpen)}
+                                        className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md bg-transparent border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:ring-1 focus:ring-accent"
+                                    >
+                                        <span className="truncate mr-2 font-medium">
+                                            {postType ? POST_TYPES.find(t => t.value === postType)?.label : "Select Post Type"}
+                                        </span>
+                                        <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${isPostTypeDropdownOpen ? "rotate-180" : ""}`} />
+                                    </button>
+
+                                    {isPostTypeDropdownOpen && (
+                                        <div className="dropdown-menu absolute z-50 left-0 w-full mt-1 max-h-60 flex flex-col p-1 border-none bg-surface-primary rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/5">
+                                            {POST_TYPES.map((type) => (
+                                                <button
+                                                    key={type.value}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setPostType(type.value as PostType);
+                                                        setIsPostTypeDropdownOpen(false);
+                                                    }}
+                                                    className={`dropdown-item w-full rounded text-sm flex items-center justify-between px-2 py-1.5 transition-colors ${postType === type.value ? "bg-surface-hover text-content-primary" : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"}`}
+                                                >
+                                                    <span>{type.label}</span>
+                                                    {postType === type.value && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-3 w-3 text-white" /></span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Slug Display */}
+                        <div className="px-1">
+                            <p className="text-[10px] text-content-muted font-mono flex items-center gap-1">
+                                <span className="text-content-muted">slug:</span>
+                                {slug || "..."}
+                            </p>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                <Youtube className="h-4 w-4 text-red-500" />
+                                YouTube URL
+                            </label>
+                            <input
+                                type="url"
+                                value={videoUrl}
+                                onChange={(e) => setVideoUrl(e.target.value)}
+                                className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                            />
+                        </div>
+
+                        {(postType === 'recipes' || postType === 'news_events') && (
+                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                    <Link className="h-4 w-4 text-accent" />
+                                    Source URL
+                                </label>
+                                <input
+                                    type="url"
+                                    value={sourceUrl}
+                                    onChange={(e) => setSourceUrl(e.target.value)}
+                                    className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
+                                    placeholder="https://example.com/original-recipe"
+                                />
+                            </div>
+                        )}
+
+                        <div className={`flex flex-col gap-2 pt-2 ${postType === 'recipes' ? 'flex-1 min-h-0' : ''}`}>
+                            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                <AlignLeft className="h-4 w-4 text-accent" />
+                                Content
+                            </h3>
+
+                            {postType === 'recipes' && (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Prep Time</label>
+                                        <div className="relative w-28 shrink-0">
+                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                            <input
+                                                type="number"
+                                                value={prepTime}
+                                                onChange={(e) => setPrepTime(e.target.value)}
+                                                className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
+                                                placeholder="15"
+                                            />
+                                            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                <button type="button" onClick={() => setPrepTime(String((parseInt(prepTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
+                                                <button type="button" onClick={() => setPrepTime(String(Math.max(0, (parseInt(prepTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Cook Time</label>
+                                        <div className="relative w-28 shrink-0">
+                                            <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
+                                            <input
+                                                type="number"
+                                                value={cookTime}
+                                                onChange={(e) => setCookTime(e.target.value)}
+                                                className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
+                                                placeholder="45"
+                                            />
+                                            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+                                                <button type="button" onClick={() => setCookTime(String((parseInt(cookTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
+                                                <button type="button" onClick={() => setCookTime(String(Math.max(0, (parseInt(cookTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Yield</label>
+                                        <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
+                                    </div>
+                                </div>
+                            )}
+                            <RichTextEditor
+                                value={content}
+                                onChange={setContent}
+                                placeholder="Content goes here..."
+                                minHeight={postType === 'recipes' ? undefined : "min-h-[300px]"}
+                                className={`bg-surface-input text-content-primary placeholder-content-muted border-none overflow-hidden ${postType === 'recipes' ? 'flex-1 min-h-0' : 'flex-1'}`}
+                            />
+                            <div className="flex flex-col gap-2 pt-2 shrink-0">
+                                <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-1">
+                                    <FileText className="h-4 w-4 text-accent" />
+                                    Excerpt / Summary
+                                </label>
+                                <textarea
+                                    value={excerpt}
+                                    onChange={(e) => setExcerpt(e.target.value)}
+                                    className="form-input text-sm p-3 rounded-lg resize-y min-h-[80px]"
+                                    placeholder="Short description for preview cards..."
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Dynamic Sections Based on Type */}
+                    {postType === 'news_events' && (
+                        <div className="bg-surface-input rounded-lg p-[5px] space-y-3 border-l-4 border-l-blue-500">
+                            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                                <Hash className="h-4 w-4 text-accent" />
+                                News &amp; Events Links
+                            </h3>
+
+                            <div className="space-y-2">
+                                {links.map((link, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={link.text}
+                                            onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, text: e.target.value } : l))}
+                                            className="form-input text-sm px-3 h-8 rounded-md flex-1"
+                                            placeholder="Display Text (e.g. Read original article)"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={link.url}
+                                            onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, url: e.target.value } : l))}
+                                            className="form-input text-sm px-3 h-8 rounded-md flex-1"
+                                            placeholder="URL (e.g. https://...)"
+                                        />
+                                        <button type="button" onClick={() => setLinks(links.filter((_, i) => i !== idx))} className="btn-danger p-2 h-8">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setLinks([...links, { text: "", url: "" }])}
+                                    className="text-sm text-accent hover:text-accent-light flex items-center gap-1 font-medium mt-2"
+                                >
+                                    <Plus className="w-4 h-4" /> Add Link
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Column 2: Recipe Ingredients (Only for Recipes) */}
+                {postType === 'recipes' && (
+                    <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
+                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
+                            <div className="flex-1 min-h-0 flex flex-col">
+                                <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                    <Utensils className="h-4 w-4 text-accent" />
+                                    Ingredients
+                                </h3>
+                                <div className="overflow-y-auto flex-1 pr-1">
+                                    {ingredients.map((ing, idx) => (
+                                        <div key={idx} className="group flex items-center gap-2 px-2 py-1 rounded-lg bg-surface-input transition-colors mb-1">
+                                            <div className="flex-1 flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={ing.amount}
+                                                    onChange={(e) => setIngredients(ingredients.map((l, i) => i === idx ? { ...l, amount: e.target.value } : l))}
+                                                    className="form-input text-sm w-[8ch] h-8 rounded-md px-2 flex-shrink-0"
+                                                    placeholder="Amount"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={ing.name}
+                                                    onChange={(e) => setIngredients(ingredients.map((l, i) => i === idx ? { ...l, name: e.target.value } : l))}
+                                                    className="form-input text-sm w-full h-8 rounded-md px-2"
+                                                    placeholder="Ingredient (e.g. Olive Oil)"
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-1 transition-opacity">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newIngredients = [...ingredients];
+                                                        newIngredients.splice(idx + 1, 0, { amount: "", name: "" });
+                                                        setIngredients(newIngredients);
+                                                    }}
+                                                    className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
+                                                    title="Insert Ingredient Below"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))}
+                                                    className="p-1 text-content-muted hover:text-red-400 hover:bg-red-400/10 rounded flex-shrink-0"
+                                                    title="Remove Ingredient"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Column 3: Recipe Steps (Only for Recipes) */}
+                {postType === 'recipes' && (
+                    <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
+                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
+                            <div className="flex-1 min-h-0 flex flex-col">
+                                <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
+                                    <ListOrdered className="h-4 w-4 text-accent" />
+                                    Steps
+                                </h3>
+                                <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+                                    {instructions.map((inst, idx) => (
+                                        <div key={idx} className="group flex items-start gap-2 px-2 py-2 rounded-lg bg-surface-input transition-colors mb-2">
+                                            <div className="flex-1 flex gap-2">
+                                                <div className="w-6 h-8 flex items-center justify-center shrink-0">
+                                                    <span className="text-sm font-medium text-content-muted">{idx + 1}.</span>
+                                                </div>
+                                                <div className="flex flex-col gap-2 w-20 shrink-0">
+                                                    <div className="h-20 w-full rounded-md flex flex-col items-center justify-center overflow-hidden group/img relative bg-surface-primary transition-colors">
+                                                        {inst.image ? (
+                                                            <>
+                                                                <img src={toThumbUrl(inst.image)} alt={`Step ${idx + 1}`} className="w-full h-full object-cover cursor-pointer" onClick={() => setStepImageSelectorOpen(idx)} />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const newInst = [...instructions];
+                                                                        newInst[idx] = { ...inst, image: undefined };
+                                                                        setInstructions(newInst);
+                                                                    }}
+                                                                    className="absolute top-1 right-1 p-1 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover/img:opacity-100 transition-all rounded-md hover:!bg-accent hover:text-white cursor-pointer z-10"
+                                                                    title="Remove image"
+                                                                >
+                                                                    <X className="w-3 h-3" />
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setStepImageSelectorOpen(idx)}
+                                                                className="w-full h-full flex flex-col items-center justify-center gap-1 text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors cursor-pointer"
+                                                                title="Add step image"
+                                                            >
+                                                                <ImageIcon className="w-5 h-5" />
+                                                                <span className="text-[10px] uppercase font-medium">Image</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <textarea
+                                                    value={inst.text}
+                                                    onChange={(e) => {
+                                                        const newInst = [...instructions];
+                                                        newInst[idx] = { ...inst, text: e.target.value };
+                                                        setInstructions(newInst);
+                                                    }}
+                                                    className="form-input text-sm w-full min-h-[5rem] rounded-md px-3 py-2 resize-y"
+                                                    rows={3}
+                                                    placeholder={`Step ${idx + 1} instructions...`}
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-1 pt-0.5 transition-opacity whitespace-nowrap">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newInstructions = [...instructions];
+                                                        newInstructions.splice(idx + 1, 0, { text: "" });
+                                                        setInstructions(newInstructions);
+                                                    }}
+                                                    className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
+                                                    title="Insert Step Below"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setInstructions(instructions.filter((_, i) => i !== idx))}
+                                                    className="p-1 text-content-muted hover:text-red-400 hover:bg-red-400/10 rounded flex-shrink-0"
+                                                    title="Remove Step"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+            </div>
+        );
+    }
 
     return (
         <>
@@ -372,9 +835,51 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         {isSubmitting ? "Saving..." : (post ? "Save Changes" : "Create Post")}
                     </button>
                 }
+                contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
                 headerChildren={
-                    <div className="flex justify-end items-center gap-2 px-6 pt-2 pb-3 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex">
+                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
+                        <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
+                        {tabs.map(tab => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            const tabColor = 'var(--surface-tab)';
+                            return (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`
+                                        relative flex items-center gap-2 px-4 text-sm font-medium
+                                        whitespace-nowrap transition-colors duration-150 select-none
+                                        ${isActive
+                                            ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
+                                            : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
+                                        }
+                                    `}
+                                    style={isActive ? { backgroundColor: tabColor } : undefined}
+                                >
+                                    {isActive && (
+                                        <span className="absolute bottom-0 left-[-8px] w-2 h-2 pointer-events-none">
+                                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M8 0 L8 8 L0 8 A 8 8 0 0 0 8 0 Z" fill={tabColor} />
+                                            </svg>
+                                        </span>
+                                    )}
+                                    <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                                    {tab.label}
+                                    {isActive && (
+                                        <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
+                                            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0 0 L0 8 L8 8 A 8 8 0 0 1 0 0 Z" fill={tabColor} />
+                                            </svg>
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                        </div>
+                        <div className="flex items-center gap-2 pb-2">
+                        <div className="flex bg-surface-input p-1 rounded-lg shrink-0">
                             <button
                                 type="button"
                                 onClick={() => setStatus('published')}
@@ -390,418 +895,11 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                 Draft
                             </button>
                         </div>
+                        </div>
                     </div>
                 }
             >
-                <div className="w-full h-full flex flex-col min-h-0">
-                    <div className={`grid grid-cols-1 gap-6 flex-1 min-h-0 ${postType === 'recipes' ? 'lg:grid-cols-4' : 'lg:grid-cols-2'}`}>
-                        {/* Column 1: Core Details & Dynamic Content */}
-                        <div className={`flex flex-col gap-6 min-h-0 h-full ${postType === 'recipes' ? 'lg:col-span-2 lg:row-span-2' : ''}`}>
-                            <div className="bg-surface-input rounded-lg p-[5px] flex flex-col gap-3 flex-1 min-h-0">
-                                <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
-                                    <FileText className="h-4 w-4 text-accent" />
-                                    Post Details
-                                </h3>
-
-                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
-                                        Title
-                                        <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => {
-                                            setTitle(e.target.value);
-                                            autoGenerateSlug(e.target.value);
-                                        }}
-                                        className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
-                                        placeholder="Enter post title"
-                                        required
-                                    />
-                                    <div className="flex items-center gap-2">
-                                        <div className="relative w-48" ref={postTypeDropdownRef}>
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsPostTypeDropdownOpen(!isPostTypeDropdownOpen)}
-                                                className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md bg-transparent border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:ring-1 focus:ring-accent"
-                                            >
-                                                <span className="truncate mr-2 font-medium">
-                                                    {postType ? POST_TYPES.find(t => t.value === postType)?.label : "Select Post Type"}
-                                                </span>
-                                                <ChevronDown className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 text-content-muted ${isPostTypeDropdownOpen ? "rotate-180" : ""}`} />
-                                            </button>
-
-                                            {isPostTypeDropdownOpen && (
-                                                <div className="dropdown-menu absolute z-50 left-0 w-full mt-1 max-h-60 flex flex-col p-1 border-none bg-surface-primary rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/5">
-                                                    {POST_TYPES.map((type) => (
-                                                        <button
-                                                            key={type.value}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setPostType(type.value as PostType);
-                                                                setIsPostTypeDropdownOpen(false);
-                                                            }}
-                                                            className={`dropdown-item w-full rounded text-sm flex items-center justify-between px-2 py-1.5 transition-colors ${postType === type.value ? "bg-surface-hover text-content-primary" : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"}`}
-                                                        >
-                                                            <span>{type.label}</span>
-                                                            {postType === type.value && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-3 w-3 text-white" /></span>}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Slug Display */}
-                                <div className="px-1">
-                                    <p className="text-[10px] text-content-muted font-mono flex items-center gap-1">
-                                        <span className="text-content-muted">slug:</span>
-                                        {slug || "..."}
-                                    </p>
-                                </div>
-
-                                <div className="flex flex-col gap-2 pt-2">
-                                    <label className="text-sm font-medium text-content-secondary pl-1">
-                                        Excerpt / Summary
-                                    </label>
-                                    <textarea
-                                        value={excerpt}
-                                        onChange={(e) => setExcerpt(e.target.value)}
-                                        className="form-input text-sm p-3 rounded-lg resize-y min-h-[80px]"
-                                        placeholder="Short description for preview cards..."
-                                    />
-                                </div>
-
-                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-                                    <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
-                                        <Youtube className="h-4 w-4 text-red-500" />
-                                        YouTube URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        value={videoUrl}
-                                        onChange={(e) => setVideoUrl(e.target.value)}
-                                        className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
-                                        placeholder="https://www.youtube.com/watch?v=..."
-                                    />
-                                </div>
-
-                                {(postType === 'recipes' || postType === 'news_events') && (
-                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-                                        <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
-                                            <Link className="h-4 w-4 text-accent" />
-                                            Source URL
-                                        </label>
-                                        <input
-                                            type="url"
-                                            value={sourceUrl}
-                                            onChange={(e) => setSourceUrl(e.target.value)}
-                                            className="form-input text-sm text-left w-full h-8 rounded-md px-3 flex-1"
-                                            placeholder="https://example.com/original-recipe"
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="flex flex-col flex-1 gap-2 pt-2 min-h-0">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
-                                        <AlignLeft className="h-4 w-4 text-accent" />
-                                        Content
-                                    </h3>
-
-                                    {postType === 'recipes' && (
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Prep Time</label>
-                                                <div className="relative w-28 shrink-0">
-                                                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
-                                                    <input
-                                                        type="number"
-                                                        value={prepTime}
-                                                        onChange={(e) => setPrepTime(e.target.value)}
-                                                        className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
-                                                        placeholder="15"
-                                                    />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
-                                                        <button type="button" onClick={() => setPrepTime(String((parseInt(prepTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
-                                                        <button type="button" onClick={() => setPrepTime(String(Math.max(0, (parseInt(prepTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Cook Time</label>
-                                                <div className="relative w-28 shrink-0">
-                                                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
-                                                    <input
-                                                        type="number"
-                                                        value={cookTime}
-                                                        onChange={(e) => setCookTime(e.target.value)}
-                                                        className="form-input w-full pl-7 pr-7 py-1 h-8 text-sm text-left overflow-hidden [&::-webkit-inner-spin-button]:appearance-none"
-                                                        placeholder="45"
-                                                    />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
-                                                        <button type="button" onClick={() => setCookTime(String((parseInt(cookTime) || 0) + 1))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronUp className="h-2 w-2" /></button>
-                                                        <button type="button" onClick={() => setCookTime(String(Math.max(0, (parseInt(cookTime) || 0) - 1)))} className="p-0.5 hover:bg-surface-hover rounded text-content-muted hover:text-content-primary transition-colors"><ChevronDown className="h-2 w-2" /></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
-                                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Yield</label>
-                                                <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
-                                            </div>
-                                        </div>
-                                    )}
-                                    <RichTextEditor
-                                        value={content}
-                                        onChange={setContent}
-                                        placeholder="Content goes here..."
-                                        minHeight="min-h-[300px]"
-                                        className="flex-1 bg-surface-input text-content-primary placeholder-content-muted border-none h-full overflow-hidden"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Dynamic Sections Based on Type */}
-                            {postType === 'news_events' && (
-                                <div className="bg-surface-input rounded-lg p-[5px] space-y-3 border-l-4 border-l-blue-500">
-                                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
-                                        <Hash className="h-4 w-4 text-accent" />
-                                        News & Events Links
-                                    </h3>
-
-                                    <div className="space-y-2">
-                                        {links.map((link, idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={link.text}
-                                                    onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, text: e.target.value } : l))}
-                                                    className="form-input text-sm px-3 h-8 rounded-md flex-1"
-                                                    placeholder="Display Text (e.g. Read original article)"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    value={link.url}
-                                                    onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, url: e.target.value } : l))}
-                                                    className="form-input text-sm px-3 h-8 rounded-md flex-1"
-                                                    placeholder="URL (e.g. https://...)"
-                                                />
-                                                <button type="button" onClick={() => setLinks(links.filter((_, i) => i !== idx))} className="btn-danger p-2 h-8">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                        <button
-                                            type="button"
-                                            onClick={() => setLinks([...links, { text: "", url: "" }])}
-                                            className="text-sm text-accent hover:text-accent-light flex items-center gap-1 font-medium mt-2"
-                                        >
-                                            <Plus className="w-4 h-4" /> Add Link
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                        </div>
-
-                        {/* Column 2: Recipe Ingredients (Only for Recipes) */}
-                        {postType === 'recipes' && (
-                            <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                                <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
-                                    <div className="flex-1 min-h-0 flex flex-col">
-                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
-                                            <Utensils className="h-4 w-4 text-accent" />
-                                            Ingredients
-                                        </h3>
-                                        <div className="overflow-y-auto flex-1 pr-1">
-                                            {ingredients.map((ing, idx) => (
-                                                <div key={idx} className="group flex items-center gap-2 px-2 py-1 rounded-lg bg-surface-input transition-colors mb-1">
-                                                    <div className="flex-1 flex gap-2">
-                                                        <input
-                                                            type="text"
-                                                            value={ing.amount}
-                                                            onChange={(e) => setIngredients(ingredients.map((l, i) => i === idx ? { ...l, amount: e.target.value } : l))}
-                                                            className="form-input text-sm w-[8ch] h-8 rounded-md px-2 flex-shrink-0"
-                                                            placeholder="Amount"
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            value={ing.name}
-                                                            onChange={(e) => setIngredients(ingredients.map((l, i) => i === idx ? { ...l, name: e.target.value } : l))}
-                                                            className="form-input text-sm w-full h-8 rounded-md px-2"
-                                                            placeholder="Ingredient (e.g. Olive Oil)"
-                                                        />
-                                                    </div>
-                                                    <div className="flex items-center gap-1 transition-opacity">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newIngredients = [...ingredients];
-                                                                newIngredients.splice(idx + 1, 0, { amount: "", name: "" });
-                                                                setIngredients(newIngredients);
-                                                            }}
-                                                            className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
-                                                            title="Insert Ingredient Below"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))}
-                                                            className="p-1 text-content-muted hover:text-red-400 hover:bg-red-400/10 rounded flex-shrink-0"
-                                                            title="Remove Ingredient"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Column 3: Recipe Steps (Only for Recipes) */}
-                        {postType === 'recipes' && (
-                            <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                                <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
-                                    <div className="flex-1 min-h-0 flex flex-col">
-                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
-                                            <ListOrdered className="h-4 w-4 text-accent" />
-                                            Steps
-                                        </h3>
-                                        <div className="space-y-3 overflow-y-auto flex-1 pr-1">
-                                            {instructions.map((inst, idx) => (
-                                                <div key={idx} className="group flex items-start gap-2 px-2 py-2 rounded-lg bg-surface-input transition-colors mb-2">
-                                                    <div className="flex-1 flex gap-2">
-                                                        <div className="w-6 h-8 flex items-center justify-center shrink-0">
-                                                            <span className="text-sm font-medium text-content-muted">{idx + 1}.</span>
-                                                        </div>
-                                                        <div className="flex flex-col gap-2 w-20 shrink-0">
-                                                            <div className="h-20 w-full rounded-md flex flex-col items-center justify-center overflow-hidden group/img relative bg-surface-primary transition-colors">
-                                                                {inst.image ? (
-                                                                    <>
-                                                                        <img src={toThumbUrl(inst.image)} alt={`Step ${idx + 1}`} className="w-full h-full object-cover cursor-pointer" onClick={() => setStepImageSelectorOpen(idx)} />
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                const newInst = [...instructions];
-                                                                                newInst[idx] = { ...inst, image: undefined };
-                                                                                setInstructions(newInst);
-                                                                            }}
-                                                                            className="absolute top-1 right-1 p-1 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover/img:opacity-100 transition-all rounded-md hover:!bg-accent hover:text-white cursor-pointer z-10"
-                                                                            title="Remove image"
-                                                                        >
-                                                                            <X className="w-3 h-3" />
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setStepImageSelectorOpen(idx)}
-                                                                        className="w-full h-full flex flex-col items-center justify-center gap-1 text-content-muted hover:text-content-primary hover:bg-surface-hover transition-colors cursor-pointer"
-                                                                        title="Add step image"
-                                                                    >
-                                                                        <ImageIcon className="w-5 h-5" />
-                                                                        <span className="text-[10px] uppercase font-medium">Image</span>
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <textarea
-                                                            value={inst.text}
-                                                            onChange={(e) => {
-                                                                const newInst = [...instructions];
-                                                                newInst[idx] = { ...inst, text: e.target.value };
-                                                                setInstructions(newInst);
-                                                            }}
-                                                            className="form-input text-sm w-full min-h-[5rem] rounded-md px-3 py-2 resize-y"
-                                                            rows={3}
-                                                            placeholder={`Step ${idx + 1} instructions...`}
-                                                        />
-                                                    </div>
-                                                    <div className="flex items-center gap-1 pt-0.5 transition-opacity whitespace-nowrap">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const newInstructions = [...instructions];
-                                                                newInstructions.splice(idx + 1, 0, { text: "" });
-                                                                setInstructions(newInstructions);
-                                                            }}
-                                                            className="p-1 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded flex-shrink-0"
-                                                            title="Insert Step Below"
-                                                        >
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setInstructions(instructions.filter((_, i) => i !== idx))}
-                                                            className="p-1 text-content-muted hover:text-red-400 hover:bg-red-400/10 rounded flex-shrink-0"
-                                                            title="Remove Step"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Column 2 for non-recipes OR Bottom Span for recipes: Media Gallery */}
-                        <div className={`flex flex-col h-full min-h-0 ${postType === 'recipes' ? 'lg:col-span-2 lg:col-start-3' : ''}`}>
-                            {mediaFolderId ? (
-                                <MediaGallery
-                                    folderId={mediaFolderId}
-                                    title={postType === 'recipes' ? (
-                                        <div className="flex flex-col">
-                                            <span>{title || "Post"} Image Library</span>
-                                            <span className="text-xs text-content-muted font-normal mt-0.5">Select an image to be the Featured Image</span>
-                                        </div>
-                                    ) : `${title || "Post"} Image Library`}
-                                    dropzoneText="this post"
-                                    className="flex-1 min-h-0"
-                                    galleries={postType === 'recipes' ? undefined : [
-                                        {
-                                            id: "main",
-                                            title: "Post Gallery",
-                                            shortLabel: "Image Gallery",
-                                            emptyText: "Select an image below to add it to the Post Gallery.",
-                                            urls: postImages,
-                                            onChange: (urls: string[]) => {
-                                                setPostImages(urls);
-                                            }
-                                        }
-                                    ]}
-                                    onMediaSelect={(item: { url: string }) => {
-                                        if (postType === 'recipes') {
-                                            setPostImages([item.url]); // Replace with selected image if it's strictly featured
-                                        } else {
-                                            if (postImages.includes(item.url)) {
-                                                setPostImages(postImages.filter(u => u !== item.url));
-                                            } else {
-                                                setPostImages([...postImages, item.url]);
-                                            }
-                                        }
-                                    }}
-                                    isDirty={isDirty}
-                                    entityName={title || undefined}
-                                    featuredImageUrl={postType === 'recipes' && postImages.length > 0 ? postImages[0] : undefined}
-                                    stepImageMap={postType === 'recipes' ? stepImageMap : undefined}
-                                />
-                            ) : (
-                                <div className="p-8 text-center border border-dashed border-ui-border rounded-xl">
-                                    <p className="text-content-muted text-sm">Save this post first to upload images.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                {renderTabContent()}
             </SlidePanel>
 
             {/* Step Image Selector Modal */}

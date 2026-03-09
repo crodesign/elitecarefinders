@@ -1,13 +1,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHouse, faBuilding, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { getBrowseNavTypes } from '@/lib/public-db';
 
-export function PublicFooter() {
+export async function PublicFooter() {
+    const { homeTypes, facilityTypes } = await getBrowseNavTypes();
+
     return (
         <footer className="mt-16">
             <div className="max-w-6xl mx-auto">
             <div className="bg-gray-100 rounded-t-xl px-6 sm:px-8 pt-12 pb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div className="md:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-[200px_160px_1fr_1fr] gap-8">
+
+                    {/* Logo + tagline */}
+                    <div>
                         <Image
                             src="/images/site/ecf-logo-black.svg"
                             alt="Elite CareFinders"
@@ -19,19 +26,59 @@ export function PublicFooter() {
                             Helping families find the best senior living care options with personalized guidance.
                         </p>
                     </div>
+
+                    {/* Company */}
                     <div>
-                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Explore</h3>
-                        <ul className="space-y-2 text-sm text-gray-600">
-                            <li><Link href="/homes" className="hover:text-[#239ddb] transition-colors">Adult Family Homes</Link></li>
-                            <li><Link href="/facilities" className="hover:text-[#239ddb] transition-colors">Assisted Living</Link></li>
+                        <h3 className="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <span className="flex items-center justify-center w-4 h-4 rounded bg-[#239ddb] shrink-0">
+                                <FontAwesomeIcon icon={faHeart} className="h-2.5 w-2.5 text-white" />
+                            </span>
+                            Company
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-gray-600">
+                            <li><Link href="/about" className="hover:text-[#239ddb] transition-colors">About Us</Link></li>
+                            <li><Link href="/contact" className="hover:text-[#239ddb] transition-colors">Contact</Link></li>
                             <li><Link href="/blog" className="hover:text-[#239ddb] transition-colors">Resources</Link></li>
                         </ul>
                     </div>
+
+                    {/* Care Homes */}
                     <div>
-                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Company</h3>
-                        <ul className="space-y-2 text-sm text-gray-600">
-                            <li><Link href="/about" className="hover:text-[#239ddb] transition-colors">About Us</Link></li>
-                            <li><Link href="/contact" className="hover:text-[#239ddb] transition-colors">Contact</Link></li>
+                        <h3 className="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <span className="flex items-center justify-center w-4 h-4 rounded bg-[#239ddb] shrink-0">
+                                <FontAwesomeIcon icon={faHouse} className="h-2.5 w-2.5 text-white" />
+                            </span>
+                            Care Homes
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-gray-600">
+                            {homeTypes.map(type => (
+                                <li key={type.id}>
+                                    <Link href={`/homes/type/${type.slug}`} className="hover:text-[#239ddb] transition-colors">{type.name}</Link>
+                                </li>
+                            ))}
+                            <li>
+                                <Link href="/homes" className="font-semibold text-gray-500 hover:text-[#239ddb] transition-colors">View all Homes →</Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Senior Living Communities */}
+                    <div>
+                        <h3 className="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <span className="flex items-center justify-center w-4 h-4 rounded bg-[#239ddb] shrink-0">
+                                <FontAwesomeIcon icon={faBuilding} className="h-2.5 w-2.5 text-white" />
+                            </span>
+                            Senior Living Communities
+                        </h3>
+                        <ul className="space-y-1.5 text-xs text-gray-600">
+                            {facilityTypes.map(type => (
+                                <li key={type.id}>
+                                    <Link href={`/facilities/type/${type.slug}`} className="hover:text-[#239ddb] transition-colors">{type.name}</Link>
+                                </li>
+                            ))}
+                            <li>
+                                <Link href="/facilities" className="font-semibold text-gray-500 hover:text-[#239ddb] transition-colors">View all Communities →</Link>
+                            </li>
                         </ul>
                     </div>
                 </div>

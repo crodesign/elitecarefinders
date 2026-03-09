@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube } from "lucide-react";
+import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type {
     Facility,
@@ -12,7 +12,8 @@ import type {
     RoomFieldDefinition,
     RoomFixedFieldOption,
     RoomDetails,
-    VideoEntry
+    VideoEntry,
+    SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import {
@@ -39,6 +40,7 @@ import { FacilityLocationTab } from "./forms/facility/FacilityLocationTab";
 import { FacilityGalleryTab } from "./forms/facility/FacilityGalleryTab";
 import { FacilityVideosTab } from "./forms/facility/FacilityVideosTab";
 import { FacilityProviderTab } from "./forms/facility/FacilityProviderTab";
+import { FacilitySeoTab } from "./forms/facility/FacilitySeoTab";
 import { ensureLocationFolders } from "@/lib/services/mediaFolderService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
@@ -56,7 +58,7 @@ interface FacilityFormProps {
     facility?: Facility | null;
 }
 
-type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider";
+type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider" | "seo";
 
 interface Tab {
     id: TabId;
@@ -110,7 +112,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     // Sync activeTab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider"].includes(tab)) {
+        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider", "seo"].includes(tab)) {
             setActiveTab(tab as TabId);
         }
     }, [searchParams]);
@@ -151,6 +153,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [title, setTitle] = useState("");
     const [slug, setSlug] = useState("");
     const [description, setDescription] = useState("");
+    const [excerpt, setExcerpt] = useState("");
     const [licenseNumber, setLicenseNumber] = useState("");
     const [capacity, setCapacity] = useState<number | "">("");
 
@@ -183,6 +186,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [managingTaxonomy, setManagingTaxonomy] = useState<Taxonomy | null>(null);
     const [taxonomyEntries, setTaxonomyEntries] = useState<TaxonomyEntry[]>([]);
     const [loadingEntries, setLoadingEntries] = useState(false);
+
+    // SEO State
+    const [seo, setSeo] = useState<SeoFields>({ indexable: true });
 
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
@@ -305,6 +311,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         { id: "gallery", label: "Gallery", icon: FileText },
         { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
+        { id: "seo", label: "SEO & Metadata", icon: Search },
     ];
 
     const { showNotification } = useNotification();
@@ -364,6 +371,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 originalTitleRef.current = facility.title;
                 setSlug(facility.slug);
                 setDescription(facility.description || "");
+                setExcerpt(facility.excerpt || "");
                 setLicenseNumber(facility.licenseNumber || "");
                 setCapacity(facility.capacity || "");
                 setStatus(facility.status || 'published');
@@ -395,6 +403,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setTeamImages(facility.teamImages || []);
                 setCuisineImages(facility.cuisineImages || []);
                 setVideos(facility.videos || []);
+
+                // SEO
+                setSeo((facility as any).seo ?? { indexable: true });
             } else {
                 // Reset
                 setTitle("");
@@ -424,6 +435,9 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setFeaturedLabel("");
                 setIsCustomLabelMode(false);
                 setFacilityOfMonthDescription("");
+
+                // Reset SEO
+                setSeo({ indexable: true });
             }
         }
     }, [isOpen, facility]);
@@ -650,6 +664,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 title,
                 slug: finalSlug,
                 description,
+                excerpt,
                 licenseNumber,
                 capacity: capacity === "" ? 0 : capacity,
                 status,
@@ -678,6 +693,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 cuisineImages: finalCuisineImages,
                 videos,
                 roomDetails,
+                seo,
             };
             // For BOTH new and existing facilities: ensure the gallery folder is in the right location.
             // If the city/state changed, ensureLocationFolders will move the existing folder.
@@ -751,6 +767,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setSlug={setSlug}
                         description={description}
                         setDescription={setDescription}
+                        excerpt={excerpt}
+                        setExcerpt={setExcerpt}
                         street={street}
                         setStreet={setStreet}
                         city={city}
@@ -849,6 +867,18 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         roomDefinitions={roomDefinitions}
                         invalidEmailFields={invalidEmailFields}
                         setInvalidEmailFields={setInvalidEmailFields}
+                    />
+                );
+            case "seo":
+                return (
+                    <FacilitySeoTab
+                        seo={seo}
+                        onChange={(field, value) => setSeo(prev => ({ ...prev, [field]: value }))}
+                        setIsDirty={setIsDirty}
+                        defaultTitle={title || undefined}
+                        defaultDescription={description || undefined}
+                        defaultImage={images[0] || undefined}
+                        recordId={facility?.id}
                     />
                 );
             default:

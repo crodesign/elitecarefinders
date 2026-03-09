@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Home, Bed, Image, Users, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Minus, ChevronUp, ChevronDown, Mail, DollarSign, Youtube } from "lucide-react";
+import { Home, Bed, Image, Users, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Minus, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import { FEATURED_LABELS, US_STATES } from "@/lib/constants/formConstants";
 import type {
@@ -13,7 +13,8 @@ import type {
     RoomFieldDefinition,
     RoomFixedFieldOption,
     RoomDetails,
-    VideoEntry
+    VideoEntry,
+    SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
 import {
@@ -36,6 +37,7 @@ import { HomeLocationTab } from "./forms/home/HomeLocationTab";
 import { HomeProviderTab } from "./forms/home/HomeProviderTab";
 import { HomeGalleryTab } from "./forms/home/HomeGalleryTab";
 import { HomeVideosTab } from "./forms/home/HomeVideosTab";
+import { HomeSeoTab } from "./forms/home/HomeSeoTab";
 import { TaxonomySelector } from "./TaxonomySelector";
 import { SimpleSelect } from "./SimpleSelect";
 import { EntryTree } from "./taxonomy/EntryTree";
@@ -53,7 +55,7 @@ interface HomeFormProps {
     home?: HomeType | null;
 }
 
-type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider";
+type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider" | "seo";
 
 interface Tab {
     id: TabId;
@@ -86,7 +88,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     // Sync activeTab with URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider"].includes(tab)) {
+        if (tab && ["information", "rooms", "location", "gallery", "videos", "provider", "seo"].includes(tab)) {
             setActiveTab(tab as TabId);
         }
     }, [searchParams]);
@@ -102,6 +104,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [title, setTitle] = useState("");
     const [slug, setSlug] = useState("");
     const [description, setDescription] = useState("");
+    const [excerpt, setExcerpt] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
 
@@ -210,6 +213,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 title,
                 slug: finalSlug,
                 description,
+                excerpt,
                 phone,
                 email,
                 displayReferenceNumber,
@@ -231,7 +235,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 teamImages: finalTeamImages,
                 cuisineImages: finalCuisineImages,
                 videos,
-                roomDetails
+                roomDetails,
+                seo,
             };
 
             // For BOTH new and existing homes: ensure the gallery folder is in the right location.
@@ -322,6 +327,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [managingTaxonomy, setManagingTaxonomy] = useState<Taxonomy | null>(null);
     const [taxonomyEntries, setTaxonomyEntries] = useState<TaxonomyEntry[]>([]);
     const [loadingEntries, setLoadingEntries] = useState(false);
+
+    // SEO State
+    const [seo, setSeo] = useState<SeoFields>({ indexable: true });
 
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
@@ -446,6 +454,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         { id: "gallery", label: "Gallery", icon: Image },
         { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
+        { id: "seo", label: "SEO & Metadata", icon: Search },
     ];
 
     // Using Notification Context
@@ -524,6 +533,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 originalTitleRef.current = home.title;
                 setSlug(home.slug);
                 setDescription(home.description);
+                setExcerpt(home.excerpt || "");
                 setPhone(home.phone || "");
                 setEmail(home.email || "");
                 setDisplayReferenceNumber(home.displayReferenceNumber ?? true);
@@ -552,6 +562,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setTeamImages(home.teamImages || []);
                 setCuisineImages(home.cuisineImages || []);
                 setVideos(home.videos || []);
+
+                // SEO
+                setSeo(home.seo ?? { indexable: true });
 
                 // Explicitly clear dirty state when we finish populating from a prop
                 // We use a timeout to allow the React state queue to flush so checkIsDirty runs against the NEW state
@@ -585,6 +598,9 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
                 // Reset Room Details
                 setRoomDetails({ customFields: {} });
+
+                // Reset SEO
+                setSeo({ indexable: true });
 
                 // Reset Images
                 setGalleryFolderId(null);
@@ -807,6 +823,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setSlug={setSlug}
                         description={description}
                         setDescription={setDescription}
+                        excerpt={excerpt}
+                        setExcerpt={setExcerpt}
                         isFeatured={isFeatured}
                         setIsFeatured={setIsFeatured}
                         featuredLabel={featuredLabel}
@@ -906,6 +924,18 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setVideos={setVideos}
                         setIsDirty={setIsDirty}
                         title={title}
+                    />
+                );
+            case "seo":
+                return (
+                    <HomeSeoTab
+                        seo={seo}
+                        onChange={(field, value) => setSeo(prev => ({ ...prev, [field]: value }))}
+                        setIsDirty={setIsDirty}
+                        defaultTitle={title || undefined}
+                        defaultDescription={description || undefined}
+                        defaultImage={images[0] || undefined}
+                        recordId={home?.id}
                     />
                 );
             default:

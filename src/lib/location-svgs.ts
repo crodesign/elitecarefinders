@@ -1,0 +1,71 @@
+// Maps location slugs (as they appear in URLs) to state/island outline SVG paths.
+// Try most-specific slug first, fall back toward state level.
+const LOCATION_SVG: Record<string, string> = {
+    // US States
+    alabama: '/images/states/al.svg',
+    alaska: '/images/states/ak.svg',
+    arizona: '/images/states/az.svg',
+    arkansas: '/images/states/ar.svg',
+    california: '/images/states/ca.svg',
+    colorado: '/images/states/co.svg',
+    connecticut: '/images/states/ct.svg',
+    delaware: '/images/states/de.svg',
+    florida: '/images/states/fl.svg',
+    georgia: '/images/states/ga.svg',
+    hawaii: '/images/states/hi.svg',
+    idaho: '/images/states/id.svg',
+    illinois: '/images/states/il.svg',
+    indiana: '/images/states/in.svg',
+    iowa: '/images/states/ia.svg',
+    kansas: '/images/states/ks.svg',
+    kentucky: '/images/states/ky.svg',
+    louisiana: '/images/states/la.svg',
+    maine: '/images/states/me.svg',
+    maryland: '/images/states/md.svg',
+    massachusetts: '/images/states/ma.svg',
+    michigan: '/images/states/mi.svg',
+    minnesota: '/images/states/mn.svg',
+    mississippi: '/images/states/ms.svg',
+    missouri: '/images/states/mo.svg',
+    montana: '/images/states/mt.svg',
+    nebraska: '/images/states/ne.svg',
+    nevada: '/images/states/nv.svg',
+    'new-hampshire': '/images/states/nh.svg',
+    'new-jersey': '/images/states/nj.svg',
+    'new-mexico': '/images/states/nm.svg',
+    'new-york': '/images/states/ny.svg',
+    'north-carolina': '/images/states/nc.svg',
+    'north-dakota': '/images/states/nd.svg',
+    ohio: '/images/states/oh.svg',
+    oklahoma: '/images/states/ok.svg',
+    oregon: '/images/states/or.svg',
+    pennsylvania: '/images/states/pa.svg',
+    'rhode-island': '/images/states/ri.svg',
+    'south-carolina': '/images/states/sc.svg',
+    'south-dakota': '/images/states/sd.svg',
+    tennessee: '/images/states/tn.svg',
+    texas: '/images/states/tx.svg',
+    utah: '/images/states/ut.svg',
+    vermont: '/images/states/vt.svg',
+    virginia: '/images/states/va.svg',
+    washington: '/images/states/wa.svg',
+    'west-virginia': '/images/states/wv.svg',
+    wisconsin: '/images/states/wi.svg',
+    wyoming: '/images/states/wy.svg',
+    'district-of-columbia': '/images/states/dc.svg',
+
+    // Hawaii islands
+    oahu: '/images/states/oahu.svg',
+    maui: '/images/states/maui.svg',
+    kauai: '/images/states/kauai.svg',
+    molokai: '/images/states/molokai.svg',
+    lanai: '/images/states/lanai.svg',
+    'big-island': '/images/states/big-island.svg',
+    niihau: '/images/states/niihau.svg',
+};
+
+// Returns the most-specific SVG path available for the given URL slug array.
+// Tries from last slug (most specific) to first (state), returns first match.
+export function getLocationSvg(slugs: string[]): string | undefined {
+    return [...slugs].reverse().map(s => LOCATION_SVG[s]).find(Boolean);
+}

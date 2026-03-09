@@ -263,6 +263,9 @@ UPDATE homes SET created_at = '2024-09-09T08:51:26Z', updated_at = '2024-09-09T0
 UPDATE homes SET created_at = '2025-02-16T21:25:24Z', updated_at = '2025-02-20T19:29:50Z' WHERE slug = 'aiea-care-home-coming-soon';
 UPDATE homes SET created_at = '2025-02-18T12:18:40Z', updated_at = '2025-02-25T01:39:58Z' WHERE slug = 'hale-kuike';
 UPDATE homes SET created_at = '2025-12-08T23:06:23Z', updated_at = '2026-01-06T00:24:42Z' WHERE slug = 'wphu-1124';
+UPDATE homes SET created_at = '2026-02-27T22:24:31Z', updated_at = '2026-02-28T09:00:36Z' WHERE slug = 'hilo-1002-big-island';
+UPDATE homes SET created_at = '2026-02-28T01:12:35Z', updated_at = '2026-02-28T01:12:35Z' WHERE slug = '__trashed';
+UPDATE homes SET created_at = '2026-02-28T00:32:53Z', updated_at = '2026-03-03T00:14:09Z' WHERE slug = 'hilo-1001-big-island';
 
 -- Facilities
 UPDATE facilities SET created_at = '2021-03-04T22:42:16Z', updated_at = '2023-10-06T22:14:47Z' WHERE slug = 'belmont-village';

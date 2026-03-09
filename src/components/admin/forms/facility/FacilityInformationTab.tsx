@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 import dynamic from "next/dynamic";
-import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft } from "lucide-react";
+import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft, FileText } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type { Facility, Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -40,6 +40,8 @@ interface FacilityInformationTabProps {
     setSlug: Dispatch<SetStateAction<string>>;
     description: string;
     setDescription: Dispatch<SetStateAction<string>>;
+    excerpt: string;
+    setExcerpt: Dispatch<SetStateAction<string>>;
     street: string;
     setStreet: Dispatch<SetStateAction<string>>;
     city: string;
@@ -81,6 +83,7 @@ export function FacilityInformationTab({
     title, setTitle,
     slug, setSlug,
     description, setDescription,
+    excerpt, setExcerpt,
     street, setStreet,
     city, setCity,
     state, setState,
@@ -137,7 +140,7 @@ export function FacilityInformationTab({
                     </div>
 
                     {/* Description */}
-                    <div className="flex flex-col flex-1 gap-2">
+                    <div className="flex flex-col flex-1 min-h-0 gap-2">
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
                             <AlignLeft className="h-4 w-4 text-accent" />
                             Description
@@ -149,8 +152,22 @@ export function FacilityInformationTab({
                                 setIsDirty(true);
                             }}
                             placeholder="Describe the facility, services offered, and amenities..."
-                            minHeight="min-h-[200px]"
-                            className="flex-1 bg-surface-input text-content-primary placeholder-content-muted border-none"
+                            minHeight="min-h-[140px]"
+                            className="flex-1 min-h-0 bg-surface-input text-content-primary placeholder-content-muted border-none"
+                        />
+                    </div>
+
+                    {/* Excerpt */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-1">
+                            <FileText className="h-4 w-4 text-accent" />
+                            Excerpt / Summary
+                        </label>
+                        <textarea
+                            value={excerpt}
+                            onChange={(e) => { setExcerpt(e.target.value); setIsDirty(true); }}
+                            className="form-input text-sm p-3 rounded-lg resize-y min-h-[80px]"
+                            placeholder="Short description for preview cards..."
                         />
                     </div>
                 </div>
