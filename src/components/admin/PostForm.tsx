@@ -841,7 +841,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         {isSubmitting ? "Saving..." : (post ? "Save Changes" : "Create Post")}
                     </button>
                 }
-                contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
+                contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-4 md:p-6" : "flex-1 overflow-y-auto p-4 md:p-6"}
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">

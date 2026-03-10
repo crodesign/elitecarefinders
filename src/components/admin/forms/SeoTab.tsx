@@ -39,12 +39,12 @@ function CharCounter({ value, soft, hard }: { value: string; soft: number; hard?
 
 function FieldRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
     return (
-        <div className="flex items-start justify-between gap-3 p-[5px] bg-surface-hover rounded-lg">
-            <div className="min-w-[140px] pt-1.5">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[5px] bg-surface-hover rounded-lg">
+            <div className="sm:min-w-[140px] sm:pt-1.5">
                 <p className="text-sm font-medium text-content-secondary">{label}</p>
                 {hint && <p className="text-[10px] text-content-muted mt-0.5">{hint}</p>}
             </div>
-            <div className="flex-1">{children}</div>
+            <div className="sm:flex-1">{children}</div>
         </div>
     );
 }
@@ -156,7 +156,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
             {/* AI Generate */}
             {recordId && contentType && (
                 <div className="bg-surface-input rounded-lg p-[5px]">
-                    <div className="flex items-center justify-between gap-4 p-[5px] bg-surface-hover rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-[5px] bg-surface-hover rounded-lg">
                         <div>
                             <p className="text-sm font-medium text-content-primary flex items-center gap-1.5">
                                 <Sparkles className="h-4 w-4 text-accent" />
@@ -166,7 +166,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                 AI suggestions based on your content. Review and adjust before saving.
                             </p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 sm:shrink-0">
                             <button
                                 type="button"
                                 onClick={handleGenerateSeo}

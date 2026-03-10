@@ -45,7 +45,8 @@ export function HomeFieldCategory({
         <div className="bg-surface-input rounded-lg p-[5px]">
             <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 {category.icon && ICON_MAP[category.icon] && (() => { const CatIcon = ICON_MAP[category.icon!]; return <CatIcon className="h-4 w-4 text-accent" />; })()}
-                {category.name}
+                <span className="lg:hidden">{category.name.replace("Management", "Mgmt")}</span>
+                <span className="hidden lg:inline">{category.name}</span>
             </h3>
             <div className="space-y-2">
                 {categoryFields.map(field => (

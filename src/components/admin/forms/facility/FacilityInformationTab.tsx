@@ -113,7 +113,7 @@ export function FacilityInformationTab({
                     <div className="space-y-1.5">
                         <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
-                                Facility Name
+                                <span className="sm:hidden">Name</span><span className="hidden sm:inline">Facility Name</span>
                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
                             </label>
                             <input
@@ -199,7 +199,8 @@ export function FacilityInformationTab({
                                 return (
                                     <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
-                                            {taxonomy.singularName}
+                                            <span className="sm:hidden">{taxonomy.singularName.includes("Type") ? "Type" : taxonomy.singularName}</span>
+                                            <span className="hidden sm:inline">{taxonomy.singularName}</span>
                                             {(taxonomy.singularName === "Facility Type" || taxonomy.singularName === "Location") && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                             )}

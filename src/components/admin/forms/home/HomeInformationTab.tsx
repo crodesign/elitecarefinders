@@ -92,12 +92,13 @@ export function HomeInformationTab({
                 <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1">
                     {/* Home Name & Slug */}
                     <div className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
-                                {displayReferenceNumber ? "Reference No." : "Home Name"}
-                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                            </label>
-                            <div className="flex items-center gap-2 flex-1">
+                        <div className="p-[5px] bg-surface-hover rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                    <span className="sm:hidden">{displayReferenceNumber ? "No." : "Name"}</span>
+                                    <span className="hidden sm:inline">{displayReferenceNumber ? "Reference No." : "Home Name"}</span>
+                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                </label>
                                 <input
                                     type="text"
                                     required
@@ -111,26 +112,27 @@ export function HomeInformationTab({
                                     className="form-input px-3 h-8 flex-1"
                                     placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
                                 />
-                                {/* No./Name toggle */}
-                                <div className="flex items-center bg-surface-input rounded-lg p-0.5">
-                                    <button
-                                        type="button"
-                                        onClick={() => setDisplayReferenceNumber(true)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber
-                                            ? "bg-accent text-white shadow-sm"
-                                            : "text-content-muted hover:text-content-secondary"
-                                            }`}
-                                    >
+                                {/* No./Name toggle — inline on desktop */}
+                                <div className="hidden sm:flex items-center bg-surface-input rounded-lg p-0.5">
+                                    <button type="button" onClick={() => setDisplayReferenceNumber(true)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
                                         No.
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setDisplayReferenceNumber(false)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber
-                                            ? "bg-accent text-white shadow-sm"
-                                            : "text-content-muted hover:text-content-secondary"
-                                            }`}
-                                    >
+                                    <button type="button" onClick={() => setDisplayReferenceNumber(false)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                        Name
+                                    </button>
+                                </div>
+                            </div>
+                            {/* No./Name toggle — below input on mobile */}
+                            <div className="flex justify-end mt-1 sm:hidden">
+                                <div className="flex items-center bg-surface-input rounded-lg p-0.5">
+                                    <button type="button" onClick={() => setDisplayReferenceNumber(true)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                        No.
+                                    </button>
+                                    <button type="button" onClick={() => setDisplayReferenceNumber(false)}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
                                         Name
                                     </button>
                                 </div>
@@ -203,7 +205,8 @@ export function HomeInformationTab({
                                 return (
                                     <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
                                         <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
-                                            {taxonomy.singularName}
+                                            <span className="sm:hidden">{taxonomy.singularName.includes("Type") ? "Type" : taxonomy.singularName}</span>
+                                            <span className="hidden sm:inline">{taxonomy.singularName}</span>
                                             {(taxonomy.singularName === "Home Type" || taxonomy.singularName === "Location") && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                             )}

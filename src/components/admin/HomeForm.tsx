@@ -972,7 +972,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 title={isEditing ? "Edit Home" : "Add Home"}
                 subtitle={isEditing ? (title || "Update home details and settings") : "Add a new residential care home"}
                 fullScreen
-                contentClassName={activeTab === 'gallery' ? 'p-6 overflow-y-auto sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col' : activeTab === 'videos' ? 'flex-1 overflow-hidden p-6 flex flex-col' : activeTab === 'information' ? 'flex-1 overflow-y-auto p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={activeTab === 'gallery' ? 'p-4 md:p-6 overflow-y-auto sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col' : activeTab === 'videos' ? 'flex-1 overflow-hidden p-4 md:p-6 flex flex-col' : activeTab === 'information' ? 'flex-1 overflow-y-auto p-4 md:p-6 flex flex-col' : 'flex-1 overflow-y-auto p-4 md:p-6'}
                 actions={
                     <button
                         type="submit"
