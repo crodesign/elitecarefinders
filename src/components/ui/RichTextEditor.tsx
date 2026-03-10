@@ -485,11 +485,11 @@ export function RichTextEditor({
         <LexicalComposer initialConfig={initialConfig}>
             <div className={`w-full bg-surface-input border border-ui-border rounded-lg overflow-hidden flex flex-col transition-colors focus-within:border-accent focus-within:ring-1 focus-within:ring-accent ${className}`}>
                 <Toolbar />
-                <div className="relative flex-1 flex flex-col">
+                <div className="relative flex-1 flex flex-col min-h-0">
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable
-                                className={`editor-bg max-w-none focus:outline-none text-sm text-content-primary ${minHeight} flex-1 p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-content-primary [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-content-primary [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-content-primary [&_p]:text-content-secondary [&_a]:text-accent hover:[&_a]:underline`}
+                                className={`editor-bg max-w-none focus:outline-none text-sm text-content-primary ${minHeight} flex-1 overflow-y-auto p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-content-primary [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-content-primary [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-content-primary [&_p]:text-content-secondary [&_a]:text-accent hover:[&_a]:underline`}
                             />
                         }
                         placeholder={<PlaceholderComponent text={placeholder} />}

@@ -86,10 +86,10 @@ export function HomeInformationTab({
     setIsDirty
 }: HomeInformationTabProps) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
             {/* Col B — Name + Description (order-2, wide) */}
-            <div className="order-2 lg:col-span-2 flex flex-col">
-                <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1">
+            <div className="order-2 lg:col-span-2 flex flex-col h-full min-h-0">
+                <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1 min-h-0">
                     {/* Home Name & Slug */}
                     <div className="space-y-1.5">
                         <div className="p-[5px] bg-surface-hover rounded-lg">
@@ -182,7 +182,7 @@ export function HomeInformationTab({
             </div>
 
             {/* Col A — Classification + Location + Contact (order-1) */}
-            <div className="order-1 space-y-[10px]">
+            <div className="order-1 space-y-[10px] lg:overflow-y-auto">
                 {/* Classification Section */}
                 {availableTaxonomies.length > 0 && (
                     <div className="bg-surface-input rounded-lg p-[5px]">
