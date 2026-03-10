@@ -7,7 +7,7 @@ function getCredentials(): object {
     return JSON.parse(json);
 }
 
-export function geminiModel(modelName = 'gemini-2.5-flash') {
+export function geminiModel(modelName = 'gemini-2.0-flash-001') {
     const vertex = new VertexAI({
         project: process.env.GCP_PROJECT_ID!,
         location: process.env.GCP_LOCATION ?? 'us-central1',
