@@ -273,14 +273,14 @@ export function FacilityInformationTab({
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all flex-1">
+                            <div className="flex-1 flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
                                 <SimpleSelect
                                     value={state}
                                     onChange={(val) => { setState(val); setIsDirty(true); }}
                                     options={US_STATES.map(s => s.name)}
                                     placeholder="State..."
-                                    className="w-32 h-8 flex items-center justify-between px-2 text-sm text-left"
+                                    className="w-32 h-8 flex items-center justify-between text-sm text-left"
                                 />
                             </div>
                             <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">

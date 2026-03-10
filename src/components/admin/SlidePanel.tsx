@@ -146,7 +146,7 @@ export function SlidePanel({
                 `}</style>
                     {/* Header */}
                     <div
-                        className={`flex-none relative z-20 w-full shrink-0 px-6 pt-6 ${headerChildren ? 'pb-0' : 'pb-6 border-b-[6px]'}`}
+                        className={`flex-none relative z-20 w-full shrink-0 px-4 pt-4 sm:px-6 sm:pt-6 ${headerChildren ? 'pb-0' : 'pb-6 border-b-[6px]'}`}
                         style={!headerChildren ? { borderColor: 'var(--surface-tab-border)' } : undefined}
                     >
                         <div className="flex items-start justify-between">

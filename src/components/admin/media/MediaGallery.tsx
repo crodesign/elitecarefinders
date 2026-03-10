@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, RefreshCw, X, LayoutGrid } from "lucide-react";
+import { Upload, X, LayoutGrid, Images } from "lucide-react";
+import { StockImagePicker } from "@/components/admin/media/StockImagePicker";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { MediaItem, MediaFolder } from "@/types";
 import { getMediaItems, getMediaItemsByUrls, deleteMediaItem, bulkUploadMedia } from "@/lib/services/mediaService";
@@ -48,9 +49,10 @@ interface MediaGalleryProps {
     featuredImageUrl?: string;
     stepImageMap?: Record<string, number>;
     entityName?: string;
+    showStockImages?: boolean;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap, entityName }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap, entityName, showStockImages = false }: MediaGalleryProps) {
     const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team" | "cuisine">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +61,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const [isUploading, setIsUploading] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
+    const [showStockPicker, setShowStockPicker] = useState(false);
     const { showNotification } = useNotification();
     const galleriesRef = useRef(galleries);
     useEffect(() => { galleriesRef.current = galleries; }, [galleries]);
@@ -245,6 +248,15 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
     return (
         <div className={`flex flex-col gap-4 ${className}`}>
+            {showStockImages && (
+                <StockImagePicker
+                    isOpen={showStockPicker}
+                    onClose={() => setShowStockPicker(false)}
+                    folderId={folderId}
+                    namePrefix={entityName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || undefined}
+                    onImportComplete={loadMedia}
+                />
+            )}
             {/* Upload Modal */}
             {showUploadModal && (
                 <div
@@ -388,13 +400,15 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                     )}
                 </h3>
                 <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={loadMedia}
-                        className="p-2 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-lg transition-colors shrink-0"
-                    >
-                        <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-                    </button>
+                    {showStockImages && (
+                        <button
+                            type="button"
+                            onClick={() => setShowStockPicker(true)}
+                            className="p-2 bg-surface-hover text-content-secondary hover:bg-accent hover:text-white rounded-lg transition-colors shrink-0"
+                        >
+                            <Images className="h-4 w-4" />
+                        </button>
+                    )}
                     {mediaItems.length > 0 && (
                         <button
                             type="button"

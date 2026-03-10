@@ -431,6 +431,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             entityName={title || undefined}
                             featuredImageUrl={postType === 'recipes' && postImages.length > 0 ? postImages[0] : undefined}
                             stepImageMap={postType === 'recipes' ? stepImageMap : undefined}
+                            showStockImages={postType !== 'recipes'}
                         />
                     ) : (
                         <div className="p-8 text-center border border-dashed border-ui-border rounded-xl">
@@ -843,7 +844,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 }
                 contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-4 md:p-6" : "flex-1 overflow-y-auto p-4 md:p-6"}
                 headerChildren={
-                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
+                    <div className="flex items-center justify-between px-4 sm:pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                         {tabs.map(tab => {
                             const Icon = tab.icon;

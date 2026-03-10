@@ -984,7 +984,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     </button>
                 }
                 headerChildren={
-                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
+                    <div className="flex items-center justify-between px-4 sm:pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;

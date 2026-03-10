@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search, Image } from "lucide-react";
+import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, MapPinned, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search, Image } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type {
     Facility,
@@ -313,7 +313,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const tabs: Tab[] = [
         { id: "information", label: "Facility Information", icon: Building2 },
         ...(hasRoomFields ? [{ id: "rooms" as const, label: "Room Details", icon: Bed }] : []),
-        ...(hasLocationFields ? [{ id: "location" as const, label: "Location Details", icon: Map }] : []),
+        ...(hasLocationFields ? [{ id: "location" as const, label: "Location Details", icon: MapPinned }] : []),
         { id: "gallery", label: "Gallery", icon: Image },
         { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
@@ -927,7 +927,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     </button>
                 }
                 headerChildren={
-                    <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
+                    <div className="flex items-center justify-between px-4 sm:pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
