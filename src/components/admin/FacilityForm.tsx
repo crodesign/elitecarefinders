@@ -16,6 +16,7 @@ import type {
     SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
+import { updateFacilitySeo } from "@/lib/services/facilityService";
 import {
     getTaxonomyEntries,
     createTaxonomyEntry,
@@ -189,6 +190,11 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
     // SEO State
     const [seo, setSeo] = useState<SeoFields>({ indexable: true });
+
+    async function handleSaveSeo() {
+        if (!facility?.id) return;
+        await updateFacilitySeo(facility.id, seo);
+    }
 
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
@@ -693,7 +699,6 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 cuisineImages: finalCuisineImages,
                 videos,
                 roomDetails,
-                seo,
             };
             // For BOTH new and existing facilities: ensure the gallery folder is in the right location.
             // If the city/state changed, ensureLocationFolders will move the existing folder.
@@ -879,6 +884,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         defaultDescription={description || undefined}
                         defaultImage={images[0] || undefined}
                         recordId={facility?.id}
+                        onSaveSeo={facility?.id ? handleSaveSeo : undefined}
                     />
                 );
             default:

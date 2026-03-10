@@ -11,9 +11,10 @@ interface HomeSeoTabProps {
     defaultDescription?: string;
     defaultImage?: string;
     recordId?: string;
+    onSaveSeo?: () => Promise<void>;
 }
 
-export function HomeSeoTab({ seo, onChange, setIsDirty, defaultTitle, defaultDescription, defaultImage, recordId }: HomeSeoTabProps) {
+export function HomeSeoTab({ seo, onChange, setIsDirty, defaultTitle, defaultDescription, defaultImage, recordId, onSaveSeo }: HomeSeoTabProps) {
     return (
         <SeoTab
             seo={seo}
@@ -26,6 +27,7 @@ export function HomeSeoTab({ seo, onChange, setIsDirty, defaultTitle, defaultDes
             }}
             recordId={recordId}
             contentType="home"
+            onSaveSeo={onSaveSeo}
         />
     );
 }

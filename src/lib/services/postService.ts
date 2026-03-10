@@ -126,8 +126,6 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
     if (updates.postType !== undefined) dbUpdates.post_type = updates.postType;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.metadata !== undefined) dbUpdates.metadata = updates.metadata;
-    if (updates.seo !== undefined) Object.assign(dbUpdates, mapSeoToDb(updates.seo));
-
     if (updates.status === 'published' && updates.publishedAt === undefined) {
         dbUpdates.published_at = new Date().toISOString();
     } else if (updates.publishedAt !== undefined) {
@@ -147,6 +145,14 @@ export async function updatePost(id: string, updates: Partial<Post>): Promise<Po
     }
 
     return transformPost(data);
+}
+
+export async function updatePostSeo(id: string, seo: SeoFields): Promise<void> {
+    const { error } = await supabase
+        .from("posts")
+        .update(mapSeoToDb(seo))
+        .eq("id", id);
+    if (error) throw new Error(error.message);
 }
 
 export async function deletePost(id: string, slug?: string): Promise<void> {

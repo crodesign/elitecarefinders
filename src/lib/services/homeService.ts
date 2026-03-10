@@ -151,8 +151,6 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.cuisineImages !== undefined) dbUpdates.cuisine_images = updates.cuisineImages;
     if (updates.videos !== undefined) dbUpdates.videos = updates.videos;
     if (updates.roomDetails !== undefined) dbUpdates.room_details = updates.roomDetails;
-    if (updates.seo !== undefined) Object.assign(dbUpdates, mapSeoToDb(updates.seo));
-
     const { data, error } = await supabase
         .from("homes")
         .update(dbUpdates)
@@ -166,6 +164,14 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     }
 
     return transformHome(data);
+}
+
+export async function updateHomeSeo(id: string, seo: SeoFields): Promise<void> {
+    const { error } = await supabase
+        .from("homes")
+        .update(mapSeoToDb(seo))
+        .eq("id", id);
+    if (error) throw new Error(error.message);
 }
 
 export async function deleteHome(id: string, slug?: string): Promise<void> {

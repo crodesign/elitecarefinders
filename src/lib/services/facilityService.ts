@@ -149,7 +149,6 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if ((updates as any).featuredLabel !== undefined) dbUpdates.featured_label = (updates as any).featuredLabel;
     if ((updates as any).facilityOfMonthDescription !== undefined) dbUpdates.facility_of_month_description = (updates as any).facilityOfMonthDescription;
     if (updates.excerpt !== undefined) dbUpdates.excerpt = updates.excerpt;
-    if (updates.seo !== undefined) Object.assign(dbUpdates, mapSeoToDb(updates.seo));
 
     const { data, error } = await supabase
         .from("facilities")
@@ -164,6 +163,14 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     }
 
     return transformFacility(data);
+}
+
+export async function updateFacilitySeo(id: string, seo: SeoFields): Promise<void> {
+    const { error } = await supabase
+        .from("facilities")
+        .update(mapSeoToDb(seo))
+        .eq("id", id);
+    if (error) throw new Error(error.message);
 }
 
 export async function deleteFacility(id: string, slug?: string): Promise<void> {

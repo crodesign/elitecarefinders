@@ -17,6 +17,7 @@ import type {
     SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
+import { updateHomeSeo } from "@/lib/services/homeService";
 import {
     getTaxonomyEntries,
     createTaxonomyEntry,
@@ -236,7 +237,6 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 cuisineImages: finalCuisineImages,
                 videos,
                 roomDetails,
-                seo,
             };
 
             // For BOTH new and existing homes: ensure the gallery folder is in the right location.
@@ -330,6 +330,11 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
 
     // SEO State
     const [seo, setSeo] = useState<SeoFields>({ indexable: true });
+
+    async function handleSaveSeo() {
+        if (!home?.id) return;
+        await updateHomeSeo(home.id, seo);
+    }
 
     // Media Gallery State
     const [galleryFolderId, setGalleryFolderId] = useState<string | null>(null);
@@ -936,6 +941,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         defaultDescription={description || undefined}
                         defaultImage={images[0] || undefined}
                         recordId={home?.id}
+                        onSaveSeo={home?.id ? handleSaveSeo : undefined}
                     />
                 );
             default:

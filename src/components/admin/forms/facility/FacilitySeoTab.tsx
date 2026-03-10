@@ -11,9 +11,10 @@ interface FacilitySeoTabProps {
     defaultDescription?: string;
     defaultImage?: string;
     recordId?: string;
+    onSaveSeo?: () => Promise<void>;
 }
 
-export function FacilitySeoTab({ seo, onChange, setIsDirty, defaultTitle, defaultDescription, defaultImage, recordId }: FacilitySeoTabProps) {
+export function FacilitySeoTab({ seo, onChange, setIsDirty, defaultTitle, defaultDescription, defaultImage, recordId, onSaveSeo }: FacilitySeoTabProps) {
     return (
         <SeoTab
             seo={seo}
@@ -26,6 +27,7 @@ export function FacilitySeoTab({ seo, onChange, setIsDirty, defaultTitle, defaul
             }}
             recordId={recordId}
             contentType="facility"
+            onSaveSeo={onSaveSeo}
         />
     );
 }

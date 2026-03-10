@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Globe, Image, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle } from "lucide-react";
+import { Search, Globe, Image, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle, Save, CheckCircle } from "lucide-react";
 import type { SeoFields } from "@/types";
 
 export interface SeoTabProps {
@@ -17,6 +17,8 @@ export interface SeoTabProps {
     /** When set, shows the "Generate SEO with AI" button */
     recordId?: string;
     contentType?: 'home' | 'facility' | 'post';
+    /** When set, shows a dedicated Save SEO button */
+    onSaveSeo?: () => Promise<void>;
 }
 
 function CharCounter({ value, soft, hard }: { value: string; soft: number; hard?: number }) {
@@ -47,13 +49,16 @@ function FieldRow({ label, hint, children }: { label: string; hint?: string; chi
     );
 }
 
-export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, contentType }: SeoTabProps) {
+export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, contentType, onSaveSeo }: SeoTabProps) {
     const [schemaExpanded, setSchemaExpanded] = useState(false);
     const [schemaText, setSchemaText] = useState("");
     const [schemaError, setSchemaError] = useState<string | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
     const [aiFaqs, setAiFaqs] = useState<{ question: string; answer: string }[]>([]);
+    const [seoDirty, setSeoDirty] = useState(false);
+    const [seoSaving, setSeoSaving] = useState(false);
+    const [seoSaved, setSeoSaved] = useState(false);
 
     // Sync schemaText with the seo.schemaJson prop (e.g. on form open)
     useEffect(() => {
@@ -66,7 +71,21 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
 
     function set<K extends keyof SeoFields>(field: K, value: SeoFields[K]) {
         onChange(field, value);
-        setIsDirty(true);
+        setSeoDirty(true);
+        setSeoSaved(false);
+    }
+
+    async function handleSaveSeo() {
+        if (!onSaveSeo) return;
+        setSeoSaving(true);
+        try {
+            await onSaveSeo();
+            setSeoDirty(false);
+            setSeoSaved(true);
+            setTimeout(() => setSeoSaved(false), 3000);
+        } finally {
+            setSeoSaving(false);
+        }
     }
 
     function handleSchemaChange(raw: string) {
@@ -74,13 +93,15 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
         setSchemaError(null);
         if (!raw.trim()) {
             onChange("schemaJson", null);
-            setIsDirty(true);
+            setSeoDirty(true);
+            setSeoSaved(false);
             return;
         }
         try {
             const parsed = JSON.parse(raw);
             onChange("schemaJson", parsed);
-            setIsDirty(true);
+            setSeoDirty(true);
+            setSeoSaved(false);
         } catch {
             setSchemaError("Invalid JSON — changes will not be saved until fixed.");
         }
@@ -109,10 +130,10 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || data.error || 'AI generation failed');
-            if (data.metaTitle) { onChange('metaTitle', data.metaTitle); setIsDirty(true); }
-            if (data.metaDescription) { onChange('metaDescription', data.metaDescription); setIsDirty(true); }
-            if (data.ogTitle) { onChange('ogTitle', data.ogTitle); setIsDirty(true); }
-            if (data.ogDescription) { onChange('ogDescription', data.ogDescription); setIsDirty(true); }
+            if (data.metaTitle) { onChange('metaTitle', data.metaTitle); setSeoDirty(true); setSeoSaved(false); }
+            if (data.metaDescription) { onChange('metaDescription', data.metaDescription); setSeoDirty(true); setSeoSaved(false); }
+            if (data.ogTitle) { onChange('ogTitle', data.ogTitle); setSeoDirty(true); setSeoSaved(false); }
+            if (data.ogDescription) { onChange('ogDescription', data.ogDescription); setSeoDirty(true); setSeoSaved(false); }
             if (Array.isArray(data.faqs) && data.faqs.length > 0) setAiFaqs(data.faqs);
         } catch (err) {
             setAiError(err instanceof Error ? err.message : 'AI generation failed. Please try again.');
@@ -374,10 +395,31 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                 </div>
             )}
 
-            {/* Helper note */}
-            <p className="text-[10px] text-content-muted px-1 pb-2">
-                Fields left blank will use auto-generated values based on the main content. Changes take effect after saving.
-            </p>
+            {/* Save SEO button */}
+            {onSaveSeo && (
+                <div className="flex items-center justify-between gap-3 pt-1 pb-2 px-1">
+                    <p className="text-[10px] text-content-muted">
+                        Fields left blank will use auto-generated values. SEO saves independently — does not update "last modified" date.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={handleSaveSeo}
+                        disabled={seoSaving || (!seoDirty && !seoSaved)}
+                        className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-input text-content-primary hover:bg-surface-hover"
+                    >
+                        {seoSaved ? (
+                            <><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> Saved</>
+                        ) : (
+                            <><Save className="h-3.5 w-3.5" /> {seoSaving ? 'Saving…' : 'Save SEO'}</>
+                        )}
+                    </button>
+                </div>
+            )}
+            {!onSaveSeo && (
+                <p className="text-[10px] text-content-muted px-1 pb-2">
+                    Fields left blank will use auto-generated values based on the main content. Changes take effect after saving.
+                </p>
+            )}
         </div>
     );
 }

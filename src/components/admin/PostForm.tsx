@@ -10,6 +10,7 @@ import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction,
 import { SeoTab } from "./forms/SeoTab";
 import { MediaGallery } from "@/components/admin/media/MediaGallery";
 import { getFolders, createFolder, getMediaItems } from "@/lib/services/mediaService";
+import { updatePostSeo } from "@/lib/services/postService";
 import { ensurePostFolder } from "@/lib/services/mediaFolderService";
 import { supabase } from "@/lib/supabase";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
@@ -62,6 +63,11 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
     // SEO state
     const [seo, setSeo] = useState<SeoFields>({ indexable: true });
+
+    async function handleSaveSeo() {
+        if (!post?.id) return;
+        await updatePostSeo(post.id, seo);
+    }
 
     // Tabs
     type TabId = "information" | "images" | "seo";
@@ -372,7 +378,6 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 images: postImages,
                 featuredImageUrl: postImages.length > 0 ? postImages[0] : null,
                 metadata,
-                seo,
             };
 
             await onSave(payload);
@@ -449,6 +454,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                     }}
                     recordId={post?.id}
                     contentType="post"
+                    onSaveSeo={post?.id ? handleSaveSeo : undefined}
                 />
             );
         }
