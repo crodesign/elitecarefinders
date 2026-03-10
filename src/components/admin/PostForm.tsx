@@ -844,7 +844,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                 contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-6" : "flex-1 overflow-y-auto p-6"}
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
+                        <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -872,7 +872,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         </span>
                                     )}
                                     <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
-                                    {tab.label}
+                                    <span className="hidden sm:inline">{tab.label}</span>
                                     {isActive && (
                                         <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
                                             <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">

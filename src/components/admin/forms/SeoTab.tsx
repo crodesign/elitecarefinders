@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Globe, Image, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle, Save, CheckCircle } from "lucide-react";
+import { Search, Globe, Image, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle } from "lucide-react";
 import type { SeoFields } from "@/types";
 
 export interface SeoTabProps {
@@ -166,15 +166,27 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                 AI suggestions based on your content. Review and adjust before saving.
                             </p>
                         </div>
-                        <button
-                            type="button"
-                            onClick={handleGenerateSeo}
-                            disabled={aiLoading}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shrink-0"
-                        >
-                            <Sparkles className="h-3.5 w-3.5" />
-                            {aiLoading ? 'Generating…' : 'Generate'}
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                type="button"
+                                onClick={handleGenerateSeo}
+                                disabled={aiLoading}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                            >
+                                <Sparkles className="h-3.5 w-3.5" />
+                                {aiLoading ? 'Generating…' : 'Generate'}
+                            </button>
+                            {onSaveSeo && (
+                                <button
+                                    type="button"
+                                    onClick={handleSaveSeo}
+                                    disabled={seoSaving || (!seoDirty && !seoSaved)}
+                                    className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-input text-content-primary hover:bg-surface-hover"
+                                >
+                                    {seoSaved ? 'Saved' : seoSaving ? 'Saving…' : 'Save SEO'}
+                                </button>
+                            )}
+                        </div>
                     </div>
                     {aiError && (
                         <div className="flex items-center gap-1.5 text-red-500 text-xs px-2 pt-2">
@@ -186,7 +198,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
             )}
 
             {/* Two-column: Search Appearance + Social/Open Graph */}
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
                 {/* Search Appearance */}
                 <div className="bg-surface-input rounded-lg p-[5px] space-y-1.5">
@@ -199,16 +211,18 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         label="Meta Title"
                         hint="~60 chars recommended"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="space-y-1">
                             <input
                                 type="text"
                                 value={metaTitleVal}
                                 onChange={e => set("metaTitle", e.target.value || null)}
                                 placeholder={defaults.title || "Auto-generated from title"}
                                 maxLength={120}
-                                className="form-input px-3 h-8 flex-1 text-sm"
+                                className="form-input px-3 h-8 w-full text-sm"
                             />
-                            <CharCounter value={metaTitleVal} soft={60} hard={120} />
+                            <div className="flex justify-end">
+                                <CharCounter value={metaTitleVal} soft={60} hard={120} />
+                            </div>
                         </div>
                     </FieldRow>
 
@@ -270,16 +284,18 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                     </p>
 
                     <FieldRow label="OG Title" hint="Leave blank to use Meta Title">
-                        <div className="flex items-center gap-2">
+                        <div className="space-y-1">
                             <input
                                 type="text"
                                 value={ogTitleVal}
                                 onChange={e => set("ogTitle", e.target.value || null)}
                                 placeholder={metaTitleVal || defaults.title || "Inherits from Meta Title"}
                                 maxLength={120}
-                                className="form-input px-3 h-8 flex-1 text-sm"
+                                className="form-input px-3 h-8 w-full text-sm"
                             />
-                            <CharCounter value={ogTitleVal} soft={60} hard={120} />
+                            <div className="flex justify-end">
+                                <CharCounter value={ogTitleVal} soft={60} hard={120} />
+                            </div>
                         </div>
                     </FieldRow>
 
@@ -395,31 +411,6 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                 </div>
             )}
 
-            {/* Save SEO button */}
-            {onSaveSeo && (
-                <div className="flex items-center justify-between gap-3 pt-1 pb-2 px-1">
-                    <p className="text-[10px] text-content-muted">
-                        Fields left blank will use auto-generated values. SEO saves independently — does not update "last modified" date.
-                    </p>
-                    <button
-                        type="button"
-                        onClick={handleSaveSeo}
-                        disabled={seoSaving || (!seoDirty && !seoSaved)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-input text-content-primary hover:bg-surface-hover"
-                    >
-                        {seoSaved ? (
-                            <><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> Saved</>
-                        ) : (
-                            <><Save className="h-3.5 w-3.5" /> {seoSaving ? 'Saving…' : 'Save SEO'}</>
-                        )}
-                    </button>
-                </div>
-            )}
-            {!onSaveSeo && (
-                <p className="text-[10px] text-content-muted px-1 pb-2">
-                    Fields left blank will use auto-generated values based on the main content. Changes take effect after saving.
-                </p>
-            )}
         </div>
     );
 }

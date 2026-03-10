@@ -29,7 +29,7 @@ export function FacilityGalleryTab({
     isDirty,
 }: FacilityGalleryTabProps) {
     return (
-        <div className="flex flex-col flex-1 min-h-0">
+        <div className="sm:flex sm:flex-col sm:flex-1 sm:min-h-0">
             {!galleryFolderId || !title ? (
                 <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
                     <p className="text-content-secondary mb-2">Location Classification and Name Required</p>
@@ -39,13 +39,14 @@ export function FacilityGalleryTab({
                 <MediaGallery
                     folderId={galleryFolderId}
                     title={`${title} Image Library`}
-                    className="flex-1 min-h-0"
+                    className="sm:flex-1 sm:min-h-0"
                     isDirty={isDirty}
                     galleries={[
                         {
                             id: "main",
                             title: "Gallery Images",
                             shortLabel: "Image Gallery",
+                            mobileLabel: "Gallery",
                             urls: images,
                             onChange: (urls) => {
                                 setImages(urls);
@@ -56,6 +57,7 @@ export function FacilityGalleryTab({
                             id: "team",
                             title: "Team Images",
                             shortLabel: "Team Photos",
+                            mobileLabel: "Team",
                             urls: teamImages,
                             onChange: (urls) => {
                                 setTeamImages?.(urls);
@@ -66,6 +68,7 @@ export function FacilityGalleryTab({
                             id: "cuisine",
                             title: "Cuisine Images",
                             shortLabel: "Cuisine Images",
+                            mobileLabel: "Cuisine",
                             urls: cuisineImages,
                             onChange: (urls) => {
                                 setCuisineImages?.(urls);

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search } from "lucide-react";
+import { Building2, Bed, MapPin, Phone, FileText, Hash, Globe, Tags, Check, Ban, Plus, X, Layers, Save, Circle, Users, Map, ChevronUp, ChevronDown, Mail, DollarSign, Youtube, Search, Image } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type {
     Facility,
@@ -314,7 +314,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         { id: "information", label: "Facility Information", icon: Building2 },
         ...(hasRoomFields ? [{ id: "rooms" as const, label: "Room Details", icon: Bed }] : []),
         ...(hasLocationFields ? [{ id: "location" as const, label: "Location Details", icon: Map }] : []),
-        { id: "gallery", label: "Gallery", icon: FileText },
+        { id: "gallery", label: "Gallery", icon: Image },
         { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
         { id: "seo", label: "SEO & Metadata", icon: Search },
@@ -915,7 +915,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 title={isEditing ? "Editing Facility" : "Add New Facility"}
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
-                contentClassName={(activeTab === 'gallery' || activeTab === 'videos') ? 'flex-1 overflow-hidden p-6 flex flex-col' : (activeTab === 'information') ? 'flex-1 overflow-y-auto p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
+                contentClassName={activeTab === 'gallery' ? 'p-6 overflow-y-auto sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col' : activeTab === 'videos' ? 'flex-1 overflow-hidden p-6 flex flex-col' : activeTab === 'information' ? 'flex-1 overflow-y-auto p-6 flex flex-col' : 'flex-1 overflow-y-auto p-6'}
                 actions={
                     <button
                         type="submit"
@@ -928,7 +928,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 }
                 headerChildren={
                     <div className="flex items-center justify-between pl-4 pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex items-start overflow-visible gap-1 pt-2 px-2">
+                        <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -969,7 +969,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                             </span>
                                         )}
                                         <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
-                                        {tab.label}
+                                        <span className="hidden sm:inline">{tab.label}</span>
                                         {/* Right concave corner notch (active only) */}
                                         {isActive && (
                                             <span className="absolute bottom-0 right-[-8px] w-2 h-2 pointer-events-none">
@@ -1011,7 +1011,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 {/* Tab Content */}
                 <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0" onChange={handleFormChange}>
-                    <div className={(activeTab === 'gallery' || activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
+                    <div className={activeTab === 'gallery' ? 'sm:flex sm:flex-col sm:flex-1 sm:min-h-0' : (activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
                         {renderTabContent()}
                     </div>
                 </form>

@@ -157,7 +157,7 @@ export function VideosTabContent({ videos, setVideos, setIsDirty, entityTitle }:
             </div>
 
             {/* Video Gallery */}
-            <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 min-h-0 overflow-y-auto">
                 {videos.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center border border-dashed border-ui-border rounded-xl py-16">
                         <Youtube className="h-10 w-10 text-content-muted opacity-30 mb-3" />
@@ -174,7 +174,7 @@ export function VideosTabContent({ videos, setVideos, setIsDirty, entityTitle }:
                             items={videos.map(v => v.url)}
                             strategy={rectSortingStrategy}
                         >
-                            <div className="flex flex-wrap gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
                                 {videos.map((video, index) => (
                                     <VideoTile
                                         key={video.url}
@@ -203,6 +203,7 @@ interface VideoTileProps {
 function VideoTile({ id, video, onDelete, onCaptionChange }: VideoTileProps) {
     const [caption, setCaption] = useState(video.caption || "");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const captionChanged = caption !== (video.caption || "");
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -245,10 +246,10 @@ function VideoTile({ id, video, onDelete, onCaptionChange }: VideoTileProps) {
             style={style}
             {...attributes}
             {...listeners}
-            className="flex flex-col rounded-xl overflow-hidden group shrink-0 cursor-grab active:cursor-grabbing touch-none"
+            className="relative rounded-xl overflow-hidden group cursor-grab active:cursor-grabbing touch-none"
         >
             {/* Thumbnail */}
-            <div className={`relative h-36 ${isShorts ? "aspect-[9/16]" : "aspect-video"} bg-surface-input rounded-t-xl overflow-hidden`}>
+            <div className={`relative w-full ${isShorts ? "aspect-[9/16]" : "aspect-video"} bg-surface-input rounded-xl overflow-hidden`}>
                 {thumbnail ? (
                     <img
                         src={thumbnail}
@@ -290,18 +291,30 @@ function VideoTile({ id, video, onDelete, onCaptionChange }: VideoTileProps) {
                 </button>
             </div>
 
-            {/* Caption */}
-            <div className="p-1.5 bg-[var(--media-caption-bg)] text-[var(--text-primary)]">
-                <input
-                    type="text"
-                    value={caption}
-                    onChange={(e) => setCaption(e.target.value)}
-                    onBlur={handleCaptionBlur}
-                    onKeyDown={handleCaptionKeyDown}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    placeholder="Add caption..."
-                    className="w-full text-sm text-content-primary placeholder-content-muted dark:placeholder-content-secondary focus:outline-none focus:ring-1 focus:ring-accent rounded-md px-2 py-1.5 transition-colors bg-surface-input cursor-text"
-                />
+            {/* Caption overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-2">
+                <div className={`relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md`}>
+                    <input
+                        type="text"
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        onBlur={handleCaptionBlur}
+                        onKeyDown={handleCaptionKeyDown}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        placeholder="Add caption..."
+                        className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
+                    />
+                    {captionChanged && (
+                        <button
+                            type="button"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => { e.stopPropagation(); onCaptionChange(caption); }}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors font-medium"
+                        >
+                            Save
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Video modal */}

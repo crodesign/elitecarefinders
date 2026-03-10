@@ -352,7 +352,7 @@ export function MediaTile({
                 </div>
                 {/* Caption overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <div className="relative rounded-lg ring-1 ring-black/10 dark:ring-white/10 focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                    <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
                         <input
                             type="text"
                             value={caption}

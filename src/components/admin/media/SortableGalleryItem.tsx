@@ -39,7 +39,7 @@ export function SortableGalleryItem({ url, onRemove, onError, isFeatured = false
             style={style}
             {...attributes}
             {...listeners}
-            className="relative group flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-ui-border bg-surface-input cursor-grab active:cursor-grabbing touch-none"
+            className="relative group w-full aspect-square sm:w-24 sm:h-24 sm:aspect-auto flex-shrink-0 rounded-lg overflow-hidden border border-ui-border bg-surface-input cursor-grab active:cursor-grabbing touch-none"
         >
             <img
                 src={toThumbUrl(url)}

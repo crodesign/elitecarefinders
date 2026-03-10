@@ -23,13 +23,14 @@ import {
     arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
-    horizontalListSortingStrategy,
+    rectSortingStrategy,
 } from "@dnd-kit/sortable";
 
 export interface GalleryConfig {
     id: "main" | "team" | "cuisine";
     title: string;
     shortLabel: string;
+    mobileLabel?: string;
     urls: string[];
     emptyText?: string;
     onChange: (urls: string[]) => void;
@@ -297,7 +298,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
             {/* Selected Images Container */}
             {galleries && galleries.length > 0 && (
                 <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 overflow-x-auto">
-                    <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-4">
+                    <div className="flex items-center justify-between mb-4 gap-4">
                         {galleries.length > 1 ? (
                             <div className="flex bg-surface-input p-1 rounded-lg">
                                 {galleries.map(g => (
@@ -310,7 +311,8 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                             : "text-content-muted hover:text-content-secondary"
                                             }`}
                                     >
-                                        <span>{g.shortLabel}</span>
+                                        <span className="sm:hidden">{g.mobileLabel ?? g.shortLabel}</span>
+                                        <span className="hidden sm:inline">{g.shortLabel}</span>
                                         {g.urls.length > 0 && (
                                             <span
                                                 className={`flex items-center justify-center w-[18px] h-[18px] rounded-[4px] text-[10px] font-bold tracking-tight ${activeGalleryId === g.id
@@ -331,18 +333,16 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                 </h3>
                             </div>
                         )}
-                        <div className="flex items-center">
-                            {activeUrls.length > 0 && activeGallery && (
-                                <button
-                                    type="button"
-                                    onClick={() => activeGallery.onChange([])}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all bg-[var(--media-gallery-bg)] ${activeUrls.length > 0 ? "text-content-secondary hover:bg-accent hover:text-white" : "opacity-50 cursor-not-allowed text-content-muted"}`}
-                                >
-                                    <X className="w-3.5 h-3.5" />
-                                    Clear
-                                </button>
-                            )}
-                        </div>
+                        {activeUrls.length > 0 && activeGallery && (
+                            <button
+                                type="button"
+                                onClick={() => activeGallery.onChange([])}
+                                title="Clear gallery"
+                                className="p-1.5 rounded-md text-content-muted hover:bg-accent hover:text-white transition-all"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
                     </div>
 
                     {activeUrls.length > 0 ? (
@@ -351,10 +351,10 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                             collisionDetection={closestCenter}
                             onDragEnd={handleDragEnd}
                         >
-                            <div className="flex gap-3 pb-2 pt-1 min-h-[104px] items-center">
+                            <div className="grid grid-cols-4 gap-2 pb-2 pt-1 sm:flex sm:flex-wrap sm:gap-3">
                                 <SortableContext
                                     items={activeUrls}
-                                    strategy={horizontalListSortingStrategy}
+                                    strategy={rectSortingStrategy}
                                 >
                                     {activeUrls.map((url, index) => (
                                         <SortableGalleryItem
@@ -369,7 +369,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                             </div>
                         </DndContext>
                     ) : (
-                        <div className="h-[104px] flex items-center justify-center border-2 border-dashed border-ui-border rounded-lg bg-surface-primary/30 text-center px-4">
+                        <div className="min-h-[80px] py-4 flex items-center justify-center border-2 border-dashed border-ui-border rounded-lg bg-surface-primary/30 text-center px-4">
                             <p className="text-sm text-content-muted">
                                 {activeGallery?.emptyText || `Select an image below to add it to the ${activeGallery?.shortLabel} Gallery.`}
                             </p>
