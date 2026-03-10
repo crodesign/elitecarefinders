@@ -23,6 +23,7 @@ import {
     Bed,
     Plus,
     Palette,
+    Search,
 } from "lucide-react";
 import { Logo, LogoIcon } from "@/components/icons/Logo";
 import { getTaxonomies, updateTaxonomy } from "@/lib/services/taxonomyService";
@@ -392,6 +393,32 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             >
                                 <ImageIcon className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/site-images") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                                 Site Images
+                            </Link>
+                        )}
+                        {isSuperAdmin && (
+                            <Link
+                                href="/admin/settings/pages"
+                                onClick={(e) => handleNavClick(e, "/admin/settings/pages")}
+                                className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/pages")
+                                    ? "bg-surface-hover text-content-primary"
+                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    }`}
+                            >
+                                <FileText className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/pages") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                                Pages
+                            </Link>
+                        )}
+                        {isSuperAdmin && (
+                            <Link
+                                href="/admin/settings/seo-templates"
+                                onClick={(e) => handleNavClick(e, "/admin/settings/seo-templates")}
+                                className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/seo-templates")
+                                    ? "bg-surface-hover text-content-primary"
+                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    }`}
+                            >
+                                <Search className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/seo-templates") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                                SEO Templates
                             </Link>
                         )}
                     </div>

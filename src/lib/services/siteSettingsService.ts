@@ -100,3 +100,75 @@ export async function getSocialAccounts(): Promise<SocialAccount[]> {
 export async function saveSocialAccounts(accounts: SocialAccount[]): Promise<void> {
     await saveSiteSetting("social_accounts", JSON.stringify(accounts));
 }
+
+export interface SeoTemplate {
+    id: string;
+    label: string;
+    description: string;
+    variables: string[];
+    metaTitle: string;
+    metaDescription: string;
+    ogTitle: string;
+    ogDescription: string;
+}
+
+const DEFAULT_SEO_TEMPLATES: SeoTemplate[] = [
+    {
+        id: 'homes-search',
+        label: 'Homes Search Results',
+        description: 'Shown when users search or filter senior homes',
+        variables: ['query', 'location', 'state'],
+        metaTitle: '',
+        metaDescription: '',
+        ogTitle: '',
+        ogDescription: '',
+    },
+    {
+        id: 'facilities-search',
+        label: 'Facilities Search Results',
+        description: 'Shown when users search or filter senior care facilities',
+        variables: ['query', 'location', 'state'],
+        metaTitle: '',
+        metaDescription: '',
+        ogTitle: '',
+        ogDescription: '',
+    },
+    {
+        id: 'blog-listing',
+        label: 'Blog Listing',
+        description: 'Shown on the main blog and posts listing page',
+        variables: [],
+        metaTitle: '',
+        metaDescription: '',
+        ogTitle: '',
+        ogDescription: '',
+    },
+    {
+        id: 'taxonomy',
+        label: 'Category / Taxonomy Pages',
+        description: 'Shown on category and taxonomy archive pages',
+        variables: ['category', 'taxonomy'],
+        metaTitle: '',
+        metaDescription: '',
+        ogTitle: '',
+        ogDescription: '',
+    },
+];
+
+export async function getSeoTemplates(): Promise<SeoTemplate[]> {
+    const raw = await getSiteSetting("seo_templates");
+    if (!raw?.trim()) return DEFAULT_SEO_TEMPLATES;
+    try {
+        const saved = JSON.parse(raw) as SeoTemplate[];
+        return DEFAULT_SEO_TEMPLATES.map(def => {
+            const match = saved.find(s => s.id === def.id);
+            return match ? { ...def, ...match } : def;
+        });
+    } catch {
+        return DEFAULT_SEO_TEMPLATES;
+    }
+}
+
+export async function saveSeoTemplates(templates: SeoTemplate[]): Promise<void> {
+    await saveSiteSetting("seo_templates", JSON.stringify(templates));
+}
