@@ -86,7 +86,7 @@ export function HomeInformationTab({
     setIsDirty
 }: HomeInformationTabProps) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Col B — Name + Description (order-2, wide) */}
             <div className="order-2 lg:col-span-2 flex flex-col">
                 <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1">
@@ -380,12 +380,6 @@ export function HomeInformationTab({
                         </div>
                     </div>
                 </div>
-
-            </div>
-
-            {/* Col C — Status + Classification + Promotions (order-3) */}
-            <div className="order-3 space-y-[10px]">
-
 
                 {/* Promotions */}
                 <div className="space-y-2">

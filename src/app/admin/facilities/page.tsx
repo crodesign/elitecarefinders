@@ -407,6 +407,36 @@ export default function FacilitiesPage() {
             ),
         },
         {
+            key: "type",
+            width: "22%",
+            header: (
+                <EnhancedSelect
+                    multiValue={typeFilter}
+                    onMultiChange={setTypeFilter}
+                    options={typeOptions}
+                    placeholder="Type"
+                    textSize="text-xs"
+                    isActive={typeFilter.length > 0}
+                    onClear={() => setTypeFilter([])}
+                    multiLabel="types"
+                    className="w-32"
+                />
+            ),
+            headerLabel: "Type",
+            render: (facility) => {
+                const typeTaxonomy = taxonomies.find(t =>
+                    t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
+                );
+                const typeEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
+                return (
+                    <div className="flex items-center text-sm text-content-secondary">
+                        <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
+                        {typeEntry ? typeEntry.name : "—"}
+                    </div>
+                );
+            },
+        },
+        {
             key: "location-classification",
             width: "24%",
             header: (
@@ -450,36 +480,6 @@ export default function FacilitiesPage() {
                     <div className="flex items-center text-sm text-content-secondary">
                         <MapPin className="mr-1 h-3.5 w-3.5 hidden md:block" />
                         {buildPath(locationEntry)}
-                    </div>
-                );
-            },
-        },
-        {
-            key: "type",
-            width: "22%",
-            header: (
-                <EnhancedSelect
-                    multiValue={typeFilter}
-                    onMultiChange={setTypeFilter}
-                    options={typeOptions}
-                    placeholder="Type"
-                    textSize="text-xs"
-                    isActive={typeFilter.length > 0}
-                    onClear={() => setTypeFilter([])}
-                    multiLabel="types"
-                    className="w-32"
-                />
-            ),
-            headerLabel: "Type",
-            render: (facility) => {
-                const typeTaxonomy = taxonomies.find(t =>
-                    t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
-                );
-                const typeEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
-                return (
-                    <div className="flex items-center text-sm text-content-secondary">
-                        <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
-                        {typeEntry ? typeEntry.name : "—"}
                     </div>
                 );
             },
@@ -587,6 +587,20 @@ export default function FacilitiesPage() {
                             actions={renderActions}
                             primaryColumn="title"
                             emptyMessage={searchResultSet !== null || nameFilter || locationFilter || typeFilter.length > 0 ? "No facilities match your filters." : "No facilities yet."}
+                            mobileImageRender={(facility) =>
+                                facility.images && facility.images.length > 0 ? (
+                                    <img
+                                        src={facility.images[0].includes('/media/') ? facility.images[0].replace(/(\.[^.]+)$/, '-100x100.webp') : facility.images[0]}
+                                        alt={facility.title}
+                                        className="h-[82px] w-[82px] rounded object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-[82px] w-[82px] rounded border-2 border-ui-border flex items-center justify-center">
+                                        <Building2 className={`h-5 w-5 ${facility.status === 'published' ? 'text-emerald-500' : 'text-content-muted'}`} />
+                                    </div>
+                                )
+                            }
+                            mobileFarRightColumn="updated_at"
                         />
                     </div>
 

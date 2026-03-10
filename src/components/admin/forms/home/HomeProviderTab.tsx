@@ -22,7 +22,7 @@ export function HomeProviderTab({
     setInvalidEmailFields
 }: HomeProviderTabProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             {/* Column 1 */}
             <div className="space-y-[10px]">
                 {roomCategories
@@ -64,26 +64,7 @@ export function HomeProviderTab({
             {/* Column 3 */}
             <div className="space-y-[10px]">
                 {roomCategories
-                    .filter(c => c.section === 'care_provider_details' && c.columnNumber === 3)
-                    .map(category => (
-                        <HomeFieldCategory
-                            key={category.id}
-                            category={category}
-                            roomDefinitions={roomDefinitions}
-                            roomDetails={roomDetails}
-                            setRoomDetails={setRoomDetails}
-                            setIsDirty={setIsDirty}
-                            invalidEmailFields={invalidEmailFields}
-                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
-                            setInvalidEmailFields={setInvalidEmailFields}
-                        />
-                    ))}
-            </div>
-
-            {/* Column 4 */}
-            <div className="space-y-[10px]">
-                {roomCategories
-                    .filter(c => c.section === 'care_provider_details' && c.columnNumber === 4)
+                    .filter(c => c.section === 'care_provider_details' && (c.columnNumber === 3 || c.columnNumber === 4))
                     .map(category => (
                         <HomeFieldCategory
                             key={category.id}

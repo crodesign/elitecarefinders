@@ -39,7 +39,7 @@ export function FacilityProviderTab({
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             {/* Column 1 */}
             <div className="space-y-[10px]">
                 {roomCategories
@@ -81,26 +81,7 @@ export function FacilityProviderTab({
             {/* Column 3 */}
             <div className="space-y-[10px]">
                 {roomCategories
-                    .filter(c => c.section === 'care_provider_details' && c.columnNumber === 3)
-                    .map(category => (
-                        <FacilityFieldCategory
-                            key={category.id}
-                            category={category}
-                            roomDetails={roomDetails}
-                            setRoomDetails={setRoomDetails}
-                            setIsDirty={setIsDirty}
-                            roomDefinitions={roomDefinitions}
-                            invalidEmailFields={invalidEmailFields}
-                            setInvalidEmailFields={setInvalidEmailFields}
-                            lighterCheckboxes={/food|skill|specialt/i.test(category.name)}
-                        />
-                    ))}
-            </div>
-
-            {/* Column 4 */}
-            <div className="space-y-[10px]">
-                {roomCategories
-                    .filter(c => c.section === 'care_provider_details' && c.columnNumber === 4)
+                    .filter(c => c.section === 'care_provider_details' && (c.columnNumber === 3 || c.columnNumber === 4))
                     .map(category => (
                         <FacilityFieldCategory
                             key={category.id}

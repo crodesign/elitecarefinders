@@ -42,7 +42,7 @@ export function FacilityRoomsTab({
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             {/* Column 1: General Info & Col 1 Categories */}
             <div className="space-y-[10px]">
                 {/* Fixed Fields Section (General Room Info) */}
@@ -228,25 +228,7 @@ export function FacilityRoomsTab({
             {/* Column 3 */}
             <div className="space-y-[10px]">
                 {roomCategories
-                    .filter(c => c.columnNumber === 3 && c.section === 'room_details')
-                    .map(category => (
-                        <FacilityFieldCategory
-                            key={category.id}
-                            category={category}
-                            roomDetails={roomDetails}
-                            setRoomDetails={setRoomDetails}
-                            setIsDirty={setIsDirty}
-                            roomDefinitions={roomDefinitions}
-                            invalidEmailFields={invalidEmailFields}
-                            setInvalidEmailFields={setInvalidEmailFields}
-                        />
-                    ))}
-            </div>
-
-            {/* Column 4 */}
-            <div className="space-y-[10px]">
-                {roomCategories
-                    .filter(c => c.columnNumber === 4 && c.section === 'room_details')
+                    .filter(c => (c.columnNumber === 3 || c.columnNumber === 4) && c.section === 'room_details')
                     .map(category => (
                         <FacilityFieldCategory
                             key={category.id}

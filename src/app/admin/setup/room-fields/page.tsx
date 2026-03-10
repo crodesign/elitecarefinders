@@ -464,7 +464,7 @@ function SortableCategoryItem({
                             </Tooltip>
                         </div>
                         <div className="flex bg-surface-input rounded p-1 gap-1">
-                            {[1, 2, 3, 4].map((col) => (
+                            {[1, 2, 3].map((col) => (
                                 <Tooltip key={col} content={`Column ${col}`}>
                                     <button
                                         onClick={() => setEditCategoryColumn(col)}

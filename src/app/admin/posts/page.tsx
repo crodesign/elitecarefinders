@@ -426,6 +426,20 @@ export default function PostsPage() {
                             actions={renderActions}
                             primaryColumn="title"
                             emptyMessage={searchResultSet !== null || nameFilter || postTypeFilter.length > 0 ? "No posts match your filters." : "No posts yet."}
+                            mobileImageRender={(post) => (
+                                <div className="h-[82px] w-[82px] rounded border-2 border-ui-border flex items-center justify-center overflow-hidden">
+                                    {post.featuredImageUrl ? (
+                                        <img
+                                            src={post.featuredImageUrl.includes('/media/') ? post.featuredImageUrl.replace(/(\.[^.]+)$/, '-100x100.webp') : post.featuredImageUrl}
+                                            alt={`${post.title} cover`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <FileText className={`h-5 w-5 ${post.status === 'published' ? 'text-emerald-500' : 'text-content-muted'}`} />
+                                    )}
+                                </div>
+                            )}
+                            mobileFarRightColumn="date"
                         />
                     </div>
 

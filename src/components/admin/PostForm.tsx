@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft, Search } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { useToast } from "@/hooks/use-toast";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import type { Post, PostType, PostMetadata, RecipeIngredient, RecipeInstruction, SeoFields } from "@/types";
@@ -125,6 +126,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const [showDisabledTabAlert, setShowDisabledTabAlert] = useState(false);
     const isInitializedRef = useRef(false);
 
     // Track original title for rename detection
@@ -462,9 +464,9 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
         // "information" tab
         return (
-            <div className={`grid grid-cols-1 gap-6 ${postType === 'recipes' ? 'lg:grid-cols-4 flex-1 min-h-0' : ''}`}>
+            <div className={`grid grid-cols-1 gap-6 ${postType === 'recipes' ? 'lg:grid-cols-3 flex-1 min-h-0' : 'lg:grid-cols-2 flex-1 min-h-0'}`}>
                 {/* Column 1: Core Details & Dynamic Content */}
-                <div className={`flex flex-col gap-6 ${postType === 'recipes' ? 'lg:col-span-2 h-full min-h-0 flex flex-col' : ''}`}>
+                <div className={`flex flex-col gap-6 ${postType === 'recipes' ? 'lg:col-span-2 h-full min-h-0 flex flex-col' : 'overflow-y-auto'}`}>
                     <div className={`bg-surface-input rounded-lg p-[5px] flex flex-col gap-3 ${postType === 'recipes' ? 'flex-1 min-h-0' : ''}`}>
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                             <FileText className="h-4 w-4 text-accent" />
@@ -492,7 +494,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                     <button
                                         type="button"
                                         onClick={() => setIsPostTypeDropdownOpen(!isPostTypeDropdownOpen)}
-                                        className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md bg-transparent border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:ring-1 focus:ring-accent"
+                                        className="form-input w-full flex items-center justify-between px-3 h-8 text-sm rounded-md border-none hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:ring-1 focus:ring-accent"
                                     >
                                         <span className="truncate mr-2 font-medium">
                                             {postType ? POST_TYPES.find(t => t.value === postType)?.label : "Select Post Type"}
@@ -560,14 +562,14 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             </div>
                         )}
 
-                        <div className={`flex flex-col gap-2 pt-2 ${postType === 'recipes' ? 'flex-1 min-h-0' : ''}`}>
+                        {postType === 'recipes' && (
+                        <div className="flex flex-col gap-2 pt-2 flex-1 min-h-0">
                             <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
                                 <AlignLeft className="h-4 w-4 text-accent" />
                                 Content
                             </h3>
 
-                            {postType === 'recipes' && (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Prep Time</label>
                                         <div className="relative w-28 shrink-0">
@@ -607,13 +609,11 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                         <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
                                     </div>
                                 </div>
-                            )}
                             <RichTextEditor
                                 value={content}
                                 onChange={setContent}
                                 placeholder="Content goes here..."
-                                minHeight={postType === 'recipes' ? undefined : "min-h-[300px]"}
-                                className={`bg-surface-input text-content-primary placeholder-content-muted border-none overflow-hidden ${postType === 'recipes' ? 'flex-1 min-h-0' : 'flex-1'}`}
+                                className="bg-surface-input text-content-primary placeholder-content-muted border-none overflow-hidden flex-1 min-h-0"
                             />
                             <div className="flex flex-col gap-2 pt-2 shrink-0">
                                 <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-1">
@@ -628,6 +628,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                 />
                             </div>
                         </div>
+                        )}
                     </div>
 
                     {/* Dynamic Sections Based on Type */}
@@ -673,10 +674,42 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
 
                 </div>
 
-                {/* Column 2: Recipe Ingredients (Only for Recipes) */}
+                {/* Column 2: Content & Excerpt (Non-recipes) */}
+                {postType !== 'recipes' && (
+                    <div className="flex flex-col gap-6 h-full min-h-0">
+                        <div className="bg-surface-input rounded-lg p-[5px] flex flex-col gap-3 flex-1 min-h-0">
+                            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                                <AlignLeft className="h-4 w-4 text-accent" />
+                                Content
+                            </h3>
+                            <RichTextEditor
+                                value={content}
+                                onChange={setContent}
+                                placeholder="Content goes here..."
+                                minHeight="min-h-[300px]"
+                                className="bg-surface-input text-content-primary placeholder-content-muted border-none overflow-hidden flex-1"
+                            />
+                            <div className="flex flex-col gap-2 pt-2 shrink-0">
+                                <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-1">
+                                    <FileText className="h-4 w-4 text-accent" />
+                                    Excerpt / Summary
+                                </label>
+                                <textarea
+                                    value={excerpt}
+                                    onChange={(e) => setExcerpt(e.target.value)}
+                                    className="form-input text-sm p-3 rounded-lg resize-y min-h-[80px]"
+                                    placeholder="Short description for preview cards..."
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Column 2: Recipe Ingredients + Steps (Only for Recipes) */}
                 {postType === 'recipes' && (
                     <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
+                        {/* Ingredients */}
+                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 flex-1">
                             <div className="flex-1 min-h-0 flex flex-col">
                                 <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
                                     <Utensils className="h-4 w-4 text-accent" />
@@ -728,13 +761,9 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {/* Column 3: Recipe Steps (Only for Recipes) */}
-                {postType === 'recipes' && (
-                    <div className="flex flex-col gap-6 min-h-0 h-full lg:col-span-1">
-                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 h-full">
+                        {/* Steps */}
+                        <div className="bg-surface-input rounded-lg p-[5px] gap-4 flex flex-col min-h-0 flex-1">
                             <div className="flex-1 min-h-0 flex flex-col">
                                 <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
                                     <ListOrdered className="h-4 w-4 text-accent" />
@@ -842,22 +871,31 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         {isSubmitting ? "Saving..." : (post ? "Save Changes" : "Create Post")}
                     </button>
                 }
-                contentClassName={activeTab === "images" || (activeTab === "information" && postType === "recipes") ? "flex-1 overflow-hidden flex flex-col p-4 md:p-6" : "flex-1 overflow-y-auto p-4 md:p-6"}
+                contentClassName={activeTab === "seo" ? "flex-1 overflow-y-auto p-4 md:p-6" : "flex-1 overflow-hidden flex flex-col p-4 md:p-6"}
                 headerChildren={
                     <div className="flex items-center justify-between px-4 sm:pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
                         <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
+                            const isDisabled = !post?.id && tab.id !== 'information';
                             const tabColor = 'var(--surface-tab)';
                             return (
                                 <button
                                     key={tab.id}
                                     type="button"
-                                    onClick={() => setActiveTab(tab.id)}
+                                    aria-disabled={isDisabled}
+                                    onClick={() => {
+                                        if (isDisabled) {
+                                            setShowDisabledTabAlert(true);
+                                            return;
+                                        }
+                                        setActiveTab(tab.id);
+                                    }}
                                     className={`
                                         relative flex items-center gap-2 px-4 text-sm font-medium
                                         whitespace-nowrap transition-colors duration-150 select-none
+                                        ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                         ${isActive
                                             ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
                                             : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
@@ -908,6 +946,16 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
             >
                 {renderTabContent()}
             </SlidePanel>
+
+            <ConfirmationModal
+                isOpen={showDisabledTabAlert}
+                onClose={() => setShowDisabledTabAlert(false)}
+                onConfirm={() => setShowDisabledTabAlert(false)}
+                title="Action Required"
+                message="Please fill out required fields (Title, Post Type) and save the Post before accessing other tabs."
+                confirmLabel="Understood"
+                hideCancel={true}
+            />
 
             {/* Step Image Selector Modal */}
             {stepImageSelectorOpen !== null && typeof document !== 'undefined' && createPortal(
