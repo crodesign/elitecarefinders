@@ -185,6 +185,7 @@ export interface RoomFieldCategory {
     displayOrder: number;
     section: 'room_details' | 'location_details' | 'care_provider_details';
     columnNumber: number;
+    publicColumnNumber?: number | null;
     icon?: string;
     createdAt: string;
 }

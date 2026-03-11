@@ -249,33 +249,41 @@ export default async function HomeDetailPage({ params }: Props) {
                         {/* Care Provider Details */}
                         {(() => {
                             const cf = home.roomDetails?.customFields || {};
-                            const defBySlug = new Map(definitions.map(d => [d.slug, d]));
+                            const defById = new Map(definitions.map(d => [d.id, d]));
 
-                            const col1Slugs = ['care-provider-title', 'care-provider-gender', 'number-on-staff', 'care-provider-hours'];
-                            const col1Items = col1Slugs.flatMap(slug => {
-                                const def = defBySlug.get(slug);
-                                if (!def) return [];
-                                const val = cf[def.id];
-                                if (val == null || val === '') return [];
-                                return [{ id: def.id, label: def.name, value: Array.isArray(val) ? val.join(', ') : String(val) }];
-                            });
+                            // Field IDs — stable UUIDs, rename-safe
+                            const FID = {
+                                title:          '2aba0a31-4765-4f83-9815-c5490041345b',
+                                about:          '4d0c4db3-aa4f-4059-9ba6-72ce1c0856fd',
+                                skills:         '6c4b678b-6c6e-4765-a7bf-a9940cb60b74',
+                                gender:         '8804d48b-bdf1-4df4-8a30-083d6c8e5a3b',
+                                numberOfStaff:  '8d730ade-3d42-4d08-83db-5aef6dd5ffce',
+                                availableHours: '3224c668-8958-4813-8690-a1f5824d1aed',
+                                food:           '6c5e2cc9-bff5-4da5-b4c6-b8d2bcc41022',
+                            };
 
-                            const aboutDef = defBySlug.get('about-care-provider');
-                            const aboutText = aboutDef ? (cf[aboutDef.id] as string | undefined) : undefined;
-
-                            const skillsDef = defBySlug.get('care-provider-skills-specialties');
-                            const skillsRaw = skillsDef ? cf[skillsDef.id] : undefined;
+                            const titleVal = cf[FID.title] as string | undefined;
+                            const aboutText = cf[FID.about] as string | undefined;
+                            const skillsRaw = cf[FID.skills];
                             const skills: string[] = skillsRaw == null ? [] : Array.isArray(skillsRaw) ? skillsRaw : [String(skillsRaw)];
+                            const genderVal = cf[FID.gender] as string | undefined;
+                            const genderLabel = defById.get(FID.gender)?.name ?? 'Gender';
 
-                            const foodDef = defBySlug.get('types-of-food-available');
-                            const foodRaw = foodDef ? cf[foodDef.id] : undefined;
-                            const foods: string[] = foodRaw == null ? [] : Array.isArray(foodRaw) ? foodRaw : [String(foodRaw)];
+                            const col2TopIds = [FID.numberOfStaff, FID.availableHours];
+                            const col2TopItems = col2TopIds.flatMap(id => {
+                                const val = cf[id];
+                                if (val == null || val === '') return [];
+                                return [{ id, label: defById.get(id)?.name ?? id, value: Array.isArray(val) ? val.join(', ') : String(val) }];
+                            });
 
                             const languages: string[] = home.roomDetails?.languages || [];
 
-                            const hasCol2 = !!aboutText || skills.length > 0 || foods.length > 0;
+                            const foodRaw = cf[FID.food];
+                            const foods: string[] = foodRaw == null ? [] : Array.isArray(foodRaw) ? foodRaw : [String(foodRaw)];
+
                             const teamImages: string[] = home.teamImages || [];
-                            if (col1Items.length === 0 && !hasCol2 && languages.length === 0 && !teamImages.length) return null;
+                            const hasAnyContent = !!titleVal || !!aboutText || skills.length > 0 || !!genderVal || col2TopItems.length > 0 || languages.length > 0 || foods.length > 0 || teamImages.length > 0;
+                            if (!hasAnyContent) return null;
 
                             return (
                                 <DiagonalReveal color="#f0f8fc" className="rounded-xl">
@@ -287,30 +295,14 @@ export default async function HomeDetailPage({ params }: Props) {
                                         About The Care Provider
                                     </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {/* Col 1: Provider Information + Languages */}
+                                        {/* Col 1: Title, About, Skills & Specialties, Gender */}
                                         <div className="space-y-5">
-                                            {col1Items.map(({ id, label, value }) => (
-                                                <div key={id}>
-                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">{label}</p>
-                                                    <p className="text-sm text-gray-900">{value}</p>
-                                                </div>
-                                            ))}
-                                            {languages.length > 0 && (
+                                            {titleVal && (
                                                 <div>
-                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-2">Languages Spoken</p>
-                                                    <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
-                                                        {languages.map(lang => (
-                                                            <li key={lang} className="flex items-center gap-2 text-sm">
-                                                                <FontAwesomeIcon icon={faCheck} className="h-3.5 w-3.5 text-[#239ddb] shrink-0" />
-                                                                <span className="text-gray-700">{lang}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">Title</p>
+                                                    <p className="text-sm text-gray-900">{titleVal}</p>
                                                 </div>
                                             )}
-                                        </div>
-                                        {/* Col 2: About + Skills + Food */}
-                                        <div className="space-y-5">
                                             {aboutText && (
                                                 <div>
                                                     <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">About Care Provider</p>
@@ -325,6 +317,34 @@ export default async function HomeDetailPage({ params }: Props) {
                                                             <li key={skill} className="flex items-center gap-2 text-sm">
                                                                 <FontAwesomeIcon icon={faCheck} className="h-3.5 w-3.5 text-[#239ddb] shrink-0" />
                                                                 <span className="text-gray-700">{skill}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {genderVal && (
+                                                <div>
+                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">{genderLabel}</p>
+                                                    <p className="text-sm text-gray-900">{genderVal}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {/* Col 2: Number on Staff, Available Hours, Languages, Food */}
+                                        <div className="space-y-5">
+                                            {col2TopItems.map(({ id, label, value }) => (
+                                                <div key={id}>
+                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">{label}</p>
+                                                    <p className="text-sm text-gray-900">{value}</p>
+                                                </div>
+                                            ))}
+                                            {languages.length > 0 && (
+                                                <div>
+                                                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-2">Languages Spoken</p>
+                                                    <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                                        {languages.map(lang => (
+                                                            <li key={lang} className="flex items-center gap-2 text-sm">
+                                                                <FontAwesomeIcon icon={faCheck} className="h-3.5 w-3.5 text-[#239ddb] shrink-0" />
+                                                                <span className="text-gray-700">{lang}</span>
                                                             </li>
                                                         ))}
                                                     </ul>

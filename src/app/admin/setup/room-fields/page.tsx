@@ -40,7 +40,6 @@ import {
     verticalListSortingStrategy,
     useSortable,
 } from '@dnd-kit/sortable';
-import { Tooltip } from "@/components/ui/tooltip";
 import { CSS } from '@dnd-kit/utilities';
 import { reorderRoomFields } from "@/lib/services/roomFieldService";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
@@ -118,68 +117,54 @@ function SortableFieldItem({
                         autoFocus
                     />
                     <div className="flex bg-surface-input rounded p-1 gap-1">
-                        <Tooltip content="Yes/No (Boolean)">
-                            <button
-                                onClick={() => setEditFieldType("boolean")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <ToggleLeft className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
-                        <Tooltip content="Single Choice">
-                            <button
-                                onClick={() => setEditFieldType("single")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <CircleDot className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
-                        <Tooltip content="Multiple Choice">
-                            <button
-                                onClick={() => setEditFieldType("multi")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <CheckSquare className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
+                        <button
+                            onClick={() => setEditFieldType("boolean")}
+                            className={`p-1.5 rounded transition-colors ${editFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <ToggleLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setEditFieldType("single")}
+                            className={`p-1.5 rounded transition-colors ${editFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <CircleDot className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setEditFieldType("multi")}
+                            className={`p-1.5 rounded transition-colors ${editFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <CheckSquare className="h-4 w-4" />
+                        </button>
                         <div className="relative">
                             <FieldTypeSelector value={editFieldType} onChange={(val) => setEditFieldType(val as any)} />
                         </div>
-                        <Tooltip content="Dropdown">
-                            <button
-                                onClick={() => setEditFieldType("dropdown")}
-                                className={`p-1.5 rounded transition-colors ${editFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <List className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
+                        <button
+                            onClick={() => setEditFieldType("dropdown")}
+                            className={`p-1.5 rounded transition-colors ${editFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <List className="h-4 w-4" />
+                        </button>
                     </div>
 
                     <div className="flex bg-surface-input rounded p-1 gap-1">
-                        <Tooltip content="Home Only">
-                            <button
-                                onClick={() => setEditFieldTarget('home')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <Home className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
-                        <Tooltip content="Facility Only">
-                            <button
-                                onClick={() => setEditFieldTarget('facility')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <Building2 className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
-                        <Tooltip content="Both Home & Facility">
-                            <button
-                                onClick={() => setEditFieldTarget('both')}
-                                className={`p-1.5 rounded transition-colors ${editFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                            >
-                                <Layers className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
+                        <button
+                            onClick={() => setEditFieldTarget('home')}
+                            className={`p-1.5 rounded transition-colors ${editFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <Home className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setEditFieldTarget('facility')}
+                            className={`p-1.5 rounded transition-colors ${editFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <Building2 className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setEditFieldTarget('both')}
+                            className={`p-1.5 rounded transition-colors ${editFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                        >
+                            <Layers className="h-4 w-4" />
+                        </button>
                     </div>
 
                     <button
@@ -360,6 +345,8 @@ function SortableCategoryItem({
     setEditCategorySection,
     editCategoryColumn,
     setEditCategoryColumn,
+    editCategoryPublicColumn,
+    setEditCategoryPublicColumn,
     editCategoryIcon,
     setEditCategoryIcon,
     handleDeleteCategory,
@@ -379,6 +366,8 @@ function SortableCategoryItem({
     setEditCategorySection: (val: 'room_details' | 'location_details' | 'care_provider_details') => void;
     editCategoryColumn: number;
     setEditCategoryColumn: (val: number) => void;
+    editCategoryPublicColumn: number | null;
+    setEditCategoryPublicColumn: (val: number | null) => void;
     editCategoryIcon: string | undefined;
     setEditCategoryIcon: (val: string | undefined) => void;
     handleDeleteCategory: (id: string) => void;
@@ -438,41 +427,53 @@ function SortableCategoryItem({
                             autoFocus
                         />
                         <div className="flex bg-surface-input rounded p-1 gap-1">
-                            <Tooltip content="Room Details">
-                                <button
-                                    onClick={() => setEditCategorySection('room_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                >
-                                    Room
-                                </button>
-                            </Tooltip>
-                            <Tooltip content="Location Details">
-                                <button
-                                    onClick={() => setEditCategorySection('location_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                >
-                                    Location
-                                </button>
-                            </Tooltip>
-                            <Tooltip content="Care Provider Details">
-                                <button
-                                    onClick={() => setEditCategorySection('care_provider_details')}
-                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                >
-                                    Provider
-                                </button>
-                            </Tooltip>
+                            <button
+                                onClick={() => setEditCategorySection('room_details')}
+                                className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                            >
+                                Room
+                            </button>
+                            <button
+                                onClick={() => setEditCategorySection('location_details')}
+                                className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                            >
+                                Location
+                            </button>
+                            <button
+                                onClick={() => setEditCategorySection('care_provider_details')}
+                                className={`px-2 py-1 rounded text-xs transition-colors ${editCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                            >
+                                Provider
+                            </button>
                         </div>
                         <div className="flex bg-surface-input rounded p-1 gap-1">
+                            <span className="px-1 text-[10px] text-content-muted self-center uppercase tracking-wider">Admin</span>
                             {[1, 2, 3].map((col) => (
-                                <Tooltip key={col} content={`Column ${col}`}>
-                                    <button
-                                        onClick={() => setEditCategoryColumn(col)}
-                                        className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryColumn === col ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                    >
-                                        {col}
-                                    </button>
-                                </Tooltip>
+                                <button
+                                    key={col}
+                                    onClick={() => setEditCategoryColumn(col)}
+                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryColumn === col ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                >
+                                    {col}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex bg-surface-input rounded p-1 gap-1">
+                            <span className="px-1 text-[10px] text-content-muted self-center uppercase tracking-wider">Public</span>
+                            <button
+                                onClick={() => setEditCategoryPublicColumn(null)}
+                                className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryPublicColumn === null ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                            >
+                                –
+                            </button>
+                            {[1, 2, 3].map((col) => (
+                                <button
+                                    key={col}
+                                    onClick={() => setEditCategoryPublicColumn(col)}
+                                    className={`px-2 py-1 rounded text-xs transition-colors ${editCategoryPublicColumn === col ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                >
+                                    {col}
+                                </button>
                             ))}
                         </div>
                         <button
@@ -502,12 +503,18 @@ function SortableCategoryItem({
                                 Col {category.columnNumber}
                             </span>
                         )}
+                        {category.publicColumnNumber != null && (
+                            <span className="px-2 py-0.5 rounded text-[10px] bg-accent/20 text-accent uppercase tracking-wider">
+                                Pub {category.publicColumnNumber}
+                            </span>
+                        )}
                         <button
                             onClick={() => {
                                 setEditingCategory(category.id);
                                 setEditCategoryName(category.name);
                                 setEditCategorySection(category.section);
                                 setEditCategoryColumn(category.columnNumber);
+                                setEditCategoryPublicColumn(category.publicColumnNumber ?? null);
                                 setEditCategoryIcon(category.icon);
                             }}
                             className="p-1 text-content-muted hover:text-white"
@@ -520,17 +527,15 @@ function SortableCategoryItem({
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
-                        <Tooltip content="Add field">
-                            <button
-                                onClick={() => {
-                                    setAddingFieldToCategory(category.id);
-                                    setExpandedCategories(prev => new Set([...Array.from(prev), category.id]));
-                                }}
-                                className="p-1 text-accent hover:text-accent-light"
-                            >
-                                <Plus className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
+                        <button
+                            onClick={() => {
+                                setAddingFieldToCategory(category.id);
+                                setExpandedCategories(prev => new Set([...Array.from(prev), category.id]));
+                            }}
+                            className="p-1 text-accent hover:text-accent-light"
+                        >
+                            <Plus className="h-4 w-4" />
+                        </button>
                     </>
                 )}
             </div>
@@ -579,35 +584,32 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
 
     return (
         <div className="relative" ref={containerRef}>
-            <Tooltip content={currentOption.label}>
-                <button
-                    type="button"
-                    onClick={() => setIsOpen(!isOpen)}
-                    className={`flex items-center justify-center p-1.5 rounded transition-colors ${isActive ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"
-                        }`}
-                >
-                    <Icon className="h-4 w-4" />
-                </button>
-            </Tooltip>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`flex items-center justify-center p-1.5 rounded transition-colors ${isActive ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"
+                    }`}
+            >
+                <Icon className="h-4 w-4" />
+            </button>
 
             {isOpen && (
                 <div className="absolute top-full left-0 mt-1 bg-[#111111] border border-ui-border rounded-lg shadow-xl overflow-hidden z-50 p-1 min-w-[32px]">
                     {options.map((opt) => (
-                        <Tooltip key={opt.id} content={opt.label}>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    onChange(opt.id);
-                                    setIsOpen(false);
-                                }}
-                                className={`w-full flex items-center justify-center p-1.5 mb-1 last:mb-0 rounded transition-colors ${value === opt.id
-                                    ? "bg-accent text-white"
-                                    : "text-content-muted hover:bg-surface-input hover:text-white"
-                                    }`}
-                            >
-                                <opt.icon className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
+                        <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                                onChange(opt.id);
+                                setIsOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-center p-1.5 mb-1 last:mb-0 rounded transition-colors ${value === opt.id
+                                ? "bg-accent text-white"
+                                : "text-content-muted hover:bg-surface-input hover:text-white"
+                                }`}
+                        >
+                            <opt.icon className="h-4 w-4" />
+                        </button>
                     ))}
                 </div>
             )}
@@ -646,6 +648,7 @@ export default function RoomFieldsPage() {
     const [editCategoryName, setEditCategoryName] = useState("");
     const [editCategorySection, setEditCategorySection] = useState<'room_details' | 'location_details' | 'care_provider_details'>('room_details');
     const [editCategoryColumn, setEditCategoryColumn] = useState<number>(1);
+    const [editCategoryPublicColumn, setEditCategoryPublicColumn] = useState<number | null>(null);
     const [editCategoryIcon, setEditCategoryIcon] = useState<string | undefined>(undefined);
     const [sectionFilter, setSectionFilter] = useState<'all' | 'room_details' | 'location_details' | 'care_provider_details'>('all');
 
@@ -781,7 +784,7 @@ export default function RoomFieldsPage() {
     async function handleUpdateCategory(id: string) {
         if (!editCategoryName.trim()) return;
         try {
-            await updateRoomFieldCategory(id, editCategoryName.trim(), editCategorySection, editCategoryColumn, editCategoryIcon || null);
+            await updateRoomFieldCategory(id, editCategoryName.trim(), editCategorySection, editCategoryColumn, editCategoryIcon || null, editCategoryPublicColumn);
             await fetchData();
             setEditingCategory(null);
             showNotification("Category Updated", editCategoryName.trim());
@@ -1148,30 +1151,24 @@ export default function RoomFieldsPage() {
                                             autoFocus
                                         />
                                         <div className="flex bg-surface-input rounded p-1 gap-1">
-                                            <Tooltip content="Room Details">
-                                                <button
-                                                    onClick={() => setNewCategorySection('room_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                >
-                                                    Room
-                                                </button>
-                                            </Tooltip>
-                                            <Tooltip content="Location Details">
-                                                <button
-                                                    onClick={() => setNewCategorySection('location_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                >
-                                                    Location
-                                                </button>
-                                            </Tooltip>
-                                            <Tooltip content="Care Provider Details">
-                                                <button
-                                                    onClick={() => setNewCategorySection('care_provider_details')}
-                                                    className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                >
-                                                    Provider
-                                                </button>
-                                            </Tooltip>
+                                            <button
+                                                onClick={() => setNewCategorySection('room_details')}
+                                                className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'room_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                            >
+                                                Room
+                                            </button>
+                                            <button
+                                                onClick={() => setNewCategorySection('location_details')}
+                                                className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'location_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                            >
+                                                Location
+                                            </button>
+                                            <button
+                                                onClick={() => setNewCategorySection('care_provider_details')}
+                                                className={`px-2 py-1 rounded text-xs transition-colors ${newCategorySection === 'care_provider_details' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                            >
+                                                Provider
+                                            </button>
                                         </div>
                                         <button
                                             onClick={handleAddCategory}
@@ -1230,6 +1227,8 @@ export default function RoomFieldsPage() {
                                                             setEditCategorySection={setEditCategorySection}
                                                             editCategoryColumn={editCategoryColumn}
                                                             setEditCategoryColumn={setEditCategoryColumn}
+                                                            editCategoryPublicColumn={editCategoryPublicColumn}
+                                                            setEditCategoryPublicColumn={setEditCategoryPublicColumn}
                                                             editCategoryIcon={editCategoryIcon}
                                                             setEditCategoryIcon={setEditCategoryIcon}
                                                             handleDeleteCategory={handleDeleteCategory}
@@ -1284,87 +1283,69 @@ export default function RoomFieldsPage() {
                                                                                             autoFocus
                                                                                         />
                                                                                         <div className="flex bg-surface-input rounded p-1 gap-1">
-                                                                                            <Tooltip content="Yes/No (Boolean)">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldType("boolean")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <ToggleLeft className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
-                                                                                            <Tooltip content="Single Choice">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldType("single")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <CircleDot className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
-                                                                                            <Tooltip content="Multiple Choice">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldType("multi")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <CheckSquare className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldType("boolean")}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldType === "boolean" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <ToggleLeft className="h-4 w-4" />
+                                                                                            </button>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldType("single")}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldType === "single" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <CircleDot className="h-4 w-4" />
+                                                                                            </button>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldType("multi")}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldType === "multi" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <CheckSquare className="h-4 w-4" />
+                                                                                            </button>
                                                                                             <div className="relative">
                                                                                                 <FieldTypeSelector value={newFieldType} onChange={(val) => setNewFieldType(val as any)} />
                                                                                             </div>
-                                                                                            <Tooltip content="Dropdown">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldType("dropdown")}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <List className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldType("dropdown")}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldType === "dropdown" ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <List className="h-4 w-4" />
+                                                                                            </button>
                                                                                         </div>
 
                                                                                         <div className="flex bg-surface-input rounded p-1 gap-1">
-                                                                                            <Tooltip content="Home Only">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldTarget('home')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <Home className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
-                                                                                            <Tooltip content="Facility Only">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldTarget('facility')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <Building2 className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
-                                                                                            <Tooltip content="Both Home & Facility">
-                                                                                                <button
-                                                                                                    onClick={() => setNewFieldTarget('both')}
-                                                                                                    className={`p-1.5 rounded transition-colors ${newFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
-                                                                                                >
-                                                                                                    <Layers className="h-4 w-4" />
-                                                                                                </button>
-                                                                                            </Tooltip>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldTarget('home')}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldTarget === 'home' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <Home className="h-4 w-4" />
+                                                                                            </button>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldTarget('facility')}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldTarget === 'facility' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <Building2 className="h-4 w-4" />
+                                                                                            </button>
+                                                                                            <button
+                                                                                                onClick={() => setNewFieldTarget('both')}
+                                                                                                className={`p-1.5 rounded transition-colors ${newFieldTarget === 'both' ? "bg-accent text-white" : "text-content-muted hover:text-content-primary"}`}
+                                                                                            >
+                                                                                                <Layers className="h-4 w-4" />
+                                                                                            </button>
                                                                                         </div>
 
-                                                                                        <Tooltip content="Add Field">
-                                                                                            <button
-                                                                                                onClick={() => handleAddField(cat.id)}
-                                                                                                disabled={!newFieldName.trim()}
-                                                                                                className="p-1.5 bg-accent text-white rounded hover:bg-accent-light disabled:opacity-50"
-                                                                                            >
-                                                                                                <Plus className="h-4 w-4" />
-                                                                                            </button>
-                                                                                        </Tooltip>
-                                                                                        <Tooltip content="Cancel">
-                                                                                            <button
-                                                                                                onClick={() => setAddingFieldToCategory(null)}
-                                                                                                className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
-                                                                                            >
-                                                                                                <X className="h-4 w-4" />
-                                                                                            </button>
-                                                                                        </Tooltip>
+                                                                                        <button
+                                                                                            onClick={() => handleAddField(cat.id)}
+                                                                                            disabled={!newFieldName.trim()}
+                                                                                            className="p-1.5 bg-accent text-white rounded hover:bg-accent-light disabled:opacity-50"
+                                                                                        >
+                                                                                            <Plus className="h-4 w-4" />
+                                                                                        </button>
+                                                                                        <button
+                                                                                            onClick={() => setAddingFieldToCategory(null)}
+                                                                                            className="p-1.5 text-content-muted hover:text-content-primary bg-surface-input rounded hover:bg-surface-hover"
+                                                                                        >
+                                                                                            <X className="h-4 w-4" />
+                                                                                        </button>
                                                                                     </div>
 
                                                                                     {["single", "multi", "dropdown"].includes(newFieldType) && (

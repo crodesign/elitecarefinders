@@ -164,6 +164,7 @@ export async function getRoomFieldData(): Promise<{
         displayOrder: row.display_order,
         section: row.section || 'room_details',
         columnNumber: row.column_number || 1,
+        publicColumnNumber: row.public_column_number ?? null,
         icon: row.icon || undefined,
         createdAt: row.created_at,
     }));
@@ -257,6 +258,7 @@ export interface HomeListingCard {
     description: string;
     taxonomyEntryIds: string[];
     isFeatured: boolean;
+    isHomeOfMonth: boolean;
 }
 
 export interface FacilityListingCard {
@@ -268,6 +270,7 @@ export interface FacilityListingCard {
     taxonomyIds: string[];
     capacity: number | null;
     isFeatured: boolean;
+    isFacilityOfMonth: boolean;
 }
 
 export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
@@ -276,8 +279,10 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
     const offset = (page - 1) * limit;
     let query = db
         .from('homes')
-        .select('id, slug, title, images, description, taxonomy_entry_ids, is_featured', { count: 'exact' })
+        .select('id, slug, title, images, description, taxonomy_entry_ids, is_featured, is_home_of_month', { count: 'exact' })
         .eq('status', 'published')
+        .order('is_home_of_month', { ascending: false })
+        .order('is_featured', { ascending: false })
         .order('title')
         .range(offset, offset + limit - 1);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
@@ -293,6 +298,7 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
             description: row.description || '',
             taxonomyEntryIds: row.taxonomy_entry_ids || [],
             isFeatured: row.is_featured || false,
+            isHomeOfMonth: row.is_home_of_month || false,
         })),
         total: count ?? 0,
     };
@@ -304,8 +310,10 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
     const offset = (page - 1) * limit;
     let query = db
         .from('facilities')
-        .select('id, slug, title, images, description, taxonomy_ids, capacity, is_featured', { count: 'exact' })
+        .select('id, slug, title, images, description, taxonomy_ids, capacity, is_featured, is_facility_of_month', { count: 'exact' })
         .eq('status', 'published')
+        .order('is_facility_of_month', { ascending: false })
+        .order('is_featured', { ascending: false })
         .order('title')
         .range(offset, offset + limit - 1);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_ids', locationEntryIds);
@@ -322,6 +330,7 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
             taxonomyIds: row.taxonomy_ids || [],
             capacity: row.capacity ?? null,
             isFeatured: row.is_featured || false,
+            isFacilityOfMonth: row.is_facility_of_month || false,
         })),
         total: count ?? 0,
     };

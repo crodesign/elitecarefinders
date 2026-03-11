@@ -179,11 +179,12 @@ export function RoomDetailsSection({
 
     const catRowsWithIdx = catRows.map((item, idx) => ({ ...item, idx }));
 
-    // When columns prop is explicitly set, always auto-split (ignore natural column numbers in DB).
-    // Fall back to natural column numbers only when columns prop is not provided.
+    // When columns prop is explicitly set, always auto-split (ignore column numbers in DB).
+    // Otherwise use publicColumnNumber (public-page layout), falling back to columnNumber.
     const useAutoSplit = columns !== undefined && columns > 1 && catRowsWithIdx.length > 1;
-    const naturalCol2 = catRowsWithIdx.filter(({ cat }) => cat.columnNumber === 2);
-    const naturalCol3 = catRowsWithIdx.filter(({ cat }) => cat.columnNumber === 3);
+    const getPublicCol = (cat: RoomFieldCategory) => cat.publicColumnNumber ?? cat.columnNumber;
+    const naturalCol2 = catRowsWithIdx.filter(({ cat }) => getPublicCol(cat) === 2);
+    const naturalCol3 = catRowsWithIdx.filter(({ cat }) => getPublicCol(cat) === 3);
     const hasNaturalMultiColumn = !useAutoSplit && (naturalCol2.length > 0 || naturalCol3.length > 0);
     const hasMultiColumn = useAutoSplit || hasNaturalMultiColumn;
 
@@ -203,7 +204,7 @@ export function RoomDetailsSection({
             gridClass = 'grid grid-cols-1 md:grid-cols-2 gap-8 items-start';
         }
     } else if (hasNaturalMultiColumn) {
-        const c1 = catRowsWithIdx.filter(({ cat }) => (cat.columnNumber || 1) === 1);
+        const c1 = catRowsWithIdx.filter(({ cat }) => getPublicCol(cat) === 1);
         if (naturalCol3.length > 0) {
             cols = [c1, naturalCol2, naturalCol3].filter(c => c.length > 0);
             gridClass = 'grid grid-cols-1 md:grid-cols-3 gap-6 items-start';

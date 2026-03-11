@@ -82,12 +82,12 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
 
                     {/* Homes section */}
                     <div className="mb-6">
-                        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                        <Link href="/homes" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
                             <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
                                 <FontAwesomeIcon icon={faHouse} className="h-3 w-3 text-white" />
                             </span>
                             Care Homes &amp; Adult Foster Homes
-                        </p>
+                        </Link>
                         <ul className="space-y-0.5 pl-7">
                             {homeTypes.map(type => (
                                 <li key={type.id}>
@@ -114,12 +114,12 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
 
                     {/* Facilities section */}
                     <div className="mb-6">
-                        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                        <Link href="/facilities" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
                             <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
                                 <FontAwesomeIcon icon={faBuilding} className="h-3 w-3 text-white" />
                             </span>
                             Senior Living Communities
-                        </p>
+                        </Link>
                         <ul className="space-y-0.5 pl-7">
                             {facilityTypes.map(type => (
                                 <li key={type.id}>

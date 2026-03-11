@@ -339,28 +339,6 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                     </div>
                     <div className="p-2 space-y-1">
                         <Link
-                            href="/admin/taxonomies"
-                            onClick={(e) => handleNavClick(e, "/admin/taxonomies")}
-                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/taxonomies")
-                                ? "bg-surface-hover text-content-primary"
-                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                                }`}
-                        >
-                            <Tags className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/taxonomies") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
-                            Taxonomies
-                        </Link>
-                        <Link
-                            href="/admin/setup/room-fields"
-                            onClick={(e) => handleNavClick(e, "/admin/setup/room-fields")}
-                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/setup/room-fields")
-                                ? "bg-surface-hover text-content-primary"
-                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                                }`}
-                        >
-                            <Bed className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/setup/room-fields") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
-                            Detail Fields
-                        </Link>
-                        <Link
                             href="/admin/settings"
                             onClick={(e) => handleNavClick(e, "/admin/settings")}
                             className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname === "/admin/settings"
@@ -371,30 +349,6 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Settings className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname === "/admin/settings" ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             General
                         </Link>
-                        <Link
-                            href="/admin/settings/users"
-                            onClick={(e) => handleNavClick(e, "/admin/settings/users")}
-                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/users")
-                                ? "bg-surface-hover text-content-primary"
-                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                                }`}
-                        >
-                            <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
-                            Users
-                        </Link>
-                        {isSuperAdmin && (
-                            <Link
-                                href="/admin/settings/site-images"
-                                onClick={(e) => handleNavClick(e, "/admin/settings/site-images")}
-                                className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/site-images")
-                                    ? "bg-surface-hover text-content-primary"
-                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
-                                    }`}
-                            >
-                                <ImageIcon className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/site-images") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
-                                Site Images
-                            </Link>
-                        )}
                         {isSuperAdmin && (
                             <Link
                                 href="/admin/settings/pages"
@@ -421,6 +375,52 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                 SEO Templates
                             </Link>
                         )}
+                        <Link
+                            href="/admin/taxonomies"
+                            onClick={(e) => handleNavClick(e, "/admin/taxonomies")}
+                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/taxonomies")
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                }`}
+                        >
+                            <Tags className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/taxonomies") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                            Taxonomies
+                        </Link>
+                        <Link
+                            href="/admin/setup/room-fields"
+                            onClick={(e) => handleNavClick(e, "/admin/setup/room-fields")}
+                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/setup/room-fields")
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                }`}
+                        >
+                            <Bed className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/setup/room-fields") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                            Detail Fields
+                        </Link>
+                        {isSuperAdmin && (
+                            <Link
+                                href="/admin/settings/site-images"
+                                onClick={(e) => handleNavClick(e, "/admin/settings/site-images")}
+                                className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/site-images")
+                                    ? "bg-surface-hover text-content-primary"
+                                    : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                    }`}
+                            >
+                                <ImageIcon className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/site-images") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                                Site Images
+                            </Link>
+                        )}
+                        <Link
+                            href="/admin/settings/users"
+                            onClick={(e) => handleNavClick(e, "/admin/settings/users")}
+                            className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin/settings/users")
+                                ? "bg-surface-hover text-content-primary"
+                                : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"
+                                }`}
+                        >
+                            <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
+                            Users
+                        </Link>
                     </div>
                 </div>
             )}

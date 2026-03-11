@@ -143,6 +143,9 @@ export async function updateHome(id: string, updates: Partial<Home>): Promise<Ho
     if (updates.isFeatured !== undefined) dbUpdates.is_featured = updates.isFeatured;
     if (updates.hasFeaturedVideo !== undefined) dbUpdates.has_featured_video = updates.hasFeaturedVideo;
     if (updates.isHomeOfMonth !== undefined) dbUpdates.is_home_of_month = updates.isHomeOfMonth;
+    if (dbUpdates.is_home_of_month === true) {
+        await supabase.from('homes').update({ is_home_of_month: false }).eq('is_home_of_month', true).neq('id', id);
+    }
     if (updates.featuredLabel !== undefined) dbUpdates.featured_label = updates.featuredLabel;
     if (updates.homeOfMonthDescription !== undefined) dbUpdates.home_of_month_description = updates.homeOfMonthDescription;
     if (updates.excerpt !== undefined) dbUpdates.excerpt = updates.excerpt;

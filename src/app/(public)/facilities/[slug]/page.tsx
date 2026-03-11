@@ -391,10 +391,10 @@ export default async function FacilityDetailPage({ params }: Props) {
                                             c.section === 'location_details' &&
                                             !['Health Care Services', 'Additional Services', 'Common Areas'].includes(c.name)
                                         ),
-                                        ...categories
-                                            .filter(c => c.section === 'room_details' && c.name === 'Outdoor & Access')
-                                            .map(c => ({ ...c, columnNumber: 3, displayOrder: 12 })),
-                                    ]}
+                                        ...categories.filter(c =>
+                                            c.section === 'room_details' && c.name === 'Outdoor & Access'
+                                        ),
+                                    ].map((c, i) => ({ ...c, displayOrder: i }))}
                                     definitions={definitions}
                                     targetType="facility"
                                     hideFixedFields

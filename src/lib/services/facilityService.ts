@@ -146,6 +146,9 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if ((updates as any).isFeatured !== undefined) dbUpdates.is_featured = (updates as any).isFeatured;
     if ((updates as any).hasFeaturedVideo !== undefined) dbUpdates.has_featured_video = (updates as any).hasFeaturedVideo;
     if ((updates as any).isFacilityOfMonth !== undefined) dbUpdates.is_facility_of_month = (updates as any).isFacilityOfMonth;
+    if (dbUpdates.is_facility_of_month === true) {
+        await supabase.from('facilities').update({ is_facility_of_month: false }).eq('is_facility_of_month', true).neq('id', id);
+    }
     if ((updates as any).featuredLabel !== undefined) dbUpdates.featured_label = (updates as any).featuredLabel;
     if ((updates as any).facilityOfMonthDescription !== undefined) dbUpdates.facility_of_month_description = (updates as any).facilityOfMonthDescription;
     if (updates.excerpt !== undefined) dbUpdates.excerpt = updates.excerpt;

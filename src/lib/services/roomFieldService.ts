@@ -17,6 +17,7 @@ interface CategoryRow {
     display_order: number;
     section: 'room_details' | 'location_details' | 'care_provider_details';
     column_number: number;
+    public_column_number: number | null;
     icon: string | null;
     created_at: string;
 }
@@ -61,6 +62,7 @@ function toCategory(row: CategoryRow): RoomFieldCategory {
         displayOrder: row.display_order,
         section: row.section || 'room_details',
         columnNumber: row.column_number || 1,
+        publicColumnNumber: row.public_column_number ?? null,
         icon: row.icon || undefined,
         createdAt: row.created_at,
     };
@@ -141,12 +143,14 @@ export async function updateRoomFieldCategory(
     name: string,
     section: 'room_details' | 'location_details' | 'care_provider_details',
     columnNumber?: number,
-    icon?: string | null
+    icon?: string | null,
+    publicColumnNumber?: number | null
 ): Promise<RoomFieldCategory> {
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const updates: any = { name, slug, section };
     if (columnNumber !== undefined) updates.column_number = columnNumber;
     if (icon !== undefined) updates.icon = icon || null;
+    if (publicColumnNumber !== undefined) updates.public_column_number = publicColumnNumber;
 
     const { data, error } = await supabase
         .from('room_field_categories')
