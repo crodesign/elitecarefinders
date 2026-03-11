@@ -144,12 +144,12 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
                                     {(facility.isFacilityOfMonth || facility.isFeatured) && (
                                         <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
                                             {facility.isFacilityOfMonth ? (
-                                                <span className="flex items-center gap-1 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-b-lg shadow">
+                                                <span className="flex items-center gap-1 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-b-lg shadow">
                                                     <FontAwesomeIcon icon={faTrophy} className="h-2.5 w-2.5" />
                                                     Facility of the Month
                                                 </span>
                                             ) : (
-                                                <span className="flex items-center gap-1 bg-green-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-b-lg shadow">
+                                                <span className="flex items-center gap-1 bg-green-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-b-lg shadow">
                                                     <FontAwesomeIcon icon={faStar} className="h-2.5 w-2.5" />
                                                     Featured
                                                 </span>
