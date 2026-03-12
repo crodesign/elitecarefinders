@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShareNodes, faCheck, faHandHoldingHeart, faHouse, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
-import { getHomeBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getAdjacentHome, getFeaturedHomes } from '@/lib/public-db';
+import { getHomeBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getMediaTitlesByUrls, getAdjacentHome, getFeaturedHomes } from '@/lib/public-db';
 import { generateSeoMetadataFromRecord, buildHomeJsonLd } from '@/lib/seo';
 import { HeroGallery } from '@/components/public/HeroGallery';
 import { RoomDetailsSection } from '@/components/public/RoomDetailsSection';
@@ -67,7 +67,11 @@ export default async function HomeDetailPage({ params }: Props) {
 
     // Fetch media captions for gallery + team images + cuisine images
     const allImageUrls = [...home.images, ...(home.teamImages || []), ...(home.cuisineImages || [])];
-    const mediaCaptions = allImageUrls.length > 0 ? await getMediaCaptionsByUrls(allImageUrls) : {};
+    const teamImageUrls = home.teamImages || [];
+    const [mediaCaptions, teamTitles] = await Promise.all([
+        allImageUrls.length > 0 ? getMediaCaptionsByUrls(allImageUrls) : Promise.resolve({}),
+        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({}),
+    ]);
 
     // Format images for the gallery with their resolved captions
     const galleryImages = home.images.map(url => ({
@@ -286,7 +290,7 @@ export default async function HomeDetailPage({ params }: Props) {
                             if (!hasAnyContent) return null;
 
                             return (
-                                <DiagonalReveal color="#f0f8fc" className="rounded-xl">
+                                <div className="rounded-xl bg-[#f0f8fc]">
                                 <div className="p-6">
                                     <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                         <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
@@ -371,13 +375,15 @@ export default async function HomeDetailPage({ params }: Props) {
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                             {teamImages.map((url, i) => {
                                                 const caption = mediaCaptions[url];
+                                                const memberTitle = teamTitles[url];
                                                 return (
                                                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
                                                         <img src={url} alt={caption || `Team member ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                                                        {caption && (
+                                                        {(caption || memberTitle) && (
                                                             <div className="absolute bottom-0 left-0 right-0 px-[15px]">
-                                                                <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 font-medium text-center truncate">
-                                                                    {caption}
+                                                                <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 text-center leading-tight">
+                                                                    {caption && <p className="font-medium truncate">{caption}</p>}
+                                                                    {memberTitle && <p className="text-gray-500 mt-0.5">{memberTitle}</p>}
                                                                 </div>
                                                             </div>
                                                         )}
@@ -388,7 +394,7 @@ export default async function HomeDetailPage({ params }: Props) {
                                         </div>
                                     )}
                                 </div>
-                                </DiagonalReveal>
+                                </div>
                             );
                         })()}
 

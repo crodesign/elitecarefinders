@@ -457,6 +457,22 @@ export async function getMediaCaptionsByUrls(urls: string[]): Promise<Record<str
     return captions;
 }
 
+export async function getMediaTitlesByUrls(urls: string[]): Promise<Record<string, string>> {
+    if (!urls?.length) return {};
+    const db = getClient();
+    const uniqueUrls = Array.from(new Set(urls));
+    const { data, error } = await db
+        .from('media_items')
+        .select('url, title')
+        .in('url', uniqueUrls);
+    if (error || !data) return {};
+    const titles: Record<string, string> = {};
+    data.forEach((row: any) => {
+        if (row.title) titles[row.url] = row.title;
+    });
+    return titles;
+}
+
 const HOME_TYPE_TAX_ID = '286967ff-a897-4529-9c25-6f452f77f0d7';
 const FACILITY_TYPE_TAX_ID = 'aaff7539-60ec-448d-ae56-5ee8763917f6';
 

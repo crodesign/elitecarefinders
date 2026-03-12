@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = createClient();
         const body = await request.json();
-        const { mediaId, newFolderId, altText } = body;
+        const { mediaId, newFolderId, altText, title } = body;
 
-        console.log("[Media Update] Request body:", { mediaId, newFolderId, altText });
+        console.log("[Media Update] Request body:", { mediaId, newFolderId, altText, title });
 
         if (!mediaId) {
             return NextResponse.json({ error: "Media ID is required" }, { status: 400 });
@@ -28,6 +28,11 @@ export async function POST(request: NextRequest) {
         const updates: Record<string, unknown> = {
             updated_at: new Date().toISOString(),
         };
+
+        // Handle title change
+        if (title !== undefined && title !== mediaItem.title) {
+            updates.title = title;
+        }
 
         // Handle caption change with file rename
         if (altText !== undefined && altText !== mediaItem.alt_text) {
@@ -180,6 +185,7 @@ export async function POST(request: NextRequest) {
                 folderId: data.folder_id,
                 filename: data.filename,
                 altText: data.alt_text,
+                title: data.title,
                 url: data.url,
                 updatedAt: data.updated_at,
             },

@@ -453,6 +453,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                     showDimensions={true}
                                     isFeaturedImage={featuredImageUrl ? featuredImageUrl === item.url : !!(activeUrls.length > 0 && activeUrls[0] === item.url && activeGallery?.id === 'main')}
                                     stepLabel={stepImageMap && stepImageMap[item.url] !== undefined ? `Step ${stepImageMap[item.url]}` : undefined}
+                                    isTeamView={activeGalleryId === 'team'}
                                     onMediaSelect={galleries ? () => handleToggleSelection(item.url) : onMediaSelect}
                                 />
                             </div>

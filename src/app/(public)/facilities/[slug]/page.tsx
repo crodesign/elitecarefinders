@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuilding, faUsers, faHandHoldingHeart, faHeart, faShareNodes, faCheck, faXmark, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
-import { getFacilityBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getAdjacentFacility, getFeaturedFacilities } from '@/lib/public-db';
+import { getFacilityBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getMediaTitlesByUrls, getAdjacentFacility, getFeaturedFacilities } from '@/lib/public-db';
 import { generateSeoMetadataFromRecord, buildFacilityJsonLd } from '@/lib/seo';
 import { HeroGallery } from '@/components/public/HeroGallery';
 import { RoomDetailsSection } from '@/components/public/RoomDetailsSection';
@@ -60,7 +60,10 @@ export default async function FacilityDetailPage({ params }: Props) {
     const teamImageUrls = facility.teamImages || [];
     const cuisineImageUrls = facility.cuisineImages || [];
     const allMediaUrls = [...teamImageUrls, ...cuisineImageUrls];
-    const mediaCaptions = allMediaUrls.length > 0 ? await getMediaCaptionsByUrls(allMediaUrls) : {};
+    const [mediaCaptions, teamTitles] = await Promise.all([
+        allMediaUrls.length > 0 ? getMediaCaptionsByUrls(allMediaUrls) : Promise.resolve({}),
+        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({}),
+    ]);
 
     const addr = facility.address;
     const hasAddress = addr.street || addr.city;
@@ -295,7 +298,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                             );
 
                             return (
-                                <DiagonalReveal color="#f0f8fc" className="rounded-xl">
+                                <div className="rounded-xl bg-[#f0f8fc]">
                                 <div className="p-6">
                                     <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                         <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
@@ -341,13 +344,15 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                             {teamImages.map((url, i) => {
                                                 const caption = mediaCaptions[url];
+                                                const memberTitle = teamTitles[url];
                                                 return (
                                                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
                                                         <img src={url} alt={caption || `Team member ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                                                        {caption && (
+                                                        {(caption || memberTitle) && (
                                                             <div className="absolute bottom-0 left-0 right-0 px-[15px]">
-                                                                <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 font-medium text-center truncate">
-                                                                    {caption}
+                                                                <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 text-center leading-tight">
+                                                                    {caption && <p className="font-medium truncate">{caption}</p>}
+                                                                    {memberTitle && <p className="text-gray-500 mt-0.5">{memberTitle}</p>}
                                                                 </div>
                                                             </div>
                                                         )}
@@ -358,7 +363,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         </div>
                                     )}
                                 </div>
-                                </DiagonalReveal>
+                                </div>
                             );
                         })()}
 

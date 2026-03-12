@@ -59,7 +59,7 @@ interface MediaTileProps {
     isGalleryImage?: boolean;
     isFeaturedImage?: boolean;
     stepLabel?: string;
-
+    isTeamView?: boolean;
 }
 
 export function MediaTile({
@@ -81,9 +81,10 @@ export function MediaTile({
     isGalleryImage = false,
     isFeaturedImage = false,
     stepLabel,
-
+    isTeamView = false,
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
+    const [itemTitle, setItemTitle] = useState(item.title || "");
     const [folderId, setFolderId] = useState<string | null>(item.folderId || null);
     const [isSaving, setIsSaving] = useState(false);
     const [liveDims, setLiveDims] = useState<{ w: number; h: number } | null>(null);
@@ -95,13 +96,15 @@ export function MediaTile({
     // Sync local state when item changes (fixes stale state issues)
     useEffect(() => {
         setCaption(item.altText || "");
+        setItemTitle(item.title || "");
         setFolderId(item.folderId || null);
     }, [item]);
 
-    // Check if caption or folder has changed
+    // Check if caption, title, or folder has changed
     const captionChanged = caption !== (item.altText || "");
+    const titleChanged = itemTitle !== (item.title || "");
     const folderChanged = folderId !== (item.folderId || null);
-    const hasChanges = captionChanged || folderChanged;
+    const hasChanges = captionChanged || titleChanged || folderChanged;
 
     const handleSaveClick = () => {
         if (!hasChanges) {
@@ -128,6 +131,7 @@ export function MediaTile({
                     mediaId: item.id,
                     newFolderId: folderChanged && showFolderMove ? folderId : undefined,
                     altText: captionChanged ? caption : undefined,
+                    title: titleChanged ? itemTitle : undefined,
                 }),
             });
 
@@ -155,8 +159,9 @@ export function MediaTile({
         setFolderId(item.folderId || null);
     };
 
-    const handleSaveCaptionOnly = async () => {
-        if (!captionChanged) return;
+    const handleSaveFieldOnly = async (field: 'caption' | 'title') => {
+        const isCaption = field === 'caption';
+        if (isCaption ? !captionChanged : !titleChanged) return;
         setIsSaving(true);
         try {
             const response = await fetch("/api/media/update", {
@@ -164,7 +169,7 @@ export function MediaTile({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     mediaId: item.id,
-                    altText: caption,
+                    ...(isCaption ? { altText: caption } : { title: itemTitle }),
                 }),
             });
 
@@ -174,10 +179,8 @@ export function MediaTile({
                 throw new Error(result.error || "Update failed");
             }
 
-            // Refresh the media list with updated item
             await onUpdate(item.id, result.item);
 
-            // Blur the active element to remove cursor
             if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur();
             }
@@ -187,10 +190,10 @@ export function MediaTile({
         setIsSaving(false);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && captionChanged) {
+    const handleKeyDown = (e: React.KeyboardEvent, field: 'caption' | 'title') => {
+        if (e.key === "Enter") {
             e.preventDefault();
-            handleSaveCaptionOnly();
+            handleSaveFieldOnly(field);
         }
     };
 
@@ -334,7 +337,7 @@ export function MediaTile({
                 )}
 
                 {/* URL Overlay */}
-                <div className="absolute bottom-10 left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className={`absolute ${isTeamView ? 'bottom-[52px]' : 'bottom-10'} left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}>
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--media-edit-btn-bg)]/50 text-[var(--media-edit-btn-text)]">
                         <span className="text-[9px] uppercase font-black opacity-30 shrink-0">URL</span>
                         <span className="flex-1 text-[10px] truncate font-mono font-medium opacity-60">{item.url}</span>
@@ -350,21 +353,43 @@ export function MediaTile({
                         </button>
                     </div>
                 </div>
-                {/* Caption overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-2">
+                {/* Caption / Name + Title overlays */}
+                <div className={`absolute bottom-0 left-0 right-0 p-2 flex flex-col gap-1`}>
+                    {isTeamView && (
+                        <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                            <input
+                                type="text"
+                                value={itemTitle}
+                                onChange={(e) => setItemTitle(e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(e, 'title')}
+                                placeholder="Title..."
+                                className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${titleChanged ? 'pr-12' : ''}`}
+                            />
+                            {titleChanged && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleSaveFieldOnly('title')}
+                                    disabled={isSaving}
+                                    className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
+                                >
+                                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                                </button>
+                            )}
+                        </div>
+                    )}
                     <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
                         <input
                             type="text"
                             value={caption}
                             onChange={(e) => setCaption(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Add caption..."
+                            onKeyDown={(e) => handleKeyDown(e, 'caption')}
+                            placeholder={isTeamView ? "Name..." : "Add caption..."}
                             className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
                         />
                         {captionChanged && (
                             <button
                                 type="button"
-                                onClick={handleSaveCaptionOnly}
+                                onClick={() => handleSaveFieldOnly('caption')}
                                 disabled={isSaving}
                                 className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
                             >
