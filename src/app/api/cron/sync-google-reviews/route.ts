@@ -96,15 +96,26 @@ export async function GET(request: Request) {
         const { token } = await oauth2Client.getAccessToken();
         if (!token) throw new Error("Could not retrieve access token for syncing");
 
-        const reviewsRes = await fetch(`https://mybusinessreviews.googleapis.com/v1/${locationId}/reviews?pageSize=50&orderBy=updateTime desc`, {
+        // Reviews API parent: locations/{locationId}
+        // locationId from mybusinessbusinessinformation is already "locations/{id}"
+        const reviewsParent = locationId.startsWith('locations/') ? locationId : `locations/${locationId}`;
+        const reviewsUrl = `https://mybusinessreviews.googleapis.com/v1/${reviewsParent}/reviews?pageSize=50&orderBy=updateTime desc`;
+
+        console.log('[reviews sync] accountId:', accountId);
+        console.log('[reviews sync] locationId:', locationId);
+        console.log('[reviews sync] reviewsUrl:', reviewsUrl);
+
+        const reviewsRes = await fetch(reviewsUrl, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
+        console.log('[reviews sync] response status:', reviewsRes.status);
+
         if (!reviewsRes.ok) {
             const errBody = await reviewsRes.text();
-            throw new Error(`Google API error fetching reviews: ${errBody}`);
+            throw new Error(`Google API error fetching reviews (${reviewsRes.status}): ${errBody}`);
         }
 
         const reviewsData = await reviewsRes.json();

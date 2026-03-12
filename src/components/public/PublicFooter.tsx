@@ -39,6 +39,8 @@ export async function PublicFooter() {
                             <li><Link href="/about" className="hover:text-[#239ddb] transition-colors">About Us</Link></li>
                             <li><Link href="/contact" className="hover:text-[#239ddb] transition-colors">Contact</Link></li>
                             <li><Link href="/blog" className="hover:text-[#239ddb] transition-colors">Resources</Link></li>
+                            <li><Link href="/terms" className="hover:text-[#239ddb] transition-colors">Terms &amp; Conditions</Link></li>
+                            <li><Link href="/privacy" className="hover:text-[#239ddb] transition-colors">Privacy Policy</Link></li>
                         </ul>
                     </div>
 
