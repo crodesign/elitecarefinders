@@ -105,7 +105,7 @@ function SortableFieldItem({
 
     if (editingFieldId === field.id) {
         return (
-            <div ref={setNodeRef} style={style} className="p-[3px] bg-accent/10 rounded-lg space-y-3 cursor-default" style={{ border: '2px solid var(--form-border)' }}>
+            <div ref={setNodeRef} style={{ ...style, border: '2px solid var(--form-border)' }} className="p-[3px] bg-accent/10 rounded-lg space-y-3 cursor-default">
                 {/* Inline Edit Form - Note: Dragging disabled while editing */}
                 <div className="flex items-center gap-3">
                     <input
@@ -281,7 +281,7 @@ function SortableFixedOptionItem({
 
     if (editingId === option.id) {
         return (
-            <div ref={setNodeRef} style={style} className="p-[3px] bg-accent/10 rounded-lg flex items-center gap-3 cursor-default" style={{ border: '2px solid var(--form-border)' }}>
+            <div ref={setNodeRef} style={{ ...style, border: '2px solid var(--form-border)' }} className="p-[3px] bg-accent/10 rounded-lg flex items-center gap-3 cursor-default">
                 <input
                     type="text"
                     value={editValue}
