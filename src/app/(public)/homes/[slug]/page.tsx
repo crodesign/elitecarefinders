@@ -69,8 +69,8 @@ export default async function HomeDetailPage({ params }: Props) {
     const allImageUrls = [...home.images, ...(home.teamImages || []), ...(home.cuisineImages || [])];
     const teamImageUrls = home.teamImages || [];
     const [mediaCaptions, teamTitles] = await Promise.all([
-        allImageUrls.length > 0 ? getMediaCaptionsByUrls(allImageUrls) : Promise.resolve({}),
-        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({}),
+        allImageUrls.length > 0 ? getMediaCaptionsByUrls(allImageUrls) : Promise.resolve({} as Record<string, string>),
+        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({} as Record<string, string>),
     ]);
 
     // Format images for the gallery with their resolved captions

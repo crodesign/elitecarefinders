@@ -61,8 +61,8 @@ export default async function FacilityDetailPage({ params }: Props) {
     const cuisineImageUrls = facility.cuisineImages || [];
     const allMediaUrls = [...teamImageUrls, ...cuisineImageUrls];
     const [mediaCaptions, teamTitles] = await Promise.all([
-        allMediaUrls.length > 0 ? getMediaCaptionsByUrls(allMediaUrls) : Promise.resolve({}),
-        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({}),
+        allMediaUrls.length > 0 ? getMediaCaptionsByUrls(allMediaUrls) : Promise.resolve({} as Record<string, string>),
+        teamImageUrls.length > 0 ? getMediaTitlesByUrls(teamImageUrls) : Promise.resolve({} as Record<string, string>),
     ]);
 
     const addr = facility.address;
