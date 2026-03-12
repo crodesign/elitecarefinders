@@ -323,7 +323,7 @@ export default function AdminDashboardPage() {
                 )}
             </div>
 
-            <AnalyticsDashboard />
+            {isSystemAdmin && <AnalyticsDashboard />}
         </div>
     );
 }
