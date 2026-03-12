@@ -132,7 +132,7 @@ function StatCard({ label, value, pct, prevLabel, lowerIsBetter }: StatCardProps
     const display = pct !== null ? `${pct > 0 ? "+" : ""}${pct.toFixed(1)}%` : null;
 
     return (
-        <div className="card border-0 p-5 flex flex-col gap-1">
+        <div className="card p-5 flex flex-col gap-1">
             <span className="text-[11px] text-content-muted font-medium uppercase tracking-wide leading-none">{label}</span>
             <span className="text-2xl font-bold text-content-primary tabular-nums mt-1">{value}</span>
             <div className="flex items-center gap-1.5 mt-1">
@@ -237,7 +237,7 @@ export function AnalyticsDashboard() {
 
     if (error === "not_configured") {
         return (
-            <div className="card border-0 p-8 text-center text-sm text-content-muted">
+            <div className="card p-8 text-center text-sm text-content-muted">
                 Analytics not configured.{" "}
                 <Link href="/admin/settings" className="text-accent hover:underline">Set up GA4 in Settings.</Link>
             </div>
@@ -246,7 +246,7 @@ export function AnalyticsDashboard() {
 
     if (!loading && (error || !data)) {
         return (
-            <div className="card border-0 p-8 text-center text-sm text-content-muted">
+            <div className="card p-8 text-center text-sm text-content-muted">
                 Unable to load analytics data.{" "}
                 {error && <span className="text-red-400 font-mono text-xs">{error}</span>}
             </div>
@@ -391,7 +391,7 @@ export function AnalyticsDashboard() {
 
             {/* Traffic chart */}
             {charts.traffic && formattedTraffic.length > 0 && (
-                <div className="card border-0 p-6">
+                <div className="card p-6">
                     <h3 className="text-sm font-semibold text-content-primary mb-5">Traffic Over Time</h3>
                     <ResponsiveContainer width="100%" height={200}>
                         <AreaChart data={formattedTraffic} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -428,7 +428,7 @@ export function AnalyticsDashboard() {
             {(charts.topPages || charts.sources) && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {charts.topPages && topPages.length > 0 && (
-                        <div className="card border-0 p-6">
+                        <div className="card p-6">
                             <h3 className="text-sm font-semibold text-content-primary mb-4">Top Pages</h3>
                             <div className="space-y-3">
                                 {topPages.map((p, i) => (
@@ -447,7 +447,7 @@ export function AnalyticsDashboard() {
                     )}
 
                     {charts.sources && sources.length > 0 && (
-                        <div className="card border-0 p-6">
+                        <div className="card p-6">
                             <h3 className="text-sm font-semibold text-content-primary mb-4">Traffic Sources</h3>
                             <div className="space-y-3">
                                 {sources.map((s, i) => {
@@ -474,7 +474,7 @@ export function AnalyticsDashboard() {
                         </div>
                     )}
 
-                    <div className="card border-0 p-6">
+                    <div className="card p-6">
                         <h3 className="text-sm font-semibold text-content-primary mb-4">Top Keywords</h3>
                         {keywords && keywords.length > 0 ? (
                             <div className="space-y-3">
@@ -501,7 +501,7 @@ export function AnalyticsDashboard() {
 
                 {/* Devices */}
                 {devices.length > 0 && (
-                    <div className="card border-0 p-6">
+                    <div className="card p-6">
                         <h3 className="text-sm font-semibold text-content-primary mb-4">Devices</h3>
                         <div className="flex items-center gap-4">
                             <ResponsiveContainer width={110} height={110}>
@@ -550,7 +550,7 @@ export function AnalyticsDashboard() {
 
                 {/* New vs Returning */}
                 {(newVisitors > 0 || returnVisitors > 0) && (
-                    <div className="card border-0 p-6">
+                    <div className="card p-6">
                         <h3 className="text-sm font-semibold text-content-primary mb-4">New vs Returning</h3>
                         <div className="flex items-center gap-4">
                             <ResponsiveContainer width={110} height={110}>
@@ -589,7 +589,7 @@ export function AnalyticsDashboard() {
 
                 {/* Top Countries */}
                 {countries.length > 0 && (
-                    <div className="card border-0 p-6">
+                    <div className="card p-6">
                         <h3 className="text-sm font-semibold text-content-primary mb-4 flex items-center gap-2">
                             <Globe className="h-3.5 w-3.5 text-content-muted" />
                             Top Countries
@@ -604,7 +604,7 @@ export function AnalyticsDashboard() {
 
                 {/* Top Cities */}
                 {cities && cities.length > 0 && (
-                    <div className="card border-0 p-6">
+                    <div className="card p-6">
                         <h3 className="text-sm font-semibold text-content-primary mb-4">Top Cities</h3>
                         <div className="space-y-3">
                             {cities.slice(0, 6).map((c, i) => (

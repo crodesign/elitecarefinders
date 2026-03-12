@@ -309,7 +309,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
 
             {/* Selected Images Container */}
             {galleries && galleries.length > 0 && (
-                <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 overflow-x-auto">
+                <div className="bg-surface-input rounded-lg p-4 overflow-x-auto" style={{ border: '2px solid var(--form-border)' }}>
                     <div className="flex items-center justify-between mb-4 gap-4">
                         {galleries.length > 1 ? (
                             <div className="flex bg-surface-input p-1 rounded-lg">
@@ -435,7 +435,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                     />
                 </div>
             ) : (
-                <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 overflow-y-auto min-h-0">
+                <div className="bg-surface-input rounded-lg p-4 flex-1 overflow-y-auto min-h-0" style={{ border: '2px solid var(--form-border)' }}>
                     <div className="grid gap-4 grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
                         {mediaItems.map((item) => (
                             <div key={item.id}>

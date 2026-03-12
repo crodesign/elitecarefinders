@@ -130,11 +130,12 @@ export function SlidePanel({
                 {/* Panel - full width on mobile, fixed width on md+ */}
                 <div
                     ref={panelRef}
-                    className="slide-panel absolute right-0 top-0 h-full w-full bg-surface-secondary shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto border-l-2"
+                    className="slide-panel absolute right-0 top-0 h-full w-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-out pointer-events-auto border-l-2"
                     style={{
                         animation: "slideInFromRight 0.3s ease-out",
                         "--panel-width": fullScreen ? "100%" : `${width}px`,
-                        borderColor: "var(--surface-tab-border)",
+                        backgroundColor: "var(--form-bg)",
+                        borderColor: "var(--form-border)",
                     } as React.CSSProperties}
                 >
                     <style>{`
@@ -147,7 +148,7 @@ export function SlidePanel({
                     {/* Header */}
                     <div
                         className={`flex-none relative z-20 w-full shrink-0 px-4 pt-4 sm:px-6 sm:pt-6 ${headerChildren ? 'pb-0' : 'pb-6 border-b-[6px]'}`}
-                        style={!headerChildren ? { borderColor: 'var(--surface-tab-border)' } : undefined}
+                        style={!headerChildren ? { borderColor: 'var(--form-border)' } : undefined}
                     >
                         <div className="flex items-start justify-between">
                             <div>
@@ -160,7 +161,7 @@ export function SlidePanel({
                                 {actions}
                                 <button
                                     onClick={() => handleAction(onClose)}
-                                    className="p-2 rounded-lg bg-surface-input text-content-secondary hover:bg-accent hover:text-white transition-colors"
+                                    className="px-2 py-1.5 rounded-lg bg-surface-input text-content-secondary hover:bg-surface-hover transition-colors"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>

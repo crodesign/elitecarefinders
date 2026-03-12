@@ -53,7 +53,7 @@ export function FacilityRoomsTab({
                     </div>
                     <div className="space-y-2">
                     {/* Room Price */}
-                    <div className="min-h-[40px] flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                    <div className="min-h-[40px] flex items-center justify-between gap-2 p-[3px] rounded-lg transition-all bg-surface-hover">
                         <label className="text-sm font-medium text-content-secondary pl-[5px]">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-content-secondary" : "text-content-muted"}`}>$</span>
@@ -93,7 +93,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bedroom Type - multi-select */}
-                    <div className="p-[5px] rounded-lg bg-surface-hover">
+                    <div className="p-[3px] rounded-lg bg-surface-hover">
                         <label className="text-sm font-medium text-content-secondary block mb-2 pl-[5px]">Bedroom Type</label>
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions.filter(o => o.fieldType === 'bedroom').map((opt) => {
@@ -110,7 +110,7 @@ export function FacilityRoomsTab({
                                             setRoomDetails((prev: RoomDetails) => ({ ...prev, bedroomTypes: updated }));
                                             setIsDirty(true);
                                         }}
-                                        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                        className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div
@@ -126,7 +126,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                    <div className="flex items-center justify-between gap-2 p-[3px] rounded-lg transition-all bg-surface-hover">
                         <label className="text-sm font-medium text-content-secondary pl-[5px]">Bathroom Type</label>
                         <SimpleSelect
                             value={roomDetails.bathroomType || ""}
@@ -141,7 +141,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                    <div className="flex items-center justify-between gap-2 p-[3px] rounded-lg transition-all bg-surface-hover">
                         <label className="text-sm font-medium text-content-secondary pl-[5px]">Shower Type</label>
                         <SimpleSelect
                             value={roomDetails.showerType || ""}
@@ -156,7 +156,7 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Room Types - multi-select */}
-                    <div className="p-[5px] rounded-lg bg-surface-hover">
+                    <div className="p-[3px] rounded-lg bg-surface-hover">
                         <label className="text-sm font-medium text-content-secondary block mb-2 pl-[5px]">Room Types</label>
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions.filter(o => o.fieldType === 'roomType').map((opt) => {
@@ -173,7 +173,7 @@ export function FacilityRoomsTab({
                                             setRoomDetails((prev: RoomDetails) => ({ ...prev, roomTypes: updated }));
                                             setIsDirty(true);
                                         }}
-                                        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
+                                        className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${selected ? "bg-surface-input text-content-primary" : "bg-surface-input hover:bg-surface-hover text-content-secondary"}`}
                                     >
                                         <span className="text-sm font-medium">{opt.value}</span>
                                         <div

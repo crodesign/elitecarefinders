@@ -34,7 +34,7 @@ const CombinedCareSection = ({ formData, setFormData, handleChange, readOnly = f
         type="button"
         onClick={() => toggleArrayItem(field, option)}
         disabled={readOnly}
-        className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${
+        className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${
           isSelected
             ? "bg-surface-input text-content-primary"
             : "bg-surface-input hover:bg-surface-hover text-content-secondary"

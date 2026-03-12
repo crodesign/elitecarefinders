@@ -478,23 +478,23 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
 
                                         {/* Inline Display Settings (Under Photo) */}
                                         <div className="flex items-center justify-center gap-2 w-full">
-                                            <div className="flex bg-surface-input p-1 rounded-lg gap-1">
+                                            <div className="flex bg-surface-input p-1 rounded-lg gap-1" style={{ border: '2px solid var(--form-border)' }}>
                                                 <button
                                                     onClick={() => setMode('light')}
-                                                    className={`flex items-center justify-center p-1.5 rounded-md transition-all ${mode === 'light' ? 'bg-surface-secondary text-content-primary shadow' : 'text-content-muted hover:text-content-primary'}`}
+                                                    className={`flex items-center justify-center p-1.5 rounded-md transition-all ${mode === 'light' ? 'bg-surface-hover text-content-primary' : 'text-content-muted hover:text-content-primary'}`}
                                                 >
                                                     <Sun className="h-4 w-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => setMode('dark')}
-                                                    className={`flex items-center justify-center p-1.5 rounded-md transition-all ${mode === 'dark' ? 'bg-surface-secondary text-content-primary shadow' : 'text-content-muted hover:text-content-primary'}`}
+                                                    className={`flex items-center justify-center p-1.5 rounded-md transition-all ${mode === 'dark' ? 'bg-surface-hover text-content-primary' : 'text-content-muted hover:text-content-primary'}`}
                                                 >
                                                     <Moon className="h-4 w-4" />
                                                 </button>
                                             </div>
 
                                             <div className="relative" ref={colorPickerRef}>
-                                                <div className="bg-surface-input p-1 rounded-lg">
+                                                <div className="bg-surface-input p-1 rounded-lg" style={{ border: '2px solid var(--form-border)' }}>
                                                     <button
                                                         onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
                                                         className="flex items-center justify-center p-1.5 rounded-md hover:bg-surface-hover transition-all group"
@@ -638,12 +638,12 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                 {/* Left Column: Personal Fields */}
                                 <div className="space-y-[10px]">
                                     <div>
-                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
+                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 px-2 pt-1">
                                             <User className="h-4 w-4 text-accent" />
                                             Personal Information
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1 min-w-[85px] pl-[5px]">
                                                     Full Name
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
@@ -652,11 +652,11 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     type="text"
                                                     value={fullName}
                                                     onChange={(e) => { setFullName(e.target.value); setIsDirty(true); }}
-                                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3"
+                                                    className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3"
                                                     placeholder="Jane Doe"
                                                 />
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[85px] pl-[5px]">
                                                     Nickname
                                                 </label>
@@ -664,12 +664,12 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     type="text"
                                                     value={nickname}
                                                     onChange={(e) => { setNickname(e.target.value); setIsDirty(true); }}
-                                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3"
+                                                    className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3"
                                                     placeholder="Janey"
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                     <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px] pl-[5px]">
                                                         <Mail className="h-3.5 w-3.5" />
                                                         Email
@@ -678,7 +678,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type="text"
                                                         value={user?.email || ""}
                                                         disabled
-                                                        className="bg-surface-input border-transparent text-content-muted text-sm text-left opacity-70 cursor-not-allowed flex-1 min-w-0 h-8 rounded-md px-3"
+                                                        className="form-input text-content-muted text-sm text-left opacity-70 cursor-not-allowed flex-1 min-w-0 h-8 rounded-md px-3"
                                                         placeholder="jane@example.com"
                                                     />
                                                 </div>
@@ -686,7 +686,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     You can log in using either your email or nickname.
                                                 </p>
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[85px] pl-[5px]">
                                                     <Phone className="h-3.5 w-3.5" />
                                                     Phone
@@ -695,7 +695,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     type="tel"
                                                     value={phone}
                                                     onChange={(e) => { setPhone(e.target.value); setIsDirty(true); }}
-                                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3"
+                                                    className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3"
                                                     placeholder="(555) 123-4567"
                                                 />
                                             </div>
@@ -706,13 +706,12 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
 
                                 {/* Middle Column: Password */}
                                 <div className="space-y-[10px]">
-                                    <div className="pt-2">
-                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
+                                    <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 px-2 pt-1">
                                             <Lock className="h-4 w-4 text-accent" />
                                             Update Password
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all relative">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all relative" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 min-w-[100px] pl-[5px]">
                                                     <Lock className="h-3.5 w-3.5" />
                                                     Current
@@ -722,7 +721,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type={showCurrentPassword ? "text" : "password"}
                                                         value={currentPassword}
                                                         onChange={(e) => setCurrentPassword(e.target.value)}
-                                                        className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3 pr-10"
+                                                        className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3 pr-10"
                                                         placeholder="••••••••"
                                                     />
                                                     <button
@@ -734,7 +733,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all relative">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all relative" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[100px] pl-[5px]">
                                                     New
                                                 </label>
@@ -743,7 +742,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type={showNewPassword ? "text" : "password"}
                                                         value={newPassword}
                                                         onChange={(e) => setNewPassword(e.target.value)}
-                                                        className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3 pr-10"
+                                                        className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3 pr-10"
                                                         placeholder="(min 8 characters)"
                                                     />
                                                     <button
@@ -755,8 +754,8 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className={`flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all relative ${confirmPassword && confirmPassword !== newPassword ? 'bg-red-500/10' : 'bg-surface-hover'
-                                                }`}>
+                                            <div className={`flex items-center justify-between gap-2 p-[3px] rounded-lg transition-all relative ${confirmPassword && confirmPassword !== newPassword ? 'bg-red-500/10' : 'bg-surface-hover'
+                                                }`} style={{ border: confirmPassword && confirmPassword !== newPassword ? '2px solid rgba(239,68,68,0.3)' : '2px solid var(--form-border)', backgroundColor: confirmPassword && confirmPassword !== newPassword ? undefined : 'var(--form-bg)' }}>
                                                 <label className={`text-sm font-medium whitespace-nowrap min-w-[100px] pl-[5px] ${confirmPassword && confirmPassword !== newPassword ? 'text-red-400' : 'text-content-secondary'
                                                     }`}>
                                                     Confirm
@@ -766,9 +765,9 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type={showConfirmPassword ? "text" : "password"}
                                                         value={confirmPassword}
                                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                                        className={`bg-surface-input border text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3 pr-10 ${confirmPassword && confirmPassword !== newPassword
-                                                            ? "border-red-500/30 text-red-400"
-                                                            : "border-transparent text-content-primary"
+                                                        className={`form-input text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3 pr-10 ${confirmPassword && confirmPassword !== newPassword
+                                                            ? "!border-red-500/30 text-red-400"
+                                                            : "text-content-primary"
                                                             }`}
                                                         placeholder="••••••••"
                                                     />
@@ -804,18 +803,17 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
                                 </div>
 
                                 {/* Right Column: Address */}
                                 <div className="space-y-[10px]">
                                     <div>
-                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 mb-[5px]">
+                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
+                                        <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 px-2 pt-1">
                                             <MapPin className="h-4 w-4 text-accent" />
                                             Address
                                         </h3>
-                                        <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px] pl-[5px]">
                                                     Street
                                                 </label>
@@ -823,11 +821,11 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     type="text"
                                                     value={street}
                                                     onChange={(e) => { setStreet(e.target.value); setIsDirty(true); }}
-                                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3"
+                                                    className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3"
                                                     placeholder="123 Main St"
                                                 />
                                             </div>
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap min-w-[60px] pl-[5px]">
                                                     City
                                                 </label>
@@ -835,12 +833,12 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                     type="text"
                                                     value={city}
                                                     onChange={(e) => { setCity(e.target.value); setIsDirty(true); }}
-                                                    className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors flex-1 min-w-0 h-8 rounded-md px-3"
+                                                    className="form-input text-content-primary text-sm text-left flex-1 min-w-0 h-8 rounded-md px-3"
                                                     placeholder="City"
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-2">
-                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                     <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px] pl-[5px]">
                                                         State
                                                     </label>
@@ -848,11 +846,11 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type="text"
                                                         value={state}
                                                         onChange={(e) => { setState(e.target.value); setIsDirty(true); }}
-                                                        className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-full min-w-0 h-8 rounded-md px-2"
+                                                        className="form-input text-content-primary text-sm text-left w-full min-w-0 h-8 rounded-md px-2"
                                                         placeholder="State"
                                                     />
                                                 </div>
-                                                <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                                <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                     <label className="text-sm font-medium text-content-secondary whitespace-nowrap max-w-[40px] pl-[5px]">
                                                         ZIP
                                                     </label>
@@ -860,7 +858,7 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                                         type="text"
                                                         value={zip}
                                                         onChange={(e) => { setZip(e.target.value); setIsDirty(true); }}
-                                                        className="bg-surface-input border-transparent text-content-primary text-sm text-left hover:bg-surface-hover focus:bg-surface-hover focus:outline-none transition-colors w-full min-w-0 h-8 rounded-md px-2"
+                                                        className="form-input text-content-primary text-sm text-left w-full min-w-0 h-8 rounded-md px-2"
                                                         placeholder="96801"
                                                     />
                                                 </div>

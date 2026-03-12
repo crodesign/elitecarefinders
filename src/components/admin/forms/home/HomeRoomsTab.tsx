@@ -39,7 +39,7 @@ export function HomeRoomsTab({
                     </div>
                     <div className="space-y-2">
                     {/* Room Price */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                         <label className="text-sm font-medium text-content-secondary pl-[5px]">Room Price</label>
                         <div className="relative w-32">
                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.roomPrice ? "text-content-secondary" : "text-content-muted"}`}>$</span>
@@ -91,7 +91,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bedroom Type */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                         <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['bedroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bedroomType'];
@@ -115,7 +115,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Bathroom Type */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                         <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['bathroomType'] && (() => {
                                 const Icon = fixedFieldIcons['bathroomType'];
@@ -139,7 +139,7 @@ export function HomeRoomsTab({
                     </div>
 
                     {/* Shower Type */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                         <label className="text-sm font-medium text-content-secondary flex items-center gap-2 pl-[5px]">
                             {fixedFieldIcons['showerType'] && (() => {
                                 const Icon = fixedFieldIcons['showerType'];
@@ -165,7 +165,7 @@ export function HomeRoomsTab({
                 </div>
 
                 {/* Languages */}
-                <div className="bg-surface-hover rounded-lg p-[5px]">
+                <div className="bg-surface-hover rounded-lg p-[3px]">
                     <div className="flex items-center gap-2 pl-[5px]">
                         <Languages className="h-4 w-4 text-accent" />
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pb-[5px]">Languages Spoken</h3>
@@ -189,7 +189,7 @@ export function HomeRoomsTab({
                                             return { ...prev, languages: newLangs };
                                         });
                                     }}
-                                    className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
+                                    className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
                                         ? "bg-surface-input text-content-primary"
                                         : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                         }`}

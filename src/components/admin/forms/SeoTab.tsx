@@ -39,7 +39,7 @@ function CharCounter({ value, soft, hard }: { value: string; soft: number; hard?
 
 function FieldRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[5px] bg-surface-hover rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[3px] bg-surface-hover rounded-lg">
             <div className="sm:min-w-[140px] sm:pt-1.5">
                 <p className="text-sm font-medium text-content-secondary">{label}</p>
                 {hint && <p className="text-[10px] text-content-muted mt-0.5">{hint}</p>}
@@ -156,7 +156,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
             {/* AI Generate */}
             {recordId && contentType && (
                 <div className="bg-surface-input rounded-lg p-[5px]">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-[5px] bg-surface-hover rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-[3px] bg-surface-hover rounded-lg">
                         <div>
                             <p className="text-sm font-medium text-content-primary flex items-center gap-1.5">
                                 <Sparkles className="h-4 w-4 text-accent" />
@@ -358,7 +358,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
 
                 {schemaExpanded && (
                     <div className="px-[5px] pb-[5px] space-y-2">
-                        <div className="p-[5px] bg-surface-hover rounded-lg space-y-2">
+                        <div className="p-[3px] bg-surface-hover rounded-lg space-y-2">
                             <p className="text-[10px] text-content-muted px-1">
                                 Paste a valid JSON-LD object here to merge with or override the auto-generated structured data. Leave blank to use defaults.
                             </p>
@@ -402,7 +402,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                     </p>
                     <div className="space-y-1.5 px-[5px] pb-[5px]">
                         {aiFaqs.map((faq, i) => (
-                            <div key={i} className="p-[5px] bg-surface-hover rounded-lg space-y-1">
+                            <div key={i} className="p-[3px] bg-surface-hover rounded-lg space-y-1">
                                 <p className="text-xs font-medium text-content-primary px-1">{faq.question}</p>
                                 <p className="text-xs text-content-secondary px-1 pb-1">{faq.answer}</p>
                             </div>

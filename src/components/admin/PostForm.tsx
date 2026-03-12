@@ -473,7 +473,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             Post Details
                         </h3>
 
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                 Title
                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
@@ -532,7 +532,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             </p>
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 <Youtube className="h-4 w-4 text-red-500" />
                                 YouTube URL
@@ -547,7 +547,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         </div>
 
                         {(postType === 'recipes' || postType === 'news_events') && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                     <Link className="h-4 w-4 text-accent" />
                                     Source URL
@@ -570,7 +570,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Prep Time</label>
                                         <div className="relative w-28 shrink-0">
                                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${prepTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
@@ -587,7 +587,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Cook Time</label>
                                         <div className="relative w-28 shrink-0">
                                             <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${cookTime ? "text-content-secondary" : "text-content-muted"}`}>m</span>
@@ -604,7 +604,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+                                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
                                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Yield</label>
                                         <input type="text" value={recipeYield} onChange={(e) => setRecipeYield(e.target.value)} className="form-input text-sm w-full h-8 rounded-md px-2 flex-1" placeholder="4-6 servings" />
                                     </div>
@@ -924,7 +924,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         })}
                         </div>
                         <div className="flex items-center gap-2 pb-2">
-                        <div className="flex bg-surface-input p-1 rounded-lg shrink-0">
+                        <div className="flex bg-surface-input p-1 rounded-lg shrink-0" style={{ border: '2px solid var(--form-border)' }}>
                             <button
                                 type="button"
                                 onClick={() => setStatus('published')}
@@ -935,7 +935,7 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             <button
                                 type="button"
                                 onClick={() => setStatus('draft')}
-                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
                             >
                                 Draft
                             </button>

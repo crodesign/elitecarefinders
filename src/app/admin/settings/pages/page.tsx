@@ -298,7 +298,7 @@ export default function PagesSettingsPage() {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted px-1.5 pt-1 pb-0.5">
                             Page Details
                         </p>
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[5px] bg-surface-hover rounded-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[3px] bg-surface-hover rounded-lg">
                             <div className="sm:min-w-[140px] sm:pt-1.5">
                                 <p className="text-sm font-medium text-content-secondary">Label</p>
                                 <p className="text-[10px] text-content-muted mt-0.5">Display name</p>
@@ -314,7 +314,7 @@ export default function PagesSettingsPage() {
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[5px] bg-surface-hover rounded-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[3px] bg-surface-hover rounded-lg">
                             <div className="sm:min-w-[140px] sm:pt-1.5">
                                 <p className="text-sm font-medium text-content-secondary">Slug</p>
                                 <p className="text-[10px] text-content-muted mt-0.5">URL identifier</p>

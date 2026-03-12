@@ -232,12 +232,12 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
 
                     <form id="taxonomy-form" onSubmit={handleSubmit} className="flex-none space-y-6">
                         <div className="space-y-4">
-                            <div className="bg-surface-input rounded-lg p-4">
+                            <div className="bg-surface-input rounded-lg p-4" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                 <h3 className="text-base font-medium text-content-primary mb-4 flex items-center gap-2">
                                     <Tag className="h-4 w-4 text-accent" />
                                     General Information
                                 </h3>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-4">
                                     <div>
                                         <label htmlFor="singularName" className="block text-sm font-medium text-content-secondary mb-2">
                                             <span className="flex items-center gap-1">
@@ -337,7 +337,7 @@ export function TaxonomyForm({ isOpen, onClose, onSave, taxonomy, autoOpenEntrie
                     {/* Entries Section - Only show when editing */}
                     {/* Entries Section - Only show when editing */}
                     {isEditing && (
-                        <div className="flex-1 min-h-0 flex flex-col bg-surface-input rounded-lg p-4">
+                        <div className="flex-1 min-h-0 flex flex-col bg-surface-input rounded-lg p-4" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                             <h3 className="flex-none text-base font-medium text-content-primary mb-4 flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-accent" />
                                 {taxonomy?.pluralName || "Entries"}

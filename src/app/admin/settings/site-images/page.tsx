@@ -352,7 +352,7 @@ export default function SiteImagesPage() {
                             </div>
                         ) : (
                             <div
-                                className={`grid gap-4 md:gap-6 ${isBulkSelectMode ? "grid-cols-2" : "grid-cols-1"} md:grid-cols-[repeat(auto-fill,minmax(250px,1fr))]`}
+                                className={`grid gap-4 md:gap-6 ${isBulkSelectMode ? "grid-cols-2" : "grid-cols-1"} md:grid-cols-6`}
                                 onClick={() => setSelectedItemId(null)}
                             >
                                 {mediaItems.map((item) => (

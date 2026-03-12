@@ -150,7 +150,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             )}
 
             {/* Logo / Branding Header */}
-            <div className="flex-none h-16 flex items-center px-4 bg-surface-card relative z-10">
+            <div className="flex-none h-16 flex items-center px-4 bg-surface-secondary relative z-10">
                 <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center">
                     {!collapsed ? (
                         <Logo className="h-8 w-auto" />
@@ -230,7 +230,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             </div>
 
             {/* Profile Section */}
-            <div className="flex-none bg-surface-card p-4 relative z-30">
+            <div className="flex-none bg-surface-secondary p-4 relative z-30">
                 <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
                     <Link
                         href={`${pathname}?${new URLSearchParams({ ...Object.fromEntries(searchParams.entries()), view_profile: 'true' }).toString()}`}

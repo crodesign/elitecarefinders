@@ -29,7 +29,7 @@ interface ChecklistSectionProps {
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
       <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{label}</label>
       {children}
     </div>
@@ -38,7 +38,7 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 
 function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+    <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
       <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
         <Icon className="h-4 w-4 text-accent" />
         {title}
@@ -56,7 +56,7 @@ function ToggleRow({
 }) {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+      <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
         <label htmlFor={id} className="text-sm font-medium text-content-secondary select-none cursor-pointer">{label}</label>
         <Switch
           id={id}
@@ -340,7 +340,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
         {/* Invoice Status — always shown in col 1 (invoiceEditMode shows this exclusively) */}
         <Section icon={FileCheck} title="Invoice Status">
           {/* Invoice Sent row */}
-          <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+          <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
             <label htmlFor="col1-invoice-sent" className="text-sm font-medium text-content-secondary select-none cursor-pointer whitespace-nowrap">Invoice Sent</label>
             <div className="flex items-center gap-2">
               {formData?.invoiceSent && (
@@ -367,7 +367,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
             </div>
           </div>
           {/* Invoice Paid row */}
-          <div className={cn("flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg", (!formData?.invoiceSentDate) && "opacity-50")}>
+          <div className={cn("flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg", (!formData?.invoiceSentDate) && "opacity-50")}>
             <label htmlFor="col1-invoice-received" className="text-sm font-medium text-content-secondary select-none cursor-pointer whitespace-nowrap">
               Invoice Paid{!formData?.invoiceSentDate ? " (requires sent date)" : ""}
             </label>
@@ -412,7 +412,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
           {/* ── COLUMN 3: COVID, TB Clearance ── */}
           <div className="flex-1 space-y-[10px] min-w-0">
 
-            <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+            <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
               {/* Title + subtitle left, switch right */}
               <div className="flex items-start justify-between gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 <div>
@@ -469,7 +469,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
               )}
             </div>
 
-            <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+            <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
               {/* Title + subtitle left, switch right */}
               <div className="flex items-start justify-between gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 <div>
@@ -520,7 +520,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
                       allowNone
                     />
                   </FieldRow>
-                  <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+                  <div className="bg-surface-hover rounded-lg p-[3px] space-y-2">
                     {/* Chest X-Ray toggle inline with label */}
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-content-secondary">Chest X-Ray <span className="text-content-muted">(&ldquo;No Active TB&rdquo;)</span></span>
@@ -567,7 +567,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
 
           {/* ── COLUMN 4: AD/POA, Email/Fax Records ── */}
           <div className="flex-1 space-y-[10px] min-w-0">
-            <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+            <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
               {/* Title row: icon+title left, switch right */}
               <div className="flex items-center justify-between gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 <h3 className="text-sm font-medium text-content-primary flex items-center gap-2">
@@ -601,7 +601,7 @@ const ChecklistSection = ({ formData, setFormData, handleChange: handleChangePro
               )}
             </div>
 
-            <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+            <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
               {/* Title+subtitle left, optional date + switch right */}
               <div className="flex items-start justify-between gap-2 pt-[5px] pl-[5px] pb-[5px]">
                 <div>

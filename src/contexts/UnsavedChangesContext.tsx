@@ -138,7 +138,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
                                 <button
                                     type="button"
                                     onClick={handleDiscard}
-                                    className="px-4 py-2 rounded-lg text-sm font-medium bg-surface-hover text-white hover:bg-surface-hover transition-colors shadow-lg shadow-black/20"
+                                    className="px-4 py-2 rounded-lg text-sm font-medium bg-surface-hover text-content-primary hover:bg-surface-hover transition-colors shadow-lg shadow-black/20"
                                 >
                                     Discard & Proceed
                                 </button>

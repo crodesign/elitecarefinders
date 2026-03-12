@@ -57,7 +57,7 @@ export function HomeFieldCategory({
 
                         {/* Boolean Field */}
                         {field.type === 'boolean' && (
-                            <div className="bg-surface-hover rounded-lg p-[5px] flex items-center justify-between gap-3">
+                            <div className="bg-surface-hover rounded-lg p-[3px] flex items-center justify-between gap-3">
                                 <span className="font-medium text-sm text-content-secondary pl-[5px]">{field.name}</span>
                                 <button
                                     type="button"
@@ -94,7 +94,10 @@ export function HomeFieldCategory({
                                                 ? "No"
                                                 : "Select"}
                                     </span>
-                                    <div className={`p-0.5 rounded-full bg-white/20`}>
+                                    <div
+                                        className="p-0.5 rounded-full"
+                                        style={{ backgroundColor: roomDetails.customFields[field.id] !== undefined ? 'rgba(255,255,255,0.20)' : 'var(--form-border)' }}
+                                    >
                                         {roomDetails.customFields[field.id] === true ? (
                                             <Check className="h-3 w-3" />
                                         ) : roomDetails.customFields[field.id] === false ? (
@@ -109,7 +112,7 @@ export function HomeFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
+                            <div className="bg-surface-hover rounded-lg p-[3px] space-y-3">
                                 <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                     {field.options?.map((opt) => (
@@ -126,7 +129,7 @@ export function HomeFieldCategory({
                                                 }
                                                 return { ...prev, customFields: newCustomFields };
                                             })}
-                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
+                                            className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
@@ -147,7 +150,7 @@ export function HomeFieldCategory({
                         )}
 
                         {field.type === 'dropdown' && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] rounded-lg transition-all bg-surface-hover">
+                            <div className="flex items-center justify-between gap-2 p-[3px] rounded-lg transition-all bg-surface-hover">
                                 <span className="font-medium text-sm text-content-secondary pl-[5px]">{field.name}</span>
                                 <SimpleSelect
                                     value={roomDetails.customFields[field.id] as string || ""}
@@ -167,7 +170,7 @@ export function HomeFieldCategory({
 
                         {/* Text Field */}
                         {field.type === 'text' && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
                                 <input
                                     type="text"
@@ -187,7 +190,7 @@ export function HomeFieldCategory({
 
                         {/* Text Block (Textarea) */}
                         {field.type === 'textarea' && (
-                            <div className="bg-surface-hover rounded-lg p-[5px] transition-all space-y-2">
+                            <div className="bg-surface-hover rounded-lg p-[3px] transition-all space-y-2">
                                 <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <textarea
                                     value={roomDetails.customFields[field.id] as string || ""}
@@ -206,7 +209,7 @@ export function HomeFieldCategory({
 
                         {/* Number Field */}
                         {field.type === 'number' && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                                 <div className="relative w-32">
                                     <input
@@ -258,7 +261,7 @@ export function HomeFieldCategory({
 
                         {/* Phone Field */}
                         {field.type === 'phone' && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
                                 <div className="relative w-40">
                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
@@ -281,7 +284,7 @@ export function HomeFieldCategory({
 
                         {/* Email Field */}
                         {field.type === 'email' && (
-                            <div className={`flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
+                            <div className={`flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all ${invalidEmailFields.has(field.id) ? 'border border-red-500/50' : ''}`}>
                                 <div className="flex items-center gap-2 min-w-0">
                                     <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
                                     {invalidEmailFields.has(field.id) && (
@@ -322,7 +325,7 @@ export function HomeFieldCategory({
 
                         {/* Currency Field */}
                         {field.type === 'currency' && (
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                                 <div className="relative w-32">
                                     <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${roomDetails.customFields[field.id] ? "text-content-secondary" : "text-content-muted"}`}>$</span>
@@ -389,7 +392,7 @@ export function HomeFieldCategory({
                                                         customFields: { ...prev.customFields, [field.id]: updated }
                                                     }));
                                                 }}
-                                                className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
+                                                className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
                                                     ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
                                                     : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
                                                     }`}
@@ -406,7 +409,7 @@ export function HomeFieldCategory({
                                     })}
                                 </div>
                             ) : (
-                                <div className="bg-surface-hover rounded-lg p-[5px] space-y-3">
+                                <div className="bg-surface-hover rounded-lg p-[3px] space-y-3">
                                     <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                     <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                         {field.options?.map((opt) => {
@@ -425,7 +428,7 @@ export function HomeFieldCategory({
                                                             customFields: { ...prev.customFields, [field.id]: updated }
                                                         }));
                                                     }}
-                                                    className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
+                                                    className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
                                                         ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
                                                         : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
                                                         }`}

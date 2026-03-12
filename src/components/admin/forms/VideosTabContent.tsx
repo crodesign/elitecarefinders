@@ -157,7 +157,7 @@ export function VideosTabContent({ videos, setVideos, setIsDirty, entityTitle }:
             </div>
 
             {/* Video Gallery */}
-            <div className="bg-[var(--media-gallery-bg)] rounded-lg p-4 flex-1 min-h-0 overflow-y-auto">
+            <div className="bg-surface-input rounded-lg p-4 flex-1 min-h-0 overflow-y-auto" style={{ border: '2px solid var(--form-border)' }}>
                 {videos.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center border border-dashed border-ui-border rounded-xl py-16">
                         <Youtube className="h-10 w-10 text-content-muted opacity-30 mb-3" />
@@ -293,7 +293,7 @@ function VideoTile({ id, video, onDelete, onCaptionChange }: VideoTileProps) {
 
             {/* Caption overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-2">
-                <div className={`relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md`}>
+                <div className={`relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md`}>
                     <input
                         type="text"
                         value={caption}
@@ -302,7 +302,7 @@ function VideoTile({ id, video, onDelete, onCaptionChange }: VideoTileProps) {
                         onKeyDown={handleCaptionKeyDown}
                         onPointerDown={(e) => e.stopPropagation()}
                         placeholder="Add caption..."
-                        className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
+                        className={`overlay-input w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
                     />
                     {captionChanged && (
                         <button

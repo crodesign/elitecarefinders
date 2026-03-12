@@ -983,7 +983,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             })}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex">
+                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex" style={{ border: '2px solid var(--form-border)' }}>
                                 <button
                                     type="button"
                                     onClick={() => { setStatus('published'); setIsDirty(true); }}
@@ -994,7 +994,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                 <button
                                     type="button"
                                     onClick={() => { setStatus('draft'); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
                                 >
                                     Draft
                                 </button>

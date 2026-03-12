@@ -122,7 +122,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
         {/* Column 1: Documents Gallery + Add New Note */}
         <div className="flex flex-col gap-4 min-h-0">
-          <div className="bg-surface-input rounded-lg p-[5px] flex-1 min-h-0 overflow-y-auto">
+          <div className="bg-surface-input rounded-lg p-[5px] flex-1 min-h-0 overflow-y-auto" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
             <ContactDocumentsGallery contactId={contactId} readOnly={readOnly} />
           </div>
           {!readOnly && (
@@ -165,7 +165,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
 
         {/* Column 2: Notes History — fixed header, scrollable body only */}
         <div className="flex flex-col min-h-0 border-2 rounded-md" style={{ borderColor: 'var(--surface-input)' }}>
-          <h3 className="flex-none text-lg font-semibold text-content-primary py-3 px-6 bg-surface-input rounded-t-md">Notes History</h3>
+          <h3 className="flex-none text-lg font-semibold text-content-primary py-3 px-6 bg-surface-input rounded-t-md" style={{ borderBottom: '2px solid var(--form-border)' }}>Notes History</h3>
           <div className="flex-1 min-h-0 overflow-y-auto pt-4 pb-4">
             {notes.length === 0 ? (
               <div className="px-6 py-4">

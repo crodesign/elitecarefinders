@@ -28,8 +28,8 @@
   /* Surfaces */
   --surface-primary: #09090b;
   --surface-secondary: #111111;
-  --surface-card: #141414;
-  --surface-input: rgba(255, 255, 255, 0.08);
+  --surface-card: #000000;
+  --surface-input: #000000;
   --surface-hover: rgba(255, 255, 255, 0.12);
   --surface-well: #1e1e1e;
   --surface-caption: #303030;
@@ -45,6 +45,10 @@
   --content-muted: #71717a;
   /* Glass overlays — black tint for dark mode */
   --glass-overlay: rgba(0, 0, 0, 0.5);
+  /* Form fields & containers */
+  --form-bg: #000000;
+  --form-border: rgba(255, 255, 255, 0.22);
+  --form-hover: rgba(255, 255, 255, 0.06);
   /* Accent — overwritten dynamically by ThemeContext */
   --accent: #239ddb;
   --accent-light: #1a7fb3;
@@ -86,12 +90,13 @@
 }
 
 /* ── Light mode ──────────────────────────────────── */
+
 [data-theme="light"],
 :root[data-theme="light"] {
   --surface-primary: #f4f4f5;
   --surface-secondary: #ffffff;
   --surface-card: #ffffff;
-  --surface-input: rgba(0, 0, 0, 0.07);
+  --surface-input: #ffffff;
   --surface-hover: rgba(0, 0, 0, 0.11);
   --surface-well: #e8e8ea;
   --surface-caption: #f9f9fa;
@@ -134,6 +139,10 @@
   --media-tree-selected-text: #000000;
   --media-dropdown-btn-bg: rgba(0, 0, 0, 0.04);
   --media-dropdown-btn-hover: rgba(0, 0, 0, 0.08);
+  /* Form fields & containers */
+  --form-bg: #ffffff;
+  --form-border: rgba(0, 0, 0, 0.15);
+  --form-hover: rgba(0, 0, 0, 0.055);
 }
 
 /* ── Dynamic Greyscales (Slate, Stone, Gray, Neutral) ── */
@@ -255,38 +264,87 @@ body {
   color: var(--content-muted);
 }
 
-/* Light mode: white background for checkboxes and radio buttons */
-[data-theme="light"] input[type="checkbox"],
-[data-theme="light"] input[type="radio"],
-[data-theme="light"] [role="checkbox"] {
-  background-color: #ffffff !important;
+/* Radix checkboxes/radios: form-bg + 2px form-border */
+[role="checkbox"],
+[role="radio"] {
+  background-color: var(--form-bg) !important;
+  border: 2px solid var(--form-border) !important;
   accent-color: var(--accent);
 }
 
-/* ── Global: no borders on inputs, textareas, selects, or dropdowns ── */
-input,
-input[type],
+/* Checked state: switch to primary colour */
+[role="checkbox"][data-state="checked"] {
+  background-color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+/* Native checkboxes/radios */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+/* ── Overlay inputs (image tile captions, video captions): no border ── */
+.overlay-input {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ── Form inputs: 2px bordered, solid bg ─────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]):not(.overlay-input),
 textarea,
 select,
 [role="combobox"],
+[data-radix-select-trigger],
+.form-input {
+  border: 2px solid var(--form-border) !important;
+  background-color: var(--form-bg) !important;
+  outline: none !important;
+}
+
+/* Focus: switch border to accent */
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus,
+[role="combobox"]:focus,
+button.form-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Dropdown overlay content: no border, no outline */
 [role="listbox"],
 [role="option"],
 [data-radix-popper-content-wrapper]>*,
-[data-radix-select-content],
-[data-radix-select-trigger],
-.form-input {
+[data-radix-select-content] {
   border: none !important;
   outline: none !important;
 }
 
-/* Restore focus ring via box-shadow only */
-input:focus,
-select:focus,
-textarea:focus,
-[role="combobox"]:focus,
-button.form-input:focus {
-  box-shadow: 0 0 0 2px var(--accent) !important;
-  outline: none !important;
+/* ── Listing table card exterior ── */
+div.bg-surface-card.rounded-xl {
+  border: 2px solid var(--form-border);
+}
+
+/* ── Checkbox/radio option buttons ── */
+button.bg-surface-input.w-full,
+button.bg-surface-hover.w-full {
+  border: 2px solid var(--form-border);
+  background-color: var(--form-bg);
+}
+
+/* ── Checkbox/radio button hover: half density ── */
+button.bg-surface-input.w-full:hover,
+button.bg-surface-hover.w-full:hover {
+  background-color: var(--form-hover) !important;
+}
+
+/* ── X icon: solid bg on button hover ── */
+button.bg-surface-input.w-full:hover .lucide-x,
+button.bg-surface-hover.w-full:hover .lucide-x {
+  background-color: var(--form-bg);
+  border-radius: 2px;
 }
 
 /* Custom utility classes */
@@ -341,7 +399,8 @@ button.form-input:focus {
   }
 
   .card {
-    @apply bg-surface-card border border-ui-border rounded-xl;
+    @apply bg-surface-card rounded-xl;
+    border: 2px solid var(--form-border);
   }
 
   .table-header {
@@ -400,15 +459,14 @@ button.form-input:focus {
   }
 
   /* ── Form Input — light/dark compatible ─────────── */
-  /* Replaces the bg-black/30 text-white placeholder-content-muted pattern */
   .form-input {
-    background-color: color-mix(in srgb, var(--surface-secondary) 75%, var(--surface-hover));
+    background-color: var(--form-bg);
     color: var(--content-primary);
-    border: 1px solid var(--ui-border);
+    border: 2px solid var(--form-border) !important;
     border-radius: 6px;
     font-size: 0.875rem;
     text-align: left;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition: border-color 0.15s;
     outline: none;
   }
 
@@ -417,12 +475,12 @@ button.form-input:focus {
   }
 
   .form-input:hover {
-    background-color: var(--surface-hover);
+    background-color: var(--form-bg);
   }
 
   .form-input:focus {
-    background-color: var(--surface-hover);
-    border-color: var(--accent);
+    background-color: var(--form-bg);
+    border-color: var(--accent) !important;
   }
 
   .form-input:disabled,
@@ -501,7 +559,7 @@ select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
   -webkit-text-fill-color: var(--content-primary) !important;
-  box-shadow: inset 0 0 0 1000px var(--surface-input) !important;
+  box-shadow: inset 0 0 0 1000px var(--form-bg) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

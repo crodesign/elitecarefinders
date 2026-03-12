@@ -111,7 +111,7 @@ export function FacilityInformationTab({
                 <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1 min-h-0">
                     {/* Facility Name & Slug */}
                     <div className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 <span className="sm:hidden">Name</span><span className="hidden sm:inline">Facility Name</span>
                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
@@ -197,7 +197,7 @@ export function FacilityInformationTab({
                                     findEntryInTree(taxonomy.entries, id)
                                 ) || "";
                                 return (
-                                    <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                    <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
                                             <span className="sm:hidden">{taxonomy.singularName.includes("Type") ? "Type" : taxonomy.singularName}</span>
                                             <span className="hidden sm:inline">{taxonomy.singularName}</span>
@@ -246,7 +246,7 @@ export function FacilityInformationTab({
                     </h3>
 
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                             <input
                                 type="text"
@@ -259,7 +259,7 @@ export function FacilityInformationTab({
                                 placeholder="Street address"
                             />
                         </div>
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">City</label>
                             <input
                                 type="text"
@@ -273,7 +273,7 @@ export function FacilityInformationTab({
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex-1 flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex-1 flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
                                 <SimpleSelect
                                     value={state}
@@ -283,7 +283,7 @@ export function FacilityInformationTab({
                                     className="w-32 h-8 flex items-center justify-between text-sm text-left"
                                 />
                             </div>
-                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
                                 <input
                                     type="text"
@@ -307,7 +307,7 @@ export function FacilityInformationTab({
                         Contact
                     </h3>
                     <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
                             <input
                                 type="tel"
@@ -320,7 +320,7 @@ export function FacilityInformationTab({
                                 placeholder="(555) 123-4567"
                             />
                         </div>
-                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
                             <input
                                 type="email"
@@ -441,7 +441,7 @@ export function FacilityInformationTab({
                     </div>
 
                     {/* Featured Video */}
-                    <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                             <Video className={`h-3.5 w-3.5 flex-shrink-0 ${hasFeaturedVideo ? 'text-accent' : 'text-content-secondary'}`} />
                             Featured Video

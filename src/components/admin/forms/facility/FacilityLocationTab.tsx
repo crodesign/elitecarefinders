@@ -49,7 +49,7 @@ export function FacilityLocationTab({
             {/* Column 1: Levels of Care (Fixed) */}
             <div className="space-y-[10px]">
                 <div className="space-y-4">
-                    <div className="bg-surface-hover rounded-lg p-[5px]">
+                    <div className="bg-surface-hover rounded-lg p-[3px]">
                         {(() => {
                             const Icon = fixedFieldIcons["levelOfCare"] ? ICON_MAP[fixedFieldIcons["levelOfCare"]] : null;
                             return (
@@ -79,7 +79,7 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
+                                            className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}
@@ -100,7 +100,7 @@ export function FacilityLocationTab({
 
                 {/* Languages Spoken (Fixed) */}
                 <div className="space-y-4">
-                    <div className="bg-surface-hover rounded-lg p-[5px]">
+                    <div className="bg-surface-hover rounded-lg p-[3px]">
                         {(() => {
                             const Icon = fixedFieldIcons["language"] ? ICON_MAP[fixedFieldIcons["language"]] : null;
                             return (
@@ -130,7 +130,7 @@ export function FacilityLocationTab({
                                                 }));
                                                 setIsDirty(true);
                                             }}
-                                            className={`w-full flex items-center justify-between p-[7px] rounded-lg text-left transition-all ${isSelected
+                                            className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
                                                 ? "bg-surface-input text-content-primary"
                                                 : "bg-surface-input hover:bg-surface-hover text-content-secondary"
                                                 }`}

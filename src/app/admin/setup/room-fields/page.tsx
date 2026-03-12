@@ -105,7 +105,7 @@ function SortableFieldItem({
 
     if (editingFieldId === field.id) {
         return (
-            <div ref={setNodeRef} style={style} className="p-3 bg-accent/10 rounded-lg space-y-3 cursor-default">
+            <div ref={setNodeRef} style={style} className="p-[3px] bg-accent/10 rounded-lg space-y-3 cursor-default" style={{ border: '2px solid var(--form-border)' }}>
                 {/* Inline Edit Form - Note: Dragging disabled while editing */}
                 <div className="flex items-center gap-3">
                     <input
@@ -281,7 +281,7 @@ function SortableFixedOptionItem({
 
     if (editingId === option.id) {
         return (
-            <div ref={setNodeRef} style={style} className="p-3 bg-accent/10 rounded-lg flex items-center gap-3 cursor-default">
+            <div ref={setNodeRef} style={style} className="p-[3px] bg-accent/10 rounded-lg flex items-center gap-3 cursor-default" style={{ border: '2px solid var(--form-border)' }}>
                 <input
                     type="text"
                     value={editValue}
@@ -395,9 +395,9 @@ function SortableCategoryItem({
     };
 
     return (
-        <div ref={setNodeRef} style={style} className="bg-surface-input rounded-lg mb-3">
+        <div ref={setNodeRef} style={{ ...style, border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }} className="rounded-lg mb-3">
             {/* Category Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-surface-input rounded-t-lg">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-t-lg" style={{ backgroundColor: 'var(--form-hover)' }}>
                 <div {...attributes} {...listeners} className="cursor-grab hover:text-content-primary text-content-muted">
                     <GripVertical className="h-4 w-4" />
                 </div>
@@ -1393,8 +1393,8 @@ export default function RoomFieldsPage() {
 
                                 return (
                                     <div key={type} className="space-y-2">
-                                        <div className="bg-surface-input rounded-lg p-3 space-y-2">
-                                            <div className="flex items-center justify-between">
+                                        <div className="bg-surface-input rounded-lg p-3 space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
+                                            <div className="flex items-center justify-between" style={{ backgroundColor: 'var(--form-hover)', margin: '-12px -12px 0 -12px', padding: '8px 12px', borderRadius: '6px 6px 0 0' }}>
                                                 <div className="flex items-center gap-2">
                                                     <IconPicker
                                                         value={fixedFieldIcons[type]}

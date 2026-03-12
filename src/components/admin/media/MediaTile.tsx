@@ -234,7 +234,7 @@ export function MediaTile({
     return (
         <div className="rounded-xl overflow-hidden group">
             {/* Image container */}
-            <div className="relative w-full aspect-square bg-surface-input rounded-xl overflow-hidden">
+            <div className="relative w-full aspect-square rounded-xl overflow-hidden" style={{ backgroundColor: 'rgba(128,128,128,0.1)' }}>
                 {item.mimeType.startsWith("image/") ? (
                     <>
                         <img
@@ -356,14 +356,14 @@ export function MediaTile({
                 {/* Caption / Name + Title overlays */}
                 <div className={`absolute bottom-0 left-0 right-0 p-2 flex flex-col gap-1`}>
                     {isTeamView && (
-                        <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                        <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
                             <input
                                 type="text"
                                 value={itemTitle}
                                 onChange={(e) => setItemTitle(e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(e, 'title')}
                                 placeholder="Title..."
-                                className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${titleChanged ? 'pr-12' : ''}`}
+                                className={`overlay-input w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${titleChanged ? 'pr-12' : ''}`}
                             />
                             {titleChanged && (
                                 <button
@@ -377,14 +377,14 @@ export function MediaTile({
                             )}
                         </div>
                     )}
-                    <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent/60 bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                    <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
                         <input
                             type="text"
                             value={caption}
                             onChange={(e) => setCaption(e.target.value)}
                             onKeyDown={(e) => handleKeyDown(e, 'caption')}
                             placeholder={isTeamView ? "Name..." : "Add caption..."}
-                            className={`w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
+                            className={`overlay-input w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
                         />
                         {captionChanged && (
                             <button

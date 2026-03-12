@@ -603,9 +603,9 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
                             <div className="space-y-[10px]">
-                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                     <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <User className="h-4 w-4 text-accent" />
                                         Account Information
@@ -613,7 +613,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                                     <div className="flex gap-4 mb-[5px]">
                                         <div className="flex-1 space-y-2">
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                     Full Name
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
@@ -629,7 +629,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                                 />
                                             </div>
 
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Nickname</label>
                                                 <input
                                                     type="text"
@@ -676,7 +676,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                 Email
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
@@ -697,7 +697,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                         </div>
 
                                         {!isEditing && (
-                                            <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">
                                                     Password
                                                     <span className="h-1.5 w-1.5 rounded-full bg-red-500 ml-1 inline-block"></span>
@@ -765,7 +765,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             </div>
                                         )}
 
-                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap pl-[5px]">
                                                 Role
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
@@ -804,7 +804,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                                         {/* Reports To - cascading: type → RM → optional LM */}
                                         {(isSuperAdmin || isSystemAdmin) && (role === 'location_manager' || role === 'local_user') && (
-                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2">
+                                            <div className="bg-surface-hover rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 {/* Step 1: manager type */}
                                                 <div className="flex items-center justify-between gap-2">
                                                     <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 whitespace-nowrap pl-[5px]">
@@ -869,7 +869,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                                         {/* Entity Assignments - shown for Local User role */}
                                         {role === 'local_user' && (
-                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2 transition-all">
+                                            <div className="bg-surface-hover rounded-lg p-[3px] space-y-2 transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 w-full">
                                                     <MapPin className="h-3.5 w-3.5 text-accent" />
                                                     Assigned Homes / Facilities
@@ -958,7 +958,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
 
                                         {/* Location Assignments - shown for RM and Location Manager */}
                                         {showLocationSelector && (
-                                            <div className="bg-surface-hover rounded-lg p-[5px] space-y-2 transition-all">
+                                            <div className="bg-surface-hover rounded-lg p-[3px] space-y-2 transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                                 <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 w-full">
                                                     <Globe className="h-3.5 w-3.5 text-accent" />
                                                     Location Assignments
@@ -1092,14 +1092,14 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                             </div>
 
                             <div className="space-y-[10px]">
-                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                     <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <Phone className="h-4 w-4 text-accent" />
                                         Contact Information
                                     </h3>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Phone</label>
                                             <div className="relative flex-shrink-0">
                                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
@@ -1116,14 +1116,14 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                     </div>
                                 </div>
 
-                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
+                                <div className="bg-surface-input rounded-lg p-[5px] space-y-2" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                     <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                                         <MapPin className="h-4 w-4 text-accent" />
                                         Address
                                     </h3>
 
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                                             <input
                                                 type="text"
@@ -1135,7 +1135,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             />
                                         </div>
 
-                                        <div className="flex items-center justify-between gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">City</label>
                                             <input
                                                 type="text"
@@ -1147,7 +1147,7 @@ export function UserForm({ isOpen, onClose, onSave, user }: UserFormProps) {
                                             />
                                         </div>
 
-                                        <div className="flex items-center gap-2 p-[5px] bg-surface-hover rounded-lg transition-all">
+                                        <div className="flex items-center gap-2 p-[3px] bg-surface-hover rounded-lg transition-all" style={{ border: '2px solid var(--form-border)', backgroundColor: 'var(--form-bg)' }}>
                                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex-shrink-0 pl-[5px]">State / Zip</label>
                                             <div className="flex gap-2 ml-auto">
                                                 <SimpleSelect

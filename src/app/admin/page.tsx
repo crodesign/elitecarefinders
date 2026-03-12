@@ -97,7 +97,7 @@ function EntityPanel({ name, manageHref, createHref, icon: Icon, published, unpu
     published: number; unpublished: number; loading: boolean; items: RecentItem[];
 }) {
     return (
-        <div className="card border-0 flex flex-col overflow-hidden">
+        <div className="card flex flex-col overflow-hidden">
             <div className="px-4 py-3 flex items-center gap-2.5 border-b border-ui-border">
                 <Icon className="h-5 w-5 text-accent flex-shrink-0" />
                 <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">{name}</h3>
@@ -126,7 +126,7 @@ function EntityPanel({ name, manageHref, createHref, icon: Icon, published, unpu
 
 function BlogPanel({ loading, count, items }: { loading: boolean; count: number; items: RecentItem[] }) {
     return (
-        <div className="card border-0 flex flex-col overflow-hidden">
+        <div className="card flex flex-col overflow-hidden">
             <div className="px-4 py-3 flex items-center gap-2.5 border-b border-ui-border">
                 <FileText className="h-5 w-5 text-accent flex-shrink-0" />
                 <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">Blog</h3>
@@ -155,7 +155,7 @@ function ReviewsPanel({ loading, reviews, items }: { loading: boolean; reviews: 
     };
 
     return (
-        <div className="card border-0 flex flex-col overflow-hidden">
+        <div className="card flex flex-col overflow-hidden">
             <div className="px-4 py-3 flex items-center gap-2 border-b border-ui-border">
                 <Star className="h-5 w-5 text-accent flex-shrink-0" />
                 <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">Reviews</h3>
