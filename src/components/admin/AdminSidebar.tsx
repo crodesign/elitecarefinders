@@ -92,13 +92,15 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             return item.name === 'Invoices';
         }
 
-        // Show Users link only to System Admins (not Super Admins)
+        // Users nav item: system_admin only (not super_admin, who uses Settings > Users)
         if (item.requireSystemAdmin) {
-            return isSystemAdmin && !canAccessSettings; // System Admins but not Super Admins
+            return isSystemAdmin && !isSuperAdmin;
         }
 
-        // Hide Invoices from others if needed, or show it. 
-        // Let's assume admins can see it too.
+        // Invoices, Contacts, Reviews, Posts: super_admin and system_admin only
+        if (['Invoices', 'Contacts', 'Reviews', 'Posts'].includes(item.name)) {
+            return isSystemAdmin; // isSystemAdmin is true for both system_admin and super_admin
+        }
 
         return true;
     });
@@ -340,6 +342,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                         </div>
                     </div>
                     <div className="p-2 space-y-1">
+                        {isSuperAdmin && (
                         <Link
                             href="/admin/settings"
                             onClick={(e) => handleNavClick(e, "/admin/settings")}
@@ -351,6 +354,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Settings className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname === "/admin/settings" ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             General
                         </Link>
+                        )}
                         {isSuperAdmin && (
                             <Link
                                 href="/admin/settings/pages"
@@ -377,6 +381,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                 SEO Templates
                             </Link>
                         )}
+                        {isSuperAdmin && (
                         <Link
                             href="/admin/taxonomies"
                             onClick={(e) => handleNavClick(e, "/admin/taxonomies")}
@@ -388,6 +393,8 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Tags className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/taxonomies") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Taxonomies
                         </Link>
+                        )}
+                        {isSuperAdmin && (
                         <Link
                             href="/admin/setup/room-fields"
                             onClick={(e) => handleNavClick(e, "/admin/setup/room-fields")}
@@ -399,6 +406,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Bed className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/setup/room-fields") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Detail Fields
                         </Link>
+                        )}
                         {isSuperAdmin && (
                             <Link
                                 href="/admin/settings/site-images"
