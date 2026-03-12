@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "Elite CareFinders",
     description: "Senior Living Advisors",
+    icons: {
+        icon: 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-4.png',
+    },
 };
 
 function hexToHsl(hex: string): [number, number, number] {
