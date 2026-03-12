@@ -104,14 +104,14 @@ function HeroSection() {
         <section className="max-w-6xl mx-auto px-5 pt-8">
             {/* Blue header bar */}
             <h1
-                className="bg-[#239ddb] text-white text-center py-3 m-0 rounded-t-2xl"
-                style={{ fontFamily: 'var(--font-montserrat)', fontSize: '44px', fontWeight: 200, lineHeight: 1.2 }}
+                className="bg-[#239ddb] text-white text-center py-3 m-0 rounded-t-2xl text-[33px] sm:text-[44px]"
+                style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 200, lineHeight: 1.2 }}
             >
                 Quality Senior Care in Hawaii
             </h1>
 
             {/* Image with overlays */}
-            <div className="relative overflow-hidden bg-gray-200 rounded-b-2xl" style={{ height: '680px' }}>
+            <div className="relative overflow-hidden bg-gray-200 rounded-b-2xl h-[340px] sm:h-[680px]">
                 <Image
                     src={`${R2}/ECF_Rose-couple-consultation-edited-by-Rose_02.17.25_RG-scaled.webp`}
                     alt="Elite CareFinders — Hawaii Senior Care Advisors"
@@ -125,10 +125,9 @@ function HeroSection() {
                 {/* Text — bottom left */}
                 <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-7" style={{ textAlign: 'left', lineHeight: 1 }} role="text" aria-label="Going beyond to find the care your loved one deserves">
                     <p
-                        className="text-white m-0"
+                        className="text-white m-0 text-[44px] sm:text-[clamp(36px,5vw,75px)]"
                         style={{
                             fontFamily: 'var(--font-alex-brush)',
-                            fontSize: 'clamp(36px, 5vw, 75px)',
                             lineHeight: 0.95,
                             textShadow: 'rgba(25, 27, 33, 0.6) 2px 0px 15px',
                         }}
@@ -136,10 +135,9 @@ function HeroSection() {
                         Going beyond
                     </p>
                     <p
-                        className="text-white m-0"
+                        className="text-white m-0 text-[24px] sm:text-[clamp(20px,3vw,45px)]"
                         style={{
                             fontFamily: 'var(--font-montserrat)',
-                            fontSize: 'clamp(20px, 3vw, 45px)',
                             lineHeight: 1,
                             fontWeight: 400,
                             textShadow: 'rgba(25, 27, 33, 0.6) 2px 0px 15px',
@@ -148,10 +146,9 @@ function HeroSection() {
                         to find the <strong>care</strong>
                     </p>
                     <p
-                        className="text-white m-0"
+                        className="text-white m-0 text-[24px] sm:text-[clamp(20px,3vw,45px)]"
                         style={{
                             fontFamily: 'var(--font-montserrat)',
-                            fontSize: 'clamp(20px, 3vw, 45px)',
                             lineHeight: 1,
                             fontWeight: 400,
                             textShadow: 'rgba(25, 27, 33, 0.6) 2px 0px 15px',
@@ -160,10 +157,9 @@ function HeroSection() {
                         your loved one
                     </p>
                     <p
-                        className="text-white m-0"
+                        className="text-white m-0 text-[44px] sm:text-[clamp(36px,5vw,75px)]"
                         style={{
                             fontFamily: 'var(--font-alex-brush)',
-                            fontSize: 'clamp(36px, 5vw, 75px)',
                             lineHeight: 1,
                             textShadow: 'rgba(25, 27, 33, 0.6) 2px 0px 20px',
                         }}
@@ -172,8 +168,8 @@ function HeroSection() {
                     </p>
                 </div>
 
-                {/* Awards — bottom right, spans half the hero width */}
-                <div className="absolute bottom-4 right-0 sm:bottom-6 w-1/2 flex flex-col items-center gap-1 pr-3 sm:pr-5">
+                {/* Awards — bottom right, desktop only */}
+                <div className="hidden sm:flex sm:absolute bottom-4 right-0 sm:bottom-6 w-1/2 flex-col items-center gap-1 pr-3 sm:pr-5">
                     <div className="flex gap-2 sm:gap-3 w-full">
                         {HERO_AWARDS.map(award => (
                             <a
@@ -201,6 +197,36 @@ function HeroSection() {
                         Click the logos above to read about the awards
                     </p>
                 </div>
+            </div>
+
+            {/* Awards — mobile only, below image */}
+            <div className="sm:hidden bg-white pt-4 pb-2 px-3">
+                <div className="flex gap-3 justify-center">
+                    {HERO_AWARDS.map(award => (
+                        <a
+                            key={award.alt}
+                            href={award.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 max-w-[110px] transition-transform duration-200 hover:scale-105"
+                        >
+                            <div className="aspect-square bg-white rounded-full flex items-center justify-center p-[8%] border border-gray-100">
+                                <div className="relative w-full h-full">
+                                    <Image
+                                        src={award.src}
+                                        alt={award.alt}
+                                        fill
+                                        className="object-contain"
+                                        sizes="28vw"
+                                    />
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+                <p className="text-gray-400 text-[8px] font-bold uppercase tracking-widest text-center mt-2 mb-0">
+                    Click the logos above to read about the awards
+                </p>
             </div>
 
             {/* Below image text */}
@@ -337,26 +363,26 @@ const ELITE_STANDARDS = [
 function ContentSection() {
     return (
         <section className="max-w-6xl mx-auto px-5 py-12">
-            <div className="flex flex-col lg:flex-row gap-0">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 mb-[30px] lg:mb-0">
 
                 {/* Left column */}
-                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                <div className="flex-1 min-w-0 flex flex-col justify-center bg-gray-100 rounded-2xl p-5 lg:bg-transparent lg:rounded-none lg:p-0">
                     <h2
-                        className="text-[#239ddb] text-center mb-6 pr-8"
-                        style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-0.3px' }}
+                        className="text-[#239ddb] text-center mb-6 lg:pr-8 font-bold lg:font-extralight"
+                        style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.1, letterSpacing: '-0.3px' }}
                     >
                         Your no-cost senior care placement experts
                     </h2>
 
                     <p
-                        className="mb-6 pr-8"
+                        className="mb-6 lg:pr-8"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(16px, 1.7vw, 24px)', fontWeight: 400, lineHeight: 1.3, textAlign: 'justify', color: '#191b21' }}
                     >
                         Finding care for your loved one can be difficult and complex. Our <strong>FREE</strong> consultation makes it simple. We have decades of experience, ready to assist you from beginning to end.
                     </p>
 
                     {/* Inner 2-col: care types + specialization — blue card */}
-                    <div className="flex flex-col sm:flex-row gap-8 mb-10 bg-[#239ddb] rounded-l-2xl p-6">
+                    <div className="flex flex-col sm:flex-row gap-8 mb-10 bg-[#239ddb] rounded-2xl lg:rounded-r-none p-6">
                         <div className="flex-1">
                             <h3
                                 className="font-semibold mb-3"
@@ -382,7 +408,7 @@ function ContentSection() {
                     </div>
 
                     {/* Free services CTA */}
-                    <div className="text-center pr-8">
+                    <div className="text-center lg:pr-8">
                         <p
                             className="mb-2"
                             style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(15px, 1.7vw, 24px)', fontWeight: 400, lineHeight: 1.3, color: '#191b21' }}
@@ -408,7 +434,7 @@ function ContentSection() {
                 </div>
 
                 {/* Right column: services image + features */}
-                <div className="w-full lg:w-[44%] flex-shrink-0 rounded-2xl overflow-hidden bg-gray-100 shadow-xl">
+                <div className="w-full lg:w-[44%] flex-shrink-0 rounded-2xl overflow-hidden bg-white lg:bg-gray-100 shadow-[0_40px_50px_-10px_rgba(0,0,0,0.18),0_16px_20px_-12px_rgba(0,0,0,0.15)]">
                     <div className="relative w-full rounded-t-2xl overflow-hidden mb-6" style={{ aspectRatio: '16/9' }}>
                         <Image
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-5.webp"
@@ -463,7 +489,7 @@ function BlueCTASection() {
     return (
         <section className="max-w-6xl mx-auto px-5 py-8">
             <div
-                className="relative overflow-hidden rounded-2xl py-14 px-[92px] flex flex-col sm:flex-row items-center gap-8"
+                className="relative overflow-hidden rounded-2xl p-[40px] flex flex-col sm:flex-row items-center gap-8"
                 style={{ backgroundColor: '#239ddb' }}
             >
                 {/* Hibiscus background */}
@@ -472,7 +498,7 @@ function BlueCTASection() {
                     src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site/hibiscus-bg2.svg"
                     alt=""
                     aria-hidden="true"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-2/3 h-auto pointer-events-none"
+                    className="absolute right-0 bottom-0 w-2/3 h-auto pointer-events-none"
                     style={{ opacity: 0.35 }}
                 />
                 {/* Left: ECF white icon */}
@@ -485,7 +511,7 @@ function BlueCTASection() {
                 <div className="flex-1 text-center">
                     <p
                         className="text-white mb-4"
-                        style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(20px, 2.5vw, 32px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-1.5px' }}
+                        style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(30px, 3.75vw, 48px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-1.5px' }}
                     >
                         We assist you through the entire process to find the right care for you, from beginning to end.
                     </p>
@@ -565,7 +591,7 @@ function AboutSection() {
                 {/* Left: text */}
                 <div className="flex-1 min-w-0">
                     <p
-                        className="mb-1"
+                        className="mb-1 text-center lg:text-left"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: '20px', fontWeight: 500, color: '#191b21' }}
                     >
                         About Elite CareFinders
@@ -578,29 +604,32 @@ function AboutSection() {
                     </p>
                 </div>
 
-                {/* Middle: Rose photo + caption */}
-                <div className="flex-shrink-0 relative lg:w-56 rounded-lg overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Rose-10-25-546x720x0x0x546x698x1761257435.jpg"
-                        alt="Rose Guillermo Gallego RN — Founder &amp; Owner"
-                        className="w-full object-cover"
-                    />
-                    <div className="absolute bottom-0 left-[15px] right-[15px] bg-gray-100 rounded-t-xl px-3 py-2 text-center">
-                        <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Rose Guillermo Gallego RN</p>
-                        <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Founder &amp; Owner</p>
-                        <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Senior Care Advisor</p>
+                {/* Images: side by side on mobile, stacked inline on desktop */}
+                <div className="flex flex-row lg:contents gap-3 w-full lg:w-auto">
+                    {/* Rose photo + caption */}
+                    <div className="flex-1 lg:flex-shrink-0 relative lg:w-56 rounded-lg overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Rose-10-25-546x720x0x0x546x698x1761257435.jpg"
+                            alt="Rose Guillermo Gallego RN — Founder &amp; Owner"
+                            className="w-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-[15px] right-[15px] bg-gray-100 rounded-t-xl px-3 py-2 text-center">
+                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Rose Guillermo Gallego RN</p>
+                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Founder &amp; Owner</p>
+                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Senior Care Advisor</p>
+                        </div>
                     </div>
-                </div>
 
-                {/* Right: cover photo */}
-                <div className="flex-shrink-0 lg:w-56">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Elite-CareFinders_Cover-2025a-546x700x0x0x546x700x1749175439.webp"
-                        alt="Elite CareFinders 2025"
-                        className="w-full object-cover rounded-lg"
-                    />
+                    {/* Cover photo */}
+                    <div className="flex-1 lg:flex-shrink-0 lg:w-56">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Elite-CareFinders_Cover-2025a-546x700x0x0x546x700x1749175439.webp"
+                            alt="Elite CareFinders 2025"
+                            className="w-full object-cover rounded-lg"
+                        />
+                    </div>
                 </div>
 
             </div>
