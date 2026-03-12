@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faHouse, faStar, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { permanentRedirect } from 'next/navigation';
 import { getHomeListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds } from '@/lib/public-db';
 import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
+import { HomeListingGrid } from '@/components/public/HomeListingGrid';
 
 const LIMIT = 24;
 
 interface Props {
     params: { slugs: string[] };
-    searchParams: { page?: string };
+    searchParams: { page?: string; view?: string };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomesByLocationPage({ params, searchParams }: Props) {
     const { slugs } = params;
     const page = Math.max(1, parseInt(searchParams.page || '1', 10));
+    const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
+    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
+    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
 
     let entry = await getLocationEntryByPath(slugs);
     if (!entry && slugs.length === 2) {
@@ -52,7 +55,8 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
     const basePath = `/homes/location/${slugs.join('/')}`;
 
     function pageHref(p: number) {
-        return p > 1 ? `${basePath}?page=${p}` : basePath;
+        const v = explicitView ? `&view=${explicitView}` : '';
+        return p > 1 ? `${basePath}?page=${p}${v}` : explicitView ? `${basePath}?view=${explicitView}` : basePath;
     }
 
     return (
@@ -65,6 +69,7 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
                 backHref="/homes"
                 backLabel="All Homes"
                 typeNameParts={locationParts ?? [pageTitle]}
+                showViewToggle
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
@@ -74,59 +79,12 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
                         <p className="text-lg">No homes found.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {homes.map(home => (
-                            <Link
-                                key={home.id}
-                                href={`/homes/${home.slug}`}
-                                className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-200 bg-gray-100"
-                            >
-                                <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
-                                    {home.image ? (
-                                        <Image
-                                            src={home.image.startsWith('/images/media/') ? home.image.replace(/(\.[^.]+)$/, '-500x500.webp') : home.image}
-                                            alt={home.title}
-                                            fill
-                                            className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
-                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        />
-                                    ) : (
-                                        <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                                            <FontAwesomeIcon icon={faHouse} className="h-12 w-12" />
-                                        </div>
-                                    )}
-                                    {home.isFeatured && (
-                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
-                                            <span className="flex items-center gap-1 bg-green-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-b-lg shadow">
-                                                <FontAwesomeIcon icon={faStar} className="h-2.5 w-2.5" />
-                                                Featured
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-col flex-1 p-4">
-                                    <h2 className="text-base font-bold text-gray-900 leading-snug mb-1 group-hover:text-[#239ddb] transition-colors">
-                                        {home.title}
-                                    </h2>
-                                    {typeNameMap.get(home.id) && (
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#239ddb] mb-2">
-                                            {typeNameMap.get(home.id)}
-                                        </p>
-                                    )}
-                                    {home.description && (
-                                        <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 flex-1">
-                                            {home.description.replace(/<[^>]*>/g, '').trim()}
-                                        </p>
-                                    )}
-                                    <div className="mt-3 flex items-center justify-end gap-1 text-[#239ddb] text-sm font-semibold">
-                                        Learn More
-                                        <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    <HomeListingGrid
+                        homes={homes}
+                        typeNameMap={typeNameMap}
+                        gridClass={gridClass}
+                        listClass={listClass}
+                    />
                 )}
 
                 {totalPages > 1 && (
