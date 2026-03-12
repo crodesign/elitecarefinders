@@ -14,7 +14,10 @@ function toEmbedUrl(url: string): string | null {
         const u = new URL(url);
         if (u.hostname.includes('youtube.com')) {
             const v = u.searchParams.get('v');
-            return v ? `https://www.youtube.com/embed/${v}` : null;
+            if (v) return `https://www.youtube.com/embed/${v}`;
+            const shortsMatch = u.pathname.match(/\/shorts\/([^/?#]+)/);
+            if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+            return null;
         }
         if (u.hostname === 'youtu.be') {
             const v = u.pathname.slice(1);
@@ -32,6 +35,14 @@ function toEmbedUrl(url: string): string | null {
 
 function isDirectVideo(url: string) {
     return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+}
+
+function isVerticalYouTube(url: string): boolean {
+    try {
+        return new URL(url).pathname.includes('/shorts/');
+    } catch {
+        return false;
+    }
 }
 
 // ─── Tile (pure display, no button wrapper) ────────────────────────────────
@@ -223,27 +234,44 @@ function GalleryModal({ items, onClose, onImageClick }: {
                     {/* Videos Section */}
                     {videos.length > 0 && (
                         <div className="space-y-6">
-                            {videos.map((item, i) => (
-                                <div key={`video-${i}`} className="relative w-full bg-black rounded-lg overflow-hidden ">
-                                    {isDirectVideo(item.url) ? (
-                                        <video src={item.url} controls className="w-full aspect-video" />
-                                    ) : (
-                                        <iframe
-                                            src={toEmbedUrl(item.url) || item.url}
-                                            className="w-full aspect-video"
-                                            allow="fullscreen"
-                                            allowFullScreen
-                                        />
-                                    )}
-                                    {item.caption && (
-                                        <div className="absolute bottom-0 left-0 right-0 px-5 pointer-events-none">
-                                            <div className="rounded-t-lg bg-white px-3 py-1.5 text-sm text-gray-800 font-medium text-center">
-                                                {item.caption}
+                            {videos.map((item, i) => {
+                                const vertical = !isDirectVideo(item.url) && isVerticalYouTube(item.url);
+                                return (
+                                    <div key={`video-${i}`} className={vertical ? 'py-2' : undefined}>
+                                    <div
+                                        className="relative bg-black rounded-lg overflow-hidden"
+                                        style={vertical
+                                            ? { width: 'calc(70vh * 9 / 16)', maxWidth: '100%', aspectRatio: '9/16', margin: '0 auto' }
+                                            : undefined}
+                                    >
+                                        {isDirectVideo(item.url) ? (
+                                            <video src={item.url} controls className="w-full aspect-video" />
+                                        ) : vertical ? (
+                                            <iframe
+                                                src={toEmbedUrl(item.url) || item.url}
+                                                className="absolute inset-0 w-full h-full border-0"
+                                                allow="fullscreen"
+                                                allowFullScreen
+                                            />
+                                        ) : (
+                                            <iframe
+                                                src={toEmbedUrl(item.url) || item.url}
+                                                className="w-full aspect-video"
+                                                allow="fullscreen"
+                                                allowFullScreen
+                                            />
+                                        )}
+                                        {item.caption && (
+                                            <div className="absolute bottom-0 left-0 right-0 px-5 pointer-events-none">
+                                                <div className="rounded-t-lg bg-white px-3 py-1.5 text-sm text-gray-800 font-medium text-center">
+                                                    {item.caption}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                        )}
+                                    </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faArrowRight, faStar, faTrophy, faHouse,
 } from '@fortawesome/free-solid-svg-icons';
-import { ReviewsWidget } from '@/components/public/ReviewsWidget';
+import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
 import { getHomeListings, getTaxonomyEntriesByIds, getFeaturedVideoItems } from '@/lib/public-db';
 
@@ -89,7 +89,7 @@ export default async function HomePage() {
             <VideoCarousel items={videoItems} />
             <FeaturedHomesSection homes={homes} typeNameMap={typeNameMap} />
             <ContentSection />
-            <ReviewsWidget />
+            <TestimonialsWidget />
             <BlueCTASection />
             <EliteStandardSection />
             <AboutSection />

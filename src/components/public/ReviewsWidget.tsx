@@ -29,9 +29,7 @@ export function ReviewsWidget() {
                 <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Testimonials</p>
                 <h2 className="text-3xl font-bold text-gray-900">What Our Clients Say</h2>
             </div>
-            <div id="trustindex-widget" className="mt-4 min-h-[200px] flex items-center justify-center">
-                <p className="text-sm text-gray-400">Loading verified reviews&hellip;</p>
-            </div>
+            <div id="trustindex-widget" />
         </section>
     );
 }
