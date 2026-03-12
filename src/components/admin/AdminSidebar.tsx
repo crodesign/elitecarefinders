@@ -151,11 +151,13 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
             {/* Logo / Branding Header */}
             <div className="flex-none h-16 flex items-center px-4 bg-surface-card relative z-10">
-                {!collapsed ? (
-                    <Logo className="h-8 w-auto" />
-                ) : (
-                    <LogoIcon className="h-8 w-8 mx-auto" />
-                )}
+                <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center">
+                    {!collapsed ? (
+                        <Logo className="h-8 w-auto" />
+                    ) : (
+                        <LogoIcon className="h-8 w-8 mx-auto" />
+                    )}
+                </a>
             </div>
 
             {/* Collapse Button - hidden on mobile */}
