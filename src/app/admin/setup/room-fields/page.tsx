@@ -1132,7 +1132,7 @@ export default function RoomFieldsPage() {
 
                             {/* Add Category Form */}
                             {addingCategory && (
-                                <div className="mb-4 p-4 bg-surface-input rounded-lg">
+                                <div className="mb-4 p-4 bg-surface-input rounded-lg" style={{ border: 'none' }}>
                                     <div className="flex items-center gap-3">
                                         <IconPicker value={newCategoryIcon} onChange={setNewCategoryIcon} />
                                         <input
@@ -1272,7 +1272,7 @@ export default function RoomFieldsPage() {
 
                                                                             {/* Add Field Form */}
                                                                             {addingFieldToCategory === cat.id && (
-                                                                                <div className="mt-2 p-3 bg-surface-input rounded-lg space-y-3">
+                                                                                <div className="mt-2 p-3 bg-surface-input rounded-lg space-y-3" style={{ border: 'none' }}>
                                                                                     <div className="flex items-center gap-3">
                                                                                         <input
                                                                                             type="text"
@@ -1445,7 +1445,7 @@ export default function RoomFieldsPage() {
                                             </DndContext>
 
                                             {addingToFixedField === type && (
-                                                <div className="flex items-center gap-2 mb-2 p-3 bg-surface-input rounded-lg border border-dashed border-white/20">
+                                                <div className="flex items-center gap-2 mb-2 p-3 bg-surface-input rounded-lg" style={{ border: '1px dashed rgba(255,255,255,0.2)' }}>
                                                     <IconPicker value={newFixedIcon} onChange={setNewFixedIcon} />
                                                     <input
                                                         type="text"

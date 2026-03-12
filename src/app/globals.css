@@ -327,6 +327,19 @@ div.bg-surface-card.rounded-xl {
   border: 2px solid var(--form-border);
 }
 
+/* ── Form label rows (bg-surface-hover) & section containers (bg-surface-input) ── */
+/* These cover HomeInformationTab, FacilityInformationTab, HomeFieldCategory, etc.  */
+/* Inline styles on ProfilePanel/UserForm/TaxonomyForm take precedence via specificity */
+div.bg-surface-hover.rounded-lg {
+  border: 2px solid var(--form-border);
+  background-color: var(--form-bg);
+}
+
+div.bg-surface-input.rounded-lg {
+  border: 2px solid var(--form-border);
+  background-color: var(--form-bg);
+}
+
 /* ── Checkbox/radio option buttons ── */
 button.bg-surface-input.w-full,
 button.bg-surface-hover.w-full {
