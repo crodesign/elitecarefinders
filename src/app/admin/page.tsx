@@ -9,6 +9,7 @@ import { getFacilities } from "@/lib/services/facilityService";
 import { getHomes } from "@/lib/services/homeService";
 import { getPosts } from "@/lib/services/postService";
 import { createClientComponentClient as createClient } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Review, Post } from "@/types";
 import type { Home as HomeType } from "@/types";
 import type { Facility } from "@/types";
@@ -184,6 +185,7 @@ function ReviewsPanel({ loading, reviews, items }: { loading: boolean; reviews: 
 
 export default function AdminDashboardPage() {
     const supabase = createClient();
+    const { isSystemAdmin } = useAuth();
     const [homes, setHomes] = useState<HomeType[]>([]);
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [posts, setPosts] = useState<Post[]>([]);
@@ -191,33 +193,41 @@ export default function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([
-            getHomes(),
-            getFacilities(),
-            getPosts(),
-            supabase
-                .from("reviews")
-                .select("id, author_name, rating, status, source, author_photo_url, created_at")
-                .order("created_at", { ascending: false }),
-        ]).then(([h, f, p, { data: reviewData }]) => {
-            setHomes(h);
-            setFacilities(f);
-            setPosts(p);
-            const mapped: Review[] = (reviewData || []).map((r: any) => ({
-                id: r.id,
-                authorName: r.author_name,
-                rating: r.rating,
-                content: "",
-                entityId: "",
-                status: r.status,
-                source: r.source,
-                authorPhotoUrl: r.author_photo_url,
-                createdAt: r.created_at,
-            }));
-            setReviews(mapped);
-            setLoading(false);
-        }).catch(() => setLoading(false));
-    }, []);
+        const base = [getHomes(), getFacilities()] as const;
+        if (isSystemAdmin) {
+            Promise.all([
+                ...base,
+                getPosts(),
+                supabase
+                    .from("reviews")
+                    .select("id, author_name, rating, status, source, author_photo_url, created_at")
+                    .order("created_at", { ascending: false }),
+            ]).then(([h, f, p, { data: reviewData }]) => {
+                setHomes(h);
+                setFacilities(f);
+                setPosts(p);
+                const mapped: Review[] = (reviewData || []).map((r: any) => ({
+                    id: r.id,
+                    authorName: r.author_name,
+                    rating: r.rating,
+                    content: "",
+                    entityId: "",
+                    status: r.status,
+                    source: r.source,
+                    authorPhotoUrl: r.author_photo_url,
+                    createdAt: r.created_at,
+                }));
+                setReviews(mapped);
+                setLoading(false);
+            }).catch(() => setLoading(false));
+        } else {
+            Promise.all(base).then(([h, f]) => {
+                setHomes(h);
+                setFacilities(f);
+                setLoading(false);
+            }).catch(() => setLoading(false));
+        }
+    }, [isSystemAdmin]);
 
     const homeCounts = {
         published: homes.filter(h => h.status === "published").length,
@@ -284,7 +294,7 @@ export default function AdminDashboardPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${isSystemAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-2'}`}>
                 <EntityPanel
                     name="Homes"
                     manageHref="/admin/homes"
@@ -305,8 +315,12 @@ export default function AdminDashboardPage() {
                     loading={loading}
                     items={recentFacilities}
                 />
-                <BlogPanel loading={loading} count={posts.length} items={recentPosts} />
-                <ReviewsPanel loading={loading} reviews={reviews} items={recentReviews} />
+                {isSystemAdmin && (
+                    <BlogPanel loading={loading} count={posts.length} items={recentPosts} />
+                )}
+                {isSystemAdmin && (
+                    <ReviewsPanel loading={loading} reviews={reviews} items={recentReviews} />
+                )}
             </div>
 
             <AnalyticsDashboard />
