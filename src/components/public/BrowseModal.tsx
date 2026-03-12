@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faPhone, faEnvelope, faHouse, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
@@ -39,6 +39,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
             .from('taxonomy_entries')
             .select('id, name, slug, taxonomy_id')
             .in('taxonomy_id', [HOME_TYPE_TAX_ID, FACILITY_TYPE_TAX_ID])
+            .order('display_order', { ascending: true, nullsFirst: false })
             .order('name')
             .then(({ data }) => {
                 if (!data) return;
@@ -144,8 +145,18 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                         </ul>
                     </div>
 
+                    {/* Memory Care section */}
+                    <div className="mb-6">
+                        <Link href="/facilities/type/memory-care" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] transition-colors">
+                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
+                                <FontAwesomeIcon icon={faBrain} className="h-3 w-3 text-white" />
+                            </span>
+                            Memory Care
+                        </Link>
+                    </div>
+
                     {/* Footer: social + contact */}
-                    <div className="pt-5 border-t border-gray-100 flex gap-6">
+                    <div className="pt-5 border-t-2 border-gray-100 -mx-6 px-6 flex gap-6">
                         {socialAccounts.length > 0 && (
                             <div className="flex flex-wrap gap-2 content-start">
                                 {socialAccounts.map(account => (
