@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className={`${alexBrush.variable} ${montserrat.variable} min-h-screen flex flex-col bg-white text-gray-900`} style={{ '--accent': '#239ddb' } as React.CSSProperties}>
+        <div className={`${alexBrush.variable} ${montserrat.variable} min-h-screen flex flex-col bg-white text-gray-900`} data-theme="light" style={{ '--accent': '#239ddb' } as React.CSSProperties}>
             <FavoritesShell>
                 <PublicHeader />
                 <main className="flex-1">{children}</main>

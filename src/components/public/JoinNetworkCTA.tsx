@@ -12,8 +12,8 @@ export function JoinNetworkCTA() {
 
     return (
         <>
-            <section style={{ backgroundColor: '#191b21' }}>
-                <div className="max-w-6xl mx-auto px-5 py-16 flex flex-col lg:flex-row items-center gap-10">
+            <section className="max-w-6xl mx-auto px-5 py-5">
+                <div className="rounded-2xl px-5 py-5 flex flex-col lg:flex-row items-center gap-10" style={{ backgroundColor: '#191b21' }}>
 
                     {/* Left: text */}
                     <div className="flex-1 min-w-0 text-center lg:text-left">
@@ -31,7 +31,7 @@ export function JoinNetworkCTA() {
                             <span style={{ color: '#239ddb', fontWeight: 600 }}>Provider Network</span>
                         </h2>
                         <p
-                            className="text-white/60 mb-6 max-w-xl mx-auto lg:mx-0"
+                            className="text-white/60 mb-6"
                             style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.6 }}
                         >
                             We are expanding our directory across all Hawaiian islands and opening our listings to the mainland United States. List your care home or senior living facility and connect with families who need you.

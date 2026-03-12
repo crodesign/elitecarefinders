@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
+import { ChevronDown } from 'lucide-react';
 import { LogoIcon } from '@/components/icons/Logo';
 
 interface JoinNetworkModalProps {
@@ -49,6 +50,57 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
         <p className="text-[10px] font-bold uppercase tracking-widest text-[#239ddb] mb-2 mt-4 first:mt-0">
             {children}
         </p>
+    );
+}
+
+function SelectField({ value, onChange, options, placeholder, required }: {
+    value: string;
+    onChange: (v: string) => void;
+    options: string[];
+    placeholder: string;
+    required?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        if (open) document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+
+    return (
+        <div ref={ref} className="relative">
+            {required && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none z-10" />
+            )}
+            <button
+                type="button"
+                onClick={() => setOpen(o => !o)}
+                className={`w-full flex items-center justify-between gap-1.5 bg-white border-2 rounded-lg pl-6 pr-3 py-[9px] text-sm focus:outline-none transition-all ${open ? 'border-[#239ddb]' : 'border-black/15'} ${value ? 'text-gray-900' : 'text-gray-400'}`}
+            >
+                <span className="truncate text-left">{value || placeholder}</span>
+                <ChevronDown className={`h-3.5 w-3.5 text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+            </button>
+            {open && (
+                <div className="absolute top-full left-0 mt-1.5 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-[300] overflow-hidden w-full">
+                    <div className="max-h-52 overflow-y-auto py-1">
+                        {options.map(o => (
+                            <button
+                                key={o}
+                                type="button"
+                                onClick={() => { onChange(o); setOpen(false); }}
+                                className={`w-full text-left px-4 py-2 text-sm transition-colors ${o === value ? 'bg-[#239ddb] text-white font-medium' : 'text-gray-700 hover:bg-gray-100'}`}
+                            >
+                                {o}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -108,14 +160,14 @@ export function JoinNetworkModal({ onClose }: JoinNetworkModalProps) {
     return (
         <div className="fixed inset-0 z-[200] bg-white/50 backdrop-blur-md flex flex-col pt-14" onClick={onClose}>
             {/* Top bar */}
-            <div className="absolute top-0 inset-x-0 h-14 bg-[#191b21] flex items-center justify-center px-4 shadow-md z-10" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-0 inset-x-0 h-14 bg-[#239ddb] flex items-center justify-center px-4 shadow-md z-10" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center gap-2 text-white font-bold tracking-widest uppercase text-sm">
-                    <FontAwesomeIcon icon={faNetworkWired} className="h-4 w-4 text-[#239ddb]" />
+                    <FontAwesomeIcon icon={faNetworkWired} className="h-4 w-4 text-white/80" />
                     Join Our Network
                 </div>
                 <button
                     onClick={onClose}
-                    className="absolute right-4 p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                    className="absolute right-4 p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                     aria-label="Close"
                 >
                     <FontAwesomeIcon icon={faXmark} className="h-6 w-6" />
@@ -187,36 +239,22 @@ export function JoinNetworkModal({ onClose }: JoinNetworkModalProps) {
                             {/* ── Location ── */}
                             <SectionLabel>Location</SectionLabel>
 
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none" />
-                                <select
-                                    required
-                                    value={state}
-                                    onChange={e => setState(e.target.value)}
-                                    className={`${fieldBase} pl-6 pr-3 appearance-none`}
-                                >
-                                    <option value="">Select state</option>
-                                    {US_STATES.map(s => (
-                                        <option key={s} value={s}>{s}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <SelectField
+                                value={state}
+                                onChange={setState}
+                                options={US_STATES}
+                                placeholder="Select state"
+                                required
+                            />
 
                             {state && isHawaii && (
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none" />
-                                    <select
-                                        required
-                                        value={island}
-                                        onChange={e => setIsland(e.target.value)}
-                                        className={`${fieldBase} pl-6 pr-3 appearance-none`}
-                                    >
-                                        <option value="">Select island</option>
-                                        {HAWAII_ISLANDS.map(i => (
-                                            <option key={i} value={i}>{i}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <SelectField
+                                    value={island}
+                                    onChange={setIsland}
+                                    options={HAWAII_ISLANDS}
+                                    placeholder="Select island"
+                                    required
+                                />
                             )}
 
                             {state && !isHawaii && (
@@ -248,20 +286,13 @@ export function JoinNetworkModal({ onClose }: JoinNetworkModalProps) {
                                 />
                             </div>
 
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none" />
-                                <select
-                                    required
-                                    value={listingType}
-                                    onChange={e => setListingType(e.target.value)}
-                                    className={`${fieldBase} pl-6 pr-3 appearance-none`}
-                                >
-                                    <option value="">Type of listing</option>
-                                    {LISTING_TYPES.map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <SelectField
+                                value={listingType}
+                                onChange={setListingType}
+                                options={LISTING_TYPES}
+                                placeholder="Type of listing"
+                                required
+                            />
 
                             <div className="relative">
                                 <span className="absolute left-3 top-3 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none" />

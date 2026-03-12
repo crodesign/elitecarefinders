@@ -3,11 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faHouse, faBuilding, faFileAlt, faTrash, faUser, faKey, faCheck, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faHouse, faBuilding, faFileAlt, faTrash, faUser, faKey, faCheck, faEye, faEyeSlash, faPencil, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { Upload } from 'lucide-react';
 import { ImageCropModal } from '@/components/admin/ImageCropModal';
+import { ListingEditModal } from '@/components/public/ListingEditModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import type { Favorite } from '@/types';
+
+type UserEntity = { id: string; entityId: string; entityType: 'home' | 'facility'; title: string; slug: string };
+const ADMIN_ROLES: string[] = ['super_admin', 'system_admin', 'regional_manager', 'location_manager'];
 
 type Tab = 'all' | 'home' | 'facility' | 'post';
 
@@ -187,6 +191,9 @@ export default function ProfilePage() {
     const [avatarUploading, setAvatarUploading] = useState(false);
     const [cropImageUrl, setCropImageUrl] = useState('');
     const [cropOpen, setCropOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string>('');
+    const [entities, setEntities] = useState<UserEntity[]>([]);
+    const [editingEntity, setEditingEntity] = useState<UserEntity | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -194,6 +201,8 @@ export default function ProfilePage() {
             fetch('/api/profile').then(r => r.json()).then(d => {
                 if (d.nickname) setNickname(d.nickname);
                 if (d.photo_url) setPhotoUrl(d.photo_url);
+                if (d.role) setUserRole(d.role);
+                if (d.entities) setEntities(d.entities);
             });
         }
     }, [user]);
@@ -307,6 +316,71 @@ export default function ProfilePage() {
 
                 {/* Right column — 3/4 */}
                 <div className="flex-1 min-w-0">
+
+                    {/* My Listings — admin roles always see admin link; local users see assigned entities */}
+                    {(ADMIN_ROLES.includes(userRole) || entities.length > 0) && (
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold text-gray-900">My Listings</h2>
+                            <p className="text-sm text-gray-500 mt-1 mb-4">
+                                {ADMIN_ROLES.includes(userRole) ? 'Manage listings in the admin panel.' : 'Update your listing information.'}
+                            </p>
+                            {ADMIN_ROLES.includes(userRole) ? (
+                                <div className="flex items-center justify-between gap-4 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 hover:border-[#239ddb]/30 transition-colors">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="w-8 h-8 rounded-lg bg-[#239ddb]/10 flex items-center justify-center shrink-0">
+                                            <FontAwesomeIcon icon={faBuilding} className="h-3.5 w-3.5 text-[#239ddb]" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-gray-900">Homes &amp; Facilities</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Admin Panel</p>
+                                        </div>
+                                    </div>
+                                    <Link
+                                        href="/admin"
+                                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#239ddb] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#1a7fb3] transition-colors"
+                                    >
+                                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3" />
+                                        Open Admin
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    {entities.map(entity => {
+                                        const adminHref = entity.entityType === 'home'
+                                            ? `/admin/homes?edit=${entity.slug}&tab=information`
+                                            : `/admin/facilities?edit=${entity.slug}&tab=information`;
+                                        return (
+                                            <div key={entity.id} className="flex items-center justify-between gap-4 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 hover:border-[#239ddb]/30 transition-colors">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#239ddb]/10 flex items-center justify-center shrink-0">
+                                                        <FontAwesomeIcon
+                                                            icon={entity.entityType === 'home' ? faHouse : faBuilding}
+                                                            className="h-3.5 w-3.5 text-[#239ddb]"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-semibold text-gray-900 truncate">{entity.title}</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                                                            {entity.entityType === 'home' ? 'Care Home' : 'Facility'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEditingEntity(entity)}
+                                                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#239ddb] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#1a7fb3] transition-colors"
+                                                >
+                                                    <FontAwesomeIcon icon={faPencil} className="h-3 w-3" />
+                                                    Edit Listing
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Header */}
                     <div className="mb-6">
                         <h1 className="text-2xl font-bold text-gray-900">My Saved</h1>
@@ -385,6 +459,15 @@ export default function ProfilePage() {
                     imageUrl={cropImageUrl}
                     onClose={() => setCropOpen(false)}
                     onSave={handleCropSave}
+                />
+            )}
+
+            {editingEntity && (
+                <ListingEditModal
+                    entityId={editingEntity.entityId}
+                    entityType={editingEntity.entityType}
+                    entityTitle={editingEntity.title}
+                    onClose={() => setEditingEntity(null)}
                 />
             )}
         </div>
