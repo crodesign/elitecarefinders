@@ -7,6 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
+import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
 import { getHomeListings, getTaxonomyEntriesByIds, getFeaturedVideoItems } from '@/lib/public-db';
 
 const R2 = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site';
@@ -92,6 +93,7 @@ export default async function HomePage() {
             <TestimonialsWidget />
             <BlueCTASection />
             <EliteStandardSection />
+            <JoinNetworkCTA />
             <AboutSection />
         </>
     );
