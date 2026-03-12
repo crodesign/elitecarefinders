@@ -64,8 +64,10 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        const PASSTHROUGH_TYPES = new Set(["image/png", "image/gif", "image/svg+xml"]);
         const isImage = file.type.startsWith("image/");
-        const outputExt = isImage ? "webp" : (file.name.split('.').pop()?.toLowerCase() || "bin");
+        const isConvertible = isImage && !PASSTHROUGH_TYPES.has(file.type);
+        const outputExt = isConvertible ? "webp" : (file.name.split('.').pop()?.toLowerCase() || "bin");
 
         let filename: string;
 
@@ -108,8 +110,8 @@ export async function POST(request: NextRequest) {
         let urlMedium: string | undefined;
         let urlThumb: string | undefined;
 
-        if (isImage) {
-            // Step 1: resize (capped at 1940px) + convert to webp; info gives true output dims
+        if (isConvertible) {
+            // Resize (capped at 1940px) + convert to webp; info gives true output dims
             const { data: origBuf, info: origInfo } = await sharp(buffer)
                 .resize(1940, 1940, { fit: "inside" })
                 .webp({ quality: 90 })
@@ -143,6 +145,7 @@ export async function POST(request: NextRequest) {
 
             console.log(`[Upload] Variants uploaded: ${largeFilename}, ${mediumFilename}, ${thumbFilename}`);
         } else {
+            // PNG, GIF, SVG, and non-images: upload as-is, no conversion or variants
             await r2Upload(filename, buffer, file.type || "application/octet-stream");
         }
 
@@ -153,7 +156,7 @@ export async function POST(request: NextRequest) {
                 filename,
                 original_filename: file.name,
                 title: file.name.replace(/\.[^/.]+$/, ""),
-                mime_type: isImage ? "image/webp" : file.type,
+                mime_type: isConvertible ? "image/webp" : file.type,
                 file_size: file.size,
                 width,
                 height,
