@@ -28,7 +28,7 @@ export default function PagesSettingsPage() {
     const [panelMode, setPanelMode] = useState<'edit' | 'create' | null>(null);
     const [editingPage, setEditingPage] = useState<Page | null>(null);
 
-    // Create form
+    // Label / slug form (used for both create and edit)
     const [newLabel, setNewLabel] = useState('');
     const [newSlug, setNewSlug] = useState('');
     const [slugEdited, setSlugEdited] = useState(false);
@@ -71,6 +71,10 @@ export default function PagesSettingsPage() {
 
     function openEdit(page: Page) {
         setEditingPage(page);
+        setNewLabel(page.label);
+        setNewSlug(page.slug);
+        setSlugEdited(false);
+        setSlugError('');
         setSeoFields({
             metaTitle: page.metaTitle || null,
             metaDescription: page.metaDescription || null,
@@ -88,6 +92,10 @@ export default function PagesSettingsPage() {
     function closePanel() {
         setPanelMode(null);
         setEditingPage(null);
+        setNewLabel('');
+        setNewSlug('');
+        setSlugEdited(false);
+        setSlugError('');
         setIsDirty(false);
     }
 
@@ -138,9 +146,17 @@ export default function PagesSettingsPage() {
                 setIsSaving(false);
             }
         } else if (panelMode === 'edit' && editingPage) {
+            if (!newLabel.trim()) return;
+            if (!newSlug.trim()) { setSlugError('Slug is required'); return; }
+            if (pages.some(p => p.slug === newSlug && p.id !== editingPage.id)) {
+                setSlugError('This slug is already in use');
+                return;
+            }
             setIsSaving(true);
             try {
                 await updatePage(editingPage.id, {
+                    label: newLabel.trim(),
+                    slug: newSlug,
                     metaTitle: seoFields.metaTitle ?? '',
                     metaDescription: seoFields.metaDescription ?? '',
                     canonicalUrl: seoFields.canonicalUrl ?? '',
@@ -154,6 +170,8 @@ export default function PagesSettingsPage() {
                     p.id === editingPage.id
                         ? {
                             ...p,
+                            label: newLabel.trim(),
+                            slug: newSlug,
                             metaTitle: seoFields.metaTitle ?? '',
                             metaDescription: seoFields.metaDescription ?? '',
                             canonicalUrl: seoFields.canonicalUrl ?? '',
@@ -165,11 +183,11 @@ export default function PagesSettingsPage() {
                         }
                         : p
                 ));
-                showNotification("Saved", `SEO for "${editingPage.label}" has been updated.`);
+                showNotification("Saved", `"${newLabel.trim()}" has been updated.`);
                 setIsDirty(false);
                 closePanel();
             } catch {
-                showNotification("Error", "Failed to save SEO fields.");
+                showNotification("Error", "Failed to save page.");
             } finally {
                 setIsSaving(false);
             }
@@ -201,8 +219,10 @@ export default function PagesSettingsPage() {
 
     if (!isSuperAdmin) return null;
 
-    const panelTitle = panelMode === 'create' ? 'New Page' : (editingPage?.label ?? '');
-    const canSave = panelMode === 'create' ? (!!newLabel.trim() && !!newSlug.trim()) : isDirty;
+    const panelTitle = panelMode === 'create' ? 'New Page' : (newLabel || editingPage?.label || '');
+    const canSave = panelMode === 'create'
+        ? (!!newLabel.trim() && !!newSlug.trim())
+        : (!!newLabel.trim() && !!newSlug.trim() && isDirty);
 
     return (
         <>
@@ -293,7 +313,7 @@ export default function PagesSettingsPage() {
                     </button>
                 }
             >
-                {panelMode === 'create' && (
+                {(panelMode === 'create' || panelMode === 'edit') && (
                     <div className="mb-6 p-[5px] bg-surface-input rounded-lg space-y-1.5">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted px-1.5 pt-1 pb-0.5">
                             Page Details

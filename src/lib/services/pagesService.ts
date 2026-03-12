@@ -63,10 +63,12 @@ export async function createPage(data: { slug: string; label: string } & Partial
 
 export async function updatePage(
     id: string,
-    data: Partial<Omit<Page, 'id' | 'slug' | 'label' | 'updatedAt'>>
+    data: Partial<Omit<Page, 'id' | 'updatedAt'>>
 ): Promise<void> {
     const supabase = createClientComponentClient();
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (data.label !== undefined) updates.label = data.label;
+    if (data.slug !== undefined) updates.slug = data.slug;
     if (data.metaTitle !== undefined) updates.meta_title = data.metaTitle;
     if (data.metaDescription !== undefined) updates.meta_description = data.metaDescription;
     if (data.canonicalUrl !== undefined) updates.canonical_url = data.canonicalUrl;
