@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faHouse, faBuilding, faFileAlt, faTrash, faUser, faKey, faCheck, faEye, faEyeSlash, faPencil, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { Upload } from 'lucide-react';
 import { ImageCropModal } from '@/components/admin/ImageCropModal';
-import { ListingEditModal } from '@/components/public/ListingEditModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import type { Favorite } from '@/types';
 
@@ -193,7 +192,6 @@ export default function ProfilePage() {
     const [cropOpen, setCropOpen] = useState(false);
     const [userRole, setUserRole] = useState<string>('');
     const [entities, setEntities] = useState<UserEntity[]>([]);
-    const [editingEntity, setEditingEntity] = useState<UserEntity | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -346,9 +344,6 @@ export default function ProfilePage() {
                             ) : (
                                 <div className="flex flex-col gap-3">
                                     {entities.map(entity => {
-                                        const adminHref = entity.entityType === 'home'
-                                            ? `/admin/homes?edit=${entity.slug}&tab=information`
-                                            : `/admin/facilities?edit=${entity.slug}&tab=information`;
                                         return (
                                             <div key={entity.id} className="flex items-center justify-between gap-4 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 hover:border-[#239ddb]/30 transition-colors">
                                                 <div className="flex items-center gap-3 min-w-0">
@@ -365,14 +360,13 @@ export default function ProfilePage() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditingEntity(entity)}
+                                                <Link
+                                                    href={`/profile/listing/${entity.entityId}`}
                                                     className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#239ddb] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#1a7fb3] transition-colors"
                                                 >
                                                     <FontAwesomeIcon icon={faPencil} className="h-3 w-3" />
                                                     Edit Listing
-                                                </button>
+                                                </Link>
                                             </div>
                                         );
                                     })}
@@ -462,14 +456,6 @@ export default function ProfilePage() {
                 />
             )}
 
-            {editingEntity && (
-                <ListingEditModal
-                    entityId={editingEntity.entityId}
-                    entityType={editingEntity.entityType}
-                    entityTitle={editingEntity.title}
-                    onClose={() => setEditingEntity(null)}
-                />
-            )}
         </div>
     );
 }

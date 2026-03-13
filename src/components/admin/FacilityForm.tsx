@@ -31,6 +31,7 @@ import {
     getFixedFieldTypeIcons,
 } from "@/lib/services/roomFieldService";
 import { SlidePanel } from "./SlidePanel";
+import { DraftApprovalBanner } from "./DraftApprovalBanner";
 import { TaxonomySelector } from "./TaxonomySelector";
 import { SimpleSelect } from "./SimpleSelect";
 import { EntryTree } from "./taxonomy/EntryTree";
@@ -1011,6 +1012,27 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
                 {/* Tab Content */}
                 <form id="facility-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0" onChange={handleFormChange}>
+                    {facility?.id && (facility as any).local_user_draft_status === 'pending_review' && (facility as any).local_user_draft && (
+                        <DraftApprovalBanner
+                            entityId={facility.id}
+                            entityType="facility"
+                            draft={(facility as any).local_user_draft}
+                            onApprove={async () => {
+                                await fetch('/api/admin/listing-draft', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ entityId: facility.id, entityType: 'facility', action: 'approve' }),
+                                });
+                            }}
+                            onReject={async () => {
+                                await fetch('/api/admin/listing-draft', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ entityId: facility.id, entityType: 'facility', action: 'reject' }),
+                                });
+                            }}
+                        />
+                    )}
                     <div className={activeTab === 'gallery' ? 'sm:flex sm:flex-col sm:flex-1 sm:min-h-0' : (activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1 min-h-full'}>
                         {renderTabContent()}
                     </div>

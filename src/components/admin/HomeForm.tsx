@@ -32,6 +32,7 @@ import {
     getFixedFieldTypeIcons,
 } from "@/lib/services/roomFieldService";
 import { SlidePanel } from "./SlidePanel";
+import { DraftApprovalBanner } from "./DraftApprovalBanner";
 import { HomeInformationTab } from "./forms/home/HomeInformationTab";
 import { HomeRoomsTab } from "./forms/home/HomeRoomsTab";
 import { HomeLocationTab } from "./forms/home/HomeLocationTab";
@@ -1061,6 +1062,27 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 }
             >
                 <form id="home-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    {home?.id && (home as any).local_user_draft_status === 'pending_review' && (home as any).local_user_draft && (
+                        <DraftApprovalBanner
+                            entityId={home.id}
+                            entityType="home"
+                            draft={(home as any).local_user_draft}
+                            onApprove={async () => {
+                                await fetch('/api/admin/listing-draft', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ entityId: home.id, entityType: 'home', action: 'approve' }),
+                                });
+                            }}
+                            onReject={async () => {
+                                await fetch('/api/admin/listing-draft', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ entityId: home.id, entityType: 'home', action: 'reject' }),
+                                });
+                            }}
+                        />
+                    )}
                     <div className={activeTab === 'gallery' ? 'sm:flex sm:flex-col sm:flex-1 sm:min-h-0' : (activeTab === 'videos' || activeTab === 'information') ? 'flex flex-col flex-1 min-h-0' : 'flex-1'}>{renderTabContent()}</div>
                 </form>
 
