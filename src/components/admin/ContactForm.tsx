@@ -259,7 +259,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                                     const Icon = tab.icon;
                                     const isActive = activeTab === tab.id;
                                     // Tab color uses the theme-aware surface-tab variable
-                                    const tabColor = 'var(--surface-tab)';
+                                    const tabColor = 'var(--nav-active-bg)';
 
                                     return (
                                         <button
@@ -272,7 +272,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                                                 transition-colors duration-150 select-none
                                                 ${isActive
                                                     ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
-                                                    : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
+                                                    : 'form-tab-hover pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary rounded-lg'
                                                 }
                                             `}
                                             style={isActive ? { backgroundColor: tabColor } : undefined}

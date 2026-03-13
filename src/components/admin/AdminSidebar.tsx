@@ -194,9 +194,9 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
                         return (
                             <div key={item.name}>
-                                <div className={`relative flex items-center rounded-lg transition-all duration-200 group ${isActive
-                                    ? "bg-[var(--surface-tab)] text-content-primary"
-                                    : "text-content-secondary hover:bg-[var(--surface-tab)] hover:text-content-primary"
+                                <div className={`nav-item relative flex items-center rounded-lg transition-all duration-200 group ${isActive
+                                    ? "active text-content-primary"
+                                    : "text-content-secondary hover:text-content-primary"
                                     }`}>
                                     <Link
                                         href={item.href}

@@ -26,12 +26,13 @@ export function Tooltip({ children, content, side = "top", delayDuration = 300 }
                 </TooltipPrimitive.Trigger>
                 <TooltipPrimitive.Portal>
                     <TooltipPrimitive.Content
-                        className="px-3 py-2 text-xs text-white bg-surface-secondary border border-ui-border rounded-md z-[9999] max-w-sm"
+                        className="px-3 py-2 text-xs rounded-md z-[9999] max-w-sm"
+                        style={{ backgroundColor: 'var(--nav-active-bg)', color: 'var(--tooltip-text)' }}
                         sideOffset={5}
                         side={side}
                     >
                         {content}
-                        <TooltipPrimitive.Arrow className="fill-surface-secondary" />
+                        <TooltipPrimitive.Arrow style={{ fill: 'var(--nav-active-bg)' }} />
                     </TooltipPrimitive.Content>
                 </TooltipPrimitive.Portal>
             </TooltipPrimitive.Root>

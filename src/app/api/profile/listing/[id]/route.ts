@@ -86,43 +86,28 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     const table = assignment.entity_type === 'home' ? 'homes' : 'facilities';
 
-    // Fetch current draft and locked fields
+    // Fetch current draft
     const { data: current } = await supabaseAdmin
         .from(table)
-        .select('local_user_draft, local_user_locked_fields, local_user_draft_status')
+        .select('local_user_draft, local_user_draft_status')
         .eq('id', entityId)
         .single();
 
     const existingDraft: Record<string, any> = current?.local_user_draft ?? {};
-    const lockedFields: Record<string, boolean> = current?.local_user_locked_fields ?? {};
 
-    // Tier 2 fields that lock on first save
-    const LOCKABLE_FIELDS = ['levelOfCare', 'bedroomTypes', 'bathroomType', 'showerType', 'roomTypes', 'roomPrice'];
+    const ALLOWED_STEP_FIELDS: Record<string, string[]> = {
+        information: ['description', 'excerpt', 'phone', 'email'],
+        description: ['description', 'excerpt'],
+        contact: ['phone', 'email'],
+        care: ['levelOfCare', 'bedroomTypes', 'bathroomType', 'showerType', 'roomTypes', 'roomPrice'],
+        amenities: ['customFields'],
+        room_details: ['roomPrice', 'bedroomType', 'bathroomType', 'showerType', 'levelOfCare', 'roomTypes', 'languages', 'customFields'],
+        photos: ['images', 'teamImages', 'cuisineImages'],
+        videos: ['videos'],
+    };
 
-    // Merge step data into draft, respecting locks
     const mergedDraft: Record<string, any> = { ...existingDraft };
-    let newLocks = { ...lockedFields };
-
-    if (step === 'care' && stepData) {
-        for (const field of LOCKABLE_FIELDS) {
-            if (field in stepData) {
-                if (!lockedFields[field]) {
-                    mergedDraft[field] = stepData[field];
-                    const val = stepData[field];
-                    const hasValue = Array.isArray(val) ? val.length > 0 : (val !== undefined && val !== null && val !== '');
-                    if (hasValue) newLocks[field] = true;
-                }
-            }
-        }
-        await supabaseAdmin.from(table).update({ local_user_locked_fields: newLocks }).eq('id', entityId);
-    } else if (stepData) {
-        const ALLOWED_STEP_FIELDS: Record<string, string[]> = {
-            description: ['description', 'excerpt'],
-            contact: ['phone', 'email'],
-            amenities: ['customFields'],
-            photos: ['images', 'teamImages', 'cuisineImages'],
-            videos: ['videos'],
-        };
+    if (stepData) {
         const allowed = ALLOWED_STEP_FIELDS[step] ?? [];
         for (const field of allowed) {
             if (field in stepData) mergedDraft[field] = stepData[field];

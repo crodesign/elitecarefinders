@@ -13,13 +13,18 @@ interface SeoInput {
     seo?: SeoFields | null;
 }
 
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export function generateSeoMetadataFromRecord(input: SeoInput): Metadata {
     const { slug, pathPrefix, defaultTitle, defaultDescription, defaultImage, seo } = input;
 
     const pageUrl = `${BASE_URL}/${pathPrefix}/${slug}`;
 
+    const rawDefault = defaultDescription ? stripHtml(defaultDescription) : '';
     const title = seo?.metaTitle || defaultTitle;
-    const description = (seo?.metaDescription || defaultDescription || '').slice(0, 160) || undefined;
+    const description = (seo?.metaDescription || rawDefault || '').slice(0, 160) || undefined;
     const canonical = seo?.canonicalUrl || pageUrl;
     const indexable = seo?.indexable ?? true;
 

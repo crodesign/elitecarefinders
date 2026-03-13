@@ -234,7 +234,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                             <textarea
                                 value={metaDescVal}
                                 onChange={e => set("metaDescription", e.target.value || null)}
-                                placeholder={defaults.description ? defaults.description.slice(0, 80) + "…" : "Auto-generated from description"}
+                                placeholder={defaults.description ? defaults.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) + "…" : "Auto-generated from description"}
                                 maxLength={320}
                                 rows={3}
                                 className="form-input px-3 py-2 w-full text-sm resize-none"

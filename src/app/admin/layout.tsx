@@ -1,17 +1,91 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Logo } from "@/components/icons/Logo";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+
+// ─── Restricted Shell (local_user / location_manager) ─────────────────────────
+
+function RestrictedShell({ children }: { children: React.ReactNode }) {
+    const { user, signOut } = useAuth();
+    const pathname = usePathname();
+    const router = useRouter();
+
+    // Force light mode
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }, []);
+
+    // Redirect dashboard and per-entity pages to the merged listing
+    useEffect(() => {
+        if (
+            pathname === '/admin' ||
+            pathname === '/admin/homes' ||
+            pathname === '/admin/facilities'
+        ) {
+            router.replace('/admin/my-listings');
+        }
+    }, [pathname, router]);
+
+    return (
+        <div className="min-h-screen" style={{ backgroundColor: '#f9fafb' }}>
+            {/* Top bar */}
+            <div
+                className="fixed top-0 left-0 right-0 z-[50] h-14 flex items-center justify-between px-5 shadow-sm"
+                style={{ backgroundColor: '#239ddb' }}
+            >
+                <Logo className="h-7 w-auto brightness-0 invert" />
+                <div className="flex items-center gap-3">
+                    {user?.email && (
+                        <span className="text-sm text-white/80 hidden sm:block truncate max-w-[200px]">
+                            {user.email}
+                        </span>
+                    )}
+                    <button
+                        onClick={signOut}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                    >
+                        <LogOut className="h-3.5 w-3.5" />
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+
+            {/* Content */}
+            <main className="pt-14">
+                <div className="h-[calc(100dvh-56px)]">
+                    {children}
+                </div>
+            </main>
+        </div>
+    );
+}
+
+// ─── Full Admin Shell ──────────────────────────────────────────────────────────
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed } = useSidebar();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { accent } = useTheme();
+    const { isLocalUser, isLocationManager, loading } = useAuth();
+    const isRestricted = isLocalUser || isLocationManager;
+
+    // Avoid shell flash while auth loads
+    if (loading) {
+        return <div className="min-h-screen bg-surface-primary" />;
+    }
+
+    if (isRestricted) {
+        return <RestrictedShell>{children}</RestrictedShell>;
+    }
 
     return (
         <div className="min-h-screen bg-surface-primary relative">
@@ -51,7 +125,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 />
             )}
 
-            {/* Sidebar - hidden on mobile, shown when menu open */}
+            {/* Sidebar */}
             <div className={`
             fixed top-0 left-0 z-[70] h-screen
             transition-transform duration-300
@@ -78,15 +152,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     );
 }
 
-import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+// ─── Root Export ───────────────────────────────────────────────────────────────
 
-
-export default function AdminLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <ThemeProvider>
             <SidebarProvider>
@@ -99,4 +167,3 @@ export default function AdminLayout({
         </ThemeProvider>
     );
 }
-

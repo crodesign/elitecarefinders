@@ -361,7 +361,7 @@ export default function ProfilePage() {
                                                     </div>
                                                 </div>
                                                 <Link
-                                                    href={`/admin/${entity.entityType === 'home' ? 'homes' : 'facilities'}?edit=${entity.slug}`}
+                                                    href={`/admin/my-listings?edit=${entity.slug}&type=${entity.entityType}`}
                                                     className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#239ddb] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#1a7fb3] transition-colors"
                                                 >
                                                     <FontAwesomeIcon icon={faPencil} className="h-3 w-3" />

@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         slug,
         pathPrefix: 'facilities',
         defaultTitle: facility.title,
-        defaultDescription: facility.description,
+        defaultDescription: facility.excerpt || facility.description,
         defaultImage: facility.images[0] ?? null,
         seo: facility.seo,
     });

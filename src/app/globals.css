@@ -25,6 +25,10 @@
 
 /* ── Dark mode (default) ─────────────────────────── */
 :root {
+  /* Nav active / tab selected solid background */
+  --nav-active-bg: #222222;
+  --tooltip-bg: #1e1e1e;
+  --tooltip-text: rgba(255, 255, 255, 0.8);
   /* Surfaces */
   --surface-primary: #09090b;
   --surface-secondary: #111111;
@@ -37,8 +41,7 @@
   --ui-border: rgba(255, 255, 255, 0.07);
   --ui-border-hover: rgba(255, 255, 255, 0.14);
   --surface-tab: rgba(255, 255, 255, 0.08);
-  /* Synchronized with surface-input */
-  --surface-tab-border: var(--surface-tab);
+  --surface-tab-border: var(--nav-active-bg);
   /* Content */
   --content-primary: #fafafa;
   --content-secondary: #a1a1aa;
@@ -93,6 +96,9 @@
 
 [data-theme="light"],
 :root[data-theme="light"] {
+  --nav-active-bg: rgba(0, 0, 0, 0.07);
+  --tooltip-bg: #e8e8ea;
+  --tooltip-text: rgba(0, 0, 0, 0.8);
   --surface-primary: #f4f4f5;
   --surface-secondary: #ffffff;
   --surface-card: #ffffff;
@@ -103,8 +109,7 @@
   --ui-border: rgba(0, 0, 0, 0.10);
   --ui-border-hover: rgba(0, 0, 0, 0.18);
   --surface-tab: rgba(0, 0, 0, 0.07);
-  /* Synchronized with surface-input */
-  --surface-tab-border: var(--surface-tab);
+  --surface-tab-border: var(--nav-active-bg);
   --content-primary: #09090b;
   --content-secondary: #52525b;
   --content-muted: #717179;
@@ -311,6 +316,15 @@ button.form-input:focus {
   border-color: var(--accent) !important;
   box-shadow: none !important;
   outline: none !important;
+}
+
+/* Nav items + tabs: active/hover background */
+.nav-item:hover,
+.nav-item.active,
+.form-tab-hover:hover,
+[role="tab"]:hover,
+[role="tab"][data-state="active"] {
+  background-color: var(--nav-active-bg) !important;
 }
 
 /* Dropdown overlay content: no border, no outline */

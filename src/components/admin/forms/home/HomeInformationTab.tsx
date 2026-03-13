@@ -398,14 +398,14 @@ export function HomeInformationTab({
                 </div>
 
                 {/* Promotions */}
-                <div className={`bg-surface-input rounded-lg p-[5px] space-y-2 ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
+                <div className="bg-surface-input rounded-lg p-[5px] space-y-2">
                     <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                         <Star className="h-4 w-4 text-accent" />
                         Promotions
                         <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                     </h3>
                     {/* Featured Home */}
-                    <div className="bg-surface-hover rounded-lg transition-all">
+                    <div className={`bg-surface-hover rounded-lg transition-all ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
                         <div className="flex items-center justify-between gap-2 p-[5px]">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 <Star className={`h-3.5 w-3.5 flex-shrink-0 ${isFeatured ? 'text-accent fill-accent' : 'text-content-secondary'}`} />
@@ -503,7 +503,7 @@ export function HomeInformationTab({
                     </div>
 
                     {/* Featured Video */}
-                    <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
+                    <div className={`flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
                         <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                             <Video className={`h-3.5 w-3.5 flex-shrink-0 ${hasFeaturedVideo ? 'text-accent' : 'text-content-secondary'}`} />
                             Featured Video
@@ -516,7 +516,7 @@ export function HomeInformationTab({
                     </div>
 
                     {/* Home of the Month */}
-                    <div className="bg-surface-hover rounded-lg transition-all">
+                    <div className={`bg-surface-hover rounded-lg transition-all ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
                         <div className="flex items-center justify-between gap-2 p-[5px]">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 <Trophy className={`h-3.5 w-3.5 flex-shrink-0 ${isHomeOfMonth ? 'text-accent' : 'text-content-secondary'}`} />

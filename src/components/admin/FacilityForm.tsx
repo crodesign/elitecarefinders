@@ -939,7 +939,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                 const isActive = activeTab === tab.id;
                                 const isDisabled = !facility?.id && tab.id !== 'information';
                                 // Tab color matches the border color exactly
-                                const tabColor = 'var(--surface-tab)';
+                                const tabColor = 'var(--nav-active-bg)';
 
                                 return (
                                     <button
@@ -960,7 +960,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                                             ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                             ${isActive
                                                 ? 'pt-[10px] pb-[11px] text-content-primary z-10 rounded-tl-lg rounded-tr-lg'
-                                                : 'pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary hover:bg-surface-input rounded-lg'
+                                                : 'form-tab-hover pt-2 pb-2 bg-transparent text-content-muted hover:text-content-secondary rounded-lg'
                                             }
                                         `}
                                         style={isActive ? { backgroundColor: tabColor } : undefined}

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     if (draft.videos !== undefined) updates.videos = draft.videos;
 
     // Care/room_details fields — merge into room_details JSONB
-    const careKeys = ['levelOfCare', 'bedroomTypes', 'bathroomType', 'showerType', 'roomTypes', 'roomPrice'];
+    const careKeys = ['levelOfCare', 'bedroomType', 'bedroomTypes', 'bathroomType', 'showerType', 'roomTypes', 'roomPrice', 'languages'];
     const roomDetailUpdates: Record<string, any> = {};
     for (const k of careKeys) {
         if (draft[k] !== undefined) roomDetailUpdates[k] = draft[k];

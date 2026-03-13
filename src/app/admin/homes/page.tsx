@@ -15,6 +15,7 @@ import { getTaxonomies } from "@/lib/services/taxonomyService";
 import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
+import { useAuth } from "@/contexts/AuthContext";
 
 function timeAgo(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
@@ -35,6 +36,8 @@ function timeAgo(dateStr: string | null | undefined): string {
 export default function HomesPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { isLocalUser, isLocationManager } = useAuth();
+    const isRestricted = isLocalUser || isLocationManager;
 
     const [homes, setHomes] = useState<Home[]>([]);
     const [filteredHomes, setFilteredHomes] = useState<Home[]>([]);
@@ -77,14 +80,27 @@ export default function HomesPage() {
         try {
             setError(null);
             const data = await getHomes();
-            setHomes(data);
-            setFilteredHomes(data);
+            if (isRestricted) {
+                const profileRes = await fetch('/api/profile');
+                const profile = await profileRes.json();
+                const assignedIds = new Set(
+                    (profile.entities || [])
+                        .filter((e: any) => e.entityType === 'home')
+                        .map((e: any) => e.entityId)
+                );
+                const allowed = data.filter(h => assignedIds.has(h.id));
+                setHomes(allowed);
+                setFilteredHomes(allowed);
+            } else {
+                setHomes(data);
+                setFilteredHomes(data);
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to load homes");
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [isRestricted]);
 
     const fetchTaxonomies = useCallback(async () => {
         try {
@@ -518,17 +534,19 @@ export default function HomesPage() {
             <button className="btn-ghost" onClick={() => handleOpenEdit(home)}>
                 <Pencil className="h-4 w-4" />
             </button>
-            <button
-                className="btn-danger"
-                onClick={() => handleDelete(home)}
-                disabled={isDeleting && itemToDelete?.id === home.id}
-            >
-                {isDeleting && itemToDelete?.id === home.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                    <Trash2 className="h-4 w-4" />
-                )}
-            </button>
+            {!isRestricted && (
+                <button
+                    className="btn-danger"
+                    onClick={() => handleDelete(home)}
+                    disabled={isDeleting && itemToDelete?.id === home.id}
+                >
+                    {isDeleting && itemToDelete?.id === home.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <Trash2 className="h-4 w-4" />
+                    )}
+                </button>
+            )}
         </>
     );
 
@@ -549,16 +567,18 @@ export default function HomesPage() {
                         <h1 className="text-xl md:text-2xl font-bold text-content-primary">Homes</h1>
                         <p className="text-xs md:text-sm text-content-secondary mt-1">Manage residential care home listings</p>
                     </div>
-                    <button
-                        onClick={handleOpenCreate}
-                        className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2"
-                    >
-                        <Plus className="h-5 w-5 md:hidden" />
-                        <span className="hidden md:flex md:items-center md:gap-2">
-                            <Plus className="h-5 w-5" />
-                            Add Home
-                        </span>
-                    </button>
+                    {!isRestricted && (
+                        <button
+                            onClick={handleOpenCreate}
+                            className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2"
+                        >
+                            <Plus className="h-5 w-5 md:hidden" />
+                            <span className="hidden md:flex md:items-center md:gap-2">
+                                <Plus className="h-5 w-5" />
+                                Add Home
+                            </span>
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2">

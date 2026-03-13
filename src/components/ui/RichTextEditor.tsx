@@ -41,7 +41,7 @@ import { $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
 import {
     Bold, Italic, Underline, List, ListOrdered,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Heading2, Heading3, Heading4, Type, ChevronDown,
+    Heading3, Heading4, Type, ChevronDown,
     Link as LinkIcon, Unlink, ExternalLink, X, Check,
 } from "lucide-react";
 import { $createParagraphNode } from "lexical";
@@ -276,7 +276,6 @@ function Toolbar() {
     };
 
     const headingIcon = () => {
-        if (blockType === "h2") return <Heading2 className="w-4 h-4" />;
         if (blockType === "h3") return <Heading3 className="w-4 h-4" />;
         if (blockType === "h4") return <Heading4 className="w-4 h-4" />;
         return <Type className="w-4 h-4" />;
@@ -288,7 +287,7 @@ function Toolbar() {
     const dropdownBtn = "flex items-center gap-2 w-full px-3 py-2 text-xs rounded hover:bg-surface-hover text-left";
 
     return (
-        <div className="flex items-center gap-1 p-2 bg-transparent flex-wrap">
+        <div className="flex items-center gap-1 p-2 bg-transparent flex-wrap border-b-2 border-ui-border">
             {/* Bold / Italic / Underline */}
             <button type="button" className={btn(isBold)} title="Bold"
                 onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}>
@@ -316,7 +315,6 @@ function Toolbar() {
                 {showHeadingMenu && (
                     <div className="absolute top-full left-0 mt-1 bg-surface-primary border border-ui-border rounded-lg shadow-xl z-50 flex flex-col p-1 min-w-[130px]">
                         {([["paragraph", <Type key="para" className="w-4 h-4" />, "Normal"],
-                        ["h2", <Heading2 key="h2" className="w-4 h-4" />, "Heading 2"],
                         ["h3", <Heading3 key="h3" className="w-4 h-4" />, "Heading 3"],
                         ["h4", <Heading4 key="h4" className="w-4 h-4" />, "Heading 4"]] as const).map(([tag, icon, label]) => (
                             <button key={tag} type="button"
@@ -489,7 +487,7 @@ export function RichTextEditor({
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable
-                                className={`editor-bg max-w-none focus:outline-none text-sm text-content-primary ${minHeight} flex-1 overflow-y-auto p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-content-primary [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-content-primary [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-content-primary [&_p]:text-content-secondary [&_a]:text-accent hover:[&_a]:underline`}
+                                className={`editor-bg max-w-none focus:outline-none text-sm text-content-primary ${minHeight} flex-1 overflow-y-auto p-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-content-primary [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-content-primary [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-content-primary [&_p]:text-content-primary [&_li]:text-content-primary [&_a]:text-accent hover:[&_a]:underline`}
                             />
                         }
                         placeholder={<PlaceholderComponent text={placeholder} />}
