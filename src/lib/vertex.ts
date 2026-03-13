@@ -1,19 +1,13 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-function getCredentials(): object {
-    const encoded = process.env.GOOGLE_SERVICE_KEY;
-    if (!encoded) throw new Error('GOOGLE_SERVICE_KEY environment variable is not set');
-    const json = Buffer.from(encoded, 'base64').toString('utf-8');
-    return JSON.parse(json);
+function getGenAI() {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) throw new Error('GEMINI_API_KEY is not set');
+    return new GoogleGenerativeAI(key);
 }
 
-export function geminiModel(modelName = 'gemini-2.0-flash-001') {
-    const vertex = new VertexAI({
-        project: process.env.GCP_PROJECT_ID!,
-        location: process.env.GCP_LOCATION ?? 'us-central1',
-        googleAuthOptions: { credentials: getCredentials() },
-    });
-    return vertex.getGenerativeModel({
+export function geminiModel(modelName = 'gemini-2.5-flash') {
+    return getGenAI().getGenerativeModel({
         model: modelName,
         generationConfig: {
             responseMimeType: 'application/json',
@@ -21,13 +15,8 @@ export function geminiModel(modelName = 'gemini-2.0-flash-001') {
     });
 }
 
-export function chatModel(modelName = 'gemini-2.0-flash-001') {
-    const vertex = new VertexAI({
-        project: process.env.GCP_PROJECT_ID!,
-        location: process.env.GCP_LOCATION ?? 'us-central1',
-        googleAuthOptions: { credentials: getCredentials() },
-    });
-    return vertex.getGenerativeModel({
+export function chatModel(modelName = 'gemini-2.5-flash') {
+    return getGenAI().getGenerativeModel({
         model: modelName,
         generationConfig: {
             responseMimeType: 'text/plain',

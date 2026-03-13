@@ -48,14 +48,13 @@ export async function POST(request: Request) {
             systemText += `\n\nThe user is logged in as ${userContext.name}${userContext.email ? ` (${userContext.email})` : ''}. Address them by first name when appropriate.`;
         }
 
-        // Convert messages to Vertex AI content format
         const contents = messages.map(msg => ({
             role: msg.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: msg.content }],
         }));
 
         const result = await model.generateContentStream({
-            systemInstruction: { role: 'system', parts: [{ text: systemText }] },
+            systemInstruction: systemText,
             contents,
         });
 
@@ -65,7 +64,7 @@ export async function POST(request: Request) {
             async start(controller) {
                 try {
                     for await (const chunk of result.stream) {
-                        const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+                        const text = chunk.text();
                         if (text) {
                             controller.enqueue(encoder.encode(text));
                         }

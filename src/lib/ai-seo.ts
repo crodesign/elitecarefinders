@@ -75,11 +75,11 @@ export async function generateSeoWithGemini(input: AiSeoInput): Promise<AiSeoOut
     const model = geminiModel();
 
     const result = await model.generateContent({
-        systemInstruction: { role: 'system', parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: SYSTEM_PROMPT,
         contents: [{ role: 'user', parts: [{ text: buildUserPrompt(input) }] }],
     });
 
-    const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const text = result.response.text() ?? '';
 
     let parsed: AiSeoOutput;
     try {
