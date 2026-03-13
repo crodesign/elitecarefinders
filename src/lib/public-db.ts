@@ -478,6 +478,88 @@ const FACILITY_TYPE_TAX_ID = 'aaff7539-60ec-448d-ae56-5ee8763917f6';
 
 export interface BrowseNavEntry { id: string; name: string; slug: string; }
 
+export interface PublicPost {
+    id: string;
+    title: string;
+    slug: string;
+    postType: string;
+    excerpt: string | null;
+    image: string | null;
+    publishedAt: string | null;
+    createdAt: string;
+}
+
+export interface PublicPostDetail extends PublicPost {
+    content: string | null;
+    videoUrl: string | null;
+    metaTitle: string | null;
+    metaDescription: string | null;
+}
+
+export async function getPublicPosts(opts: { postType?: string; page?: number; limit?: number } = {}): Promise<{ items: PublicPost[]; total: number }> {
+    const db = getClient();
+    const { postType, page = 1, limit = 12 } = opts;
+    const offset = (page - 1) * limit;
+    let query = db
+        .from('posts')
+        .select('id, title, slug, post_type, meta_description, images, published_at, created_at', { count: 'exact' })
+        .eq('status', 'published')
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+    if (postType) query = query.eq('post_type', postType);
+    try {
+        const { data, count, error } = await query;
+        if (error || !data) return { items: [], total: 0 };
+        return {
+            items: data.map((row: any) => ({
+                id: row.id,
+                title: row.title,
+                slug: row.slug,
+                postType: row.post_type,
+                excerpt: row.meta_description || null,
+                image: row.images?.[0] || null,
+                publishedAt: row.published_at || null,
+                createdAt: row.created_at,
+            })),
+            total: count ?? 0,
+        };
+    } catch {
+        return { items: [], total: 0 };
+    }
+}
+
+export async function getPublicPost(postType: string, slug: string): Promise<PublicPostDetail | null> {
+    const db = getClient();
+    let data: any, error: any;
+    try {
+        ({ data, error } = await db
+            .from('posts')
+            .select('id, title, slug, post_type, content, meta_description, images, video_url, published_at, created_at, meta_title, meta_description')
+            .eq('status', 'published')
+            .eq('post_type', postType)
+            .eq('slug', slug)
+            .maybeSingle());
+    } catch {
+        return null;
+    }
+    if (error || !data) return null;
+    return {
+        id: data.id,
+        title: data.title,
+        slug: data.slug,
+        postType: data.post_type,
+        excerpt: data.meta_description || null,
+        image: data.images?.[0] || null,
+        publishedAt: data.published_at || null,
+        createdAt: data.created_at,
+        content: data.content || null,
+        videoUrl: data.video_url || null,
+        metaTitle: data.meta_title || null,
+        metaDescription: data.meta_description || null,
+    };
+}
+
 export async function getBrowseNavTypes(): Promise<{ homeTypes: BrowseNavEntry[]; facilityTypes: BrowseNavEntry[] }> {
     const db = getClient();
     const { data } = await db

@@ -9,6 +9,7 @@ import { faUser, faHeart, faRightFromBracket, faComments, faBars, faChevronDown 
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { ConsultationModal } from './ConsultationModal';
 import { BrowseModal } from './BrowseModal';
+import { ResourcesModal } from './ResourcesModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
 
@@ -26,6 +27,7 @@ const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
 export function PublicHeader() {
     const [showConsultation, setShowConsultation] = useState(false);
     const [showBrowse, setShowBrowse] = useState(false);
+    const [showResources, setShowResources] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -90,7 +92,10 @@ export function PublicHeader() {
                             Browse our Homes &amp; Communities
                             <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 opacity-60" />
                         </button>
-                        <Link href="/blog" className="hover:text-[#239ddb] transition-colors">Resources</Link>
+                        <button onClick={() => setShowResources(true)} className="flex items-center gap-1.5 hover:text-[#239ddb] transition-colors">
+                            Resources
+                            <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 opacity-60" />
+                        </button>
                     </nav>
 
                     <div className="flex items-center gap-2">
@@ -181,6 +186,7 @@ export function PublicHeader() {
             </header>
 
             {showBrowse && <BrowseModal onClose={() => setShowBrowse(false)} />}
+            {showResources && <ResourcesModal onClose={() => setShowResources(false)} />}
             {showConsultation && (
                 <ConsultationModal onClose={() => setShowConsultation(false)} />
             )}
