@@ -46,6 +46,7 @@ import { FacilitySeoTab } from "./forms/facility/FacilitySeoTab";
 import { ensureLocationFolders } from "@/lib/services/mediaFolderService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 const RichTextEditor = dynamic(
@@ -102,6 +103,8 @@ interface TaxonomyWithEntries extends Taxonomy {
 }
 
 export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityFormProps) {
+    const { isLocalUser, isLocationManager } = useAuth();
+    const isFieldLocked = isLocalUser || isLocationManager;
     const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
     const router = useRouter(); // Import useRouter here implicitly by variable name change? No, check import
     const searchParams = useSearchParams();
@@ -318,7 +321,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         { id: "gallery", label: "Gallery", icon: Image },
         { id: "videos", label: "Videos", icon: Youtube },
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
-        { id: "seo", label: "SEO & Metadata", icon: Search },
+        ...(!isFieldLocked ? [{ id: "seo" as const, label: "SEO & Metadata", icon: Search }] : []),
     ];
 
     const { showNotification } = useNotification();
@@ -767,6 +770,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             case "information":
                 return (
                     <FacilityInformationTab
+                        isLocalUser={isFieldLocked}
                         title={title}
                         setTitle={setTitle}
                         slug={slug}
@@ -984,22 +988,24 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             })}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex" style={{ border: '2px solid var(--form-border)' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => { setStatus('published'); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Published
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => { setStatus('draft'); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Draft
-                                </button>
-                            </div>
+                            {!isFieldLocked && (
+                                <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex" style={{ border: '2px solid var(--form-border)' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStatus('published'); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Published
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStatus('draft'); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Draft
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 }

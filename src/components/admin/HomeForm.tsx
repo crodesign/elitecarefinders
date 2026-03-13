@@ -74,10 +74,13 @@ interface TaxonomyWithEntries extends Taxonomy {
 }
 
 import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ... (existing imports)
 
 export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
+    const { isLocalUser, isLocationManager } = useAuth();
+    const isFieldLocked = isLocalUser || isLocationManager;
     const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -460,7 +463,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         ...(hasProviderFields ? [{ id: "provider" as const, label: "Provider Details", icon: Users }] : []),
         { id: "gallery", label: "Gallery", icon: Image },
         { id: "videos", label: "Videos", icon: Youtube },
-        { id: "seo", label: "SEO & Metadata", icon: Search },
+        ...(!isFieldLocked ? [{ id: "seo" as const, label: "SEO & Metadata", icon: Search }] : []),
     ];
 
     // Using Notification Context
@@ -821,6 +824,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
             case "information":
                 return (
                     <HomeInformationTab
+                        isLocalUser={isFieldLocked}
                         displayReferenceNumber={displayReferenceNumber}
                         setDisplayReferenceNumber={setDisplayReferenceNumber}
                         title={title}
@@ -1041,22 +1045,24 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                             })}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex" style={{ border: '2px solid var(--form-border)' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => { setStatus('published'); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Published
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => { setStatus('draft'); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Draft
-                                </button>
-                            </div>
+                            {!isFieldLocked && (
+                                <div className="flex bg-surface-input p-1 rounded-lg hidden md:flex" style={{ border: '2px solid var(--form-border)' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStatus('published'); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'published' ? "bg-emerald-600 text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Published
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStatus('draft'); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${status === 'draft' ? "bg-surface-hover text-content-primary shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Draft
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 }

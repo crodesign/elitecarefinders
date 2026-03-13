@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 import dynamic from "next/dynamic";
-import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft, FileText } from "lucide-react";
+import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type { Facility, Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -16,6 +16,9 @@ const RichTextEditor = dynamic(
 
 import { US_STATES } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
+import { Tooltip } from "@/components/ui/tooltip";
+
+const LOCK_TOOLTIP = "Only editable by a manager or admin";
 
 
 
@@ -77,6 +80,7 @@ interface FacilityInformationTabProps {
     setFacilityOfMonthDescription: Dispatch<SetStateAction<string>>;
     setIsDirty: (value: boolean) => void;
     setManagingTaxonomy: Dispatch<SetStateAction<Taxonomy | null>>;
+    isLocalUser?: boolean;
 }
 
 export function FacilityInformationTab({
@@ -103,6 +107,7 @@ export function FacilityInformationTab({
     facilityOfMonthDescription, setFacilityOfMonthDescription,
     setIsDirty,
     setManagingTaxonomy,
+    isLocalUser = false,
 }: FacilityInformationTabProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
@@ -114,19 +119,22 @@ export function FacilityInformationTab({
                         <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                 <span className="sm:hidden">Name</span><span className="hidden sm:inline">Facility Name</span>
-                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
+                                {!isLocalUser && <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>}
                             </label>
                             <input
                                 type="text"
                                 required
                                 value={title}
+                                readOnly={isLocalUser}
                                 onChange={(e) => {
+                                    if (isLocalUser) return;
                                     const newTitle = e.target.value;
                                     setTitle(newTitle);
                                     setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                     setIsDirty(true);
                                 }}
-                                className="form-input px-3 h-8 flex-1"
+                                className={`form-input px-3 h-8 flex-1 ${isLocalUser ? 'opacity-60 cursor-default' : ''}`}
                                 placeholder="e.g. Sunrise Care Center"
                             />
                         </div>
@@ -183,6 +191,7 @@ export function FacilityInformationTab({
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                             <Tags className="h-4 w-4 text-accent" />
                             Classification
+                            <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                         </h3>
                         <div className="space-y-2">
                             {availableTaxonomies.map(taxonomy => {
@@ -196,41 +205,54 @@ export function FacilityInformationTab({
                                 const selectedId = taxonomyIds.find(id =>
                                     findEntryInTree(taxonomy.entries, id)
                                 ) || "";
+                                const findNameInTree = (entries: any[], id: string): string => {
+                                    for (const e of entries) {
+                                        if (e.id === id) return e.name;
+                                        if (e.children) { const n = findNameInTree(e.children, id); if (n) return n; }
+                                    }
+                                    return "";
+                                };
                                 return (
                                     <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                         <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
                                             <span className="sm:hidden">{taxonomy.singularName.includes("Type") ? "Type" : taxonomy.singularName}</span>
                                             <span className="hidden sm:inline">{taxonomy.singularName}</span>
-                                            {(taxonomy.singularName === "Facility Type" || taxonomy.singularName === "Location") && (
+                                            {!isLocalUser && (taxonomy.singularName === "Facility Type" || taxonomy.singularName === "Location") && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                             )}
                                         </label>
-                                        <div className="flex items-center gap-1">
-                                            <TaxonomySelector
-                                                taxonomy={taxonomy}
-                                                value={selectedId}
-                                                className="w-44 text-sm"
-                                                onChange={(newId) => {
-                                                    const otherIds = taxonomyIds.filter(id =>
-                                                        !findEntryInTree(taxonomy.entries, id)
-                                                    );
-                                                    if (newId) {
-                                                        setTaxonomyIds([...otherIds, newId]);
-                                                    } else {
-                                                        setTaxonomyIds(otherIds);
-                                                    }
-                                                    setIsDirty(true);
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setManagingTaxonomy(taxonomy)}
-                                                className="p-1.5 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-md transition-colors"
-                                                title={`Manage ${taxonomy.singularName}`}
-                                            >
-                                                <Layers className="h-3.5 w-3.5" />
-                                            </button>
-                                        </div>
+                                        {isLocalUser ? (
+                                            <span className="text-sm text-content-secondary opacity-60 pr-2">
+                                                {selectedId ? findNameInTree(taxonomy.entries, selectedId) : "—"}
+                                            </span>
+                                        ) : (
+                                            <div className="flex items-center gap-1">
+                                                <TaxonomySelector
+                                                    taxonomy={taxonomy}
+                                                    value={selectedId}
+                                                    className="w-44 text-sm"
+                                                    onChange={(newId) => {
+                                                        const otherIds = taxonomyIds.filter(id =>
+                                                            !findEntryInTree(taxonomy.entries, id)
+                                                        );
+                                                        if (newId) {
+                                                            setTaxonomyIds([...otherIds, newId]);
+                                                        } else {
+                                                            setTaxonomyIds(otherIds);
+                                                        }
+                                                        setIsDirty(true);
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setManagingTaxonomy(taxonomy)}
+                                                    className="p-1.5 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-md transition-colors"
+                                                    title={`Manage ${taxonomy.singularName}`}
+                                                >
+                                                    <Layers className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -243,19 +265,18 @@ export function FacilityInformationTab({
                     <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                         <MapPin className="h-4 w-4 text-accent" />
                         Location
+                        <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                     </h3>
 
-                    <div className="space-y-2">
+                    <div className={`space-y-2 ${isLocalUser ? 'opacity-60' : ''}`}>
                         <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                             <input
                                 type="text"
                                 value={street}
-                                onChange={(e) => {
-                                    setStreet(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                className="form-input text-left w-48 h-8 rounded-md px-3"
+                                readOnly={isLocalUser}
+                                onChange={(e) => { if (!isLocalUser) { setStreet(e.target.value); setIsDirty(true); } }}
+                                className={`form-input text-left w-48 h-8 rounded-md px-3 ${isLocalUser ? 'cursor-default' : ''}`}
                                 placeholder="Street address"
                             />
                         </div>
@@ -264,35 +285,35 @@ export function FacilityInformationTab({
                             <input
                                 type="text"
                                 value={city}
-                                onChange={(e) => {
-                                    setCity(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                className="form-input text-left w-48 h-8 rounded-md px-3"
+                                readOnly={isLocalUser}
+                                onChange={(e) => { if (!isLocalUser) { setCity(e.target.value); setIsDirty(true); } }}
+                                className={`form-input text-left w-48 h-8 rounded-md px-3 ${isLocalUser ? 'cursor-default' : ''}`}
                                 placeholder="City"
                             />
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex-1 flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
-                                <SimpleSelect
-                                    value={state}
-                                    onChange={(val) => { setState(val); setIsDirty(true); }}
-                                    options={US_STATES.map(s => s.name)}
-                                    placeholder="State..."
-                                    className="w-32 h-8 flex items-center justify-between text-sm text-left"
-                                />
+                                {isLocalUser ? (
+                                    <span className="text-sm text-content-secondary w-32 px-2">{state || "—"}</span>
+                                ) : (
+                                    <SimpleSelect
+                                        value={state}
+                                        onChange={(val) => { setState(val); setIsDirty(true); }}
+                                        options={US_STATES.map(s => s.name)}
+                                        placeholder="State..."
+                                        className="w-32 h-8 flex items-center justify-between text-sm text-left"
+                                    />
+                                )}
                             </div>
                             <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
                                 <input
                                     type="text"
                                     value={zip}
-                                    onChange={(e) => {
-                                        setZip(e.target.value);
-                                        setIsDirty(true);
-                                    }}
-                                    className="form-input text-left w-20 h-8 rounded-md px-2"
+                                    readOnly={isLocalUser}
+                                    onChange={(e) => { if (!isLocalUser) { setZip(e.target.value); setIsDirty(true); } }}
+                                    className={`form-input text-left w-20 h-8 rounded-md px-2 ${isLocalUser ? 'cursor-default' : ''}`}
                                     placeholder="Zip"
                                 />
                             </div>
@@ -337,7 +358,12 @@ export function FacilityInformationTab({
                 </div>
 
                 {/* Promotions */}
-                <div className="space-y-2">
+                <div className={`bg-surface-input rounded-lg p-[5px] space-y-2 ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
+                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                        <Star className="h-4 w-4 text-accent" />
+                        Promotions
+                        <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
+                    </h3>
                     {/* Featured Facility */}
                     <div className="bg-surface-hover rounded-lg transition-all">
                         <div className="flex items-center justify-between gap-2 p-[5px]">

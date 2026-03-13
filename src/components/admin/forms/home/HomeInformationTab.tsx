@@ -1,11 +1,14 @@
 import { Dispatch, SetStateAction } from "react";
-import { Check, Ban, X, ChevronDown, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home, Star, Video, Trophy, AlignLeft, FileText } from "lucide-react";
+import { Check, Ban, X, ChevronDown, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { US_STATES, FEATURED_LABELS } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
+import { Tooltip } from "@/components/ui/tooltip";
+
+const LOCK_TOOLTIP = "Only editable by a manager or admin";
 
 export interface HomeInformationTabProps {
     // State props
@@ -56,6 +59,7 @@ export interface HomeInformationTabProps {
     setTaxonomyEntryIds: (value: string[]) => void;
     setManagingTaxonomy: (taxonomy: Taxonomy | null) => void;
     setIsDirty: (value: boolean) => void;
+    isLocalUser?: boolean;
 }
 
 export function HomeInformationTab({
@@ -83,7 +87,8 @@ export function HomeInformationTab({
     availableTaxonomies,
     taxonomyEntryIds, setTaxonomyEntryIds,
     setManagingTaxonomy,
-    setIsDirty
+    setIsDirty,
+    isLocalUser = false,
 }: HomeInformationTabProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
@@ -97,46 +102,53 @@ export function HomeInformationTab({
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
                                     <span className="sm:hidden">{displayReferenceNumber ? "No." : "Name"}</span>
                                     <span className="hidden sm:inline">{displayReferenceNumber ? "Reference No." : "Home Name"}</span>
-                                    <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                    <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
+                                    {!isLocalUser && <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>}
                                 </label>
                                 <input
                                     type="text"
                                     required
                                     value={title}
                                     onChange={(e) => {
+                                        if (isLocalUser) return;
                                         const newTitle = e.target.value;
                                         setTitle(newTitle);
                                         setSlug(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                         setIsDirty(true);
                                     }}
-                                    className="form-input px-3 h-8 flex-1"
+                                    readOnly={isLocalUser}
+                                    className={`form-input px-3 h-8 flex-1 ${isLocalUser ? 'opacity-60 cursor-default' : ''}`}
                                     placeholder={displayReferenceNumber ? "Ref-12345" : "e.g. Sunnyvale Estate"}
                                 />
-                                {/* No./Name toggle — inline on desktop */}
-                                <div className="hidden sm:flex items-center bg-surface-input rounded-lg p-0.5">
-                                    <button type="button" onClick={() => setDisplayReferenceNumber(true)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
-                                        No.
-                                    </button>
-                                    <button type="button" onClick={() => setDisplayReferenceNumber(false)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
-                                        Name
-                                    </button>
-                                </div>
+                                {/* No./Name toggle — inline on desktop (admin only) */}
+                                {!isLocalUser && (
+                                    <div className="hidden sm:flex items-center bg-surface-input rounded-lg p-0.5">
+                                        <button type="button" onClick={() => setDisplayReferenceNumber(true)}
+                                            className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                            No.
+                                        </button>
+                                        <button type="button" onClick={() => setDisplayReferenceNumber(false)}
+                                            className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                            Name
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            {/* No./Name toggle — below input on mobile */}
-                            <div className="flex justify-end mt-1 sm:hidden">
-                                <div className="flex items-center bg-surface-input rounded-lg p-0.5">
-                                    <button type="button" onClick={() => setDisplayReferenceNumber(true)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
-                                        No.
-                                    </button>
-                                    <button type="button" onClick={() => setDisplayReferenceNumber(false)}
-                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
-                                        Name
-                                    </button>
+                            {/* No./Name toggle — below input on mobile (admin only) */}
+                            {!isLocalUser && (
+                                <div className="flex justify-end mt-1 sm:hidden">
+                                    <div className="flex items-center bg-surface-input rounded-lg p-0.5">
+                                        <button type="button" onClick={() => setDisplayReferenceNumber(true)}
+                                            className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                            No.
+                                        </button>
+                                        <button type="button" onClick={() => setDisplayReferenceNumber(false)}
+                                            className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!displayReferenceNumber ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}>
+                                            Name
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                         {/* Slug Display */}
                         <div className="px-1">
@@ -189,6 +201,7 @@ export function HomeInformationTab({
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                             <Tags className="h-4 w-4 text-accent" />
                             Classification
+                            <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                         </h3>
                         <div className="space-y-2">
                             {availableTaxonomies.map(taxonomy => {
@@ -202,41 +215,54 @@ export function HomeInformationTab({
                                 const selectedId = taxonomyEntryIds.find(id =>
                                     findEntryInTree(taxonomy.entries, id)
                                 ) || "";
+                                const findNameInTree = (entries: any[], id: string): string => {
+                                    for (const e of entries) {
+                                        if (e.id === id) return e.name;
+                                        if (e.children) { const n = findNameInTree(e.children, id); if (n) return n; }
+                                    }
+                                    return "";
+                                };
                                 return (
                                     <div key={taxonomy.id} className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
                                         <label className="text-sm font-medium text-content-secondary flex items-center gap-1.5 pl-[5px]">
                                             <span className="sm:hidden">{taxonomy.singularName.includes("Type") ? "Type" : taxonomy.singularName}</span>
                                             <span className="hidden sm:inline">{taxonomy.singularName}</span>
-                                            {(taxonomy.singularName === "Home Type" || taxonomy.singularName === "Location") && (
+                                            {!isLocalUser && (taxonomy.singularName === "Home Type" || taxonomy.singularName === "Location") && (
                                                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                             )}
                                         </label>
-                                        <div className="flex items-center gap-1">
-                                            <TaxonomySelector
-                                                taxonomy={taxonomy}
-                                                value={selectedId}
-                                                className="w-44 text-sm"
-                                                onChange={(newId: string) => {
-                                                    const otherIds = taxonomyEntryIds.filter(id =>
-                                                        !findEntryInTree(taxonomy.entries, id)
-                                                    );
-                                                    if (newId) {
-                                                        setTaxonomyEntryIds([...otherIds, newId]);
-                                                    } else {
-                                                        setTaxonomyEntryIds(otherIds);
-                                                    }
-                                                    setIsDirty(true);
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setManagingTaxonomy(taxonomy)}
-                                                className="p-1.5 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-md transition-colors"
-                                                title={`Manage ${taxonomy.singularName}`}
-                                            >
-                                                <Layers className="h-3.5 w-3.5" />
-                                            </button>
-                                        </div>
+                                        {isLocalUser ? (
+                                            <span className="text-sm text-content-secondary opacity-60 pr-2">
+                                                {selectedId ? findNameInTree(taxonomy.entries, selectedId) : "—"}
+                                            </span>
+                                        ) : (
+                                            <div className="flex items-center gap-1">
+                                                <TaxonomySelector
+                                                    taxonomy={taxonomy}
+                                                    value={selectedId}
+                                                    className="w-44 text-sm"
+                                                    onChange={(newId: string) => {
+                                                        const otherIds = taxonomyEntryIds.filter(id =>
+                                                            !findEntryInTree(taxonomy.entries, id)
+                                                        );
+                                                        if (newId) {
+                                                            setTaxonomyEntryIds([...otherIds, newId]);
+                                                        } else {
+                                                            setTaxonomyEntryIds(otherIds);
+                                                        }
+                                                        setIsDirty(true);
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setManagingTaxonomy(taxonomy)}
+                                                    className="p-1.5 text-content-muted hover:text-content-primary hover:bg-surface-hover rounded-md transition-colors"
+                                                    title={`Manage ${taxonomy.singularName}`}
+                                                >
+                                                    <Layers className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -250,49 +276,38 @@ export function HomeInformationTab({
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
                             <MapPin className="h-4 w-4 text-accent" />
                             Location
+                            <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                         </h3>
                         {/* Show Address Toggle */}
-                        <div className="flex items-center bg-surface-input rounded-lg p-0.5">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowAddress(false);
-                                    setIsDirty(true);
-                                }}
-                                className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!showAddress
-                                    ? "bg-accent text-white shadow-sm"
-                                    : "text-content-muted hover:text-content-secondary"
-                                    }`}
-                            >
-                                Private
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setShowAddress(true);
-                                    setIsDirty(true);
-                                }}
-                                className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${showAddress
-                                    ? "bg-accent text-white shadow-sm"
-                                    : "text-content-muted hover:text-content-secondary"
-                                    }`}
-                            >
-                                Public
-                            </button>
-                        </div>
+                        {!isLocalUser && (
+                            <div className="flex items-center bg-surface-input rounded-lg p-0.5">
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowAddress(false); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Private
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowAddress(true); setIsDirty(true); }}
+                                    className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                >
+                                    Public
+                                </button>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className={`space-y-2 ${isLocalUser ? 'opacity-60' : ''}`}>
                         <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                             <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Street</label>
                             <input
                                 type="text"
                                 value={street}
-                                onChange={(e) => {
-                                    setStreet(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                className="form-input text-left w-48 h-8 rounded-md px-3"
+                                readOnly={isLocalUser}
+                                onChange={(e) => { if (!isLocalUser) { setStreet(e.target.value); setIsDirty(true); } }}
+                                className={`form-input text-left w-48 h-8 rounded-md px-3 ${isLocalUser ? 'cursor-default' : ''}`}
                                 placeholder="Street address"
                             />
                         </div>
@@ -301,35 +316,35 @@ export function HomeInformationTab({
                             <input
                                 type="text"
                                 value={city}
-                                onChange={(e) => {
-                                    setCity(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                className="form-input text-left w-48 h-8 rounded-md px-3"
+                                readOnly={isLocalUser}
+                                onChange={(e) => { if (!isLocalUser) { setCity(e.target.value); setIsDirty(true); } }}
+                                className={`form-input text-left w-48 h-8 rounded-md px-3 ${isLocalUser ? 'cursor-default' : ''}`}
                                 placeholder="City"
                             />
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex-1 flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">State</label>
-                                <SimpleSelect
-                                    value={state}
-                                    onChange={(val) => { setState(val); setIsDirty(true); }}
-                                    options={US_STATES.map(s => s.name)}
-                                    placeholder="State..."
-                                    className="w-32 h-8 flex items-center justify-between text-sm text-left"
-                                />
+                                {isLocalUser ? (
+                                    <span className="text-sm text-content-secondary w-32 px-2">{state || "—"}</span>
+                                ) : (
+                                    <SimpleSelect
+                                        value={state}
+                                        onChange={(val) => { setState(val); setIsDirty(true); }}
+                                        options={US_STATES.map(s => s.name)}
+                                        placeholder="State..."
+                                        className="w-32 h-8 flex items-center justify-between text-sm text-left"
+                                    />
+                                )}
                             </div>
                             <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
                                 <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Zip</label>
                                 <input
                                     type="text"
                                     value={zip}
-                                    onChange={(e) => {
-                                        setZip(e.target.value);
-                                        setIsDirty(true);
-                                    }}
-                                    className="form-input text-left w-20 h-8 rounded-md px-2"
+                                    readOnly={isLocalUser}
+                                    onChange={(e) => { if (!isLocalUser) { setZip(e.target.value); setIsDirty(true); } }}
+                                    className={`form-input text-left w-20 h-8 rounded-md px-2 ${isLocalUser ? 'cursor-default' : ''}`}
                                     placeholder="Zip"
                                 />
                             </div>
@@ -366,15 +381,16 @@ export function HomeInformationTab({
                             />
                         </div>
                         <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
-                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">Email</label>
+                            <label className="text-sm font-medium text-content-secondary whitespace-nowrap flex items-center gap-1.5 pl-[5px]">
+                                Email
+                                <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
+                            </label>
                             <input
                                 type="email"
                                 value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                className="form-input text-left w-40 h-8 rounded-md px-3"
+                                readOnly={isLocalUser}
+                                onChange={(e) => { if (!isLocalUser) { setEmail(e.target.value); setIsDirty(true); } }}
+                                className={`form-input text-left w-40 h-8 rounded-md px-3 ${isLocalUser ? 'opacity-60 cursor-default' : ''}`}
                                 placeholder="contact@example.com"
                             />
                         </div>
@@ -382,7 +398,12 @@ export function HomeInformationTab({
                 </div>
 
                 {/* Promotions */}
-                <div className="space-y-2">
+                <div className={`bg-surface-input rounded-lg p-[5px] space-y-2 ${isLocalUser ? 'opacity-60 pointer-events-none' : ''}`}>
+                    <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                        <Star className="h-4 w-4 text-accent" />
+                        Promotions
+                        <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
+                    </h3>
                     {/* Featured Home */}
                     <div className="bg-surface-hover rounded-lg transition-all">
                         <div className="flex items-center justify-between gap-2 p-[5px]">
