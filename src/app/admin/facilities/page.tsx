@@ -118,7 +118,7 @@ export default function FacilitiesPage() {
                     });
                 }
                 const allowed = data.filter(f =>
-                    (f.taxonomyEntryIds || []).some((id: string) => expandedIds.has(id))
+                    (f.taxonomyIds || []).some((id: string) => expandedIds.has(id))
                 );
                 setFacilities(allowed);
                 setFilteredFacilities(allowed);
