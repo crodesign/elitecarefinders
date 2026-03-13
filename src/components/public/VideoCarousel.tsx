@@ -59,7 +59,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
                                 aria-label={`Play video for ${item.entityTitle}`}
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={thumbSrc} alt={item.entityTitle} className="w-full h-full object-cover" />
+                                <img src={thumbSrc} alt={item.entityTitle} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/35 transition-colors">
                                     <div className="w-[106px] h-[106px] rounded-full bg-white/90 flex items-center justify-center shadow-2xl">
                                         <svg className="w-[88px] h-[88px] text-[#239ddb] ml-1" fill="currentColor" viewBox="0 0 24 24">

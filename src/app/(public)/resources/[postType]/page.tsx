@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen, faChevronLeft, faChevronRight, faCalendarDays, faHandsHolding, faUsers, faHeart, faNewspaper, faUtensils, faBook } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faChevronLeft, faChevronRight, faArrowRight, faCalendarDays, faHandsHolding, faUsers, faHeart, faNewspaper, faUtensils, faBook } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getPublicPosts } from '@/lib/public-db';
 import { getPostTypeConfig, slugToPostType } from '@/lib/post-type-config';
@@ -94,28 +94,34 @@ export default async function ResourceTypeListPage({ params, searchParams }: Pro
                             <Link
                                 key={post.id}
                                 href={`/resources/${params.postType}/${post.slug}`}
-                                className="group flex flex-col bg-white border-2 border-gray-100 rounded-xl overflow-hidden hover:border-[#239ddb]/40 hover:shadow-sm transition-all"
+                                className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-200 bg-gray-100 hover:shadow-md"
                             >
-                                {post.image ? (
-                                    <div className="aspect-[16/9] bg-gray-100 overflow-hidden">
-                                        <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
-                                    </div>
-                                ) : (
-                                    <div className="aspect-[16/9] bg-[#239ddb]/10 flex items-center justify-center">
-                                        <FontAwesomeIcon icon={icon} className="h-8 w-8 text-[#239ddb]/40" />
-                                    </div>
-                                )}
+                                <div className="relative w-full h-48 bg-gray-200 flex-shrink-0 overflow-hidden">
+                                    {post.image ? (
+                                        <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy" />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                                            <FontAwesomeIcon icon={icon} className="h-12 w-12" />
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="p-4 flex flex-col flex-1">
-                                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors line-clamp-2 leading-snug">{post.title}</h3>
+                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-[#239ddb] transition-colors line-clamp-2 leading-snug mb-1">{post.title}</h3>
                                     {post.excerpt && (
-                                        <p className="text-xs text-gray-400 mt-1.5 line-clamp-3 leading-relaxed flex-1">{post.excerpt}</p>
+                                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed flex-1">{post.excerpt}</p>
                                     )}
-                                    {post.publishedAt && (
-                                        <p className="text-[11px] text-gray-300 mt-2 flex items-center gap-1">
-                                            <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3" />
-                                            {formatDate(post.publishedAt)}
-                                        </p>
-                                    )}
+                                    <div className="flex items-center justify-between mt-3">
+                                        {post.publishedAt ? (
+                                            <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                                                <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3" />
+                                                {formatDate(post.publishedAt)}
+                                            </p>
+                                        ) : <span />}
+                                        <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                                Learn More
+                                                <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                                            </div>
+                                    </div>
                                 </div>
                             </Link>
                         ))}

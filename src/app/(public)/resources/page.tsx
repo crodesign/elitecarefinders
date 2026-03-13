@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen, faChevronRight, faHandsHolding, faUsers, faHeart, faNewspaper, faUtensils, faBook, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faChevronRight, faArrowRight, faHandsHolding, faUsers, faHeart, faNewspaper, faUtensils, faBook, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { getPublicPosts } from '@/lib/public-db';
+import { getPublicPosts, getPostTypeCounts } from '@/lib/public-db';
 import { POST_TYPE_CONFIG } from '@/lib/post-type-config';
 
 export const metadata: Metadata = {
@@ -26,7 +26,10 @@ function formatDate(dateStr: string | null) {
 }
 
 export default async function ResourcesPage() {
-    const { items: recent } = await getPublicPosts({ limit: 6 });
+    const [{ items: recent }, typeCounts] = await Promise.all([
+        getPublicPosts({ limit: 6 }),
+        getPostTypeCounts(),
+    ]);
 
     return (
         <>
@@ -55,20 +58,30 @@ export default async function ResourcesPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {POST_TYPE_CONFIG.map(pt => {
                             const icon = ICON_MAP[pt.icon] ?? faBook;
+                            const count = typeCounts[pt.postType] ?? 0;
                             return (
                                 <Link
                                     key={pt.postType}
                                     href={`/resources/${pt.slug}`}
-                                    className="group flex items-start gap-4 p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-[#239ddb]/40 hover:shadow-sm transition-all"
+                                    className="group flex flex-col p-4 bg-white border-2 border-gray-100 rounded-xl hover:bg-gray-100 hover:shadow-md transition-all duration-200"
                                 >
-                                    <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#239ddb]/10 text-[#239ddb] shrink-0 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
-                                        <FontAwesomeIcon icon={icon} className="h-4.5 w-4.5" />
-                                    </span>
-                                    <span className="flex-1 min-w-0">
-                                        <span className="block font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors text-sm">{pt.label}</span>
-                                        <span className="block text-xs text-gray-400 mt-0.5 leading-relaxed">{pt.description}</span>
-                                    </span>
-                                    <FontAwesomeIcon icon={faChevronRight} className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#239ddb] shrink-0 mt-1 transition-colors" />
+                                    <div className="flex items-start gap-3 mb-2">
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#239ddb]/10 text-[#239ddb] shrink-0 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
+                                            <FontAwesomeIcon icon={icon} className="h-4 w-4" />
+                                        </span>
+                                        <span className="flex-1 min-w-0 pt-1">
+                                            <span className="block font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors text-sm">{pt.label}</span>
+                                        </span>
+                                        {count > 0 && (
+                                            <span className="shrink-0 text-[10px] font-bold text-[#239ddb] bg-[#239ddb]/10 px-2 py-0.5 rounded-full leading-none flex items-center">
+                                                {count}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="block text-xs text-gray-400 leading-relaxed flex-1 pl-[52px]">{pt.description}</span>
+                                    <div className="flex justify-end mt-3">
+                                        <FontAwesomeIcon icon={faChevronRight} className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#239ddb] transition-colors" />
+                                    </div>
                                 </Link>
                             );
                         })}
@@ -86,31 +99,37 @@ export default async function ResourcesPage() {
                                     <Link
                                         key={post.id}
                                         href={`/resources/${ptConfig?.slug ?? post.postType}/${post.slug}`}
-                                        className="group flex flex-col bg-white border-2 border-gray-100 rounded-xl overflow-hidden hover:border-[#239ddb]/40 hover:shadow-sm transition-all"
+                                        className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-200 bg-gray-100 hover:shadow-md"
                                     >
-                                        {post.image ? (
-                                            <div className="aspect-[16/9] bg-gray-100 overflow-hidden">
-                                                <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300" />
-                                            </div>
-                                        ) : (
-                                            <div className="aspect-[16/9] bg-[#239ddb]/10 flex items-center justify-center">
-                                                <FontAwesomeIcon icon={faBookOpen} className="h-8 w-8 text-[#239ddb]/40" />
-                                            </div>
-                                        )}
+                                        <div className="relative w-full h-48 bg-gray-200 flex-shrink-0 overflow-hidden">
+                                            {post.image ? (
+                                                <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy" />
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                                                    <FontAwesomeIcon icon={faBookOpen} className="h-12 w-12" />
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="p-4 flex flex-col flex-1">
                                             {ptConfig && (
                                                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">{ptConfig.label}</span>
                                             )}
-                                            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors line-clamp-2 leading-snug">{post.title}</h3>
+                                            <h3 className="text-sm font-bold text-gray-900 group-hover:text-[#239ddb] transition-colors line-clamp-2 leading-snug mb-1">{post.title}</h3>
                                             {post.excerpt && (
-                                                <p className="text-xs text-gray-400 mt-1.5 line-clamp-2 leading-relaxed flex-1">{post.excerpt}</p>
+                                                <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed flex-1">{post.excerpt}</p>
                                             )}
-                                            {post.publishedAt && (
-                                                <p className="text-[11px] text-gray-300 mt-2 flex items-center gap-1">
-                                                    <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3" />
-                                                    {formatDate(post.publishedAt)}
-                                                </p>
-                                            )}
+                                            <div className="flex items-center justify-between mt-3">
+                                                {post.publishedAt ? (
+                                                    <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                                                        <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3" />
+                                                        {formatDate(post.publishedAt)}
+                                                    </p>
+                                                ) : <span />}
+                                                <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                                    Learn More
+                                                    <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </Link>
                                 );

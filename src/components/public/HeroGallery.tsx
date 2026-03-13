@@ -318,20 +318,38 @@ interface HeroGalleryProps {
     videos?: VideoEntry[];
     title: string;
     featuredLabel?: string;
+    videoFirst?: boolean;
 }
 
-export function HeroGallery({ images, videos = [], title, featuredLabel }: HeroGalleryProps) {
+function getYouTubeIdHero(url: string): string | null {
+    const patterns = [
+        /youtube\.com\/watch\?v=([^&\n?#]+)/,
+        /youtu\.be\/([^&\n?#]+)/,
+        /youtube\.com\/embed\/([^&\n?#]+)/,
+        /youtube\.com\/shorts\/([^&\n?#]+)/,
+    ];
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
+    }
+    return null;
+}
+
+export function HeroGallery({ images, videos = [], title, featuredLabel, videoFirst = false }: HeroGalleryProps) {
     const [showGallery, setShowGallery] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+    const [videoPlaying, setVideoPlaying] = useState(false);
 
-    const items: GalleryItem[] = [
-        ...images.map((img, i) => {
-            if (typeof img === 'string') return { type: 'image' as const, url: img, alt: `${title} - Photo ${i + 1}` };
-            const alt = img.caption ? `${title} - ${img.caption}` : `${title} - Photo ${i + 1}`;
-            return { type: 'image' as const, url: img.url, alt, caption: img.caption };
-        }),
-        ...videos.map(v => ({ type: 'video' as const, url: v.url, caption: v.caption, thumbnailUrl: v.thumbnailUrl })),
-    ];
+    const imageItems: GalleryItem[] = images.map((img, i) => {
+        if (typeof img === 'string') return { type: 'image' as const, url: img, alt: `${title} - Photo ${i + 1}` };
+        const alt = img.caption ? `${title} - ${img.caption}` : `${title} - Photo ${i + 1}`;
+        return { type: 'image' as const, url: img.url, alt, caption: img.caption };
+    });
+    const videoItems: GalleryItem[] = videos.map(v => ({ type: 'video' as const, url: v.url, caption: v.caption, thumbnailUrl: v.thumbnailUrl }));
+
+    const items: GalleryItem[] = videoFirst
+        ? [...videoItems, ...imageItems]
+        : [...imageItems, ...videoItems];
 
     const total = items.length;
     if (total === 0) return null;
@@ -345,6 +363,13 @@ export function HeroGallery({ images, videos = [], title, featuredLabel }: HeroG
     const thumbs = items.slice(1, 5);
     const remaining = total - 5;
 
+    // Featured video thumbnail (videoFirst mode)
+    const featuredVideoItem = videoFirst && items[0]?.type === 'video' ? items[0] as Extract<GalleryItem, { type: 'video' }> : null;
+    const featuredVideoId = featuredVideoItem ? getYouTubeIdHero(featuredVideoItem.url) : null;
+    const featuredVideoThumb = featuredVideoItem ? (featuredVideoItem.thumbnailUrl || (featuredVideoId ? `https://img.youtube.com/vi/${featuredVideoId}/maxresdefault.jpg` : null)) : null;
+    const featuredVideoEmbed = featuredVideoItem ? (toEmbedUrl(featuredVideoItem.url) || featuredVideoItem.url) : null;
+    const featuredVideoEmbedAutoplay = featuredVideoEmbed ? `${featuredVideoEmbed}${featuredVideoEmbed.includes('?') ? '&' : '?'}autoplay=1` : null;
+
     return (
         <>
             <div className="relative">
@@ -353,24 +378,58 @@ export function HeroGallery({ images, videos = [], title, featuredLabel }: HeroG
                 <div className="flex flex-col md:flex-row gap-1 md:h-[440px] rounded-xl overflow-hidden">
 
                     {/* Featured image — square on mobile, 50% width on desktop */}
-                    <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setShowGallery(true)}
-                        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowGallery(true)}
-                        className="group relative w-full md:w-1/2 shrink-0 overflow-hidden bg-gray-100 aspect-square md:aspect-auto cursor-pointer"
-                        aria-label="Open gallery"
-                    >
-                        <TileContent item={items[0]} index={0} />
-                        {videos.length > 0 && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <div className="flex items-center gap-2 bg-[#239ddb] text-white text-sm uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-lg">
-                                    Watch Videos
-                                    <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5" />
+                    {featuredVideoItem ? (
+                        <div className="relative w-full md:w-1/2 shrink-0 overflow-hidden bg-black aspect-square md:aspect-auto">
+                            {videoPlaying && featuredVideoEmbedAutoplay ? (
+                                <iframe
+                                    src={featuredVideoEmbedAutoplay}
+                                    className="absolute inset-0 w-full h-full border-0"
+                                    allow="autoplay; fullscreen"
+                                    allowFullScreen
+                                    title={title}
+                                />
+                            ) : (
+                                <button
+                                    onClick={() => setVideoPlaying(true)}
+                                    className="absolute inset-0 w-full h-full group"
+                                    aria-label={`Play video: ${title}`}
+                                >
+                                    {featuredVideoThumb ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={featuredVideoThumb} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-900" />
+                                    )}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/35 transition-colors">
+                                        <div className="w-[106px] h-[106px] rounded-full bg-white/90 flex items-center justify-center shadow-2xl">
+                                            <svg className="w-[88px] h-[88px] text-[#239ddb] ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setShowGallery(true)}
+                            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setShowGallery(true)}
+                            className="group relative w-full md:w-1/2 shrink-0 overflow-hidden bg-gray-100 aspect-square md:aspect-auto cursor-pointer"
+                            aria-label="Open gallery"
+                        >
+                            <TileContent item={items[0]} index={0} />
+                            {videos.length > 0 && !videoFirst && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div className="flex items-center gap-2 bg-[#239ddb] text-white text-sm uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-lg">
+                                        Watch Videos
+                                        <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5" />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Thumbnails — horizontal row on mobile, 2×2 grid on desktop */}
                     {thumbs.length > 0 && (

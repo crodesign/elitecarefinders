@@ -214,6 +214,21 @@ export async function getAdjacentFacility(currentTitle: string): Promise<{
     };
 }
 
+export async function getAdjacentPost(postType: string, currentTitle: string): Promise<{
+    prev: { slug: string; title: string } | null;
+    next: { slug: string; title: string } | null;
+}> {
+    const db = getClient();
+    const [prevRes, nextRes] = await Promise.all([
+        db.from('posts').select('slug, title').eq('status', 'published').eq('post_type', postType).lt('title', currentTitle).order('title', { ascending: false }).limit(1),
+        db.from('posts').select('slug, title').eq('status', 'published').eq('post_type', postType).gt('title', currentTitle).order('title', { ascending: true }).limit(1),
+    ]);
+    return {
+        prev: prevRes.data?.[0] ? { slug: prevRes.data[0].slug, title: prevRes.data[0].title } : null,
+        next: nextRes.data?.[0] ? { slug: nextRes.data[0].slug, title: nextRes.data[0].title } : null,
+    };
+}
+
 export interface FeaturedCard {
     slug: string;
     title: string;
@@ -489,11 +504,33 @@ export interface PublicPost {
     createdAt: string;
 }
 
+export interface RecipeIngredient {
+    amount: string;
+    name: string;
+}
+
+export interface RecipeInstruction {
+    text: string;
+    image?: string;
+}
+
+export interface RecipeMetadata {
+    prepTime?: number;
+    cookTime?: number;
+    yield?: string;
+    ingredients?: RecipeIngredient[];
+    instructions?: RecipeInstruction[];
+    sourceUrl?: string;
+    sourceName?: string;
+}
+
 export interface PublicPostDetail extends PublicPost {
+    images: string[];
     content: string | null;
     videoUrl: string | null;
     metaTitle: string | null;
     metaDescription: string | null;
+    metadata: RecipeMetadata | null;
 }
 
 export async function getPublicPosts(opts: { postType?: string; page?: number; limit?: number } = {}): Promise<{ items: PublicPost[]; total: number }> {
@@ -502,7 +539,7 @@ export async function getPublicPosts(opts: { postType?: string; page?: number; l
     const offset = (page - 1) * limit;
     let query = db
         .from('posts')
-        .select('id, title, slug, post_type, meta_description, images, published_at, created_at', { count: 'exact' })
+        .select('id, title, slug, post_type, excerpt, meta_description, images, published_at, created_at', { count: 'exact' })
         .eq('status', 'published')
         .order('published_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
@@ -517,7 +554,7 @@ export async function getPublicPosts(opts: { postType?: string; page?: number; l
                 title: row.title,
                 slug: row.slug,
                 postType: row.post_type,
-                excerpt: row.meta_description || null,
+                excerpt: row.excerpt || row.meta_description || null,
                 image: row.images?.[0] || null,
                 publishedAt: row.published_at || null,
                 createdAt: row.created_at,
@@ -535,7 +572,7 @@ export async function getPublicPost(postType: string, slug: string): Promise<Pub
     try {
         ({ data, error } = await db
             .from('posts')
-            .select('id, title, slug, post_type, content, meta_description, images, video_url, published_at, created_at, meta_title, meta_description')
+            .select('id, title, slug, post_type, content, meta_description, images, video_url, published_at, created_at, meta_title, meta_description, metadata')
             .eq('status', 'published')
             .eq('post_type', postType)
             .eq('slug', slug)
@@ -551,13 +588,33 @@ export async function getPublicPost(postType: string, slug: string): Promise<Pub
         postType: data.post_type,
         excerpt: data.meta_description || null,
         image: data.images?.[0] || null,
+        images: data.images || [],
         publishedAt: data.published_at || null,
         createdAt: data.created_at,
         content: data.content || null,
         videoUrl: data.video_url || null,
         metaTitle: data.meta_title || null,
         metaDescription: data.meta_description || null,
+        metadata: data.metadata || null,
     };
+}
+
+export async function getPostTypeCounts(): Promise<Record<string, number>> {
+    const db = getClient();
+    try {
+        const { data, error } = await db
+            .from('posts')
+            .select('post_type')
+            .eq('status', 'published');
+        if (error || !data) return {};
+        const counts: Record<string, number> = {};
+        for (const row of data) {
+            counts[row.post_type] = (counts[row.post_type] || 0) + 1;
+        }
+        return counts;
+    } catch {
+        return {};
+    }
 }
 
 export async function getBrowseNavTypes(): Promise<{ homeTypes: BrowseNavEntry[]; facilityTypes: BrowseNavEntry[] }> {
