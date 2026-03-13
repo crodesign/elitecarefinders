@@ -7,7 +7,15 @@ function injectNodes(html: string, target: HTMLElement) {
     const temp = document.createElement("div");
     temp.innerHTML = html;
     Array.from(temp.childNodes).forEach((node) => {
-        target.appendChild(node.cloneNode(true));
+        if (node.nodeName === "SCRIPT") {
+            const orig = node as HTMLScriptElement;
+            const script = document.createElement("script");
+            Array.from(orig.attributes).forEach((attr) => script.setAttribute(attr.name, attr.value));
+            script.textContent = orig.textContent;
+            target.appendChild(script);
+        } else {
+            target.appendChild(node.cloneNode(true));
+        }
     });
 }
 

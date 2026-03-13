@@ -62,8 +62,19 @@ function FavoriteCard({ item, onRemove }: { item: Favorite; onRemove: () => void
     );
 }
 
+function validatePassword(pw: string): string | null {
+    if (pw.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(pw)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(pw)) return 'Password must contain at least one lowercase letter.';
+    if (!/[0-9]/.test(pw)) return 'Password must contain at least one number.';
+    if (!/[^A-Za-z0-9]/.test(pw)) return 'Password must contain at least one special character.';
+    return null;
+}
+
 function AccountSection({ nickname, onUpdate }: { nickname: string; onUpdate: (name: string) => void }) {
     const [name, setName] = useState(nickname);
+
+    useEffect(() => { setName(nickname); }, [nickname]);
     const [nameStatus, setNameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
     const [currentPw, setCurrentPw] = useState('');
@@ -97,7 +108,8 @@ function AccountSection({ nickname, onUpdate }: { nickname: string; onUpdate: (n
         e.preventDefault();
         setPwError('');
         if (newPw !== confirmPw) { setPwError('Passwords do not match.'); return; }
-        if (newPw.length < 6) { setPwError('Password must be at least 6 characters.'); return; }
+        const pwValidation = validatePassword(newPw);
+        if (pwValidation) { setPwError(pwValidation); return; }
         setPwStatus('saving');
         try {
             const res = await fetch('/api/profile/password', {
@@ -148,21 +160,15 @@ function AccountSection({ nickname, onUpdate }: { nickname: string; onUpdate: (n
             <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Change Password</p>
                 <form onSubmit={savePassword} className="space-y-2">
+                    <input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} className={fieldBase} placeholder="Current password" required />
                     <div className="relative">
-                        <input
-                            type={showPw ? 'text' : 'password'}
-                            value={currentPw}
-                            onChange={e => setCurrentPw(e.target.value)}
-                            className={`${fieldBase} pr-9`}
-                            placeholder="Current password"
-                            required
-                        />
+                        <input type={showPw ? 'text' : 'password'} value={newPw} onChange={e => setNewPw(e.target.value)} className={`${fieldBase} pr-9`} placeholder="New password" required />
                         <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" tabIndex={-1}>
                             <FontAwesomeIcon icon={showPw ? faEyeSlash : faEye} className="h-3.5 w-3.5" />
                         </button>
                     </div>
-                    <input type={showPw ? 'text' : 'password'} value={newPw} onChange={e => setNewPw(e.target.value)} className={fieldBase} placeholder="New password" required />
                     <input type={showPw ? 'text' : 'password'} value={confirmPw} onChange={e => setConfirmPw(e.target.value)} className={fieldBase} placeholder="Confirm new password" required />
+                    <p className="text-[11px] text-gray-400 leading-relaxed">Must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.</p>
                     {pwError && <p className="text-xs text-red-500">{pwError}</p>}
                     <button
                         type="submit"
@@ -290,7 +296,7 @@ export default function ProfilePage() {
                             />
                         </div>
                         <p className="text-sm font-semibold text-gray-900 truncate max-w-full">
-                            {user ? (nickname || user.email?.split('@')[0] || 'Account') : 'Guest'}
+                            {user ? (nickname || user.email || 'Account') : 'Guest'}
                         </p>
                         <p className="text-xs text-gray-400 truncate max-w-full">{user ? user.email : 'Not signed in'}</p>
                     </div>

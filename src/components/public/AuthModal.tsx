@@ -13,6 +13,15 @@ interface AuthModalProps {
 
 const fieldBase = 'w-full bg-gray-100 rounded-lg py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#239ddb]';
 
+function validatePassword(pw: string): string | null {
+    if (pw.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(pw)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(pw)) return 'Password must contain at least one lowercase letter.';
+    if (!/[0-9]/.test(pw)) return 'Password must contain at least one number.';
+    if (!/[^A-Za-z0-9]/.test(pw)) return 'Password must contain at least one special character.';
+    return null;
+}
+
 function formatPhone(value: string) {
     const digits = value.replace(/\D/g, '').slice(0, 10);
     if (digits.length <= 3) return digits;
@@ -109,8 +118,9 @@ export function AuthModal({ onClose, defaultTab = 'signin' }: AuthModalProps) {
             setSuError('Passwords do not match.');
             return;
         }
-        if (suPassword.length < 6) {
-            setSuError('Password must be at least 6 characters.');
+        const pwValidation = validatePassword(suPassword);
+        if (pwValidation) {
+            setSuError(pwValidation);
             return;
         }
         setSuLoading(true);
@@ -354,6 +364,8 @@ export function AuthModal({ onClose, defaultTab = 'signin' }: AuthModalProps) {
                                         <FontAwesomeIcon icon={suShowConfirm ? faEyeSlash : faEye} className="h-4 w-4" />
                                     </button>
                                 </div>
+
+                                <p className="text-[11px] text-gray-400 leading-relaxed">Must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.</p>
 
                                 {/* Nickname — optional */}
                                 <input

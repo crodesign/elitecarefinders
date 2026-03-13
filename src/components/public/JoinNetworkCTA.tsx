@@ -34,7 +34,7 @@ export function JoinNetworkCTA() {
                             className="text-white/60 mb-6"
                             style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 17px)', lineHeight: 1.6 }}
                         >
-                            We are expanding our directory across all Hawaiian islands and opening our listings to the mainland United States. List your care home or senior living facility and connect with families who need you.
+                            We are expanding our directory across the Hawaiian islands and opening our listings to the mainland United States. List your care home or senior living facility and connect with families who need you.
                         </p>
 
                         {/* Location pills */}

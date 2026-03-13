@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Menu, X, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
@@ -56,6 +57,12 @@ function RestrictedShell({ children }: { children: React.ReactNode }) {
                         <LogOut className="h-3.5 w-3.5" />
                         Sign Out
                     </button>
+                    <Link
+                        href="/profile"
+                        className="p-1.5 text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                    >
+                        <X className="h-4 w-4" />
+                    </Link>
                 </div>
             </div>
 
