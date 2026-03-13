@@ -33,14 +33,13 @@ import type { Taxonomy } from "@/types";
 
 const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Users", href: "/admin/users", icon: Users, requireSystemAdmin: true }, // Only System Admins can see this
-    { name: "Invoices", href: "/admin/invoices", icon: FileText, requireInvoiceManager: true }, // Replaced Blog icon which was FileText
+    { name: "Invoices", href: "/admin/invoices", icon: FileText, requireInvoiceManager: true },
     { name: "Contacts", href: "/admin/contacts", icon: Users },
     { name: "Homes", href: "/admin/homes", icon: Home, hasAddButton: true },
     { name: "Facilities", href: "/admin/facilities", icon: Building2, hasAddButton: true },
     { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
     { name: "Posts", href: "/admin/posts", icon: FileText, hasAddButton: true },
-    // { name: "Taxonomies", href: "/admin/taxonomies", icon: Tags }, // Moved to Settings menu
+    { name: "Users", href: "/admin/users", icon: Users, requireCanManageUsers: true },
 ];
 
 interface AdminSidebarProps {
@@ -92,14 +91,14 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             return item.name === 'Invoices';
         }
 
-        // Users nav item: system_admin only (not super_admin, who uses Settings > Users)
-        if (item.requireSystemAdmin) {
-            return isSystemAdmin && !isSuperAdmin;
+        // Users nav item: users with canManageUsers, but not super_admin (they use Settings > Users)
+        if (item.requireCanManageUsers) {
+            return canManageUsers && !isSuperAdmin;
         }
 
         // Invoices, Contacts, Reviews, Posts: super_admin and system_admin only
         if (['Invoices', 'Contacts', 'Reviews', 'Posts'].includes(item.name)) {
-            return isSystemAdmin; // isSystemAdmin is true for both system_admin and super_admin
+            return isSystemAdmin;
         }
 
         return true;
@@ -115,7 +114,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
 
     const handleLogout = async () => {
         await signOut();
-        router.push('/login');
+        window.location.href = '/';
     };
 
     return (
@@ -280,7 +279,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                     </Link>
                     {!collapsed && (
                         <div className="flex flex-col gap-1">
-                            {canAccessSettings && (
+                            {isSuperAdmin ? (
                                 <button
                                     onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                                     className={`p-2 rounded-lg transition-colors ${showSettingsMenu
@@ -290,8 +289,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                 >
                                     <Settings className="h-5 w-5" />
                                 </button>
-                            )}
-                            {!canAccessSettings && (
+                            ) : (
                                 <button
                                     onClick={handleLogout}
                                     className="p-2 rounded-lg transition-colors text-content-secondary hover:text-red-400 hover:bg-red-400/10"
@@ -420,6 +418,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                                 Site Images
                             </Link>
                         )}
+                        {isSuperAdmin && (
                         <Link
                             href="/admin/settings/users"
                             onClick={(e) => handleNavClick(e, "/admin/settings/users")}
@@ -431,6 +430,7 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
                             <Users className={`h-5 w-5 mr-3 flex-shrink-0 ${pathname.startsWith("/admin/settings/users") ? "text-accent" : "text-content-muted group-hover:text-content-primary"}`} />
                             Users
                         </Link>
+                        )}
                     </div>
                 </div>
             )}

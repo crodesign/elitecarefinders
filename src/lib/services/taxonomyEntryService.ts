@@ -105,6 +105,15 @@ export async function getTaxonomyEntries(taxonomyId: string): Promise<TaxonomyEn
     return buildTree(flat);
 }
 
+// Get all entries across all taxonomies (just id + parentId) for building hierarchy maps
+export async function getAllTaxonomyEntriesParentMap(): Promise<{ id: string; parentId: string | null }[]> {
+    const { data, error } = await supabase
+        .from('taxonomy_entries')
+        .select('id, parent_id');
+    if (error) throw error;
+    return (data || []).map((e: any) => ({ id: e.id, parentId: e.parent_id }));
+}
+
 // Get flat list (for cases where you need all entries without hierarchy)
 export async function getTaxonomyEntriesFlat(taxonomyId: string): Promise<TaxonomyEntry[]> {
     const { data, error } = await supabase

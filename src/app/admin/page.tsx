@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getFacilities } from "@/lib/services/facilityService";
 import { getHomes } from "@/lib/services/homeService";
 import { getPosts } from "@/lib/services/postService";
+import { getAllTaxonomyEntriesParentMap } from "@/lib/services/taxonomyEntryService";
 import { createClientComponentClient as createClient } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Review, Post } from "@/types";
@@ -185,7 +186,9 @@ function ReviewsPanel({ loading, reviews, items }: { loading: boolean; reviews: 
 
 export default function AdminDashboardPage() {
     const supabase = createClient();
-    const { isSystemAdmin } = useAuth();
+    const { isSystemAdmin, user, loading: authLoading } = useAuth();
+    const userRole = user?.role?.role;
+    const needsLocationFilter = userRole === 'location_manager' || userRole === 'regional_manager';
     const [homes, setHomes] = useState<HomeType[]>([]);
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [posts, setPosts] = useState<Post[]>([]);
@@ -193,6 +196,7 @@ export default function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (authLoading) return;
         const base = [getHomes(), getFacilities()] as const;
         if (isSystemAdmin) {
             Promise.all([
@@ -220,6 +224,40 @@ export default function AdminDashboardPage() {
                 setReviews(mapped);
                 setLoading(false);
             }).catch(() => setLoading(false));
+        } else if (needsLocationFilter) {
+            Promise.all([
+                ...base,
+                fetch('/api/profile').then(r => r.json()),
+                getAllTaxonomyEntriesParentMap()
+            ] as const).then(([h, f, profile, parentMap]) => {
+                const assignedIds = new Set<string>(
+                    ((profile as any).locationAssignments || []).map((la: any) => la.location_id)
+                );
+                const childrenMap = new Map<string, string[]>();
+                (parentMap as { id: string; parentId: string | null }[]).forEach(e => {
+                    if (e.parentId) {
+                        if (!childrenMap.has(e.parentId)) childrenMap.set(e.parentId, []);
+                        childrenMap.get(e.parentId)!.push(e.id);
+                    }
+                });
+                const expandedIds = new Set<string>(assignedIds);
+                const queue = Array.from(assignedIds);
+                while (queue.length > 0) {
+                    const id = queue.shift()!;
+                    (childrenMap.get(id) || []).forEach(cid => {
+                        if (!expandedIds.has(cid)) { expandedIds.add(cid); queue.push(cid); }
+                    });
+                }
+                const filteredHomes = (h as any[]).filter((home: any) =>
+                    (home.taxonomyEntryIds || []).some((id: string) => expandedIds.has(id))
+                );
+                const filteredFacilities = (f as any[]).filter((facility: any) =>
+                    (facility.taxonomyEntryIds || []).some((id: string) => expandedIds.has(id))
+                );
+                setHomes(filteredHomes);
+                setFacilities(filteredFacilities);
+                setLoading(false);
+            }).catch(() => setLoading(false));
         } else {
             Promise.all(base).then(([h, f]) => {
                 setHomes(h);
@@ -227,7 +265,7 @@ export default function AdminDashboardPage() {
                 setLoading(false);
             }).catch(() => setLoading(false));
         }
-    }, [isSystemAdmin]);
+    }, [isSystemAdmin, needsLocationFilter, authLoading]);
 
     const homeCounts = {
         published: homes.filter(h => h.status === "published").length,

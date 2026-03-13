@@ -299,6 +299,18 @@ export default function ProfilePage() {
                             {user ? (nickname || user.email || 'Account') : 'Guest'}
                         </p>
                         <p className="text-xs text-gray-400 truncate max-w-full">{user ? user.email : 'Not signed in'}</p>
+                        {(() => {
+                            const roleLabels: Record<string, string> = {
+                                super_admin: 'Super Admin',
+                                system_admin: 'System Admin',
+                                regional_manager: 'Regional Manager',
+                                location_manager: 'Local Manager',
+                                local_user: 'Local User',
+                                invoice_manager: 'Invoice Manager',
+                            };
+                            const label = roleLabels[userRole];
+                            return label ? <p className="text-xs text-[#239ddb] mt-0.5">{label}</p> : null;
+                        })()}
                     </div>
 
                     {user ? (

@@ -20,3 +20,19 @@ export function geminiModel(modelName = 'gemini-2.0-flash-001') {
         },
     });
 }
+
+export function chatModel(modelName = 'gemini-2.0-flash-001') {
+    const vertex = new VertexAI({
+        project: process.env.GCP_PROJECT_ID!,
+        location: process.env.GCP_LOCATION ?? 'us-central1',
+        googleAuthOptions: { credentials: getCredentials() },
+    });
+    return vertex.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+            responseMimeType: 'text/plain',
+            maxOutputTokens: 512,
+            temperature: 0.7,
+        },
+    });
+}

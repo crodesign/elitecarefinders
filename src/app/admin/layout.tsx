@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UnsavedChangesProvider } from "@/contexts/UnsavedChangesContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
-// ─── Restricted Shell (local_user / location_manager) ─────────────────────────
+// ─── Restricted Shell (local_user only) ───────────────────────────────────────
 
 function RestrictedShell({ children }: { children: React.ReactNode }) {
     const { user, signOut } = useAuth();
@@ -51,7 +51,7 @@ function RestrictedShell({ children }: { children: React.ReactNode }) {
                         </span>
                     )}
                     <button
-                        onClick={signOut}
+                        onClick={async () => { await signOut(); window.location.href = '/'; }}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
                     >
                         <LogOut className="h-3.5 w-3.5" />
@@ -83,7 +83,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { accent } = useTheme();
     const { isLocalUser, isLocationManager, loading } = useAuth();
-    const isRestricted = isLocalUser || isLocationManager;
+    const isRestricted = isLocalUser;
 
     // Avoid shell flash while auth loads
     if (loading) {

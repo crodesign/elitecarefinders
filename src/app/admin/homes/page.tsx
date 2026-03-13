@@ -12,7 +12,7 @@ import { getHomes, createHome, updateHome, deleteHome, searchHomes, type CreateH
 import { useNotification } from "@/contexts/NotificationContext";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
-import { getTaxonomyEntries, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
+import { getTaxonomyEntries, getAllTaxonomyEntriesParentMap, type TaxonomyEntry } from "@/lib/services/taxonomyEntryService";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,8 +36,9 @@ function timeAgo(dateStr: string | null | undefined): string {
 export default function HomesPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { isLocalUser, isLocationManager } = useAuth();
-    const isRestricted = isLocalUser || isLocationManager;
+    const { isLocalUser, user, loading: authLoading } = useAuth();
+    const userRole = user?.role?.role;
+    const isRestricted = isLocalUser || userRole === 'location_manager' || userRole === 'regional_manager';
 
     const [homes, setHomes] = useState<Home[]>([]);
     const [filteredHomes, setFilteredHomes] = useState<Home[]>([]);
@@ -77,10 +78,11 @@ export default function HomesPage() {
     const { showNotification } = useNotification();
 
     const fetchHomes = useCallback(async () => {
+        if (authLoading) return;
         try {
             setError(null);
             const data = await getHomes();
-            if (isRestricted) {
+            if (isLocalUser) {
                 const profileRes = await fetch('/api/profile');
                 const profile = await profileRes.json();
                 const assignedIds = new Set(
@@ -89,6 +91,37 @@ export default function HomesPage() {
                         .map((e: any) => e.entityId)
                 );
                 const allowed = data.filter(h => assignedIds.has(h.id));
+                setHomes(allowed);
+                setFilteredHomes(allowed);
+            } else if (userRole === 'location_manager' || userRole === 'regional_manager') {
+                const [profileRes, parentMap] = await Promise.all([
+                    fetch('/api/profile'),
+                    getAllTaxonomyEntriesParentMap()
+                ]);
+                const profile = await profileRes.json();
+                const assignedIds = new Set<string>(
+                    (profile.locationAssignments || []).map((la: any) => la.location_id)
+                );
+                // Build children map for BFS descendant expansion
+                const childrenMap = new Map<string, string[]>();
+                parentMap.forEach(e => {
+                    if (e.parentId) {
+                        if (!childrenMap.has(e.parentId)) childrenMap.set(e.parentId, []);
+                        childrenMap.get(e.parentId)!.push(e.id);
+                    }
+                });
+                // Expand assigned IDs to include all descendants
+                const expandedIds = new Set<string>(assignedIds);
+                const queue = Array.from(assignedIds);
+                while (queue.length > 0) {
+                    const id = queue.shift()!;
+                    (childrenMap.get(id) || []).forEach(cid => {
+                        if (!expandedIds.has(cid)) { expandedIds.add(cid); queue.push(cid); }
+                    });
+                }
+                const allowed = data.filter(h =>
+                    (h.taxonomyEntryIds || []).some((id: string) => expandedIds.has(id))
+                );
                 setHomes(allowed);
                 setFilteredHomes(allowed);
             } else {
@@ -100,7 +133,7 @@ export default function HomesPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [isRestricted]);
+    }, [isLocalUser, userRole, authLoading]);
 
     const fetchTaxonomies = useCallback(async () => {
         try {

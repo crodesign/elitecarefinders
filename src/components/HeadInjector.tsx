@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { getInjectedScripts } from "@/lib/services/siteSettingsService";
 
 function injectNodes(html: string, target: HTMLElement) {
@@ -20,7 +21,10 @@ function injectNodes(html: string, target: HTMLElement) {
 }
 
 export function HeadInjector() {
+    const pathname = usePathname();
+
     useEffect(() => {
+        if (pathname?.startsWith("/admin")) return;
         getInjectedScripts().then((scripts) => {
             const enabled = scripts.filter((s) => s.enabled && s.code?.trim());
             enabled.filter((s) => s.location === "header").forEach((s) => injectNodes(s.code, document.head));

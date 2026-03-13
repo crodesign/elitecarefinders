@@ -69,18 +69,12 @@ export async function GET(request: Request) {
 
     console.log('[API Debug] User role:', userRole?.role);
 
-    if (!userRole || !['super_admin', 'system_admin'].includes(userRole.role)) {
+    const allowedRoles = ['super_admin', 'system_admin', 'regional_manager', 'location_manager'];
+    if (!userRole || !allowedRoles.includes(userRole.role)) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 3. Fetch users
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-
-    if (listError) {
-        console.error('[API Debug] List users failed:', listError.message);
-        return NextResponse.json({ error: listError.message }, { status: 500 });
-    }
-
+    // 3. Fetch all data needed
     const [
         { data: roles },
         { data: profiles },
@@ -93,7 +87,58 @@ export async function GET(request: Request) {
         supabaseAdmin.from('user_entity_assignments').select('*'),
     ]);
 
-    const combinedUsers = users.map(u => {
+    // 4. Determine visible user IDs based on caller's role
+    let visibleUserIds: Set<string> | null = null; // null = all users
+
+    if (userRole.role === 'regional_manager') {
+        // Get caller's location IDs
+        const callerLocations = locations?.filter(l => l.user_id === user.id).map(l => l.location_id) || [];
+        const callerLocationSet = new Set(callerLocations);
+        const userIdsInLocations = new Set(
+            (locations || [])
+                .filter(l => l.user_id !== user.id && callerLocationSet.has(l.location_id))
+                .map(l => l.user_id)
+        );
+        // Include direct reports (manager_id = this RM)
+        (profiles || []).forEach(p => {
+            if (p.manager_id === user.id) userIdsInLocations.add(p.user_id);
+        });
+        // Chain: also include local users whose manager_id points to a visible location_manager
+        const visibleLMIds = new Set(
+            (roles || [])
+                .filter(r => r.role === 'location_manager' && userIdsInLocations.has(r.user_id))
+                .map(r => r.user_id)
+        );
+        (profiles || []).forEach(p => {
+            if (p.manager_id && visibleLMIds.has(p.manager_id)) userIdsInLocations.add(p.user_id);
+        });
+        visibleUserIds = userIdsInLocations;
+    } else if (userRole.role === 'location_manager') {
+        // Show local_users who have this user as their manager
+        const managedUserIds = new Set(
+            (profiles || []).filter(p => p.manager_id === user.id).map(p => p.user_id)
+        );
+        visibleUserIds = managedUserIds;
+    }
+
+    // 5. Build auth user list — fetch all if admin, or just visible subset
+    let authUsers: any[];
+    if (visibleUserIds !== null) {
+        // Fetch individual auth users for the visible IDs
+        const authUserResults = await Promise.all(
+            Array.from(visibleUserIds).map(id => supabaseAdmin.auth.admin.getUserById(id))
+        );
+        authUsers = authUserResults.filter(r => !r.error && r.data.user).map(r => r.data.user!);
+    } else {
+        const { data: { users: allUsers }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+        if (listError) {
+            console.error('[API Debug] List users failed:', listError.message);
+            return NextResponse.json({ error: listError.message }, { status: 500 });
+        }
+        authUsers = allUsers;
+    }
+
+    const combinedUsers = authUsers.map(u => {
         const role = roles?.find(r => r.user_id === u.id);
         const profile = profiles?.find(p => p.user_id === u.id);
         const userLocations = locations?.filter(l => l.user_id === u.id) || [];

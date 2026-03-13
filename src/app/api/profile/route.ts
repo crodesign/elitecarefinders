@@ -43,6 +43,12 @@ export async function GET() {
         }
     }
 
+    // Fetch location assignments (use admin client to bypass RLS)
+    const { data: locationAssignments } = await supabaseAdmin
+        .from('user_location_assignments')
+        .select('id, location_id')
+        .eq('user_id', userId);
+
     // Fetch entity assignments with title/slug (use admin client to bypass RLS)
     const { data: entityAssignments } = await supabaseAdmin
         .from('user_entity_assignments')
@@ -75,6 +81,7 @@ export async function GET() {
         role: role?.role,
         display_name: role?.display_name,
         entities,
+        locationAssignments: locationAssignments || [],
     });
 }
 

@@ -23,6 +23,7 @@ export interface CreateUserData {
 export interface UpdateUserData {
     profile?: Partial<UserProfile>;
     role?: UserRole;
+    password?: string;
     location_ids?: string[];
     entity_assignments?: { entity_id: string; entity_type: 'home' | 'facility' }[];
     manager_id?: string;

@@ -544,6 +544,18 @@ export function ProfilePanel({ isOpen, onClose, stackLevel = 2, offsetSidebar = 
                                             {fullName || "Your Name"}
                                         </h2>
                                         <p className="text-sm text-content-secondary mt-0.5">{user?.email}</p>
+                                        {user?.role?.role && (
+                                            <p className="text-xs text-content-muted mt-0.5 capitalize">
+                                                {{
+                                                    super_admin: 'Super Admin',
+                                                    system_admin: 'System Admin',
+                                                    regional_manager: 'Regional Manager',
+                                                    location_manager: 'Location Manager',
+                                                    local_user: 'Local User',
+                                                    invoice_manager: 'Invoice Manager',
+                                                }[user.role.role] ?? user.role.role.replace(/_/g, ' ')}
+                                            </p>
+                                        )}
 
                                         {/* Dynamic Role Badge */}
                                         <div className="flex flex-col gap-2 mt-3 w-full">

@@ -34,6 +34,7 @@ function transformFacility(facility: any): Facility {
         address: facility.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: facility.license_number,
         taxonomyIds: facility.taxonomy_ids || [],
+        taxonomyEntryIds: facility.taxonomy_entry_ids?.length ? facility.taxonomy_entry_ids : (facility.taxonomy_ids || []),
         isFeatured: facility.is_featured,
         hasFeaturedVideo: facility.has_featured_video,
         isFacilityOfMonth: facility.is_facility_of_month,

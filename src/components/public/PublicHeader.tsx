@@ -148,7 +148,7 @@ export function PublicHeader() {
                                             </Link>
                                             <button
                                                 type="button"
-                                                onClick={() => { signOut(); setProfileDropdownOpen(false); }}
+                                                onClick={async () => { await signOut(); setProfileDropdownOpen(false); window.location.href = '/'; }}
                                                 className="group flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                                             >
                                                 <FontAwesomeIcon icon={faRightFromBracket} className={iconClass(false)} />
