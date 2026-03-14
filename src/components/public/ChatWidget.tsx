@@ -196,7 +196,7 @@ export function ChatWidget() {
                     mentionSaved,
                 }),
             });
-            if (!res.ok || !res.body) { showStaticWelcome(user); return; }
+            if (!res.ok || !res.body) { showStaticWelcome(name); return; }
 
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
@@ -217,7 +217,7 @@ export function ChatWidget() {
             const welcomeText = fullText.split(CARDS_DELIMITER)[0].trim();
             setMessages([...history, trigger, { role: 'assistant', content: welcomeText }]);
         } catch {
-            showStaticWelcome(user);
+            showStaticWelcome(name);
         }
     }
 
