@@ -20,7 +20,7 @@ export function chatModel(modelName = 'gemini-2.5-flash') {
         model: modelName,
         generationConfig: {
             responseMimeType: 'text/plain',
-            maxOutputTokens: 1024,
+            maxOutputTokens: 2048,
             temperature: 0.7,
         },
     });

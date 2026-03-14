@@ -272,16 +272,23 @@ export function ChatWidget() {
                                                 href={card.url}
                                                 className="flex-shrink-0 w-[144px] rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
                                             >
-                                                {/* 2x2 image grid */}
-                                                <div className="grid grid-cols-2 gap-px bg-gray-200">
-                                                    {[0, 1, 2, 3].map(idx => (
-                                                        card.images[idx] ? (
-                                                            <img key={idx} src={card.images[idx]} alt="" className="w-full h-[58px] object-cover" />
-                                                        ) : (
-                                                            <div key={idx} className="w-full h-[58px] bg-[#239ddb]/10" />
-                                                        )
-                                                    ))}
-                                                </div>
+                                                {/* Image: full-width if 1, 2x2 grid if 2+ */}
+                                                {card.images.length === 1 ? (
+                                                    <img src={card.images[0]} alt={card.name} className="w-full h-[116px] object-cover" />
+                                                ) : card.images.length === 0 ? (
+                                                    <div className="w-full h-[116px] bg-[#239ddb]/10" />
+                                                ) : (
+                                                    <div className="grid grid-cols-2 gap-px bg-gray-200">
+                                                        <img src={card.images[0]} alt={card.name} className="w-full h-[58px] object-cover" />
+                                                        {[1, 2, 3].map(idx => (
+                                                            card.images[idx] ? (
+                                                                <img key={idx} src={card.images[idx]} alt="" className="w-full h-[58px] object-cover" />
+                                                            ) : (
+                                                                <div key={idx} className="w-full h-[58px] bg-[#239ddb]/10" />
+                                                            )
+                                                        ))}
+                                                    </div>
+                                                )}
                                                 <div className="p-2">
                                                     <div className="text-[11px] font-semibold text-gray-800 leading-tight line-clamp-2">{card.name}</div>
                                                     {card.city && <div className="text-[10px] text-gray-500 mt-0.5">{card.city}</div>}
