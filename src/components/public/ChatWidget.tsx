@@ -1,16 +1,22 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComments, faXmark, faPaperPlane, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faComments, faXmark, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { ConsultationModal } from './ConsultationModal';
+import type { EntityCard } from '@/app/api/chat/route';
+
+const ASSISTANT_AVATAR = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-1.svg';
+const CARDS_DELIMITER = '\n__CARDS__\n';
 
 interface Message {
     role: 'user' | 'assistant';
     content: string;
     quickReplies?: string[];
     showConsultationCta?: boolean;
+    entityCards?: EntityCard[];
 }
 
 const WELCOME_NEW = "Hi! I'm the Elite CareFinders assistant. I'm here to help you find the right senior living community. What can I help you with today?";
@@ -30,8 +36,16 @@ function shouldSuggestConsultation(text: string): boolean {
     return CONSULTATION_TRIGGERS.some(t => lower.includes(t));
 }
 
+function stripMarkers(content: string, entityCards?: EntityCard[]): string {
+    return content.replace(/\[\[(home|facility):([^\]]+)\]\]/g, (_, type, slug) => {
+        const card = entityCards?.find(c => c.slug === slug && c.type === type);
+        return card ? card.name : slug.replace(/-/g, ' ');
+    });
+}
+
 export function ChatWidget() {
     const { user } = useFavorites();
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
@@ -41,6 +55,16 @@ export function ChatWidget() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const abortRef = useRef<AbortController | null>(null);
+
+    const pageContext = useMemo(() => {
+        const homeMatch = pathname?.match(/^\/homes\/([^/]+)$/);
+        const facilityMatch = pathname?.match(/^\/facilities\/([^/]+)$/);
+        return {
+            path: pathname || '/',
+            entityType: homeMatch ? 'home' : facilityMatch ? 'facility' : undefined,
+            entitySlug: homeMatch?.[1] || facilityMatch?.[1],
+        };
+    }, [pathname]);
 
     // Initialize on first open
     useEffect(() => {
@@ -84,7 +108,6 @@ export function ChatWidget() {
         setInput('');
         setIsStreaming(true);
 
-        // Add empty assistant message to stream into
         const assistantMessage: Message = { role: 'assistant', content: '' };
         setMessages(prev => [...prev, assistantMessage]);
 
@@ -102,6 +125,7 @@ export function ChatWidget() {
                 body: JSON.stringify({
                     messages: newMessages.map(m => ({ role: m.role, content: m.content })),
                     userContext,
+                    pageContext,
                 }),
                 signal: abortRef.current.signal,
             });
@@ -117,21 +141,30 @@ export function ChatWidget() {
                 if (done) break;
                 const chunk = decoder.decode(value, { stream: true });
                 fullText += chunk;
+                // Show only text portion during streaming (strip __CARDS__ if already received)
+                const displayText = fullText.split(CARDS_DELIMITER)[0];
                 setMessages(prev => {
                     const updated = [...prev];
-                    updated[updated.length - 1] = { role: 'assistant', content: fullText };
+                    updated[updated.length - 1] = { role: 'assistant', content: displayText };
                     return updated;
                 });
             }
 
-            // Add quick replies / CTA after response
-            const showCta = shouldSuggestConsultation(fullText) || shouldSuggestConsultation(text);
+            // Parse entity cards
+            const [textPart, cardsJson] = fullText.split(CARDS_DELIMITER);
+            let entityCards: EntityCard[] | undefined;
+            if (cardsJson) {
+                try { entityCards = JSON.parse(cardsJson); } catch { /* ignore */ }
+            }
+
+            const showCta = shouldSuggestConsultation(textPart) || shouldSuggestConsultation(text);
             setMessages(prev => {
                 const updated = [...prev];
                 updated[updated.length - 1] = {
                     role: 'assistant',
-                    content: fullText,
+                    content: textPart,
                     showConsultationCta: showCta,
+                    entityCards,
                 };
                 return updated;
             });
@@ -149,7 +182,7 @@ export function ChatWidget() {
         } finally {
             setIsStreaming(false);
         }
-    }, [messages, isStreaming, user]);
+    }, [messages, isStreaming, user, pageContext]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -182,8 +215,8 @@ export function ChatWidget() {
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 bg-[#239ddb]">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20">
-                                <FontAwesomeIcon icon={faRobot} className="h-4 w-4 text-white" />
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 overflow-hidden p-1">
+                                <img src={ASSISTANT_AVATAR} alt="Elite CareFinders" className="w-full h-full object-contain" />
                             </div>
                             <div>
                                 <div className="text-sm font-semibold text-white leading-none">Elite CareFinders</div>
@@ -204,25 +237,61 @@ export function ChatWidget() {
                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
                         {messages.map((msg, i) => (
                             <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                <div
-                                    className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                                        msg.role === 'user'
-                                            ? 'bg-[#239ddb] text-white rounded-br-sm'
-                                            : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-sm'
-                                    }`}
-                                >
-                                    {msg.content || (
-                                        <span className="inline-flex gap-1 items-center py-0.5">
-                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                        </span>
+                                {/* Avatar + bubble */}
+                                <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                    {msg.role === 'assistant' && (
+                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#239ddb] flex items-center justify-center overflow-hidden p-0.5 mb-0.5">
+                                            <img src={ASSISTANT_AVATAR} alt="" className="w-full h-full object-contain" />
+                                        </div>
                                     )}
+                                    <div
+                                        className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                                            msg.role === 'user'
+                                                ? 'bg-[#239ddb] text-white rounded-br-sm'
+                                                : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-sm'
+                                        }`}
+                                    >
+                                        {msg.content
+                                            ? stripMarkers(msg.content, msg.entityCards)
+                                            : (
+                                                <span className="inline-flex gap-1 items-center py-0.5">
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                </span>
+                                            )}
+                                    </div>
                                 </div>
+
+                                {/* Entity cards */}
+                                {msg.entityCards && msg.entityCards.length > 0 && (
+                                    <div className="mt-2 ml-8 flex gap-2 overflow-x-auto pb-1" style={{ maxWidth: '300px' }}>
+                                        {msg.entityCards.map(card => (
+                                            <a
+                                                key={`${card.type}-${card.slug}`}
+                                                href={card.url}
+                                                className="flex-shrink-0 w-32 rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
+                                            >
+                                                {card.imageUrl ? (
+                                                    <img src={card.imageUrl} alt={card.name} className="w-full h-20 object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-20 bg-[#239ddb]/10 flex items-center justify-center">
+                                                        <img src={ASSISTANT_AVATAR} alt="" className="w-8 h-8 opacity-30" />
+                                                    </div>
+                                                )}
+                                                <div className="p-2">
+                                                    <div className="text-[11px] font-semibold text-gray-800 leading-tight line-clamp-2">{card.name}</div>
+                                                    {card.city && <div className="text-[10px] text-gray-500 mt-0.5">{card.city}</div>}
+                                                    <div className="text-[11px] text-[#239ddb] mt-1 font-medium">View →</div>
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {/* Quick replies */}
                                 {msg.quickReplies && msg.quickReplies.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1.5 max-w-[90%]">
+                                    <div className="mt-2 ml-8 flex flex-wrap gap-1.5" style={{ maxWidth: '280px' }}>
                                         {msg.quickReplies.map(qr => (
                                             <button
                                                 key={qr}
@@ -242,7 +311,7 @@ export function ChatWidget() {
                                     <button
                                         type="button"
                                         onClick={() => setShowConsultation(true)}
-                                        className="mt-2 text-xs px-3.5 py-2 rounded-full bg-[#239ddb] text-white font-medium hover:bg-[#1a7fb3] transition-colors"
+                                        className="mt-2 ml-8 text-xs px-3.5 py-2 rounded-full bg-[#239ddb] text-white font-medium hover:bg-[#1a7fb3] transition-colors"
                                     >
                                         Schedule a free consultation →
                                     </button>
