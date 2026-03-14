@@ -48,12 +48,12 @@ function thumbUrl(url?: string): string | null {
 async function fetchListingContext() {
     const supabase = createAdminClient();
     const [homes, facilities] = await Promise.all([
-        supabase.from('homes').select('title, slug, address').eq('status', 'published').limit(30),
-        supabase.from('facilities').select('title, slug, address').eq('status', 'published').limit(15),
+        supabase.from('homes').select('title, slug, address, excerpt, description').eq('status', 'published').limit(30),
+        supabase.from('facilities').select('title, slug, address, excerpt, description').eq('status', 'published').limit(15),
     ]);
     return {
-        homes: (homes.data || []) as { title: string; slug: string; address: any }[],
-        facilities: (facilities.data || []) as { title: string; slug: string; address: any }[],
+        homes: (homes.data || []) as { title: string; slug: string; address: any; excerpt?: string; description?: string }[],
+        facilities: (facilities.data || []) as { title: string; slug: string; address: any; excerpt?: string; description?: string }[],
     };
 }
 
@@ -134,14 +134,20 @@ export async function POST(request: Request) {
             systemText += `. Reference this listing as [[${pageContext!.entityType}:${currentEntity.slug}]] when relevant.`;
         }
 
-        // Inject available listings so AI can reference real slugs
+        // Inject available listings with amenity descriptions so AI can match feature queries
         if (listings.homes.length > 0 || listings.facilities.length > 0) {
-            systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — they will show the visitor a photo card and link. Only use slugs from this list:\n`;
+            systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — this automatically shows the visitor a photo card with a link. Use these markers whenever a listing matches what the visitor is looking for. Only use slugs from this list:\n`;
             if (listings.homes.length > 0) {
-                systemText += `\nADULT FOSTER HOMES:\n` + listings.homes.map(h => `- [[home:${h.slug}]] ${h.title}${h.address?.city ? ` | ${h.address.city}` : ''}`).join('\n');
+                systemText += `\nADULT FOSTER HOMES:\n` + listings.homes.map(h => {
+                    const blurb = (h.excerpt || h.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+                    return `- [[home:${h.slug}]] ${h.title}${h.address?.city ? ` | ${h.address.city}` : ''}${blurb ? ` | ${blurb}` : ''}`;
+                }).join('\n');
             }
             if (listings.facilities.length > 0) {
-                systemText += `\n\nASSISTED LIVING FACILITIES:\n` + listings.facilities.map(f => `- [[facility:${f.slug}]] ${f.title}${f.address?.city ? ` | ${f.address.city}` : ''}`).join('\n');
+                systemText += `\n\nASSISTED LIVING FACILITIES:\n` + listings.facilities.map(f => {
+                    const blurb = (f.excerpt || f.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+                    return `- [[facility:${f.slug}]] ${f.title}${f.address?.city ? ` | ${f.address.city}` : ''}${blurb ? ` | ${blurb}` : ''}`;
+                }).join('\n');
             }
         }
 
