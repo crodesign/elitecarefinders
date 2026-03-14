@@ -215,7 +215,7 @@ export function ChatWidget() {
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 bg-[#239ddb]">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 overflow-hidden p-1">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white overflow-hidden p-1.5">
                                 <img src={ASSISTANT_AVATAR} alt="Elite CareFinders" className="w-full h-full object-contain" />
                             </div>
                             <div>
@@ -234,13 +234,13 @@ export function ChatWidget() {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
+                    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-100">
                         {messages.map((msg, i) => (
                             <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                                 {/* Avatar + bubble */}
                                 <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                                     {msg.role === 'assistant' && (
-                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#239ddb] flex items-center justify-center overflow-hidden p-0.5 mb-0.5">
+                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden p-1 mb-0.5">
                                             <img src={ASSISTANT_AVATAR} alt="" className="w-full h-full object-contain" />
                                         </div>
                                     )}
