@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { chatModel } from '@/lib/vertex';
 import { createAdminClient } from '@/lib/supabase-server';
+import { postTypeToSlug, POST_TYPE_CONFIG } from '@/lib/post-type-config';
 
 const SYSTEM_PROMPT = `You are the Elite CareFinders virtual assistant — a warm, knowledgeable guide helping families and individuals find the right senior living community in Hawaii and beyond.
 
@@ -31,7 +32,7 @@ export interface ChatMessage {
 }
 
 export interface EntityCard {
-    type: 'home' | 'facility';
+    type: 'home' | 'facility' | 'post';
     slug: string;
     name: string;
     city: string;
@@ -64,10 +65,11 @@ function buildAmenityString(roomDetails: any, fieldMap: Map<string, string>): st
 
 async function fetchListingContext() {
     const supabase = createAdminClient();
-    const [homes, facilities, fieldDefs] = await Promise.all([
+    const [homes, facilities, fieldDefs, posts] = await Promise.all([
         supabase.from('homes').select('title, slug, address, excerpt, room_details').eq('status', 'published').limit(30),
         supabase.from('facilities').select('title, slug, address, excerpt, room_details').eq('status', 'published').limit(15),
         supabase.from('room_field_definitions').select('id, name').eq('is_active', true),
+        supabase.from('posts').select('title, slug, post_type, excerpt, images').eq('status', 'published').order('published_at', { ascending: false }).limit(30),
     ]);
 
     const fieldMap = new Map<string, string>((fieldDefs.data || []).map((f: any) => [f.id, f.name]));
@@ -82,6 +84,11 @@ async function fetchListingContext() {
             title: f.title, slug: f.slug, address: f.address,
             excerpt: f.excerpt,
             amenities: buildAmenityString(f.room_details, fieldMap),
+        })),
+        posts: (posts.data || []).map((p: any) => ({
+            title: p.title, slug: p.slug, postType: p.post_type,
+            excerpt: (p.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120),
+            image: (p.images || [])[0] || null,
         })),
     };
 }
@@ -99,12 +106,13 @@ async function fetchCurrentEntity(type: string, slug: string) {
 }
 
 async function resolveEntityCards(text: string): Promise<EntityCard[]> {
-    const refs = [...text.matchAll(/\[\[(home|facility):([^\]]+)\]\]/g)].map(m => ({ type: m[1], slug: m[2] }));
+    const refs = [...text.matchAll(/\[\[(home|facility|post):([^\]]+)\]\]/g)].map(m => ({ type: m[1], slug: m[2] }));
     if (refs.length === 0) return [];
 
     const supabase = createAdminClient();
     const homeSlugs = refs.filter(r => r.type === 'home').map(r => r.slug);
     const facilitySlugs = refs.filter(r => r.type === 'facility').map(r => r.slug);
+    const postSlugs = refs.filter(r => r.type === 'post').map(r => r.slug);
     const cards: EntityCard[] = [];
 
     if (homeSlugs.length > 0) {
@@ -119,15 +127,27 @@ async function resolveEntityCards(text: string): Promise<EntityCard[]> {
             cards.push({ type: 'facility', slug: f.slug, name: f.title, city: f.address?.city || '', images: (f.images || []).slice(0, 4).map(gridThumbUrl).filter(Boolean) as string[], url: `/facilities/${f.slug}` });
         }
     }
+    if (postSlugs.length > 0) {
+        const { data } = await supabase.from('posts').select('title, slug, post_type, images').in('slug', postSlugs).eq('status', 'published');
+        for (const p of data || []) {
+            const typeLabel = POST_TYPE_CONFIG.find(c => c.postType === p.post_type)?.label ?? p.post_type;
+            const typeSlug = postTypeToSlug(p.post_type);
+            const thumb = gridThumbUrl((p.images || [])[0]);
+            cards.push({ type: 'post', slug: p.slug, name: p.title, city: typeLabel, images: thumb ? [thumb] : [], url: `/resources/${typeSlug}/${p.slug}` });
+        }
+    }
     return cards;
 }
 
 export async function POST(request: Request) {
     try {
-        const { messages, userContext, pageContext }: {
+        const { messages, userContext, pageContext, welcomeMode, savedCount, mentionSaved }: {
             messages: ChatMessage[];
             userContext?: { name?: string; email?: string };
             pageContext?: { path: string; entityType?: string; entitySlug?: string };
+            welcomeMode?: boolean;
+            savedCount?: number;
+            mentionSaved?: boolean;
         } = await request.json();
 
         if (!messages || messages.length === 0) {
@@ -148,7 +168,34 @@ export async function POST(request: Request) {
         let systemText = SYSTEM_PROMPT;
 
         if (userContext?.name) {
-            systemText += `\n\nThe user is logged in as ${userContext.name}${userContext.email ? ` (${userContext.email})` : ''}. Address them by first name when appropriate.`;
+            const firstName = userContext.name.split(' ')[0];
+            systemText += `\n\nThe user's name is ${firstName}. You may use their first name in the opening message of a new session — after that, do not use their name again unless it arises very naturally (e.g. wrapping up a long conversation). Most replies should not include their name at all. This is how natural conversation works — overusing someone's name sounds robotic.`;
+            if (!welcomeMode && messages.length > 3) {
+                systemText += ` You are continuing a previous conversation with them — pick up naturally where you left off without re-introducing yourself.`;
+            }
+        }
+
+        if (welcomeMode) {
+            // Fetch new listing count (published in last 14 days)
+            const supabase = createAdminClient();
+            const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+            const [{ count: newHomes }, { count: newFacilities }] = await Promise.all([
+                supabase.from('homes').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', twoWeeksAgo),
+                supabase.from('facilities').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', twoWeeksAgo),
+            ]);
+            const newListingCount = (newHomes ?? 0) + (newFacilities ?? 0);
+
+            systemText += `\n\nThis is a returning session start. The last message "[new_session]" is a system trigger — respond to the USER with a natural, brief welcome back (1–2 sentences). Vary your tone and angle each time — don't always open with "Welcome back!".`;
+
+            if (mentionSaved && (savedCount ?? 0) > 0) {
+                systemText += ` In this session, mention that they have ${savedCount} saved listing${(savedCount ?? 0) !== 1 ? 's' : ''} and offer to pull them up — work it in naturally, not as a sales pitch.`;
+            } else if (newListingCount > 0) {
+                systemText += ` Mention there ${newListingCount === 1 ? 'is 1 new listing' : `are ${newListingCount} new listings`} added recently that might be worth a look.`;
+            } else {
+                systemText += ` Options: reference something from your previous conversation, ask how their search is going, or just a warm brief check-in. Pick what feels most natural.`;
+            }
+
+            systemText += ` Keep it short and conversational.`;
         }
 
         if (pageContext?.path) {
@@ -164,8 +211,8 @@ export async function POST(request: Request) {
         }
 
         // Inject available listings with amenity descriptions so AI can match feature queries
-        if (listings.homes.length > 0 || listings.facilities.length > 0) {
-            systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — this automatically shows the visitor a photo card with a link. When a visitor asks to see listings or asks about features, include up to 5 matching markers. Only use slugs from this list:\n`;
+        if (listings.homes.length > 0 || listings.facilities.length > 0 || listings.posts.length > 0) {
+            systemText += `\n\nWhen recommending specific listings or articles, use [[home:slug]], [[facility:slug]], or [[post:slug]] markers — this automatically shows the visitor a card with a photo and link. When a visitor asks to see listings, articles, or asks about features, show up to 3 matching results. If you're showing fewer than 3 results (or if there are more you're not showing), mention it naturally — e.g. "Here's one that might be a good fit" or "I found a few that could work — here are the top ones". Only use slugs from this list:\n`;
             if (listings.homes.length > 0) {
                 systemText += `\nADULT FOSTER HOMES:\n` + listings.homes.map(h => {
                     const excerptBlurb = (h.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -178,6 +225,12 @@ export async function POST(request: Request) {
                     const excerptBlurb = (f.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
                     const details = [excerptBlurb, f.amenities].filter(Boolean).join(' | ');
                     return `- [[facility:${f.slug}]] ${f.title}${f.address?.city ? ` | ${f.address.city}` : ''}${details ? ` | ${details}` : ''}`;
+                }).join('\n');
+            }
+            if (listings.posts.length > 0) {
+                systemText += `\n\nRESOURCES & ARTICLES:\n` + listings.posts.map(p => {
+                    const typeLabel = POST_TYPE_CONFIG.find(c => c.postType === p.postType)?.label ?? p.postType;
+                    return `- [[post:${p.slug}]] ${p.title} [${typeLabel}]${p.excerpt ? ` | ${p.excerpt}` : ''}`;
                 }).join('\n');
             }
         }

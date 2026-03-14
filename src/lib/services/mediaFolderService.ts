@@ -120,21 +120,35 @@ export async function ensureLocationFolders(
 }
 
 /**
- * Returns the ID of the shared "posts" media folder, creating it if needed.
- * All post images are stored flat in this single folder regardless of post type.
+ * Returns the ID of a per-post media subfolder, creating it if needed.
+ * Structure: posts > {post-title-slug}
  */
 export async function ensurePostFolder(
-    _postTitle: string,
+    postTitle: string,
     _postType: string
 ): Promise<string | null> {
     try {
-        let folder = await findFolderByName('posts', null);
-        if (!folder) {
-            folder = await createFolder('posts', null);
+        // Ensure root "posts" folder exists
+        let postsRoot = await findFolderByName('posts', null);
+        if (!postsRoot) {
+            postsRoot = await createFolder('posts', null);
         }
-        return folder?.id ?? null;
+        if (!postsRoot) return null;
+
+        // Slugify the post title for the subfolder name
+        const subfolderName = postTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '')
+            .slice(0, 80);
+
+        let subFolder = await findFolderByName(subfolderName, postsRoot.id);
+        if (!subFolder) {
+            subFolder = await createFolder(subfolderName, postsRoot.id);
+        }
+        return subFolder?.id ?? null;
     } catch (error) {
-        console.error("Error ensuring posts folder:", error);
+        console.error("Error ensuring post folder:", error);
         throw error;
     }
 }

@@ -59,7 +59,7 @@ export function ResourcesModal({ onClose }: ResourcesModalProps) {
                                     <Link
                                         href={`/resources/${pt.slug}`}
                                         onClick={onClose}
-                                        className="group flex items-start gap-3 py-2.5 px-3 -mx-3 rounded-lg hover:bg-gray-50 transition-colors"
+                                        className="group flex items-start gap-3 py-2.5 px-3 -mx-3 rounded-lg hover:bg-gray-100 transition-colors"
                                     >
                                         <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#239ddb]/10 text-[#239ddb] shrink-0 mt-0.5 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
                                             <FontAwesomeIcon icon={icon} className="h-3.5 w-3.5" />

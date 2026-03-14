@@ -63,25 +63,23 @@ export default async function ResourcesPage() {
                                 <Link
                                     key={pt.postType}
                                     href={`/resources/${pt.slug}`}
-                                    className="group flex flex-col p-4 bg-white border-2 border-gray-100 rounded-xl hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+                                    className="group flex items-start gap-3 p-4 bg-white border-2 border-gray-100 rounded-xl hover:bg-gray-100 hover:shadow-md transition-all duration-200"
                                 >
-                                    <div className="flex items-start gap-3 mb-2">
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#239ddb]/10 text-[#239ddb] shrink-0 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
-                                            <FontAwesomeIcon icon={icon} className="h-4 w-4" />
+                                    <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-[#239ddb]/10 text-[#239ddb] shrink-0 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
+                                        <FontAwesomeIcon icon={icon} className="h-4 w-4" />
+                                    </span>
+                                    <span className="flex-1 min-w-0">
+                                        <span className="flex items-center gap-2">
+                                            <span className="font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors text-sm">{pt.label}</span>
+                                            {count > 0 && (
+                                                <span className="text-[10px] font-bold text-[#239ddb] bg-[#239ddb]/10 px-2 py-0.5 rounded-full leading-none">
+                                                    {count}
+                                                </span>
+                                            )}
                                         </span>
-                                        <span className="flex-1 min-w-0 pt-1">
-                                            <span className="block font-semibold text-gray-900 group-hover:text-[#239ddb] transition-colors text-sm">{pt.label}</span>
-                                        </span>
-                                        {count > 0 && (
-                                            <span className="shrink-0 text-[10px] font-bold text-[#239ddb] bg-[#239ddb]/10 px-2 py-0.5 rounded-full leading-none flex items-center">
-                                                {count}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="block text-xs text-gray-400 leading-relaxed flex-1 pl-[52px]">{pt.description}</span>
-                                    <div className="flex justify-end mt-3">
-                                        <FontAwesomeIcon icon={faChevronRight} className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#239ddb] transition-colors" />
-                                    </div>
+                                        <span className="block text-xs text-gray-400 leading-relaxed mt-0.5">{pt.description}</span>
+                                    </span>
+                                    <FontAwesomeIcon icon={faChevronRight} className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#239ddb] transition-colors shrink-0 self-center" />
                                 </Link>
                             );
                         })}

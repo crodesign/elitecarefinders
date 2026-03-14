@@ -8,6 +8,7 @@ import type { Post } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
 import { DataTable, type ColumnDef } from "@/components/admin/DataTable";
 import { getPosts, deletePost, createPost, updatePost, searchPosts } from "@/lib/services/postService";
+import { postTypeToSlug } from "@/lib/post-type-config";
 import Link from "next/link";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -275,7 +276,7 @@ export default function PostsPage() {
                             {post.title}
                         </div>
                         <a
-                href={`/blog/${post.slug}`}
+                href={`/resources/${postTypeToSlug(post.postType)}/${post.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}

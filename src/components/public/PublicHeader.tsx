@@ -7,9 +7,11 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHeart, faRightFromBracket, faComments, faBars, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
+import { createClientComponentClient } from '@/lib/supabase';
 import { ConsultationModal } from './ConsultationModal';
 import { BrowseModal } from './BrowseModal';
 import { ResourcesModal } from './ResourcesModal';
+import { MobileNavModal } from './MobileNavModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
 
@@ -30,6 +32,8 @@ export function PublicHeader() {
     const [showResources, setShowResources] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [displayName, setDisplayName] = useState<string | null>(null);
+    const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { user, openAuthModal, openSavedModal, signOut } = useFavorites();
     const pathname = usePathname();
@@ -37,6 +41,20 @@ export function PublicHeader() {
     useEffect(() => {
         getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => !a.hidden)));
     }, []);
+
+    useEffect(() => {
+        if (!user) { setDisplayName(null); setProfilePhoto(null); return; }
+        const supabase = createClientComponentClient();
+        supabase
+            .from('user_profiles')
+            .select('nickname, full_name, photo_url')
+            .eq('user_id', user.id)
+            .single()
+            .then(({ data }) => {
+                setDisplayName(data?.nickname || data?.full_name || null);
+                setProfilePhoto(data?.photo_url || null);
+            });
+    }, [user]);
     const iconClass = (active: boolean) =>
         `h-3.5 w-3.5 transition-colors ${active ? 'text-[#239ddb]' : 'text-gray-400 group-hover:text-[#239ddb]'}`;
 
@@ -123,10 +141,20 @@ export function PublicHeader() {
                                     <button
                                         type="button"
                                         onClick={() => setProfileDropdownOpen(v => !v)}
-                                        className="flex items-center justify-center w-9 h-9 rounded-full bg-[#239ddb] text-white hover:bg-[#1a7fb3] transition-colors"
+                                        className="flex items-center md:gap-2 p-0 md:pl-1 md:pr-3 md:py-1 rounded-full border-2 border-[#239ddb] bg-[#239ddb] text-white hover:bg-[#1a7fb3] hover:border-[#1a7fb3] transition-colors"
                                         aria-label="Account menu"
                                     >
-                                        <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
+                                        <span className="flex items-center justify-center w-8 h-8 md:w-7 md:h-7 rounded-full bg-white/20 shrink-0 overflow-hidden">
+                                            {profilePhoto
+                                                ? <img src={profilePhoto} alt="" className="w-full h-full object-cover" />
+                                                : <FontAwesomeIcon icon={faUser} className="h-3.5 w-3.5" />
+                                            }
+                                        </span>
+                                        {displayName && (
+                                            <span className="hidden md:block text-sm font-medium truncate max-w-[120px]">
+                                                {displayName}
+                                            </span>
+                                        )}
                                     </button>
                                     {profileDropdownOpen && (
                                         <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border-2 border-gray-100 p-[5px] z-50">
@@ -161,10 +189,11 @@ export function PublicHeader() {
                                 <button
                                     type="button"
                                     onClick={openAuthModal}
-                                    className="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 text-gray-500 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                    className="flex items-center gap-2 px-2 md:px-3 py-1.5 rounded-full border-2 border-gray-200 text-gray-500 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
                                     aria-label="Sign in"
                                 >
                                     <FontAwesomeIcon icon={faUser} className="h-4 w-4" />
+                                    <span className="hidden md:block text-sm font-medium">Sign In</span>
                                 </button>
                             )}
                         </div>
@@ -185,7 +214,12 @@ export function PublicHeader() {
                 </div>
             </header>
 
-            {showBrowse && <BrowseModal onClose={() => setShowBrowse(false)} />}
+            {showBrowse && (
+                <>
+                    <div className="md:hidden"><MobileNavModal onClose={() => setShowBrowse(false)} /></div>
+                    <div className="hidden md:block"><BrowseModal onClose={() => setShowBrowse(false)} /></div>
+                </>
+            )}
             {showResources && <ResourcesModal onClose={() => setShowResources(false)} />}
             {showConsultation && (
                 <ConsultationModal onClose={() => setShowConsultation(false)} />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faUser, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faUser, faEye, faEyeSlash, faHeart, faComments, faBookmark } from '@fortawesome/free-solid-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { readFavoritesCookie } from '@/lib/favorites-cookie';
 
@@ -310,6 +310,24 @@ export function AuthModal({ onClose, defaultTab = 'signin' }: AuthModalProps) {
 
                         {view === 'main' && tab === 'signup' && (
                             <form onSubmit={handleSignUp} className="space-y-3">
+                                {/* Benefits panel */}
+                                <div className="bg-[#239ddb]/8 border border-[#239ddb]/20 rounded-xl px-4 py-3 mb-1 space-y-2">
+                                    <p className="text-[11px] font-semibold text-[#239ddb] uppercase tracking-widest">Why create an account?</p>
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-start gap-2.5">
+                                            <FontAwesomeIcon icon={faHeart} className="h-3 w-3 text-[#239ddb] mt-0.5 shrink-0" />
+                                            <span className="text-xs text-gray-600">Save your favorite homes, facilities, and articles to revisit anytime</span>
+                                        </div>
+                                        <div className="flex items-start gap-2.5">
+                                            <FontAwesomeIcon icon={faComments} className="h-3 w-3 text-[#239ddb] mt-0.5 shrink-0" />
+                                            <span className="text-xs text-gray-600">Our assistant remembers your conversations — no need to start over each visit</span>
+                                        </div>
+                                        <div className="flex items-start gap-2.5">
+                                            <FontAwesomeIcon icon={faBookmark} className="h-3 w-3 text-[#239ddb] mt-0.5 shrink-0" />
+                                            <span className="text-xs text-gray-600">Access your saved list from any device, anytime</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 {/* Email */}
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-red-400 pointer-events-none" />
