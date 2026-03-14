@@ -599,6 +599,22 @@ export async function getPublicPost(postType: string, slug: string): Promise<Pub
     };
 }
 
+export async function getLocationTopLevelEntries(): Promise<{ id: string; name: string; slug: string }[]> {
+    const db = getClient();
+    const { data: tax } = await db.from('taxonomies').select('id').eq('slug', 'location').maybeSingle();
+    if (!tax) return [];
+    const { data } = await db.from('taxonomy_entries').select('id, name, slug').eq('taxonomy_id', tax.id).is('parent_id', null).order('name');
+    return (data || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug }));
+}
+
+export async function getLocationChildEntries(parentSlug: string): Promise<{ id: string; name: string; slug: string }[]> {
+    const db = getClient();
+    const { data: parent } = await db.from('taxonomy_entries').select('id').eq('slug', parentSlug).maybeSingle();
+    if (!parent) return [];
+    const { data } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', parent.id).order('name');
+    return (data || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug }));
+}
+
 export async function getPostTypeCounts(): Promise<Record<string, number>> {
     const db = getClient();
     try {

@@ -82,6 +82,21 @@ export default async function LocationPage({ params }: Props) {
                 typeNameParts={locationParts}
             />
 
+            {grandTotal === 0 ? (
+                <div className="max-w-6xl mx-auto px-5 py-8">
+                    <div className="text-center py-16 bg-gray-50 rounded-2xl">
+                        <p className="text-lg font-semibold text-gray-700 mb-2">No listings in {locationName} yet</p>
+                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">We&rsquo;re growing and adding new communities all the time. Check back soon, or speak with an advisor about your options anywhere in the US.</p>
+                        <a
+                            href="tel:+18084454111"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#239ddb] text-white rounded-lg text-sm font-semibold hover:bg-[#1a7fb3] transition-colors"
+                        >
+                            Call (808) 445-4111
+                        </a>
+                    </div>
+                </div>
+            ) : (
+
             <div className="max-w-6xl mx-auto px-5 py-8 space-y-12">
 
                 {/* Care Homes section */}
@@ -260,6 +275,7 @@ export default async function LocationPage({ params }: Props) {
                     )}
                 </section>
             </div>
+            )}
         </>
     );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faBookOpen, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faBookOpen, faBars, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
@@ -32,6 +32,8 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
     const [homeTypes, setHomeTypes] = useState<TaxEntry[]>([]);
     const [facilityTypes, setFacilityTypes] = useState<TaxEntry[]>([]);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [locationStates, setLocationStates] = useState<TaxEntry[]>([]);
+    const [hawaiiIslands, setHawaiiIslands] = useState<TaxEntry[]>([]);
 
     useEffect(() => {
         const supabase = createClientComponentClient();
@@ -48,6 +50,19 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
             });
 
         getSocialAccounts().then(accounts => setSocialAccounts(accounts));
+
+        (async () => {
+            const { data: tax } = await supabase.from('taxonomies').select('id').eq('slug', 'location').maybeSingle();
+            if (!tax) return;
+            const { data: states } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('taxonomy_id', tax.id).is('parent_id', null).order('name');
+            const mapped = (states || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug }));
+            setLocationStates(mapped);
+            const hawaii = mapped.find(s => s.slug === 'hawaii');
+            if (hawaii) {
+                const { data: islands } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
+                setHawaiiIslands((islands || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug })));
+            }
+        })();
     }, []);
 
     useEffect(() => {
@@ -136,6 +151,56 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                             Memory Care
                         </Link>
                     </div>
+
+                    {/* Location section */}
+                    {locationStates.length > 0 && (
+                        <div className="mb-6">
+                            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                                <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
+                                    <FontAwesomeIcon icon={faLocationDot} className="h-3 w-3 text-white" />
+                                </span>
+                                Find Care by Location
+                            </div>
+                            <div className="pl-7 space-y-3">
+                                {(() => {
+                                    const hawaii = locationStates.find(s => s.slug === 'hawaii');
+                                    const mainland = locationStates.filter(s => s.slug !== 'hawaii');
+                                    return (
+                                        <>
+                                            {hawaii && (
+                                                <div>
+                                                    <Link href="/location/hawaii" onClick={onClose} className="block text-sm font-semibold text-gray-700 hover:text-[#239ddb] transition-colors mb-1">
+                                                        Hawaii
+                                                    </Link>
+                                                    {hawaiiIslands.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {hawaiiIslands.map(island => (
+                                                                <Link key={island.id} href={`/location/hawaii/${island.slug}`} onClick={onClose} className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5 hover:bg-[#239ddb]/10 hover:text-[#239ddb] transition-colors">
+                                                                    {island.name}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {mainland.length > 0 && (
+                                                <div>
+                                                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">Mainland</p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {mainland.map(state => (
+                                                            <Link key={state.id} href={`/location/${state.slug}`} onClick={onClose} className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5 hover:bg-[#239ddb]/10 hover:text-[#239ddb] transition-colors">
+                                                                {state.name}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Resources section */}
                     <div className="py-3 -mx-6 px-6 mb-3 bg-gray-100">

@@ -8,7 +8,7 @@ import {
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
 import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
-import { getHomeListings, getTaxonomyEntriesByIds, getFeaturedVideoItems } from '@/lib/public-db';
+import { getHomeListings, getTaxonomyEntriesByIds, getFeaturedVideoItems, getLocationTopLevelEntries, getLocationChildEntries } from '@/lib/public-db';
 
 const R2 = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site';
 
@@ -68,9 +68,11 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, featuredVideos] = await Promise.all([
+    const [{ items: homes }, featuredVideos, locationStates, hawaiiIslands] = await Promise.all([
         getHomeListings({ limit: 3 }),
         getFeaturedVideoItems(),
+        getLocationTopLevelEntries(),
+        getLocationChildEntries('hawaii'),
     ]);
     const allEntryIds = [...new Set(homes.flatMap((h: any) => h.taxonomyEntryIds as string[]))];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
@@ -89,6 +91,7 @@ export default async function HomePage() {
             <HeroSection />
             <VideoCarousel items={videoItems} />
             <FeaturedHomesSection homes={homes} typeNameMap={typeNameMap} />
+            <LocationSection states={locationStates} hawaiiIslands={hawaiiIslands} />
             <ContentSection />
             <TestimonialsWidget />
             <BlueCTASection />
@@ -344,6 +347,58 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                     >
                         View all homes <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                     </Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// ── Location ──────────────────────────────────────────────────────────────────
+
+function LocationSection({ states, hawaiiIslands }: { states: { id: string; name: string; slug: string }[]; hawaiiIslands: { id: string; name: string; slug: string }[] }) {
+    const hawaii = states.find(s => s.slug === 'hawaii');
+    const mainland = states.filter(s => s.slug !== 'hawaii');
+    return (
+        <section className="max-w-6xl mx-auto px-5 pb-4">
+            <div className="bg-gray-100 rounded-2xl px-6 py-5">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-4">Find Care by Location</p>
+                <div className="flex flex-col sm:flex-row gap-5 sm:gap-8">
+                    {hawaii && (
+                        <div className="shrink-0">
+                            <Link href="/location/hawaii" className="text-sm font-bold text-gray-800 hover:text-[#239ddb] transition-colors">
+                                Hawaii
+                            </Link>
+                            {hawaiiIslands.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                    {hawaiiIslands.map(island => (
+                                        <Link
+                                            key={island.id}
+                                            href={`/location/hawaii/${island.slug}`}
+                                            className="text-xs text-gray-600 bg-white border border-gray-200 rounded-full px-2.5 py-1 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                        >
+                                            {island.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {mainland.length > 0 && (
+                        <div className="flex-1 border-t sm:border-t-0 sm:border-l border-gray-200 pt-4 sm:pt-0 sm:pl-8">
+                            <p className="text-sm font-bold text-gray-400 mb-2">Mainland &amp; Other States</p>
+                            <div className="flex flex-wrap gap-1.5">
+                                {mainland.map(state => (
+                                    <Link
+                                        key={state.id}
+                                        href={`/location/${state.slug}`}
+                                        className="text-xs text-gray-600 bg-white border border-gray-200 rounded-full px-2.5 py-1 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                    >
+                                        {state.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </section>
