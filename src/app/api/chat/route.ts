@@ -45,15 +45,44 @@ function thumbUrl(url?: string): string | null {
     return url;
 }
 
+function buildAmenityString(roomDetails: any, fieldMap: Map<string, string>): string {
+    const customFields = roomDetails?.customFields || {};
+    const parts: string[] = [];
+    for (const [fieldId, value] of Object.entries(customFields)) {
+        const name = fieldMap.get(fieldId);
+        if (!name) continue;
+        if (value === true) {
+            parts.push(name);
+        } else if (Array.isArray(value) && value.length > 0) {
+            parts.push(`${name}: ${(value as string[]).join(', ')}`);
+        } else if (typeof value === 'string' && value) {
+            parts.push(`${name}: ${value}`);
+        }
+    }
+    return parts.slice(0, 15).join(', ');
+}
+
 async function fetchListingContext() {
     const supabase = createAdminClient();
-    const [homes, facilities] = await Promise.all([
-        supabase.from('homes').select('title, slug, address, excerpt, description').eq('status', 'published').limit(30),
-        supabase.from('facilities').select('title, slug, address, excerpt, description').eq('status', 'published').limit(15),
+    const [homes, facilities, fieldDefs] = await Promise.all([
+        supabase.from('homes').select('title, slug, address, excerpt, room_details').eq('status', 'published').limit(30),
+        supabase.from('facilities').select('title, slug, address, excerpt, room_details').eq('status', 'published').limit(15),
+        supabase.from('room_field_definitions').select('id, name').eq('is_active', true),
     ]);
+
+    const fieldMap = new Map<string, string>((fieldDefs.data || []).map((f: any) => [f.id, f.name]));
+
     return {
-        homes: (homes.data || []) as { title: string; slug: string; address: any; excerpt?: string; description?: string }[],
-        facilities: (facilities.data || []) as { title: string; slug: string; address: any; excerpt?: string; description?: string }[],
+        homes: (homes.data || []).map((h: any) => ({
+            title: h.title, slug: h.slug, address: h.address,
+            excerpt: h.excerpt,
+            amenities: buildAmenityString(h.room_details, fieldMap),
+        })),
+        facilities: (facilities.data || []).map((f: any) => ({
+            title: f.title, slug: f.slug, address: f.address,
+            excerpt: f.excerpt,
+            amenities: buildAmenityString(f.room_details, fieldMap),
+        })),
     };
 }
 
@@ -139,14 +168,16 @@ export async function POST(request: Request) {
             systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — this automatically shows the visitor a photo card with a link. Use these markers whenever a listing matches what the visitor is looking for. Only use slugs from this list:\n`;
             if (listings.homes.length > 0) {
                 systemText += `\nADULT FOSTER HOMES:\n` + listings.homes.map(h => {
-                    const blurb = (h.excerpt || h.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
-                    return `- [[home:${h.slug}]] ${h.title}${h.address?.city ? ` | ${h.address.city}` : ''}${blurb ? ` | ${blurb}` : ''}`;
+                    const excerptBlurb = (h.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+                    const details = [excerptBlurb, h.amenities].filter(Boolean).join(' | ');
+                    return `- [[home:${h.slug}]] ${h.title}${h.address?.city ? ` | ${h.address.city}` : ''}${details ? ` | ${details}` : ''}`;
                 }).join('\n');
             }
             if (listings.facilities.length > 0) {
                 systemText += `\n\nASSISTED LIVING FACILITIES:\n` + listings.facilities.map(f => {
-                    const blurb = (f.excerpt || f.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
-                    return `- [[facility:${f.slug}]] ${f.title}${f.address?.city ? ` | ${f.address.city}` : ''}${blurb ? ` | ${blurb}` : ''}`;
+                    const excerptBlurb = (f.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+                    const details = [excerptBlurb, f.amenities].filter(Boolean).join(' | ');
+                    return `- [[facility:${f.slug}]] ${f.title}${f.address?.city ? ` | ${f.address.city}` : ''}${details ? ` | ${details}` : ''}`;
                 }).join('\n');
             }
         }
