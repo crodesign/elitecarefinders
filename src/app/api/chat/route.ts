@@ -160,7 +160,7 @@ export async function POST(request: Request) {
             systemText += ` They are viewing "${currentEntity.title}" (${typeLabel})`;
             if (currentEntity.address?.city) systemText += ` in ${currentEntity.address.city}`;
             if (currentEntity.excerpt) systemText += `. Description: ${currentEntity.excerpt.slice(0, 300)}`;
-            systemText += `. Reference this listing as [[${pageContext!.entityType}:${currentEntity.slug}]] when relevant.`;
+            systemText += `. Do NOT use a [[marker]] for this listing — the visitor is already on this page.`;
         }
 
         // Inject available listings with amenity descriptions so AI can match feature queries

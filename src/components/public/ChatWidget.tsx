@@ -36,11 +36,14 @@ function shouldSuggestConsultation(text: string): boolean {
     return CONSULTATION_TRIGGERS.some(t => lower.includes(t));
 }
 
-function stripMarkers(content: string, entityCards?: EntityCard[]): string {
-    return content.replace(/\[\[(home|facility):([^\]]+)\]\]/g, (_, type, slug) => {
-        const card = entityCards?.find(c => c.slug === slug && c.type === type);
-        return card ? card.name : slug.replace(/-/g, ' ');
-    });
+function parseTextParts(content: string): { intro: string; outro: string } {
+    const firstMarker = content.search(/\[\[(home|facility):[^\]]+\]\]/);
+    if (firstMarker === -1) return { intro: content, outro: '' };
+    let lastEnd = 0;
+    let m;
+    const re = /\[\[(home|facility):[^\]]+\]\]/g;
+    while ((m = re.exec(content)) !== null) lastEnd = m.index + m[0].length;
+    return { intro: content.slice(0, firstMarker).trim(), outro: content.slice(lastEnd).trim() };
 }
 
 export function ChatWidget() {
@@ -235,99 +238,111 @@ export function ChatWidget() {
 
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-100">
-                        {messages.map((msg, i) => (
-                            <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                {/* Avatar + bubble */}
-                                <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                    {msg.role === 'assistant' && (
-                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden p-1 mb-0.5">
-                                            <img src={ASSISTANT_AVATAR} alt="" className="w-full h-full object-contain" />
+                        {messages.map((msg, i) => {
+                            const hasCards = msg.role === 'assistant' && !!msg.entityCards?.length;
+                            const { intro, outro } = (msg.role === 'assistant' && msg.content)
+                                ? parseTextParts(msg.content)
+                                : { intro: msg.content, outro: '' };
+                            return (
+                                <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                    {/* Avatar + bubble */}
+                                    <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} ${hasCards ? 'self-stretch' : ''}`}>
+                                        {msg.role === 'assistant' && (
+                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden p-1 mb-0.5">
+                                                <img src={ASSISTANT_AVATAR} alt="" className="w-full h-full object-contain" />
+                                            </div>
+                                        )}
+                                        <div className={`rounded-2xl text-sm leading-relaxed ${
+                                            msg.role === 'user'
+                                                ? 'max-w-[82%] px-3.5 py-2.5 bg-[#239ddb] text-white rounded-br-sm whitespace-pre-wrap'
+                                                : hasCards
+                                                    ? 'flex-1 min-w-0 bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-sm overflow-hidden'
+                                                    : 'max-w-[82%] px-3.5 py-2.5 bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-sm whitespace-pre-wrap'
+                                        }`}>
+                                            {msg.role === 'assistant' ? (
+                                                msg.content ? (
+                                                    hasCards ? (
+                                                        <>
+                                                            {intro && <div className="px-3.5 pt-2.5 pb-1 whitespace-pre-wrap">{intro}</div>}
+                                                            <div>
+                                                                {msg.entityCards!.map(card => (
+                                                                    <a
+                                                                        key={`${card.type}-${card.slug}`}
+                                                                        href={card.url}
+                                                                        className="block border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                                                                    >
+                                                                        {card.images.length === 1 ? (
+                                                                            <img src={card.images[0]} alt={card.name} className="w-full h-[160px] object-cover" />
+                                                                        ) : card.images.length === 0 ? (
+                                                                            <div className="w-full h-[160px] bg-[#239ddb]/10" />
+                                                                        ) : (
+                                                                            <div className="grid grid-cols-2 gap-px bg-gray-200">
+                                                                                <img src={card.images[0]} alt={card.name} className="w-full h-[80px] object-cover" />
+                                                                                {[1, 2, 3].map(idx => (
+                                                                                    card.images[idx] ? (
+                                                                                        <img key={idx} src={card.images[idx]} alt="" className="w-full h-[80px] object-cover" />
+                                                                                    ) : (
+                                                                                        <div key={idx} className="w-full h-[80px] bg-[#239ddb]/10" />
+                                                                                    )
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="px-3 py-2">
+                                                                            <div className="text-[12px] font-semibold text-gray-800 leading-tight">{card.name}</div>
+                                                                            {card.city && <div className="text-[11px] text-gray-500 mt-0.5">{card.city}</div>}
+                                                                            <div className="text-[11px] text-[#239ddb] mt-1 font-medium">View →</div>
+                                                                        </div>
+                                                                    </a>
+                                                                ))}
+                                                            </div>
+                                                            {outro && <div className="px-3.5 pt-2 pb-2.5 whitespace-pre-wrap">{outro}</div>}
+                                                        </>
+                                                    ) : (
+                                                        <>{intro}</>
+                                                    )
+                                                ) : (
+                                                    <span className="inline-flex gap-1 items-center py-0.5">
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                    </span>
+                                                )
+                                            ) : (
+                                                msg.content
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Quick replies */}
+                                    {msg.quickReplies && msg.quickReplies.length > 0 && (
+                                        <div className="mt-2 ml-8 flex flex-wrap gap-1.5" style={{ maxWidth: '280px' }}>
+                                            {msg.quickReplies.map(qr => (
+                                                <button
+                                                    key={qr}
+                                                    type="button"
+                                                    onClick={() => sendMessage(qr)}
+                                                    disabled={isStreaming}
+                                                    className="text-xs px-3 py-1.5 rounded-full border border-[#239ddb] text-[#239ddb] hover:bg-[#239ddb] hover:text-white transition-colors disabled:opacity-50"
+                                                >
+                                                    {qr}
+                                                </button>
+                                            ))}
                                         </div>
                                     )}
-                                    <div
-                                        className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                                            msg.role === 'user'
-                                                ? 'bg-[#239ddb] text-white rounded-br-sm'
-                                                : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-sm'
-                                        }`}
-                                    >
-                                        {msg.content
-                                            ? stripMarkers(msg.content, msg.entityCards)
-                                            : (
-                                                <span className="inline-flex gap-1 items-center py-0.5">
-                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                                </span>
-                                            )}
-                                    </div>
+
+                                    {/* Consultation CTA */}
+                                    {msg.showConsultationCta && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConsultation(true)}
+                                            className="mt-2 ml-8 text-xs px-3.5 py-2 rounded-full bg-[#239ddb] text-white font-medium hover:bg-[#1a7fb3] transition-colors"
+                                        >
+                                            Schedule a free consultation →
+                                        </button>
+                                    )}
                                 </div>
-
-                                {/* Entity cards */}
-                                {msg.entityCards && msg.entityCards.length > 0 && (
-                                    <div className="mt-2 ml-8 flex gap-2 overflow-x-auto pb-1" style={{ maxWidth: '312px' }}>
-                                        {msg.entityCards.map(card => (
-                                            <a
-                                                key={`${card.type}-${card.slug}`}
-                                                href={card.url}
-                                                className="flex-shrink-0 w-[144px] rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
-                                            >
-                                                {/* Image: full-width if 1, 2x2 grid if 2+ */}
-                                                {card.images.length === 1 ? (
-                                                    <img src={card.images[0]} alt={card.name} className="w-full h-[116px] object-cover" />
-                                                ) : card.images.length === 0 ? (
-                                                    <div className="w-full h-[116px] bg-[#239ddb]/10" />
-                                                ) : (
-                                                    <div className="grid grid-cols-2 gap-px bg-gray-200">
-                                                        <img src={card.images[0]} alt={card.name} className="w-full h-[58px] object-cover" />
-                                                        {[1, 2, 3].map(idx => (
-                                                            card.images[idx] ? (
-                                                                <img key={idx} src={card.images[idx]} alt="" className="w-full h-[58px] object-cover" />
-                                                            ) : (
-                                                                <div key={idx} className="w-full h-[58px] bg-[#239ddb]/10" />
-                                                            )
-                                                        ))}
-                                                    </div>
-                                                )}
-                                                <div className="p-2">
-                                                    <div className="text-[11px] font-semibold text-gray-800 leading-tight line-clamp-2">{card.name}</div>
-                                                    {card.city && <div className="text-[10px] text-gray-500 mt-0.5">{card.city}</div>}
-                                                    <div className="text-[11px] text-[#239ddb] mt-1 font-medium">View →</div>
-                                                </div>
-                                            </a>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Quick replies */}
-                                {msg.quickReplies && msg.quickReplies.length > 0 && (
-                                    <div className="mt-2 ml-8 flex flex-wrap gap-1.5" style={{ maxWidth: '280px' }}>
-                                        {msg.quickReplies.map(qr => (
-                                            <button
-                                                key={qr}
-                                                type="button"
-                                                onClick={() => sendMessage(qr)}
-                                                disabled={isStreaming}
-                                                className="text-xs px-3 py-1.5 rounded-full border border-[#239ddb] text-[#239ddb] hover:bg-[#239ddb] hover:text-white transition-colors disabled:opacity-50"
-                                            >
-                                                {qr}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Consultation CTA */}
-                                {msg.showConsultationCta && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConsultation(true)}
-                                        className="mt-2 ml-8 text-xs px-3.5 py-2 rounded-full bg-[#239ddb] text-white font-medium hover:bg-[#1a7fb3] transition-colors"
-                                    >
-                                        Schedule a free consultation →
-                                    </button>
-                                )}
-                            </div>
-                        ))}
+                            );
+                        })}
                         <div ref={messagesEndRef} />
                     </div>
 
