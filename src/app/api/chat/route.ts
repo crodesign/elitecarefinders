@@ -35,13 +35,13 @@ export interface EntityCard {
     slug: string;
     name: string;
     city: string;
-    imageUrl: string | null;
+    images: string[];
     url: string;
 }
 
-function thumbUrl(url?: string): string | null {
+function gridThumbUrl(url?: string): string | null {
     if (!url) return null;
-    if (url.startsWith('/images/media/')) return url.replace(/(\.[^.]+)$/, '-500x500.webp');
+    if (url.startsWith('/images/media/')) return url.replace(/(\.[^.]+)$/, '-200x200.webp');
     return url;
 }
 
@@ -110,13 +110,13 @@ async function resolveEntityCards(text: string): Promise<EntityCard[]> {
     if (homeSlugs.length > 0) {
         const { data } = await supabase.from('homes').select('title, slug, images, address').in('slug', homeSlugs).eq('status', 'published');
         for (const h of data || []) {
-            cards.push({ type: 'home', slug: h.slug, name: h.title, city: h.address?.city || '', imageUrl: thumbUrl(h.images?.[0]), url: `/homes/${h.slug}` });
+            cards.push({ type: 'home', slug: h.slug, name: h.title, city: h.address?.city || '', images: (h.images || []).slice(0, 4).map(gridThumbUrl).filter(Boolean) as string[], url: `/homes/${h.slug}` });
         }
     }
     if (facilitySlugs.length > 0) {
         const { data } = await supabase.from('facilities').select('title, slug, images, address').in('slug', facilitySlugs).eq('status', 'published');
         for (const f of data || []) {
-            cards.push({ type: 'facility', slug: f.slug, name: f.title, city: f.address?.city || '', imageUrl: thumbUrl(f.images?.[0]), url: `/facilities/${f.slug}` });
+            cards.push({ type: 'facility', slug: f.slug, name: f.title, city: f.address?.city || '', images: (f.images || []).slice(0, 4).map(gridThumbUrl).filter(Boolean) as string[], url: `/facilities/${f.slug}` });
         }
     }
     return cards;
@@ -165,7 +165,7 @@ export async function POST(request: Request) {
 
         // Inject available listings with amenity descriptions so AI can match feature queries
         if (listings.homes.length > 0 || listings.facilities.length > 0) {
-            systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — this automatically shows the visitor a photo card with a link. Use these markers whenever a listing matches what the visitor is looking for. Only use slugs from this list:\n`;
+            systemText += `\n\nWhen recommending specific listings, use [[home:slug]] or [[facility:slug]] markers — this automatically shows the visitor a photo card with a link. When a visitor asks to see listings or asks about features, include up to 5 matching markers. Only use slugs from this list:\n`;
             if (listings.homes.length > 0) {
                 systemText += `\nADULT FOSTER HOMES:\n` + listings.homes.map(h => {
                     const excerptBlurb = (h.excerpt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);

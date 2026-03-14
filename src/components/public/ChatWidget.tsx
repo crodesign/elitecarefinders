@@ -265,20 +265,23 @@ export function ChatWidget() {
 
                                 {/* Entity cards */}
                                 {msg.entityCards && msg.entityCards.length > 0 && (
-                                    <div className="mt-2 ml-8 flex gap-2 overflow-x-auto pb-1" style={{ maxWidth: '300px' }}>
+                                    <div className="mt-2 ml-8 flex gap-2 overflow-x-auto pb-1" style={{ maxWidth: '312px' }}>
                                         {msg.entityCards.map(card => (
                                             <a
                                                 key={`${card.type}-${card.slug}`}
                                                 href={card.url}
-                                                className="flex-shrink-0 w-32 rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
+                                                className="flex-shrink-0 w-[144px] rounded-xl overflow-hidden border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
                                             >
-                                                {card.imageUrl ? (
-                                                    <img src={card.imageUrl} alt={card.name} className="w-full h-20 object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-20 bg-[#239ddb]/10 flex items-center justify-center">
-                                                        <img src={ASSISTANT_AVATAR} alt="" className="w-8 h-8 opacity-30" />
-                                                    </div>
-                                                )}
+                                                {/* 2x2 image grid */}
+                                                <div className="grid grid-cols-2 gap-px bg-gray-200">
+                                                    {[0, 1, 2, 3].map(idx => (
+                                                        card.images[idx] ? (
+                                                            <img key={idx} src={card.images[idx]} alt="" className="w-full h-[58px] object-cover" />
+                                                        ) : (
+                                                            <div key={idx} className="w-full h-[58px] bg-[#239ddb]/10" />
+                                                        )
+                                                    ))}
+                                                </div>
                                                 <div className="p-2">
                                                     <div className="text-[11px] font-semibold text-gray-800 leading-tight line-clamp-2">{card.name}</div>
                                                     {card.city && <div className="text-[10px] text-gray-500 mt-0.5">{card.city}</div>}
