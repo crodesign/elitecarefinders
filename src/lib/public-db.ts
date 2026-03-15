@@ -599,6 +599,14 @@ export async function getPublicPost(postType: string, slug: string): Promise<Pub
     };
 }
 
+export interface LocationEntryWithCounts {
+    id: string;
+    name: string;
+    slug: string;
+    homes: number;
+    facilities: number;
+}
+
 export async function getLocationTopLevelEntries(): Promise<{ id: string; name: string; slug: string }[]> {
     const db = getClient();
     const { data: tax } = await db.from('taxonomies').select('id').eq('slug', 'location').maybeSingle();
@@ -613,6 +621,82 @@ export async function getLocationChildEntries(parentSlug: string): Promise<{ id:
     if (!parent) return [];
     const { data } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', parent.id).order('name');
     return (data || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug }));
+}
+
+// Returns children of a location entry with listing counts (homes + facilities).
+// Uses a single BFS over all children combined, then 2 queries total for counts.
+export async function getLocationChildEntriesWithCounts(
+    parentSlug: string,
+): Promise<LocationEntryWithCounts[]> {
+    const db = getClient();
+    const { data: parent } = await db.from('taxonomy_entries').select('id').eq('slug', parentSlug).maybeSingle();
+    if (!parent) return [];
+    const { data: children } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', parent.id).order('name');
+    if (!children?.length) return [];
+
+    // BFS: collect all descendant IDs grouped by child (island)
+    const childDescendants = new Map<string, string[]>(); // childId → [id, ...descendants]
+    for (const child of children) childDescendants.set(child.id, [child.id]);
+
+    let frontier = children.map((c: any) => c.id);
+    for (let depth = 0; depth < 4 && frontier.length; depth++) {
+        const { data: next } = await db.from('taxonomy_entries').select('id, parent_id').in('parent_id', frontier);
+        if (!next?.length) break;
+        const newFrontier: string[] = [];
+        for (const row of next) {
+            // find which top-level child this belongs to
+            for (const [childId, ids] of childDescendants) {
+                if (ids.includes(row.parent_id)) {
+                    ids.push(row.id);
+                    newFrontier.push(row.id);
+                    break;
+                }
+            }
+        }
+        frontier = newFrontier;
+    }
+
+    // All descendant IDs across all children
+    const allIds = [...new Set([...childDescendants.values()].flat())];
+
+    // 2 queries: fetch all listings under any of these IDs
+    const [homesRes, facilitiesRes] = await Promise.all([
+        (db.from('homes').select('taxonomy_entry_ids').eq('status', 'published') as any).overlaps('taxonomy_entry_ids', allIds),
+        (db.from('facilities').select('taxonomy_ids').eq('status', 'published') as any).overlaps('taxonomy_ids', allIds),
+    ]);
+
+    // Count per child island
+    return children.map((child: any) => {
+        const ids = new Set(childDescendants.get(child.id) || []);
+        const homes = (homesRes.data || []).filter((h: any) => (h.taxonomy_entry_ids || []).some((id: string) => ids.has(id))).length;
+        const facilities = (facilitiesRes.data || []).filter((f: any) => (f.taxonomy_ids || []).some((id: string) => ids.has(id))).length;
+        return { id: child.id, name: child.name, slug: child.slug, homes, facilities };
+    });
+}
+
+export interface IslandWithNeighborhoods {
+    id: string;
+    name: string;
+    slug: string;
+    neighborhoods: { id: string; name: string; slug: string }[];
+}
+
+export async function getHawaiiNeighborhoodsGrouped(): Promise<IslandWithNeighborhoods[]> {
+    const db = getClient();
+    const { data: hawaii } = await db.from('taxonomy_entries').select('id').eq('slug', 'hawaii').maybeSingle();
+    if (!hawaii) return [];
+    const { data: islands } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
+    if (!islands?.length) return [];
+    const islandIds = islands.map((i: any) => i.id);
+    const { data: neighborhoods } = await db.from('taxonomy_entries').select('id, name, slug, parent_id').in('parent_id', islandIds).order('name');
+    return islands.map((island: any) => ({
+        id: island.id,
+        name: island.name,
+        slug: island.slug,
+        neighborhoods: (neighborhoods || [])
+            .filter((n: any) => n.parent_id === island.id)
+            .map((n: any) => ({ id: n.id, name: n.name, slug: n.slug })),
+    }));
 }
 
 export async function getPostTypeCounts(): Promise<Record<string, number>> {
