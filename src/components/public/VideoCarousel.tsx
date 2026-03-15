@@ -44,7 +44,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
 
                 {/* Main player column */}
                 <div className="flex-1 min-w-0 flex flex-col bg-gray-100 rounded-2xl overflow-hidden shadow-xl">
-                    <div className="relative bg-gray-200 aspect-video lg:aspect-auto lg:flex-1">
+                    <div className="relative bg-gray-200 aspect-video lg:aspect-auto lg:flex-1 overflow-hidden">
                         {playing && videoId ? (
                             <iframe
                                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}

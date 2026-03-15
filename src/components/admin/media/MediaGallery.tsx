@@ -155,8 +155,9 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const handleUpdateItem = async (id: string, updatedItem: Partial<MediaItem>) => {
         // Update local state immediately to reflect changes (e.g. caption, URL, folder move)
         setMediaItems(items => {
-            // If the item was moved to a different folder, remove it from the current view
-            if (updatedItem.folderId && folderId && updatedItem.folderId !== folderId) {
+            const currentItem = items.find(i => i.id === id);
+            // Only remove from view if the item's folder actually changed (explicit move)
+            if (updatedItem.folderId && currentItem?.folderId && updatedItem.folderId !== currentItem.folderId) {
                 return items.filter(i => i.id !== id);
             }
             // Otherwise update it in place
