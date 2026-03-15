@@ -331,8 +331,10 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
         .order('is_featured', { ascending: false })
         .order('title')
         .range(offset, offset + limit - 1);
-    if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_ids', locationEntryIds);
-    else if (typeEntryId) query = (query as any).filter('taxonomy_ids', 'cs', JSON.stringify([typeEntryId]));
+    if (locationEntryIds?.length) {
+        const orFilters = locationEntryIds.map(id => `taxonomy_ids.cs.${JSON.stringify([id])}`).join(',');
+        query = (query as any).or(orFilters);
+    } else if (typeEntryId) query = (query as any).filter('taxonomy_ids', 'cs', JSON.stringify([typeEntryId]));
     const { data, count, error } = await query;
     if (error || !data) return { items: [], total: 0 };
     return {
@@ -662,7 +664,7 @@ export async function getLocationChildEntriesWithCounts(
     // 2 queries: fetch all listings under any of these IDs
     const [homesRes, facilitiesRes] = await Promise.all([
         (db.from('homes').select('taxonomy_entry_ids').eq('status', 'published') as any).overlaps('taxonomy_entry_ids', allIds),
-        (db.from('facilities').select('taxonomy_ids').eq('status', 'published') as any).overlaps('taxonomy_ids', allIds),
+        (db.from('facilities').select('taxonomy_ids').eq('status', 'published') as any).or(allIds.map((id: string) => `taxonomy_ids.cs.${JSON.stringify([id])}`).join(',')),
     ]);
 
     // Count per child island
