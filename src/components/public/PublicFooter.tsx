@@ -23,7 +23,7 @@ export async function PublicFooter() {
                             className="h-7 w-auto mb-3"
                         />
                         <p className="text-sm text-gray-500 max-w-xs">
-                            Helping families find the best senior living care options with personalized guidance.
+                            Helping Hawaii families find trusted senior care homes and communities with personalized, no-cost guidance.
                         </p>
                     </div>
 

@@ -17,7 +17,7 @@ const PHONE_HREF = 'tel:+18084454111';
 
 export const metadata: Metadata = {
     title: "Hawaii's Most Trusted Senior Living Advisors | Elite CareFinders",
-    description: 'Free RN consultation to help Hawaii families find the best senior care homes and communities. Expert guidance every step of the way.',
+    description: 'Free RN-led consultation to help Hawaii families find trusted senior care homes and communities on Oahu, Maui, Kauai, and the Big Island. Expert guidance every step of the way.',
 };
 
 
@@ -112,14 +112,14 @@ function HeroSection() {
                 className="bg-[#239ddb] text-white text-center py-3 m-0 rounded-t-2xl text-[33px] sm:text-[44px]"
                 style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 200, lineHeight: 1.2 }}
             >
-                Quality Senior Care in Hawaii
+                Senior Care Placement Services in Hawaii
             </h1>
 
             {/* Image with overlays */}
             <div className="relative overflow-hidden bg-gray-200 rounded-b-2xl h-[340px] sm:h-[680px]">
                 <Image
                     src={`${R2}/ECF_Rose-couple-consultation-edited-by-Rose_02.17.25_RG-scaled.webp`}
-                    alt="Elite CareFinders — Hawaii Senior Care Advisors"
+                    alt="Senior care advisor consulting with a family about Hawaii senior care placement options"
                     fill
                     className="object-cover object-center"
                     priority
@@ -240,7 +240,7 @@ function HeroSection() {
                     Finding care for your loved one is difficult and frustrating.
                 </p>
                 <h2 className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-0.3px', color: '#239ddb' }}>
-                    We make finding senior care easy!
+                    We make finding senior care in Hawaii easy!
                 </h2>
             </div>
         </section>
@@ -376,7 +376,7 @@ function ContentSection() {
                         className="text-[#239ddb] text-center mb-6 lg:pr-8 font-bold lg:font-extralight"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.1, letterSpacing: '-0.3px' }}
                     >
-                        Your no-cost senior care placement experts
+                        Your no-cost senior care placement experts in Hawaii
                     </h2>
 
                     <p
@@ -443,7 +443,7 @@ function ContentSection() {
                     <div className="relative w-full rounded-t-2xl overflow-hidden mb-6" style={{ aspectRatio: '16/9' }}>
                         <Image
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-5.webp"
-                            alt="Elite CareFinders Services"
+                            alt="Elite CareFinders senior care placement services for Hawaii families"
                             fill
                             className="object-cover object-center"
                             sizes="(max-width: 1024px) 100vw, 44vw"
@@ -554,7 +554,7 @@ function EliteStandardSection() {
                 className="text-center mb-10"
                 style={{ fontFamily: 'var(--font-montserrat)', fontSize: '18px', fontWeight: 500, lineHeight: 1.4, color: '#191b21' }}
             >
-                Elite CareFinders has four standards used in selecting Care Providers to be part of our network.
+                Elite CareFinders applies four standards to select senior care providers across Hawaii for our trusted network.
             </h4>
             <div className="flex flex-col sm:flex-row gap-8">
                 {[ELITE_STANDARDS.slice(0, 2), ELITE_STANDARDS.slice(2)].map((col, ci) => (
@@ -631,7 +631,7 @@ function AboutSection() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Elite-CareFinders_Cover-2025a-546x700x0x0x546x700x1749175439.webp"
-                            alt="Elite CareFinders 2025"
+                            alt="Elite CareFinders Hawaii senior care placement company 2025"
                             className="w-full object-cover rounded-lg"
                         />
                     </div>

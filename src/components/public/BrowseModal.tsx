@@ -173,7 +173,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
 
                     {/* Location section */}
                     {locationStates.length > 0 && (
-                        <div className="mb-6 -mx-6 px-6 py-4 bg-gray-100">
+                        <div className="-mx-6 px-6 py-4 bg-gray-100">
                             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
                                 <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
                                     <FontAwesomeIcon icon={faLocationDot} className="h-3 w-3 text-white" />
