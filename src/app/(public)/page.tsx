@@ -355,8 +355,8 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
 
 // ── Content ───────────────────────────────────────────────────────────────────
 
-const ECF_ICON = 'https://www.elitecarefinders.com/wp-content/uploads/Elite-CareFinders-Icon-color.svg';
-const ECF_ICON_WHITE = 'https://www.elitecarefinders.com/wp-content/uploads/Elite-CareFinders-Icon-white.svg';
+const ECF_ICON = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-1.svg';
+const ECF_ICON_WHITE = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2.svg';
 
 const ELITE_STANDARDS = [
     { title: 'Caring', desc: 'The caregivers in our network are caring.' },
@@ -615,7 +615,7 @@ function AboutSection() {
                     <div className="flex-1 lg:flex-shrink-0 relative lg:w-56 rounded-lg overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Rose-10-25-546x720x0x0x546x698x1761257435.jpg"
+                            src="/images/site/Rose-10-25.webp"
                             alt="Rose Guillermo Gallego RN — Founder &amp; Owner"
                             className="w-full object-cover"
                         />
@@ -630,7 +630,7 @@ function AboutSection() {
                     <div className="flex-1 lg:flex-shrink-0 lg:w-56">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="https://www.elitecarefinders.com/wp-content/uploads/brizy/imgs/Elite-CareFinders_Cover-2025a-546x700x0x0x546x700x1749175439.webp"
+                            src="/images/site/Elite-CareFinders_Cover-2025a.webp"
                             alt="Elite CareFinders Hawaii senior care placement company 2025"
                             className="w-full object-cover rounded-lg"
                         />
