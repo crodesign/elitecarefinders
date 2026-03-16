@@ -37,7 +37,7 @@ async function generatePdfThumbnail(file: File): Promise<Blob | null> {
         canvas.width = Math.round(scaledViewport.width);
         canvas.height = Math.round(scaledViewport.height);
         const ctx = canvas.getContext("2d")!;
-        await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport: scaledViewport }).promise;
+        await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport: scaledViewport, canvas: canvas as unknown as HTMLCanvasElement }).promise;
         return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.8));
     } catch (err) {
         console.error("[PDF thumbnail]", err);
