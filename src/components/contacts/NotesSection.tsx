@@ -40,7 +40,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
-    recognition.onresult = (e: SpeechRecognitionEvent) => {
+    recognition.onresult = (e: any) => {
       let interim = "";
       let finalChunk = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
