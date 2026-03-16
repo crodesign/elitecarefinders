@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { JoinNetworkModal } from './JoinNetworkModal';
 
-const LOCATIONS = ['Oahu', 'Maui', 'Kauai', 'Big Island', 'Molokai', 'Lanai', 'Mainland US'];
+const LOCATIONS = ['Oahu', 'Maui', 'Kauai', 'Big Island', 'Mainland US'];
 
 export function JoinNetworkCTA() {
     const [open, setOpen] = useState(false);

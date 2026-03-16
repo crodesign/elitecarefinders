@@ -7,8 +7,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
-import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
-import { getHomeListings, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import type { HomeOfMonth } from '@/lib/public-db';
 import { SearchSection } from '@/components/public/SearchSection';
 
 const R2 = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site';
@@ -69,12 +69,16 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, featuredVideos, hawaiiIslandsWithNeighborhoods] = await Promise.all([
+    const [{ items: homes }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth] = await Promise.all([
         getHomeListings({ limit: 3 }),
         getFeaturedVideoItems(),
         getHawaiiNeighborhoodsGrouped(),
+        getHomeOfMonth(),
     ]);
-    const allEntryIds = [...new Set(homes.flatMap((h: any) => h.taxonomyEntryIds as string[]))];
+    const allEntryIds = [...new Set([
+        ...homes.flatMap((h: any) => h.taxonomyEntryIds as string[]),
+        ...(homeOfMonth?.taxonomyEntryIds ?? []),
+    ])];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
     const typeNameMap = new Map<string, string>();
     homes.forEach((home: any) => {
@@ -84,6 +88,20 @@ export default async function HomePage() {
         if (te) typeNameMap.set(home.id, (te as any).name.replace(/ies$/, 'y').replace(/([^s])s$/, '$1'));
     });
 
+    let homeOfMonthTypeName = '';
+    let homeOfMonthLocationNames: string[] = [];
+    if (homeOfMonth) {
+        const hotmEntries = homeOfMonth.taxonomyEntryIds
+            .map((id: string) => allTaxEntries.find((e: any) => e.id === id))
+            .filter(Boolean) as any[];
+        const typeEntry = hotmEntries.find((e: any) => e?.taxonomySlug !== 'location');
+        if (typeEntry) homeOfMonthTypeName = typeEntry.name.replace(/ies$/, 'y').replace(/([^s])s$/, '$1');
+        homeOfMonthLocationNames = hotmEntries
+            .filter((e: any) => e?.taxonomySlug === 'location')
+            .flatMap((e: any) => e.ancestorNames ?? [e.name])
+            .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i);
+    }
+
     const videoItems = shuffleArray(featuredVideos).slice(0, 8);
 
     return (
@@ -91,13 +109,19 @@ export default async function HomePage() {
             <HeroSection />
             <VideoCarousel items={videoItems} />
             <FeaturedHomesSection homes={homes} typeNameMap={typeNameMap} />
+            {homeOfMonth && (
+                <HomeOfMonthSection
+                    home={homeOfMonth}
+                    typeName={homeOfMonthTypeName}
+                    locationNames={homeOfMonthLocationNames}
+                />
+            )}
             <SearchSection islands={hawaiiIslandsWithNeighborhoods} />
+            <AboutSection />
             <ContentSection />
             <TestimonialsWidget />
             <BlueCTASection />
             <EliteStandardSection />
-            <JoinNetworkCTA />
-            <AboutSection />
         </>
     );
 }
@@ -243,6 +267,96 @@ function HeroSection() {
                     We make finding senior care in Hawaii easy!
                 </h2>
             </div>
+        </section>
+    );
+}
+
+// ── Home of the Month ─────────────────────────────────────────────────────────
+
+function HomeOfMonthSection({ home, typeName, locationNames }: {
+    home: HomeOfMonth;
+    typeName: string;
+    locationNames: string[];
+}) {
+    const description = (home.homeOfMonthDescription || home.description).replace(/<[^>]*>/g, '').trim();
+    const thumbs = home.images.slice(1, 5);
+    const remaining = home.images.length - 5;
+
+    return (
+        <section className="max-w-6xl mx-auto px-5 py-8">
+            <Link
+                href={`/homes/${home.slug}`}
+                className="group block bg-gray-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
+            >
+                {/* Image gallery grid */}
+                <div className="flex flex-col md:flex-row gap-1 md:h-[440px]">
+                    {/* Main image */}
+                    <div className="relative w-full md:w-1/2 shrink-0 overflow-hidden bg-gray-200 aspect-square md:aspect-auto">
+                        {home.images[0] ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={home.images[0]}
+                                alt={home.title}
+                                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                <FontAwesomeIcon icon={faHouse} className="h-16 w-16" />
+                            </div>
+                        )}
+                        {/* Badge */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2">
+                            <span className="flex items-center gap-1 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-b-lg shadow">
+                                <FontAwesomeIcon icon={faTrophy} className="h-2.5 w-2.5" />
+                                Home of the Month
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Thumbnails 2×2 */}
+                    {thumbs.length > 0 && (
+                        <div className="md:flex-1 grid grid-cols-4 md:grid-cols-2 gap-1 md:[grid-template-rows:1fr_1fr]">
+                            {thumbs.map((img, i) => (
+                                <div key={i} className="relative overflow-hidden bg-gray-200 aspect-square md:aspect-auto">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={img}
+                                        alt={`${home.title} photo ${i + 2}`}
+                                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                                        loading="lazy"
+                                    />
+                                    {i === 3 && remaining > 0 && (
+                                        <div className="absolute inset-0 bg-black/55 flex flex-col items-center justify-center text-white gap-1.5">
+                                            <span className="text-3xl font-bold leading-none">+{remaining}</span>
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest opacity-75">more photos</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Details */}
+                <div className="p-5">
+                    <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-1.5 group-hover:text-[#239ddb] transition-colors">{home.title}</h2>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+                        {typeName && (
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#239ddb]">{typeName}</span>
+                        )}
+                        {locationNames.length > 0 && (
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{locationNames.join(' · ')}</span>
+                        )}
+                    </div>
+                    {description && (
+                        <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">{description}</p>
+                    )}
+                    <div className="mt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                        Explore this Home
+                        <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                    </div>
+                </div>
+            </Link>
         </section>
     );
 }

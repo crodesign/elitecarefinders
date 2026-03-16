@@ -319,6 +319,37 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
     };
 }
 
+export interface HomeOfMonth {
+    id: string;
+    slug: string;
+    title: string;
+    images: string[];
+    description: string;
+    homeOfMonthDescription: string | null;
+    taxonomyEntryIds: string[];
+}
+
+export async function getHomeOfMonth(): Promise<HomeOfMonth | null> {
+    const db = getClient();
+    const { data } = await db
+        .from('homes')
+        .select('id, slug, title, images, description, home_of_month_description, taxonomy_entry_ids')
+        .eq('status', 'published')
+        .eq('is_home_of_month', true)
+        .limit(1)
+        .maybeSingle();
+    if (!data) return null;
+    return {
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        images: data.images || [],
+        description: data.description || '',
+        homeOfMonthDescription: data.home_of_month_description || null,
+        taxonomyEntryIds: data.taxonomy_entry_ids || [],
+    };
+}
+
 export async function getFacilityListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number } = {}): Promise<{ items: FacilityListingCard[]; total: number }> {
     const db = getClient();
     const { typeEntryId, locationEntryIds, page = 1, limit = 24 } = opts;
