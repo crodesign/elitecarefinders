@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unlink } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import { createClient } from "@/lib/supabase-server";
+import { r2Delete } from "@/lib/r2";
 
-const NOTES_DIR = path.join(process.cwd(), "public", "images", "media", "notes");
+const NOTES_PREFIX = "notes/";
 
 export async function DELETE(request: NextRequest) {
     try {
@@ -27,18 +25,12 @@ export async function DELETE(request: NextRequest) {
         }
 
         const filename = doc.filename as string;
-        const filePath = path.join(NOTES_DIR, filename);
+        const stem = filename.replace(/\.[^/.]+$/, "");
 
-        if (existsSync(filePath)) {
-            await unlink(filePath).catch(() => {});
-        }
-
-        // Delete thumbnail if present
-        const stem = path.basename(filename, path.extname(filename));
-        const thumbPath = path.join(NOTES_DIR, `${stem}-thumb.webp`);
-        if (existsSync(thumbPath)) {
-            await unlink(thumbPath).catch(() => {});
-        }
+        await Promise.all([
+            r2Delete(`${NOTES_PREFIX}${filename}`).catch(() => {}),
+            r2Delete(`${NOTES_PREFIX}${stem}-thumb.webp`).catch(() => {}),
+        ]);
 
         const { error: deleteError } = await supabase
             .from("contact_documents")

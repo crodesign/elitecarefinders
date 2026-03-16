@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 import sharp from "sharp";
 import { createClient } from "@/lib/supabase-server";
+import { r2Upload, toPublicUrl } from "@/lib/r2";
 import { format } from "date-fns";
 
-const NOTES_DIR = path.join(process.cwd(), "public", "images", "media", "notes");
-const NOTES_URL_BASE = "/images/media/notes/";
+const NOTES_PREFIX = "notes/";
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export async function POST(request: NextRequest) {
@@ -58,13 +55,8 @@ export async function POST(request: NextRequest) {
         const nextNumber = Math.max(0, ...numbers) + 1;
 
         const filename = `${contactSlug}-notes-${dateStr}-${nextNumber}.${outputExt}`;
+        const r2Key = `${NOTES_PREFIX}${filename}`;
 
-        // Ensure directory exists
-        if (!existsSync(NOTES_DIR)) {
-            await mkdir(NOTES_DIR, { recursive: true });
-        }
-
-        const filePath = path.join(NOTES_DIR, filename);
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
@@ -74,21 +66,25 @@ export async function POST(request: NextRequest) {
             const img = sharp(buffer);
             const meta = await img.metadata();
 
-            // Resize original if too large (fit inside 1940x1940, proportional)
             const needsResize = (meta.width ?? 0) > 1940 || (meta.height ?? 0) > 1940;
             const base = needsResize
                 ? img.resize(1940, 1940, { fit: "inside", withoutEnlargement: true })
                 : img;
 
-            await base.clone().webp({ quality: 85 }).toFile(filePath);
+            const [mainBuf, thumbBuf] = await Promise.all([
+                base.clone().webp({ quality: 85 }).toBuffer(),
+                base.clone().resize(100, null, { fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer(),
+            ]);
 
-            // Thumbnail: 100px wide, proportional height
             const thumbFilename = `${contactSlug}-notes-${dateStr}-${nextNumber}-thumb.webp`;
-            await base.clone().resize(100, null, { fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toFile(path.join(NOTES_DIR, thumbFilename));
-            urlThumb = `${NOTES_URL_BASE}${thumbFilename}`;
+            await Promise.all([
+                r2Upload(r2Key, mainBuf, "image/webp"),
+                r2Upload(`${NOTES_PREFIX}${thumbFilename}`, thumbBuf, "image/webp"),
+            ]);
+            urlThumb = toPublicUrl(`${NOTES_PREFIX}${thumbFilename}`);
         } else {
-            // PDF: store as-is, generate thumbnail via pdfjs-dist + @napi-rs/canvas
-            await writeFile(filePath, buffer);
+            // PDF: store as-is in R2
+            await r2Upload(r2Key, buffer, "application/pdf");
 
             try {
                 const { createCanvas } = await import("@napi-rs/canvas");
@@ -98,7 +94,6 @@ export async function POST(request: NextRequest) {
                 const pdfDoc = await loadingTask.promise;
                 const page = await pdfDoc.getPage(1);
 
-                // Render at 100px wide
                 const viewport = page.getViewport({ scale: 1 });
                 const scale = 100 / viewport.width;
                 const scaledViewport = page.getViewport({ scale });
@@ -112,17 +107,16 @@ export async function POST(request: NextRequest) {
                     canvas: canvas as unknown as HTMLCanvasElement,
                 } as any).promise;
 
-                const thumbBuffer = await canvas.encode("webp");
+                const thumbBuf = await canvas.encode("webp");
                 const thumbFilename = `${contactSlug}-notes-${dateStr}-${nextNumber}-thumb.webp`;
-                await writeFile(path.join(NOTES_DIR, thumbFilename), thumbBuffer);
-                urlThumb = `${NOTES_URL_BASE}${thumbFilename}`;
+                await r2Upload(`${NOTES_PREFIX}${thumbFilename}`, thumbBuf, "image/webp");
+                urlThumb = toPublicUrl(`${NOTES_PREFIX}${thumbFilename}`);
             } catch (thumbErr) {
                 console.error("[ContactDocs] PDF thumbnail generation failed:", thumbErr);
-                // Continue without thumbnail
             }
         }
 
-        const url = `${NOTES_URL_BASE}${filename}`;
+        const url = toPublicUrl(r2Key);
 
         const { data, error } = await supabase
             .from("contact_documents")
