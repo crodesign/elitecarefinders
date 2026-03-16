@@ -24,19 +24,18 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState("");
   const recognitionRef = useRef<any>(null);
+  const shouldRestartRef = useRef(false);
 
   useEffect(() => {
-    return () => { recognitionRef.current?.stop(); };
+    return () => {
+      shouldRestartRef.current = false;
+      recognitionRef.current?.stop();
+    };
   }, []);
 
-  function startListening() {
-    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) {
-      alert("Speech recognition is not supported in this browser. Use Chrome or Edge.");
-      return;
-    }
+  function buildRecognition(SR: any) {
     const recognition = new SR();
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
@@ -60,21 +59,42 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
     };
 
     recognition.onerror = () => {
+      shouldRestartRef.current = false;
       setIsListening(false);
       setInterimText("");
     };
 
     recognition.onend = () => {
-      setIsListening(false);
-      setInterimText("");
+      if (shouldRestartRef.current) {
+        // Auto-restart so Chrome treats each segment as a complete utterance,
+        // which triggers its punctuation model properly.
+        const next = buildRecognition(SR);
+        recognitionRef.current = next;
+        next.start();
+      } else {
+        setIsListening(false);
+        setInterimText("");
+      }
     };
 
+    return recognition;
+  }
+
+  function startListening() {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      alert("Speech recognition is not supported in this browser. Use Chrome or Edge.");
+      return;
+    }
+    shouldRestartRef.current = true;
+    const recognition = buildRecognition(SR);
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
   }
 
   function stopListening() {
+    shouldRestartRef.current = false;
     recognitionRef.current?.stop();
     recognitionRef.current = null;
     setIsListening(false);
