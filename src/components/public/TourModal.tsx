@@ -98,7 +98,7 @@ export function TourModal({ entityName, entityType, onClose, includeRates }: Tou
     const [date, setDate] = useState('');
     const [hour, setHour] = useState('9');
     const [minute, setMinute] = useState('00');
-    const [requestRates, setRequestRates] = useState(includeRates ?? false);
+    const [requestRates, setRequestRates] = useState(false);
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
     useEffect(() => {

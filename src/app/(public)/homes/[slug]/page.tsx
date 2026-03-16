@@ -65,6 +65,12 @@ export default async function HomeDetailPage({ params }: Props) {
     const addr = home.address;
     const hasAddress = home.showAddress && (addr.street || addr.city);
 
+    const locationTaxName = taxonomyEntries.filter(e => e.taxonomySlug === 'location').map(e => e.name)[0];
+    const mapFallback = [addr.city, addr.state].filter(Boolean).join(', ') || (locationTaxName ? `${locationTaxName}, Hawaii` : 'Hawaii');
+    const mapQuery = hasAddress
+        ? [addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', ')
+        : mapFallback;
+
     // Fetch media captions for gallery + team images + cuisine images
     const allImageUrls = [...home.images, ...(home.teamImages || []), ...(home.cuisineImages || [])];
     const teamImageUrls = home.teamImages || [];
@@ -236,14 +242,12 @@ export default async function HomeDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                {hasAddress && (
-                                    <iframe
-                                        src={`https://maps.google.com/maps?q=${encodeURIComponent([addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', '))}&output=embed`}
-                                        className="w-full h-48 rounded-lg border-0 mt-2"
-                                        loading="lazy"
-                                        allowFullScreen
-                                    />
-                                )}
+                                <iframe
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                                    className="w-full aspect-square rounded-lg border-0 mt-2"
+                                    loading="lazy"
+                                    allowFullScreen
+                                />
                             </div>
                         </div>
                     </div>
@@ -552,14 +556,12 @@ export default async function HomeDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                {hasAddress && (
-                                    <iframe
-                                        src={`https://maps.google.com/maps?q=${encodeURIComponent([addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', '))}&output=embed`}
-                                        className="w-full h-48 rounded-lg border-0 mt-2"
-                                        loading="lazy"
-                                        allowFullScreen
-                                    />
-                                )}
+                                <iframe
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                                    className="w-full aspect-square rounded-lg border-0 mt-2"
+                                    loading="lazy"
+                                    allowFullScreen
+                                />
                             </div>
                         </div>
                     </aside>
