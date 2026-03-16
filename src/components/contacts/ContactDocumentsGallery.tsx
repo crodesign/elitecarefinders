@@ -19,6 +19,41 @@ interface ContactDocumentsGalleryProps {
 }
 
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/gif,image/webp,application/pdf";
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
+const MAX_DIMENSION = 1940;
+const MAX_BYTES = 4 * 1024 * 1024; // 4MB safety margin under Vercel's 4.5MB limit
+
+async function compressImage(file: File): Promise<File> {
+    if (!IMAGE_TYPES.has(file.type)) return file;
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            let { width, height } = img;
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) { reject(new Error("Image compression failed")); return; }
+                    resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" }));
+                },
+                "image/webp",
+                0.85
+            );
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Failed to load image")); };
+        img.src = url;
+    });
+}
 
 export function ContactDocumentsGallery({ contactId, readOnly = false }: ContactDocumentsGalleryProps) {
     const [documents, setDocuments] = useState<ContactDocument[]>([]);
@@ -52,7 +87,11 @@ export function ContactDocumentsGallery({ contactId, readOnly = false }: Contact
 
         setUploading(true);
         try {
-            for (const file of files) {
+            for (const rawFile of files) {
+                const file = IMAGE_TYPES.has(rawFile.type) ? await compressImage(rawFile) : rawFile;
+                if (file.size > MAX_BYTES) {
+                    throw new Error(`"${rawFile.name}" is too large (max 4 MB)`);
+                }
                 const doc = await uploadContactDocument(contactId, file);
                 setDocuments((prev) => [doc, ...prev]);
             }
