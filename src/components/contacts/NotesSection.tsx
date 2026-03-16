@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Calendar, Trash2, Edit2, Check, X, Download } from "lucide-react";
+import { Plus, Minus, Calendar, Trash2, Edit2, Check, X, Download, Mic, MicOff } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { useNotes } from "@/hooks/useNotes";
 import { useNoteEdits } from "@/hooks/useNoteEdits";
@@ -21,6 +21,65 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(contactId);
+  const [isListening, setIsListening] = useState(false);
+  const [interimText, setInterimText] = useState("");
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    return () => { recognitionRef.current?.stop(); };
+  }, []);
+
+  function startListening() {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      alert("Speech recognition is not supported in this browser. Use Chrome or Edge.");
+      return;
+    }
+    const recognition = new SR() as SpeechRecognition;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    recognition.onresult = (e: SpeechRecognitionEvent) => {
+      let interim = "";
+      let finalChunk = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalChunk += t;
+        else interim += t;
+      }
+      if (finalChunk) {
+        setNewNote(prev => {
+          const sep = prev && !prev.endsWith(" ") ? " " : "";
+          return prev + sep + finalChunk.trim();
+        });
+        setInterimText("");
+      } else {
+        setInterimText(interim);
+      }
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      setInterimText("");
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimText("");
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }
+
+  function stopListening() {
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setIsListening(false);
+    setInterimText("");
+  }
 
 
 
@@ -145,11 +204,21 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
               </CardHeader>
               <CardContent className="p-[5px] space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="new-note" className="text-content-muted pl-[10px]">Note Content</Label>
+                  <div className="flex items-center justify-between pl-[10px] pr-1">
+                    <Label htmlFor="new-note" className="text-content-muted">Note Content</Label>
+                    <button
+                      type="button"
+                      onClick={isListening ? stopListening : startListening}
+                      title={isListening ? "Stop recording" : "Start voice input"}
+                      className={`p-1.5 rounded-lg transition-colors ${isListening ? "bg-red-500 text-white animate-pulse" : "bg-white dark:bg-black text-content-secondary hover:bg-accent hover:text-white"}`}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </button>
+                  </div>
                   <textarea
                     id="new-note"
                     placeholder="Enter your note here..."
-                    value={newNote}
+                    value={isListening && interimText ? newNote + (newNote && !newNote.endsWith(" ") ? " " : "") + interimText : newNote}
                     onChange={(e) => setNewNote(e.target.value)}
                     className="w-full rounded-md py-1.5 px-3 text-sm text-left focus:outline-none transition-colors bg-surface-input text-content-primary placeholder:text-content-muted hover:bg-surface-hover focus:bg-surface-hover min-h-[200px] resize-y"
                   />
