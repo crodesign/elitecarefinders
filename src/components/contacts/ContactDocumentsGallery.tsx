@@ -233,7 +233,7 @@ export function ContactDocumentsGallery({ contactId, readOnly = false }: Contact
 
                                         {/* PDF label */}
                                         {doc.mimeType === "application/pdf" && (
-                                            <div className="absolute bottom-0 left-0 right-0 px-1.5 py-0.5 backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] text-[10px] font-medium text-center truncate pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div className="absolute bottom-0 left-0 right-0 px-1.5 py-0.5 rounded-b-xl backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] text-[10px] font-medium text-center truncate pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                                 PDF
                                             </div>
                                         )}
