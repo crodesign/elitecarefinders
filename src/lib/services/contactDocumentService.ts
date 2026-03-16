@@ -18,10 +18,11 @@ export async function getContactDocuments(contactId: string): Promise<ContactDoc
     return data.documents;
 }
 
-export async function uploadContactDocument(contactId: string, file: File): Promise<ContactDocument> {
+export async function uploadContactDocument(contactId: string, file: File, thumbnail?: Blob): Promise<ContactDocument> {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("contactId", contactId);
+    if (thumbnail) formData.append("thumbnail", thumbnail, "thumbnail.webp");
 
     const res = await fetch("/api/contacts/documents/upload", {
         method: "POST",

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase-server";
 import { r2Upload, toPublicUrl } from "@/lib/r2";
 import { format } from "date-fns";
 
+
 const NOTES_PREFIX = "notes/";
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         const file = formData.get("file") as File;
         const contactId = formData.get("contactId") as string;
+        const thumbnailFile = formData.get("thumbnail") as File | null;
 
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -86,33 +88,12 @@ export async function POST(request: NextRequest) {
             // PDF: store as-is in R2
             await r2Upload(r2Key, buffer, "application/pdf");
 
-            try {
-                const { createCanvas } = await import("@napi-rs/canvas");
-                const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
-
-                const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
-                const pdfDoc = await loadingTask.promise;
-                const page = await pdfDoc.getPage(1);
-
-                const viewport = page.getViewport({ scale: 1 });
-                const scale = 100 / viewport.width;
-                const scaledViewport = page.getViewport({ scale });
-
-                const canvas = createCanvas(Math.round(scaledViewport.width), Math.round(scaledViewport.height));
-                const ctx = canvas.getContext("2d");
-
-                await page.render({
-                    canvasContext: ctx as unknown as CanvasRenderingContext2D,
-                    viewport: scaledViewport,
-                    canvas: canvas as unknown as HTMLCanvasElement,
-                } as any).promise;
-
-                const thumbBuf = await canvas.encode("webp");
+            // Thumbnail generated client-side and sent as a separate field
+            if (thumbnailFile) {
+                const thumbBuf = Buffer.from(await thumbnailFile.arrayBuffer());
                 const thumbFilename = `${contactSlug}-notes-${dateStr}-${nextNumber}-thumb.webp`;
                 await r2Upload(`${NOTES_PREFIX}${thumbFilename}`, thumbBuf, "image/webp");
                 urlThumb = toPublicUrl(`${NOTES_PREFIX}${thumbFilename}`);
-            } catch (thumbErr) {
-                console.error("[ContactDocs] PDF thumbnail generation failed:", thumbErr);
             }
         }
 

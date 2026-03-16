@@ -23,6 +23,28 @@ const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp
 const MAX_DIMENSION = 1940;
 const MAX_BYTES = 4 * 1024 * 1024; // 4MB safety margin under Vercel's 4.5MB limit
 
+async function generatePdfThumbnail(file: File): Promise<Blob | null> {
+    try {
+        const { getDocument, GlobalWorkerOptions } = await import("pdfjs-dist");
+        GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs`;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        const scale = 100 / viewport.width;
+        const scaledViewport = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(scaledViewport.width);
+        canvas.height = Math.round(scaledViewport.height);
+        const ctx = canvas.getContext("2d")!;
+        await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport: scaledViewport }).promise;
+        return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.8));
+    } catch (err) {
+        console.error("[PDF thumbnail]", err);
+        return null;
+    }
+}
+
 async function compressImage(file: File): Promise<File> {
     if (!IMAGE_TYPES.has(file.type)) return file;
     return new Promise((resolve, reject) => {
@@ -92,7 +114,10 @@ export function ContactDocumentsGallery({ contactId, readOnly = false }: Contact
                 if (file.size > MAX_BYTES) {
                     throw new Error(`"${rawFile.name}" is too large (max 4 MB)`);
                 }
-                const doc = await uploadContactDocument(contactId, file);
+                const thumbnail = rawFile.type === "application/pdf"
+                    ? await generatePdfThumbnail(rawFile)
+                    : null;
+                const doc = await uploadContactDocument(contactId, file, thumbnail ?? undefined);
                 setDocuments((prev) => [doc, ...prev]);
             }
         } catch (err) {
