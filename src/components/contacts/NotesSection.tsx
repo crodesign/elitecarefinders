@@ -23,7 +23,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(contactId);
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState("");
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     return () => { recognitionRef.current?.stop(); };
