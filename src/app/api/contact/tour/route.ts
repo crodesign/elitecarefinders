@@ -16,7 +16,7 @@ function formatDate(dateStr: string) {
 
 export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const { fullName, email, phone, entityName, entityType, date, hour, minute } = await request.json();
+    const { fullName, email, phone, entityName, entityType, date, hour, minute, requestRates } = await request.json();
 
     if (!fullName || !email || !phone || !date) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                         <tr><td style="padding: 8px 0; color: #666;"><strong>Name</strong></td><td style="padding: 8px 0;">${fullName}</td></tr>
                         <tr><td style="padding: 8px 0; color: #666;"><strong>Phone</strong></td><td style="padding: 8px 0;">${phone}</td></tr>
                         <tr><td style="padding: 8px 0; color: #666;"><strong>Email</strong></td><td style="padding: 8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
+                        <tr><td style="padding: 8px 0; color: #666;"><strong>Pricing Request</strong></td><td style="padding: 8px 0;">${requestRates ? 'Yes — also send pricing information' : 'No'}</td></tr>
                     </table>
                 </div>
             `,

@@ -444,6 +444,7 @@ export async function getLocationEntryByPath(slugs: string[]): Promise<{
 export interface FeaturedVideoItem {
     videoUrl: string;
     thumbnailUrl: string | null;
+    entityImage: string | null;
     caption: string | null;
     entityTitle: string;
     entitySlug: string;
@@ -453,17 +454,17 @@ export interface FeaturedVideoItem {
 export async function getFeaturedVideoItems(): Promise<FeaturedVideoItem[]> {
     const db = getClient();
     const [homesRes, facilitiesRes] = await Promise.all([
-        db.from('homes').select('title, slug, videos').eq('status', 'published').eq('has_featured_video', true),
-        db.from('facilities').select('title, slug, videos').eq('status', 'published').eq('has_featured_video', true),
+        db.from('homes').select('title, slug, videos, images').eq('status', 'published').eq('has_featured_video', true),
+        db.from('facilities').select('title, slug, videos, images').eq('status', 'published').eq('has_featured_video', true),
     ]);
     const items: FeaturedVideoItem[] = [];
     (homesRes.data || []).forEach((row: any) => {
         const v = (row.videos || [])[0];
-        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'home' });
+        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'home' });
     });
     (facilitiesRes.data || []).forEach((row: any) => {
         const v = (row.videos || [])[0];
-        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'facility' });
+        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'facility' });
     });
     return items;
 }

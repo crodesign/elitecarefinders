@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
-import { RatesModal } from './RatesModal';
 import { TourModal } from './TourModal';
 
 interface StickyEntityBarProps {
@@ -16,7 +15,6 @@ interface StickyEntityBarProps {
 
 export function StickyEntityBar({ title, entityName, entityType, subtitle }: StickyEntityBarProps) {
     const [visible, setVisible] = useState(false);
-    const [showRates, setShowRates] = useState(false);
     const [showTour, setShowTour] = useState(false);
     const [mounted, setMounted] = useState(false);
     const sentinelRef = useRef<HTMLDivElement>(null);
@@ -46,31 +44,21 @@ export function StickyEntityBar({ title, entityName, entityType, subtitle }: Sti
                     {subtitle && <p className="hidden md:block text-xs text-gray-500 truncate mt-0.5">{subtitle}</p>}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                    {/* Desktop: Rates button */}
-                    <button
-                        onClick={() => setShowRates(true)}
-                        className="hidden md:inline-flex items-center gap-2 px-4 py-2 border-2 border-[#239ddb] text-[#239ddb] rounded-lg hover:bg-[#f0f8fc] transition-colors leading-tight"
-                    >
-                        <span className="flex flex-col text-center">
-                            <span className="text-[11px] font-normal opacity-70">Private Pay Options</span>
-                            <span className="text-sm font-semibold">Get Monthly Rates</span>
-                        </span>
-                    </button>
-                    {/* Desktop: full Tour button */}
+                    {/* Desktop: combined Tour & Pricing button */}
                     <button
                         onClick={() => setShowTour(true)}
                         className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-[#239ddb] text-white rounded-lg hover:bg-[#1a7fb3] transition-colors leading-tight"
                     >
                         <span className="flex flex-col text-center">
-                            <span className="text-sm font-semibold">Schedule a tour</span>
-                            <span className="text-[11px] font-normal opacity-90">of this property</span>
+                            <span className="text-sm font-semibold">Request a Tour &amp; Pricing</span>
+                            <span className="text-[11px] font-normal opacity-90">of this {entityType === 'home' ? 'Home' : 'Community'}</span>
                         </span>
                     </button>
                     {/* Mobile: calendar icon only */}
                     <button
                         onClick={() => setShowTour(true)}
                         className="md:hidden flex items-center justify-center w-9 h-9 bg-[#239ddb] text-white rounded-lg hover:bg-[#1a7fb3] transition-colors"
-                        aria-label="Schedule a tour"
+                        aria-label="Request a tour"
                     >
                         <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4" />
                     </button>
@@ -83,11 +71,8 @@ export function StickyEntityBar({ title, entityName, entityType, subtitle }: Sti
         <>
             <div ref={sentinelRef} className="h-0 w-full" />
             {headerEl && createPortal(bar, headerEl)}
-            {showRates && (
-                <RatesModal entityName={entityName} entityType={entityType} onClose={() => setShowRates(false)} />
-            )}
             {showTour && (
-                <TourModal entityName={entityName} entityType={entityType} onClose={() => setShowTour(false)} />
+                <TourModal entityName={entityName} entityType={entityType} includeRates={true} onClose={() => setShowTour(false)} />
             )}
         </>
     );

@@ -11,6 +11,7 @@ interface TourModalProps {
     entityName: string;
     entityType: 'home' | 'facility';
     onClose: () => void;
+    includeRates?: boolean;
 }
 
 const fieldBase = 'w-full bg-gray-100 rounded-lg py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#239ddb]';
@@ -90,13 +91,14 @@ const MINUTES = [
     { value: '45', label: ':45' },
 ];
 
-export function TourModal({ entityName, entityType, onClose }: TourModalProps) {
+export function TourModal({ entityName, entityType, onClose, includeRates }: TourModalProps) {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [date, setDate] = useState('');
     const [hour, setHour] = useState('9');
     const [minute, setMinute] = useState('00');
+    const [requestRates, setRequestRates] = useState(includeRates ?? false);
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
     useEffect(() => {
@@ -116,7 +118,7 @@ export function TourModal({ entityName, entityType, onClose }: TourModalProps) {
             const res = await fetch('/api/contact/tour', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, email, phone, entityName, entityType, date, hour, minute }),
+                body: JSON.stringify({ fullName, email, phone, entityName, entityType, date, hour, minute, requestRates }),
             });
             if (!res.ok) throw new Error();
             setStatus('success');
@@ -217,6 +219,17 @@ export function TourModal({ entityName, entityType, onClose }: TourModalProps) {
                                     <TimeSelect value={minute} onChange={setMinute} options={MINUTES} className="min-w-[65px]" />
                                 </div>
                             </div>
+
+                            {/* Rates toggle */}
+                            <label className="flex items-center gap-3 py-2 cursor-pointer group">
+                                <div
+                                    onClick={() => setRequestRates(v => !v)}
+                                    className={`relative flex-shrink-0 w-10 h-5 rounded-full transition-colors ${requestRates ? 'bg-[#239ddb]' : 'bg-gray-300'}`}
+                                >
+                                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${requestRates ? 'translate-x-5' : ''}`} />
+                                </div>
+                                <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors select-none">Also request pricing information</span>
+                            </label>
 
                             {status === 'error' && (
                                 <p className="text-xs text-red-500">Something went wrong. Please try again or contact us directly.</p>

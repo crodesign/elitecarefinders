@@ -71,7 +71,7 @@ export function PublicHeader() {
     return (
         <>
             <header className="sticky top-0 z-40">
-                <div id="header-inner" className="max-w-6xl mx-auto px-[10px] rounded-b-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.075),0_2px_4px_-2px_rgba(0,0,0,0.075)]" style={{ background: 'linear-gradient(to bottom, #ffffff, #f5f5f5)' }}>
+                <div id="header-inner" className="max-w-6xl mx-auto px-[10px] md:rounded-b-xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.075),0_2px_4px_-2px_rgba(0,0,0,0.075)]" style={{ background: 'linear-gradient(to bottom, #ffffff, #f5f5f5)' }}>
                 <div className="h-16 flex items-center justify-between relative">
                     {/* Left: hamburger (mobile) | logo (desktop) */}
                     <div className="flex items-center">
@@ -107,7 +107,7 @@ export function PublicHeader() {
                     </Link>
                     <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
                         <button onClick={() => setShowBrowse(true)} className="flex items-center gap-1.5 hover:text-[#239ddb] transition-colors">
-                            Browse our Homes &amp; Communities
+                            Browse our Communities &amp; Homes
                             <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 opacity-60" />
                         </button>
                         <button onClick={() => setShowResources(true)} className="flex items-center gap-1.5 hover:text-[#239ddb] transition-colors">

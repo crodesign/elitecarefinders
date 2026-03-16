@@ -97,29 +97,6 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
             <div className="modal-content-slide-in flex-1 overflow-y-auto w-full pb-6">
                 <div className="max-w-[480px] mx-5 sm:mx-auto bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl" onClick={e => e.stopPropagation()}>
 
-                    {/* Homes section */}
-                    <div className="mb-6">
-                        <Link href="/homes" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
-                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
-                                <FontAwesomeIcon icon={faHouse} className="h-3 w-3 text-white" />
-                            </span>
-                            Care Homes &amp; Adult Foster Homes
-                        </Link>
-                        <ul className="space-y-0.5 pl-7">
-                            {homeTypes.map(type => (
-                                <li key={type.id}>
-                                    <Link
-                                        href={`/homes/type/${type.slug}`}
-                                        onClick={onClose}
-                                        className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
-                                    >
-                                        {type.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
                     {/* Facilities section */}
                     <div className="mb-6">
                         <Link href="/facilities" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
@@ -133,6 +110,29 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                                 <li key={type.id}>
                                     <Link
                                         href={`/facilities/type/${type.slug}`}
+                                        onClick={onClose}
+                                        className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
+                                    >
+                                        {type.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Homes section */}
+                    <div className="mb-6">
+                        <Link href="/homes" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
+                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
+                                <FontAwesomeIcon icon={faHouse} className="h-3 w-3 text-white" />
+                            </span>
+                            Care Homes &amp; Adult Foster Homes
+                        </Link>
+                        <ul className="space-y-0.5 pl-7">
+                            {homeTypes.map(type => (
+                                <li key={type.id}>
+                                    <Link
+                                        href={`/homes/type/${type.slug}`}
                                         onClick={onClose}
                                         className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
                                     >
@@ -169,15 +169,6 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                                         placeholder="Search islands..."
                                         items={hawaiiIslands}
                                         basePath="/location/hawaii"
-                                        onNavigate={onClose}
-                                    />
-                                )}
-                                {locationStates.filter(s => s.slug !== 'hawaii').length > 0 && (
-                                    <SearchableLocationDropdown
-                                        label="Mainland & other states"
-                                        placeholder="Search states..."
-                                        items={locationStates.filter(s => s.slug !== 'hawaii')}
-                                        basePath="/location"
                                         onNavigate={onClose}
                                     />
                                 )}

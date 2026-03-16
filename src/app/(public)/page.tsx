@@ -136,7 +136,7 @@ function HeroSection() {
                 className="bg-[#239ddb] text-white text-center py-3 m-0 rounded-t-2xl text-[33px] sm:text-[44px]"
                 style={{ fontFamily: 'var(--font-montserrat)', fontWeight: 200, lineHeight: 1.2 }}
             >
-                Senior Care Placement Services in Hawaii
+                Quality Senior Care in Hawaii
             </h1>
 
             {/* Image with overlays */}
@@ -370,7 +370,7 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                 <div className="flex items-end justify-between mb-8">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured</p>
-                        <h2 className="text-3xl font-bold text-gray-900">Care Homes &amp; Communities</h2>
+                        <h2 className="text-3xl font-bold text-gray-900">Care Homes &amp; Foster Homes</h2>
                     </div>
                     <Link
                         href="/homes"

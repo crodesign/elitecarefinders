@@ -26,7 +26,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
 
     const item = items[current];
     const videoId = getYouTubeId(item.videoUrl);
-    const thumbSrc = item.thumbnailUrl || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
+    const thumbSrc = item.entityImage || item.thumbnailUrl || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
     const entityPath = item.entityType === 'home' ? `/homes/${item.entitySlug}` : `/facilities/${item.entitySlug}`;
 
     function select(idx: number) {
@@ -36,8 +36,8 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
 
     return (
         <section className="max-w-6xl mx-auto px-5 py-12">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured Videos</p>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Care Homes &amp; Communities</h2>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured Video</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Walkthrough Tours</h2>
 
             {/* Both columns stretch to the same height (grid drives height) */}
             <div className="flex flex-col lg:flex-row gap-4 lg:items-stretch">
@@ -89,7 +89,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
                     <div className="lg:w-[40%] flex-shrink-0 grid grid-cols-2 gap-2">
                         {items.map((v, i) => {
                             const vid = getYouTubeId(v.videoUrl);
-                            const thumb = v.thumbnailUrl || (vid ? `https://img.youtube.com/vi/${vid}/mqdefault.jpg` : null);
+                            const thumb = v.entityImage || v.thumbnailUrl || (vid ? `https://img.youtube.com/vi/${vid}/mqdefault.jpg` : null);
                             const isActive = i === current;
                             return (
                                 <button
