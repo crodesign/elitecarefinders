@@ -35,7 +35,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
       alert("Speech recognition is not supported in this browser. Use Chrome or Edge.");
       return;
     }
-    const recognition = new SR() as SpeechRecognition;
+    const recognition = new SR();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "en-US";
