@@ -204,7 +204,7 @@ const NotesSection = ({ contactId, readOnly = false }: NotesSectionProps) => {
               </CardHeader>
               <CardContent className="p-[5px] space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between pl-[10px] pr-1">
+                  <div className="flex items-center justify-between pl-[10px]">
                     <Label htmlFor="new-note" className="text-content-muted">Note Content</Label>
                     <button
                       type="button"
