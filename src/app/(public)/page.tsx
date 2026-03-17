@@ -724,7 +724,7 @@ function AboutSection() {
                 </div>
 
                 {/* Images: side by side on mobile, stacked inline on desktop */}
-                <div className="flex flex-row lg:contents gap-3 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row lg:contents gap-3 w-full lg:w-auto">
                     {/* Rose photo + caption */}
                     <div className="flex-1 lg:flex-shrink-0 relative lg:w-56 rounded-lg overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
