@@ -70,7 +70,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 export default async function HomePage() {
     const [{ items: homes }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth] = await Promise.all([
-        getHomeListings({ limit: 3 }),
+        getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFeaturedVideoItems(),
         getHawaiiNeighborhoodsGrouped(),
         getHomeOfMonth(),

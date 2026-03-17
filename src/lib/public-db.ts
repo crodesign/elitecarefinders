@@ -288,9 +288,9 @@ export interface FacilityListingCard {
     isFacilityOfMonth: boolean;
 }
 
-export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
+export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; page?: number; limit?: number; excludeHomeOfMonth?: boolean } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
     const db = getClient();
-    const { typeEntryId, locationEntryIds, page = 1, limit = 24 } = opts;
+    const { typeEntryId, locationEntryIds, page = 1, limit = 24, excludeHomeOfMonth = false } = opts;
     const offset = (page - 1) * limit;
     let query = db
         .from('homes')
@@ -298,8 +298,10 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
         .eq('status', 'published')
         .order('is_home_of_month', { ascending: false })
         .order('is_featured', { ascending: false })
+        .order('sort_order', { ascending: true, nullsFirst: false })
         .order('title')
         .range(offset, offset + limit - 1);
+    if (excludeHomeOfMonth) query = query.eq('is_home_of_month', false);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
     else if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
     const { data, count, error } = await query;

@@ -25,6 +25,7 @@ export async function GET() {
             .select('slug, title, images, featured_label, sort_order')
             .eq('status', 'published')
             .eq('is_featured', true)
+            .eq('is_home_of_month', false)
             .order('sort_order', { ascending: true, nullsFirst: false }),
         supabaseAdmin
             .from('facilities')
