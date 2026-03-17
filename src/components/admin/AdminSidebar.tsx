@@ -24,6 +24,7 @@ import {
     Plus,
     Palette,
     Search,
+    ArrowUpDown,
 } from "lucide-react";
 import { Logo, LogoIcon } from "@/components/icons/Logo";
 import { getTaxonomies, updateTaxonomy } from "@/lib/services/taxonomyService";
@@ -39,6 +40,7 @@ const navigation = [
     { name: "Facilities", href: "/admin/facilities", icon: Building2, hasAddButton: true },
     { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
     { name: "Posts", href: "/admin/posts", icon: FileText, hasAddButton: true },
+    { name: "Sort Order", href: "/admin/sort-order", icon: ArrowUpDown, requireSystemAdmin: true },
     { name: "Users", href: "/admin/users", icon: Users, requireCanManageUsers: true },
 ];
 
@@ -96,8 +98,8 @@ export function AdminSidebar({ collapsed, onToggle, onMobileClose }: AdminSideba
             return canManageUsers && !isSuperAdmin;
         }
 
-        // Invoices, Contacts, Reviews, Posts: super_admin and system_admin only
-        if (['Invoices', 'Contacts', 'Reviews', 'Posts'].includes(item.name)) {
+        // Invoices, Contacts, Reviews, Posts, Sort Order: super_admin and system_admin only
+        if (['Invoices', 'Contacts', 'Reviews', 'Posts', 'Sort Order'].includes(item.name)) {
             return isSystemAdmin;
         }
 

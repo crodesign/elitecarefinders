@@ -239,7 +239,7 @@ export interface FeaturedCard {
 
 export async function getFeaturedHomes(excludeSlug?: string): Promise<FeaturedCard[]> {
     const db = getClient();
-    let query = db.from('homes').select('slug, title, images, featured_label, taxonomy_entry_ids').eq('status', 'published').eq('is_featured', true).limit(20);
+    let query = db.from('homes').select('slug, title, images, featured_label, taxonomy_entry_ids, sort_order').eq('status', 'published').eq('is_featured', true).order('sort_order', { ascending: true, nullsFirst: false }).order('title', { ascending: true }).limit(20);
     if (excludeSlug) query = query.neq('slug', excludeSlug);
     const { data } = await query;
     return (data || []).map((row: any) => ({
@@ -253,7 +253,7 @@ export async function getFeaturedHomes(excludeSlug?: string): Promise<FeaturedCa
 
 export async function getFeaturedFacilities(excludeSlug?: string): Promise<FeaturedCard[]> {
     const db = getClient();
-    let query = db.from('facilities').select('slug, title, images, featured_label, taxonomy_ids').eq('status', 'published').eq('is_featured', true).limit(20);
+    let query = db.from('facilities').select('slug, title, images, featured_label, taxonomy_ids, sort_order').eq('status', 'published').eq('is_featured', true).order('sort_order', { ascending: true, nullsFirst: false }).order('title', { ascending: true }).limit(20);
     if (excludeSlug) query = query.neq('slug', excludeSlug);
     const { data } = await query;
     return (data || []).map((row: any) => ({
@@ -453,20 +453,35 @@ export interface FeaturedVideoItem {
 
 export async function getFeaturedVideoItems(): Promise<FeaturedVideoItem[]> {
     const db = getClient();
-    const [homesRes, facilitiesRes] = await Promise.all([
+    const [homesRes, facilitiesRes, settingsRes] = await Promise.all([
         db.from('homes').select('title, slug, videos, images').eq('status', 'published').eq('has_featured_video', true),
         db.from('facilities').select('title, slug, videos, images').eq('status', 'published').eq('has_featured_video', true),
+        db.from('site_settings').select('value').eq('key', 'featured_video_order').maybeSingle(),
     ]);
-    const items: FeaturedVideoItem[] = [];
+    const raw: FeaturedVideoItem[] = [];
     (homesRes.data || []).forEach((row: any) => {
         const v = (row.videos || [])[0];
-        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'home' });
+        if (v?.url) raw.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'home' });
     });
     (facilitiesRes.data || []).forEach((row: any) => {
         const v = (row.videos || [])[0];
-        if (v?.url) items.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'facility' });
+        if (v?.url) raw.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'facility' });
     });
-    return items;
+
+    const savedOrder: { entityType: string; entitySlug: string }[] = settingsRes.data?.value || [];
+    if (!savedOrder.length) return raw;
+
+    const ordered: FeaturedVideoItem[] = [];
+    for (const entry of savedOrder) {
+        const found = raw.find(v => v.entityType === entry.entityType && v.entitySlug === entry.entitySlug);
+        if (found) ordered.push(found);
+    }
+    for (const v of raw) {
+        if (!ordered.find(o => o.entityType === v.entityType && o.entitySlug === v.entitySlug)) {
+            ordered.push(v);
+        }
+    }
+    return ordered;
 }
 
 export async function getTaxonomyEntryBySlug(slug: string): Promise<{ id: string; name: string; taxonomySlug: string } | null> {
