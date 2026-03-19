@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { unstable_noStore as noStore } from 'next/cache';
+import { createAdminClient } from '@/lib/supabase-server';
 import type { Home, Facility, RoomFieldCategory, RoomFieldDefinition, SeoFields } from '@/types';
 
 function getClient() {
@@ -780,4 +782,46 @@ export async function getBrowseNavTypes(): Promise<{ homeTypes: BrowseNavEntry[]
         homeTypes: data.filter((e: any) => e.taxonomy_id === HOME_TYPE_TAX_ID).map((e: any) => ({ id: e.id, name: e.name, slug: e.slug })),
         facilityTypes: data.filter((e: any) => e.taxonomy_id === FACILITY_TYPE_TAX_ID).map((e: any) => ({ id: e.id, name: e.name, slug: e.slug })),
     };
+}
+
+const DEFAULT_HOMEPAGE_SECTIONS = [
+    { id: 'hero', visible: true },
+    { id: 'page-title', visible: true },
+    { id: 'videos', visible: true },
+    { id: 'featured-homes', visible: true },
+    { id: 'featured-facilities', visible: true },
+    { id: 'home-of-month', visible: true },
+    { id: 'search', visible: true },
+    { id: 'about', visible: true },
+    { id: 'content', visible: true },
+    { id: 'testimonials', visible: true },
+    { id: 'cta', visible: true },
+    { id: 'elite-standard', visible: true },
+    { id: 'join-network', visible: false },
+];
+
+export async function getHomepageSections(): Promise<{ id: string; visible: boolean }[]> {
+    noStore();
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/site_settings?key=eq.homepage_sections&select=value&limit=1`;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    const rows: { value: unknown }[] = res.ok ? await res.json() : [];
+    const raw = rows[0]?.value;
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    const saved: { id: string; visible: boolean }[] = Array.isArray(parsed) ? parsed : [];
+    if (!saved.length) return DEFAULT_HOMEPAGE_SECTIONS;
+    const result = saved
+        .map(s => DEFAULT_HOMEPAGE_SECTIONS.find(d => d.id === s.id) ? { id: s.id, visible: s.visible } : null)
+        .filter(Boolean) as { id: string; visible: boolean }[];
+    for (const def of DEFAULT_HOMEPAGE_SECTIONS) {
+        if (!result.find(s => s.id === def.id)) result.push({ ...def });
+    }
+    return result;
 }

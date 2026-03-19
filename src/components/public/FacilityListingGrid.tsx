@@ -19,7 +19,7 @@ export function FacilityListingGrid({ facilities, typeNameMap, gridClass, listCl
                     <Link
                         key={facility.id}
                         href={`/facilities/${facility.slug}`}
-                        className="group flex rounded-xl overflow-hidden bg-gray-100 hover:bg-gray-50 hover:shadow-md transition-all"
+                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${facility.isFacilityOfMonth ? 'bg-amber-50 hover:bg-white' : facility.isFeatured ? 'bg-green-50 hover:bg-white' : 'bg-gray-100 hover:bg-gray-50'}`}
                     >
                         <div className="relative w-32 sm:w-40 self-stretch flex-shrink-0">
                             {facility.image ? (
@@ -83,9 +83,9 @@ export function FacilityListingGrid({ facilities, typeNameMap, gridClass, listCl
                     <Link
                         key={facility.id}
                         href={`/facilities/${facility.slug}`}
-                        className="group flex flex-col rounded-2xl overflow-hidden bg-gray-100 hover:shadow-md transition-all duration-200"
+                        className={`group flex flex-col rounded-2xl overflow-hidden hover:shadow-md transition-all duration-200 ${facility.isFacilityOfMonth ? 'bg-amber-50' : facility.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
                     >
-                        <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
+                        <div className={`relative w-full h-48 flex-shrink-0 ${facility.isFacilityOfMonth ? 'bg-amber-50' : facility.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}>
                             {facility.image ? (
                                 <Image
                                     src={facility.image.startsWith('/images/media/') ? facility.image.replace(/(\.[^.]+)$/, '-500x500.webp') : facility.image}

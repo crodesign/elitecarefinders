@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Loader2, Home, Building2, Video, GripVertical } from "lucide-react";
+import { Check, Loader2, Home, Building2, Video, GripVertical, LayoutTemplate, Eye, EyeOff } from "lucide-react";
 import {
     DndContext,
     closestCenter,
@@ -47,6 +47,12 @@ interface SortableVideo {
     entityType: "home" | "facility";
     entityTitle: string;
     entityImage: string | null;
+}
+
+interface SortableSection {
+    id: string;
+    label: string;
+    visible: boolean;
 }
 
 // ─── Sortable Row Card ─────────────────────────────────────────────────────────
@@ -106,6 +112,103 @@ function RowCard({ image, title, badge, badgeColor }: {
                         {badge}
                     </span>
                 )}
+            </div>
+        </div>
+    );
+}
+
+// ─── Sortable Section Row ──────────────────────────────────────────────────────
+
+function SortableSectionRow({ section, onToggle }: { section: SortableSection; onToggle: () => void }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+    return (
+        <div
+            ref={setNodeRef}
+            style={{
+                transform: CSS.Transform.toString(transform),
+                transition,
+                opacity: isDragging ? 0.4 : 1,
+                zIndex: isDragging ? 50 : undefined,
+            }}
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing select-none flex items-center gap-2 px-2 py-2.5 rounded-lg border border-ui-border bg-surface-card hover:bg-surface-hover transition-colors"
+        >
+            <GripVertical className="flex-shrink-0 h-4 w-4 text-content-muted" />
+            <p className="flex-1 min-w-0 text-xs font-medium text-content-primary truncate">{section.label}</p>
+            <button
+                onClick={e => { e.stopPropagation(); onToggle(); }}
+                onPointerDown={e => e.stopPropagation()}
+                title={section.visible ? 'Hide section' : 'Show section'}
+                className="flex-shrink-0 p-1 rounded hover:bg-surface-secondary transition-colors"
+            >
+                {section.visible
+                    ? <Eye className="h-4 w-4 text-accent" />
+                    : <EyeOff className="h-4 w-4 text-content-muted" />
+                }
+            </button>
+        </div>
+    );
+}
+
+// ─── Sections Column ───────────────────────────────────────────────────────────
+
+function SectionsColumn({ sections, onReorder, onToggle, onSave, isSaving, isDirty }: {
+    sections: SortableSection[];
+    onReorder: (items: SortableSection[]) => void;
+    onToggle: (id: string) => void;
+    onSave: () => Promise<void>;
+    isSaving: boolean;
+    isDirty: boolean;
+}) {
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const oldIndex = sections.findIndex(s => s.id === active.id);
+        const newIndex = sections.findIndex(s => s.id === over.id);
+        onReorder(arrayMove(sections, oldIndex, newIndex));
+    }
+
+    return (
+        <div className="flex flex-col overflow-hidden bg-surface-secondary rounded-2xl border border-ui-border">
+            <div className="flex-none flex items-center justify-between px-4 py-3 border-b border-ui-border">
+                <div className="flex items-center gap-2">
+                    <span className="text-accent"><LayoutTemplate className="h-4 w-4" /></span>
+                    <h2 className="text-sm font-semibold text-content-primary">Homepage Sections</h2>
+                    <span className="text-xs text-content-muted bg-surface-hover px-1.5 py-0.5 rounded-full leading-none">{sections.length}</span>
+                </div>
+                <button
+                    onClick={onSave}
+                    disabled={isSaving || !isDirty}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{
+                        backgroundColor: isDirty && !isSaving ? 'var(--accent)' : 'var(--surface-hover)',
+                        color: isDirty && !isSaving ? 'white' : 'var(--content-secondary)',
+                    }}
+                >
+                    {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                    {isSaving ? 'Saving…' : 'Save'}
+                </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                        <div className="p-2.5 space-y-1.5">
+                            {sections.map(section => (
+                                <SortableSectionRow
+                                    key={section.id}
+                                    section={section}
+                                    onToggle={() => onToggle(section.id)}
+                                />
+                            ))}
+                        </div>
+                    </SortableContext>
+                </DndContext>
             </div>
         </div>
     );
@@ -196,20 +299,25 @@ export default function SortOrderPage() {
     const [homes, setHomes] = useState<SortableHome[]>([]);
     const [facilities, setFacilities] = useState<SortableFacility[]>([]);
     const [videos, setVideos] = useState<SortableVideo[]>([]);
+    const [sections, setSections] = useState<SortableSection[]>([]);
 
     const [homesDirty, setHomesDirty] = useState(false);
     const [facilitiesDirty, setFacilitiesDirty] = useState(false);
     const [videosDirty, setVideosDirty] = useState(false);
+    const [sectionsDirty, setSectionsDirty] = useState(false);
 
     const [savingHomes, setSavingHomes] = useState(false);
     const [savingFacilities, setSavingFacilities] = useState(false);
     const [savingVideos, setSavingVideos] = useState(false);
+    const [savingSections, setSavingSections] = useState(false);
 
     useEffect(() => {
         if (authLoading) return;
-        fetch('/api/admin/sort-order')
-            .then(r => r.json())
-            .then(data => {
+        Promise.all([
+            fetch('/api/admin/sort-order').then(r => r.json()),
+            fetch('/api/admin/sort-order/sections').then(r => r.json()),
+        ])
+            .then(([data, sectionsData]) => {
                 setHomes((data.homes || []).map((h: any) => ({ ...h, id: h.slug })));
                 setFacilities((data.facilities || []).map((f: any) => ({ ...f, id: f.slug })));
                 setVideos((data.videos || []).map((v: any) => ({
@@ -219,6 +327,7 @@ export default function SortOrderPage() {
                     entityTitle: v.entityTitle,
                     entityImage: v.entityImage,
                 })));
+                setSections(sectionsData.sections || []);
             })
             .catch(() => showNotification('error', 'Failed to load sort data'))
             .finally(() => setIsLoading(false));
@@ -278,6 +387,32 @@ export default function SortOrderPage() {
         }
     }
 
+    async function saveSections() {
+        setSavingSections(true);
+        try {
+            const res = await fetch('/api/admin/sort-order/sections', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sections }),
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body.error || `HTTP ${res.status}`);
+            }
+            showNotification('success', 'Homepage section order saved');
+            setSectionsDirty(false);
+        } catch (err: any) {
+            showNotification('error', `Failed to save section order: ${err.message}`);
+        } finally {
+            setSavingSections(false);
+        }
+    }
+
+    function toggleSectionVisibility(id: string) {
+        setSections(prev => prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
+        setSectionsDirty(true);
+    }
+
     if (authLoading || isLoading) {
         return (
             <div className="flex-1 flex items-center justify-center">
@@ -301,7 +436,7 @@ export default function SortOrderPage() {
                 <p className="text-sm text-content-muted mt-0.5">Drag items to reorder featured content on the public site. Save each column independently.</p>
             </div>
 
-            <div className="flex-1 grid grid-cols-3 gap-4 overflow-hidden min-h-0">
+            <div className="flex-1 grid grid-cols-4 gap-4 overflow-hidden min-h-0">
                 <SortColumn
                     title="Featured Homes"
                     icon={<Home className="h-4 w-4" />}
@@ -352,6 +487,15 @@ export default function SortOrderPage() {
                             badgeColor={item.entityType === 'home' ? '#1e3a5f' : '#4169e1'}
                         />
                     )}
+                />
+
+                <SectionsColumn
+                    sections={sections}
+                    onReorder={(items) => { setSections(items); setSectionsDirty(true); }}
+                    onToggle={toggleSectionVisibility}
+                    onSave={saveSections}
+                    isSaving={savingSections}
+                    isDirty={sectionsDirty}
                 />
             </div>
         </div>

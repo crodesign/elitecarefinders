@@ -19,7 +19,7 @@ export function HomeListingGrid({ homes, typeNameMap, gridClass, listClass }: Pr
                     <Link
                         key={home.id}
                         href={`/homes/${home.slug}`}
-                        className="group flex rounded-xl overflow-hidden bg-gray-100 hover:bg-gray-50 hover:shadow-md transition-all"
+                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${home.isHomeOfMonth ? 'bg-amber-50 hover:bg-white' : home.isFeatured ? 'bg-green-50 hover:bg-white' : 'bg-gray-100 hover:bg-gray-50'}`}
                     >
                         <div className="relative w-32 sm:w-40 self-stretch flex-shrink-0">
                             {home.image ? (
@@ -77,9 +77,9 @@ export function HomeListingGrid({ homes, typeNameMap, gridClass, listClass }: Pr
                     <Link
                         key={home.id}
                         href={`/homes/${home.slug}`}
-                        className="group flex flex-col rounded-2xl overflow-hidden bg-gray-100 hover:shadow-md transition-all duration-200"
+                        className={`group flex flex-col rounded-2xl overflow-hidden hover:shadow-md transition-all duration-200 ${home.isHomeOfMonth ? 'bg-amber-50' : home.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
                     >
-                        <div className="relative w-full h-48 bg-gray-100 flex-shrink-0">
+                        <div className={`relative w-full h-48 flex-shrink-0 ${home.isHomeOfMonth ? 'bg-amber-50' : home.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}>
                             {home.image ? (
                                 <Image
                                     src={home.image.startsWith('/images/media/') ? home.image.replace(/(\.[^.]+)$/, '-500x500.webp') : home.image}

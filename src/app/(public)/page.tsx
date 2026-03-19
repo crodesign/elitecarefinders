@@ -3,17 +3,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faArrowRight, faStar, faTrophy, faHouse,
+    faArrowRight, faStar, faTrophy, faHouse, faBuilding,
 } from '@fortawesome/free-solid-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings } from '@/lib/public-db';
+import type { FacilityListingCard } from '@/lib/public-db';
 import type { HomeOfMonth } from '@/lib/public-db';
 import { SearchSection } from '@/components/public/SearchSection';
+import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
 
 const R2 = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site';
 
 const PHONE_HREF = 'tel:+18084454111';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
     title: "Hawaii's Most Trusted Senior Living Advisors | Elite CareFinders",
@@ -69,11 +73,13 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
+        getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
         getHawaiiNeighborhoodsGrouped(),
         getHomeOfMonth(),
+        getHomepageSections(),
     ]);
     const allEntryIds = [...new Set([
         ...homes.flatMap((h: any) => h.taxonomyEntryIds as string[]),
@@ -104,24 +110,35 @@ export default async function HomePage() {
 
     const videoItems = shuffleArray(featuredVideos).slice(0, 8);
 
+    const sectionComponents: Record<string, React.ReactNode> = {
+        'hero': <HeroSection key="hero" />,
+        'page-title': <PageTitleSection key="page-title" />,
+        'videos': <VideoCarousel key="videos" items={videoItems} />,
+        'featured-homes': <FeaturedHomesSection key="featured-homes" homes={homes} typeNameMap={typeNameMap} />,
+        'featured-facilities': <FeaturedFacilitiesSection key="featured-facilities" facilities={facilities} />,
+        'home-of-month': homeOfMonth ? (
+            <HomeOfMonthSection
+                key="home-of-month"
+                home={homeOfMonth}
+                typeName={homeOfMonthTypeName}
+                locationNames={homeOfMonthLocationNames}
+            />
+        ) : null,
+        'search': <SearchSection key="search" islands={hawaiiIslandsWithNeighborhoods} />,
+        'about': <AboutSection key="about" />,
+        'content': <ContentSection key="content" />,
+        'testimonials': <TestimonialsWidget key="testimonials" />,
+        'cta': <BlueCTASection key="cta" />,
+        'elite-standard': <EliteStandardSection key="elite-standard" />,
+        'join-network': <JoinNetworkCTA key="join-network" />,
+    };
+
     return (
         <>
-            <HeroSection />
-            <VideoCarousel items={videoItems} />
-            <FeaturedHomesSection homes={homes} typeNameMap={typeNameMap} />
-            {homeOfMonth && (
-                <HomeOfMonthSection
-                    home={homeOfMonth}
-                    typeName={homeOfMonthTypeName}
-                    locationNames={homeOfMonthLocationNames}
-                />
-            )}
-            <SearchSection islands={hawaiiIslandsWithNeighborhoods} />
-            <AboutSection />
-            <ContentSection />
-            <TestimonialsWidget />
-            <BlueCTASection />
-            <EliteStandardSection />
+            {sections
+                .filter(s => s.visible)
+                .map(s => sectionComponents[s.id] ?? null)
+            }
         </>
     );
 }
@@ -258,16 +275,22 @@ function HeroSection() {
                 </p>
             </div>
 
-            {/* Below image text */}
-            <div className="text-center py-6 md:py-8">
-                <p className="text-gray-700 text-xl md:text-2xl mb-2">
-                    Finding care for your loved one is difficult and frustrating.
-                </p>
-                <h2 className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-0.3px', color: '#239ddb' }}>
-                    We make finding senior care in Hawaii easy!
-                </h2>
-            </div>
         </section>
+    );
+}
+
+// ── Page Title ─────────────────────────────────────────────────────────────────
+
+function PageTitleSection() {
+    return (
+        <div className="max-w-6xl mx-auto px-5 text-center py-6 md:py-8">
+            <p className="text-gray-700 text-xl md:text-2xl mb-2">
+                Finding care for your loved one is difficult and frustrating.
+            </p>
+            <h2 className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 200, lineHeight: 1.1, letterSpacing: '-0.3px', color: '#239ddb' }}>
+                We make finding senior care in Hawaii easy!
+            </h2>
+        </div>
     );
 }
 
@@ -286,7 +309,7 @@ function HomeOfMonthSection({ home, typeName, locationNames }: {
         <section className="max-w-6xl mx-auto px-5 py-8">
             <Link
                 href={`/homes/${home.slug}`}
-                className="group block bg-gray-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
+                className="group block bg-amber-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
             >
                 {/* Image gallery grid */}
                 <div className="flex flex-col md:flex-row gap-1 md:h-[440px]">
@@ -397,9 +420,9 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                                 <Link
                                     key={home.id}
                                     href={`/homes/${home.slug}`}
-                                    className="group flex flex-col rounded-2xl overflow-hidden bg-gray-100 hover:shadow-md transition-shadow"
+                                    className={`group flex flex-col rounded-2xl overflow-hidden hover:shadow-md transition-shadow ${home.isHomeOfMonth ? 'bg-amber-50' : home.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
                                 >
-                                    <div className="relative h-48 bg-gray-100 flex-shrink-0">
+                                    <div className={`relative h-48 flex-shrink-0 ${home.isHomeOfMonth ? 'bg-amber-50' : home.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}>
                                         {imgSrc ? (
                                             <Image
                                                 src={imgSrc}
@@ -460,6 +483,107 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                         className="inline-flex items-center gap-2 text-sm font-semibold text-[#239ddb] hover:underline"
                     >
                         View all homes <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                    </Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// ── Featured Facilities ────────────────────────────────────────────────────────
+
+function FeaturedFacilitiesSection({ facilities }: { facilities: FacilityListingCard[] }) {
+    return (
+        <section>
+            <div className="max-w-6xl mx-auto px-5 py-16">
+                <div className="flex items-end justify-between mb-8">
+                    <div>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured</p>
+                        <h2 className="text-3xl font-bold text-gray-900">Senior Living Communities</h2>
+                    </div>
+                    <Link
+                        href="/facilities"
+                        className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-[#239ddb] transition-colors"
+                    >
+                        View All <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                    </Link>
+                </div>
+
+                {facilities.length === 0 ? (
+                    <div className="text-center py-16 text-gray-400">
+                        <FontAwesomeIcon icon={faBuilding} className="h-10 w-10 mb-3 opacity-30" />
+                        <p>No featured communities at this time.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {facilities.map((facility) => {
+                            const imgSrc = facility.image
+                                ? (facility.image.startsWith('/images/media/')
+                                    ? facility.image.replace(/(\.[^.]+)$/, '-500x500.webp')
+                                    : facility.image)
+                                : null;
+                            return (
+                                <Link
+                                    key={facility.id}
+                                    href={`/facilities/${facility.slug}`}
+                                    className={`group flex flex-col rounded-2xl overflow-hidden hover:shadow-md transition-shadow ${facility.isFacilityOfMonth ? 'bg-amber-50' : facility.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
+                                >
+                                    <div className={`relative h-48 flex-shrink-0 ${facility.isFacilityOfMonth ? 'bg-amber-50' : facility.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}>
+                                        {imgSrc ? (
+                                            <Image
+                                                src={imgSrc}
+                                                alt={facility.title}
+                                                fill
+                                                className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                                                <FontAwesomeIcon icon={faBuilding} className="h-12 w-12" />
+                                            </div>
+                                        )}
+                                        {(facility.isFacilityOfMonth || facility.isFeatured) && (
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+                                                {facility.isFacilityOfMonth ? (
+                                                    <span className="flex items-center gap-1 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-b-lg shadow">
+                                                        <FontAwesomeIcon icon={faTrophy} className="h-2.5 w-2.5" />
+                                                        Facility of the Month
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1 bg-green-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-b-lg shadow">
+                                                        <FontAwesomeIcon icon={faStar} className="h-2.5 w-2.5" />
+                                                        Featured
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col flex-1 p-4">
+                                        <h3 className="text-base font-bold text-gray-900 leading-snug mb-1 group-hover:text-[#239ddb] transition-colors">
+                                            {facility.title}
+                                        </h3>
+                                        {facility.description && (
+                                            <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 flex-1">
+                                                {facility.description.replace(/<[^>]*>/g, '').trim()}
+                                            </p>
+                                        )}
+                                        <div className="mt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                            Learn More
+                                            <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )}
+
+                <div className="mt-8 text-center sm:hidden">
+                    <Link
+                        href="/facilities"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#239ddb] hover:underline"
+                    >
+                        View all communities <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                     </Link>
                 </div>
             </div>
