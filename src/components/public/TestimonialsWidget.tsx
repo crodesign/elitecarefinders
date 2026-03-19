@@ -2,16 +2,17 @@
 
 import { useEffect, useRef } from 'react';
 
+const SCRIPT_SRC = 'https://cdn.trustindex.io/loader.js?07222ea611b977924806dfcdb0c';
+
 export function TestimonialsWidget() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const injected = useRef(false);
 
     useEffect(() => {
-        if (injected.current || !containerRef.current) return;
-        injected.current = true;
-
+        if (!containerRef.current) return;
+        // Don't inject if already loaded (e.g. via admin injected scripts)
+        if (document.querySelector(`script[src="${SCRIPT_SRC}"]`)) return;
         const s = document.createElement('script');
-        s.src = 'https://cdn.trustindex.io/loader.js?07222ea611b977924806dfcdb0c';
+        s.src = SCRIPT_SRC;
         s.defer = true;
         s.async = true;
         containerRef.current.appendChild(s);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faLocationDot } from '@fortawesome/free-solid-svg-icons';
@@ -24,17 +25,20 @@ const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
 };
 
 interface TaxEntry { id: string; name: string; slug: string; }
+interface IslandWithNeighborhoods { id: string; name: string; slug: string; neighborhoods: TaxEntry[]; }
 
 interface BrowseModalProps {
     onClose: () => void;
 }
 
 export function BrowseModal({ onClose }: BrowseModalProps) {
+    const router = useRouter();
     const [homeTypes, setHomeTypes] = useState<TaxEntry[]>([]);
     const [facilityTypes, setFacilityTypes] = useState<TaxEntry[]>([]);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
     const [locationStates, setLocationStates] = useState<TaxEntry[]>([]);
     const [hawaiiIslands, setHawaiiIslands] = useState<TaxEntry[]>([]);
+    const [islandNeighborhoods, setIslandNeighborhoods] = useState<IslandWithNeighborhoods[]>([]);
 
     useEffect(() => {
         const supabase = createClientComponentClient();
@@ -60,8 +64,17 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
             setLocationStates(mapped);
             const hawaii = mapped.find(s => s.slug === 'hawaii');
             if (hawaii) {
-                const { data: islands } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
-                setHawaiiIslands((islands || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug })));
+                const { data: islandsData } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
+                const islands = (islandsData || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug }));
+                setHawaiiIslands(islands);
+                if (islands.length) {
+                    const { data: hoodsData } = await supabase.from('taxonomy_entries').select('id, name, slug, parent_id').in('parent_id', islands.map(i => i.id)).order('name');
+                    const grouped = islands.map(island => ({
+                        ...island,
+                        neighborhoods: (hoodsData || []).filter((h: any) => h.parent_id === island.id).map((h: any) => ({ id: h.id, name: h.name, slug: h.slug })),
+                    })).filter(i => i.neighborhoods.length > 0);
+                    setIslandNeighborhoods(grouped);
+                }
             }
         })();
     }, []);
@@ -180,7 +193,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                 </span>
                                 Find Care by Location
                             </div>
-                            <div className="pl-7 flex flex-wrap gap-2">
+                            <div className="pl-7 flex flex-col gap-3">
                                 {hawaiiIslands.length > 0 && (
                                     <SearchableLocationDropdown
                                         label="Hawaii Islands"
@@ -189,6 +202,24 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                         basePath="/location/hawaii"
                                         onNavigate={onClose}
                                     />
+                                )}
+                                {islandNeighborhoods.length > 0 && (
+                                    <select
+                                        defaultValue=""
+                                        onChange={e => {
+                                            if (e.target.value) { router.push(`/homes?neighborhood=${e.target.value}`); onClose(); }
+                                        }}
+                                        className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#239ddb] bg-white"
+                                    >
+                                        <option value="">Browse by Neighborhood</option>
+                                        {islandNeighborhoods.map(island => (
+                                            <optgroup key={island.id} label={island.name}>
+                                                {island.neighborhoods.map(n => (
+                                                    <option key={n.id} value={n.id}>{n.name}</option>
+                                                ))}
+                                            </optgroup>
+                                        ))}
+                                    </select>
                                 )}
                             </div>
                         </div>

@@ -2,14 +2,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faBuilding } from '@fortawesome/free-solid-svg-icons';
-import { getFacilityListings, getTaxonomyEntriesByIds } from '@/lib/public-db';
+import { getFacilityListings, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
 import { ListingHero } from '@/components/public/ListingHero';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
+import { ListingFilterBar } from '@/components/public/ListingFilterBar';
 
 const LIMIT = 24;
 
 interface Props {
-    searchParams: { page?: string; view?: string };
+    searchParams: { page?: string; view?: string; q?: string; neighborhood?: string };
 }
 
 export const metadata: Metadata = {
@@ -22,8 +23,13 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
     const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
     const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
+    const q = searchParams.q?.trim() || undefined;
+    const neighborhood = searchParams.neighborhood || undefined;
 
-    const { items: facilities, total } = await getFacilityListings({ page, limit: LIMIT });
+    const [{ items: facilities, total }, islands] = await Promise.all([
+        getFacilityListings({ page, limit: LIMIT, q, locationEntryIds: neighborhood ? [neighborhood] : undefined }),
+        getHawaiiNeighborhoodsGrouped(),
+    ]);
 
     const allEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyIds))];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
@@ -36,8 +42,13 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
     const totalPages = Math.ceil(total / LIMIT);
 
     function pageHref(p: number) {
-        const v = explicitView ? `&view=${explicitView}` : '';
-        return p > 1 ? `/facilities?page=${p}${v}` : explicitView ? `/facilities?view=${explicitView}` : '/facilities';
+        const params = new URLSearchParams();
+        if (p > 1) params.set('page', String(p));
+        if (explicitView) params.set('view', explicitView);
+        if (q) params.set('q', q);
+        if (neighborhood) params.set('neighborhood', neighborhood);
+        const str = params.toString();
+        return str ? `/facilities?${str}` : '/facilities';
     }
 
     return (
@@ -50,6 +61,8 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
+                <ListingFilterBar islands={islands} basePath="/facilities" />
+
                 {facilities.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faBuilding} className="h-12 w-12 mb-4 opacity-30" />

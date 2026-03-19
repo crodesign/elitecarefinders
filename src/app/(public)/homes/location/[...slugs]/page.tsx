@@ -3,16 +3,17 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { permanentRedirect } from 'next/navigation';
-import { getHomeListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds } from '@/lib/public-db';
+import { getHomeListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
 import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
+import { ListingFilterBar } from '@/components/public/ListingFilterBar';
 
 const LIMIT = 24;
 
 interface Props {
     params: { slugs: string[] };
-    searchParams: { page?: string; view?: string };
+    searchParams: { page?: string; view?: string; q?: string; neighborhood?: string };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -29,6 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomesByLocationPage({ params, searchParams }: Props) {
     const { slugs } = params;
     const page = Math.max(1, parseInt(searchParams.page || '1', 10));
+    const q = searchParams.q || '';
+    const neighborhood = searchParams.neighborhood || '';
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
     const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
     const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
@@ -38,8 +41,14 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
         const fullPath = await findFullLocationPath(slugs[0], slugs[1]);
         if (fullPath) permanentRedirect(`/homes/location/${fullPath.join('/')}`);
     }
-    const locationIds = entry ? await getLocationDescendantIds(entry.id) : undefined;
-    const { items: homes, total } = await getHomeListings({ locationEntryIds: locationIds, page, limit: LIMIT });
+
+    const [locationIds, islands] = await Promise.all([
+        entry ? getLocationDescendantIds(entry.id) : Promise.resolve(undefined),
+        getHawaiiNeighborhoodsGrouped(),
+    ]);
+
+    const activeLocationIds = neighborhood ? [neighborhood] : locationIds;
+    const { items: homes, total } = await getHomeListings({ locationEntryIds: activeLocationIds, q: q || undefined, page, limit: LIMIT });
 
     const allEntryIds = [...new Set(homes.flatMap(h => h.taxonomyEntryIds))];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
@@ -55,8 +64,13 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
     const basePath = `/homes/location/${slugs.join('/')}`;
 
     function pageHref(p: number) {
-        const v = explicitView ? `&view=${explicitView}` : '';
-        return p > 1 ? `${basePath}?page=${p}${v}` : explicitView ? `${basePath}?view=${explicitView}` : basePath;
+        const ps = new URLSearchParams();
+        if (p > 1) ps.set('page', String(p));
+        if (explicitView) ps.set('view', explicitView);
+        if (q) ps.set('q', q);
+        if (neighborhood) ps.set('neighborhood', neighborhood);
+        const str = ps.toString();
+        return str ? `${basePath}?${str}` : basePath;
     }
 
     return (
@@ -73,6 +87,8 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
+                <ListingFilterBar islands={islands} basePath={basePath} />
+
                 {homes.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faHouse} className="h-12 w-12 mb-4 opacity-30" />

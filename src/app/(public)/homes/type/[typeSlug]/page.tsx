@@ -2,15 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
-import { getHomeListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds } from '@/lib/public-db';
+import { getHomeListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
+import { ListingFilterBar } from '@/components/public/ListingFilterBar';
 
 const LIMIT = 24;
 
 interface Props {
     params: { typeSlug: string };
-    searchParams: { page?: string; view?: string };
+    searchParams: { page?: string; view?: string; q?: string; neighborhood?: string };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,12 +23,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomesByTypePage({ params, searchParams }: Props) {
     const { typeSlug } = params;
     const page = Math.max(1, parseInt(searchParams.page || '1', 10));
+    const q = searchParams.q || '';
+    const neighborhood = searchParams.neighborhood || '';
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
     const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
     const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
 
-    const typeEntry = await getTaxonomyEntryBySlug(typeSlug);
-    const { items: homes, total } = await getHomeListings({ typeEntryId: typeEntry?.id, page, limit: LIMIT });
+    const [typeEntry, islands] = await Promise.all([
+        getTaxonomyEntryBySlug(typeSlug),
+        getHawaiiNeighborhoodsGrouped(),
+    ]);
+
+    const { items: homes, total } = await getHomeListings({
+        typeEntryId: typeEntry?.id,
+        locationEntryIds: neighborhood ? [neighborhood] : undefined,
+        q: q || undefined,
+        page,
+        limit: LIMIT,
+    });
 
     const allEntryIds = [...new Set(homes.flatMap(h => h.taxonomyEntryIds))];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
@@ -39,10 +52,16 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
 
     const totalPages = Math.ceil(total / LIMIT);
     const pageTitle = typeEntry?.name ?? 'Care Homes';
+    const basePath = `/homes/type/${typeSlug}`;
 
     function pageHref(p: number) {
-        const v = explicitView ? `&view=${explicitView}` : '';
-        return p > 1 ? `/homes/type/${typeSlug}?page=${p}${v}` : explicitView ? `/homes/type/${typeSlug}?view=${explicitView}` : `/homes/type/${typeSlug}`;
+        const params = new URLSearchParams();
+        if (p > 1) params.set('page', String(p));
+        if (explicitView) params.set('view', explicitView);
+        if (q) params.set('q', q);
+        if (neighborhood) params.set('neighborhood', neighborhood);
+        const str = params.toString();
+        return str ? `${basePath}?${str}` : basePath;
     }
 
     return (
@@ -58,6 +77,8 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
+                <ListingFilterBar islands={islands} basePath={basePath} />
+
                 {homes.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faHouse} className="h-12 w-12 mb-4 opacity-30" />
