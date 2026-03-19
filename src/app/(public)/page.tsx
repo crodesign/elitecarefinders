@@ -466,7 +466,7 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                                                 {home.description.replace(/<[^>]*>/g, '').trim()}
                                             </p>
                                         )}
-                                        <div className="mt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                        <div className="mt-auto pt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
                                             Learn More
                                             <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
                                         </div>
@@ -567,7 +567,7 @@ function FeaturedFacilitiesSection({ facilities }: { facilities: FacilityListing
                                                 {facility.description.replace(/<[^>]*>/g, '').trim()}
                                             </p>
                                         )}
-                                        <div className="mt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                        <div className="mt-auto pt-3 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
                                             Learn More
                                             <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
                                         </div>
