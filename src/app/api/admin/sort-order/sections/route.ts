@@ -1,7 +1,7 @@
 import { createClient as createServerSupabase, createAdminClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
 
-export const DEFAULT_SECTIONS = [
+const DEFAULT_SECTIONS = [
     { id: 'hero', label: 'Hero Section', visible: true },
     { id: 'page-title', label: 'Page Title', visible: true },
     { id: 'videos', label: 'Featured Video Walkthrough Tours', visible: true },
