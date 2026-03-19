@@ -5,13 +5,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faArrowRight, faStar, faTrophy, faHouse, faBuilding,
 } from '@fortawesome/free-solid-svg-icons';
+import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic } from '@/lib/public-db';
+import type { PublicSocialAccount } from '@/lib/public-db';
 import type { FacilityListingCard } from '@/lib/public-db';
 import type { HomeOfMonth } from '@/lib/public-db';
 import { SearchSection } from '@/components/public/SearchSection';
 import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
+import { MobileShareButton } from '@/components/public/MobileShareButton';
 
 const R2 = 'https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site';
 
@@ -61,6 +64,17 @@ const FEATURES = [
     { title: 'Move-in guidance', titleSize: 18, desc: 'We help to coordinate the moving in process to ensure a smooth transition.' },
 ];
 
+const SOCIAL_ICON_MAP: Record<string, typeof faFacebookF> = {
+    facebook: faFacebookF,
+    instagram: faInstagram,
+    x: faXTwitter,
+    linkedin: faLinkedinIn,
+    pinterest: faPinterestP,
+    youtube: faYoutube,
+    tiktok: faTiktok,
+    threads: faThreads,
+};
+
 function shuffleArray<T>(arr: T[]): T[] {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -73,13 +87,14 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
         getHawaiiNeighborhoodsGrouped(),
         getHomeOfMonth(),
         getHomepageSections(),
+        getSocialAccountsPublic(),
     ]);
     const allEntryIds = [...new Set([
         ...homes.flatMap((h: any) => h.taxonomyEntryIds as string[]),
@@ -135,6 +150,29 @@ export default async function HomePage() {
 
     return (
         <>
+            {/* Mobile-only social + share bar — not part of section ordering */}
+            <div className="sm:hidden max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    {socialAccounts.map((account: PublicSocialAccount) => {
+                        const icon = SOCIAL_ICON_MAP[account.platform];
+                        if (!icon) return null;
+                        return (
+                            <a
+                                key={account.id}
+                                href={account.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={account.platform}
+                                className="flex items-center justify-center w-8 h-8 rounded-md border-2 border-gray-200 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                            >
+                                <FontAwesomeIcon icon={icon} className="h-3.5 w-3.5" />
+                            </a>
+                        );
+                    })}
+                </div>
+                <MobileShareButton />
+            </div>
+
             {sections
                 .filter(s => s.visible)
                 .map(s => sectionComponents[s.id] ?? null)
@@ -147,7 +185,7 @@ export default async function HomePage() {
 
 function HeroSection() {
     return (
-        <section className="max-w-6xl mx-auto px-5 pt-8">
+        <section className="max-w-6xl mx-auto px-5 sm:pt-8">
             {/* Blue header bar */}
             <h1
                 className="bg-[#239ddb] text-white text-center py-3 m-0 rounded-t-2xl text-[33px] sm:text-[44px]"

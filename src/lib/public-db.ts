@@ -828,3 +828,15 @@ export async function getHomepageSections(): Promise<{ id: string; visible: bool
     }
     return result;
 }
+
+export interface PublicSocialAccount { id: string; platform: string; url: string; }
+
+export async function getSocialAccountsPublic(): Promise<PublicSocialAccount[]> {
+    const db = getClient();
+    const { data } = await db.from('site_settings').select('value').eq('key', 'social_accounts').maybeSingle();
+    if (!data?.value) return [];
+    try {
+        const all = JSON.parse(data.value) as (PublicSocialAccount & { hidden?: boolean })[];
+        return all.filter(a => !a.hidden);
+    } catch { return []; }
+}
