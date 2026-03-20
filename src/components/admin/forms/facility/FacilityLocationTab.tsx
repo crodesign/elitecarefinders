@@ -58,8 +58,8 @@ export function FacilityLocationTab({
                             </h3>
                         );
                     })()}
-                    <div className="bg-surface-hover rounded-lg p-[3px]">
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                    <div className="bg-surface-input rounded-lg p-[3px]">
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions
                                 .filter(o => o.fieldType === 'levelOfCare')
                                 .map((opt) => {
@@ -80,8 +80,8 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                ? "bg-surface-input text-content-primary"
-                                                : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+                                                ? "bg-surface-hover text-content-primary"
+                                                : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
@@ -94,7 +94,7 @@ export function FacilityLocationTab({
                                         </button>
                                     );
                                 })}
-                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -109,8 +109,8 @@ export function FacilityLocationTab({
                             </h3>
                         );
                     })()}
-                    <div className="bg-surface-hover rounded-lg p-[3px]">
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+                    <div className="bg-surface-input rounded-lg p-[3px]">
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions
                                 .filter(o => o.fieldType === 'language')
                                 .map((opt) => {
@@ -131,8 +131,8 @@ export function FacilityLocationTab({
                                                 setIsDirty(true);
                                             }}
                                             className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                ? "bg-surface-input text-content-primary"
-                                                : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+                                                ? "bg-surface-hover text-content-primary"
+                                                : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt.value}</span>
@@ -145,7 +145,7 @@ export function FacilityLocationTab({
                                         </button>
                                     );
                                 })}
-                        </div>
+                    </div>
                     </div>
                 </div>
 

@@ -51,6 +51,7 @@
   /* Form fields & containers */
   --form-bg: #000000;
   --form-border: rgba(255, 255, 255, 0.22);
+  --form-border-subtle: rgba(255, 255, 255, 0.11);
   --form-hover: rgba(255, 255, 255, 0.06);
   /* Accent — overwritten dynamically by ThemeContext */
   --accent: #239ddb;
@@ -147,6 +148,7 @@
   /* Form fields & containers */
   --form-bg: #ffffff;
   --form-border: rgba(0, 0, 0, 0.15);
+  --form-border-subtle: rgba(0, 0, 0, 0.075);
   --form-hover: rgba(0, 0, 0, 0.055);
 }
 

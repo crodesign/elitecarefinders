@@ -112,7 +112,7 @@ export function HomeFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-surface-hover rounded-lg p-[3px] space-y-3">
+                            <div className="bg-surface-input rounded-lg p-[3px] space-y-3">
                                 <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                 <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                     {field.options?.map((opt) => (
@@ -130,8 +130,8 @@ export function HomeFieldCategory({
                                                 return { ...prev, customFields: newCustomFields };
                                             })}
                                             className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
-                                                ? "bg-surface-input text-content-primary"
-                                                : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+                                                ? "bg-surface-hover text-content-primary"
+                                                : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{opt}</span>
@@ -393,8 +393,8 @@ export function HomeFieldCategory({
                                                     }));
                                                 }}
                                                 className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                    ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
-                                                    : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
+                                                    ? "bg-surface-hover text-content-primary"
+                                                    : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                     }`}
                                             >
                                                 <span className="text-sm font-medium">{opt}</span>
@@ -409,7 +409,7 @@ export function HomeFieldCategory({
                                     })}
                                 </div>
                             ) : (
-                                <div className="bg-surface-hover rounded-lg p-[3px] space-y-3">
+                                <div className="bg-surface-input rounded-lg p-[3px] space-y-3">
                                     <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
                                     <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                         {field.options?.map((opt) => {
@@ -429,8 +429,8 @@ export function HomeFieldCategory({
                                                         }));
                                                     }}
                                                     className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                        ? `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} text-content-primary`
-                                                        : `${lighterCheckboxes ? 'bg-surface-hover' : 'bg-surface-input'} ${lighterCheckboxes ? 'hover:bg-surface-hover' : 'hover:bg-surface-hover'} text-content-secondary`
+                                                        ? "bg-surface-hover text-content-primary"
+                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                         }`}
                                                 >
                                                     <span className="text-sm font-medium">{opt}</span>

@@ -165,7 +165,7 @@ export function HomeRoomsTab({
                 </div>
 
                 {/* Languages */}
-                <div className="bg-surface-hover rounded-lg p-[3px]">
+                <div className="bg-surface-input rounded-lg p-[5px]">
                     <div className="flex items-center gap-2 pl-[5px]">
                         <Languages className="h-4 w-4 text-accent" />
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pb-[5px]">Languages Spoken</h3>
@@ -190,8 +190,8 @@ export function HomeRoomsTab({
                                         });
                                     }}
                                     className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                        ? "bg-surface-input text-content-primary"
-                                        : "bg-surface-input hover:bg-surface-hover text-content-secondary"
+                                        ? "bg-surface-hover text-content-primary"
+                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                         }`}
                                 >
                                     <span className="text-sm font-medium">{lang}</span>
