@@ -213,9 +213,14 @@ export default function HomesPage() {
     }, [taxonomies, taxonomyEntries]);
 
     const fetchMissingCount = useCallback(async () => {
-        const supabase = createClientComponentClient();
-        const { count } = await supabase.from('homes').select('id', { count: 'exact', head: true }).or('meta_title.is.null,meta_title.eq.').neq('status', 'draft');
-        setMissingCount(count ?? 0);
+        try {
+            const supabase = createClientComponentClient();
+            const { count, error } = await supabase.from('homes').select('id', { count: 'exact', head: true }).or('meta_title.is.null,meta_title.eq.').neq('status', 'draft');
+            if (error) { console.error('[bulk-seo] fetchMissingCount error:', error.message); return; }
+            setMissingCount(count ?? 0);
+        } catch (err) {
+            console.error('[bulk-seo] fetchMissingCount exception:', err);
+        }
     }, []);
 
     useEffect(() => {
@@ -334,10 +339,11 @@ export default function HomesPage() {
                 body: JSON.stringify({ contentType: 'home' }),
             });
             const result = await res.json();
+            if (!res.ok) throw new Error(result.error || `Server error ${res.status}`);
             showNotification("SEO Generated", `Generated ${result.generated} of ${result.total} homes`);
             fetchMissingCount();
-        } catch {
-            showNotification("Error", "Bulk SEO generation failed");
+        } catch (err) {
+            showNotification("Error", err instanceof Error ? err.message : "Bulk SEO generation failed");
         } finally {
             setIsBulkGenerating(false);
         }

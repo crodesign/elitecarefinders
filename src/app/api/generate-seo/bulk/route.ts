@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 import { generateSeoWithGemini, type AiSeoInput } from '@/lib/ai-seo';
 
+export const maxDuration = 300;
+
 type ContentType = 'home' | 'facility' | 'post';
 
 const DELAY_MS = 300;

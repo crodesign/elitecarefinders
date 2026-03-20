@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Globe, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle, Info } from "lucide-react";
+import { Search, Globe, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, Loader2, HelpCircle, Info } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { SeoFields } from "@/types";
 import { SerpPreview } from "@/components/admin/seo/SerpPreview";
@@ -253,9 +253,12 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                 type="button"
                                 onClick={handleGenerateSeo}
                                 disabled={aiLoading}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:opacity-90 disabled:cursor-not-allowed transition-opacity"
                             >
-                                <Sparkles className="h-3.5 w-3.5" />
+                                {aiLoading
+                                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    : <Sparkles className="h-3.5 w-3.5" />
+                                }
                                 {aiLoading ? 'Generating…' : 'Generate'}
                             </button>
                             {onSaveSeo && (
