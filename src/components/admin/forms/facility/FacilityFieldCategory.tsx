@@ -384,80 +384,40 @@ export function FacilityFieldCategory({
                         {/* Multi Select */}
                         {field.type === 'multi' && (
                             categoryFields.length === 1 ? (
-                                field.name !== category.name ? (
-                                    <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
-                                        <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
-                                        <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
-                                            {field.options?.map((opt) => {
-                                                const currentValues = (customFields[field.id] as string[]) || [];
-                                                const isSelected = currentValues.includes(opt);
-                                                return (
-                                                    <button
-                                                        key={opt}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const updated = isSelected
-                                                                ? currentValues.filter(v => v !== opt)
-                                                                : [...currentValues, opt];
-                                                            setRoomDetails((prev: RoomDetails) => ({
-                                                                ...prev,
-                                                                customFields: { ...prev.customFields, [field.id]: updated }
-                                                            }));
-                                                            setIsDirty(true);
-                                                        }}
-                                                        className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                            ? "bg-surface-hover text-content-primary"
-                                                            : "bg-surface-hover hover:bg-surface-input text-content-secondary"
-                                                            }`}
-                                                    >
-                                                        <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                        <div
-                                                            className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                            style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                        >
-                                                            {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                        </div>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
-                                        {field.options?.map((opt) => {
-                                            const currentValues = (customFields[field.id] as string[]) || [];
-                                            const isSelected = currentValues.includes(opt);
-                                            return (
-                                                <button
-                                                    key={opt}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const updated = isSelected
-                                                            ? currentValues.filter(v => v !== opt)
-                                                            : [...currentValues, opt];
-                                                        setRoomDetails((prev: RoomDetails) => ({
-                                                            ...prev,
-                                                            customFields: { ...prev.customFields, [field.id]: updated }
-                                                        }));
-                                                        setIsDirty(true);
-                                                    }}
-                                                    className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                        ? "bg-surface-hover text-content-primary"
-                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
-                                                        }`}
+                                <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
+                                    {field.options?.map((opt) => {
+                                        const currentValues = (customFields[field.id] as string[]) || [];
+                                        const isSelected = currentValues.includes(opt);
+                                        return (
+                                            <button
+                                                key={opt}
+                                                type="button"
+                                                onClick={() => {
+                                                    const updated = isSelected
+                                                        ? currentValues.filter(v => v !== opt)
+                                                        : [...currentValues, opt];
+                                                    setRoomDetails((prev: RoomDetails) => ({
+                                                        ...prev,
+                                                        customFields: { ...prev.customFields, [field.id]: updated }
+                                                    }));
+                                                    setIsDirty(true);
+                                                }}
+                                                className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
+                                                    ? "bg-surface-hover text-content-primary"
+                                                    : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                    }`}
+                                            >
+                                                <span className="text-sm font-medium pl-[5px]">{opt}</span>
+                                                <div
+                                                    className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
+                                                    style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
                                                 >
-                                                    <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                    <div
-                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                    >
-                                                        {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )
+                                                    {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             ) : (
                                 <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
                                     <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>

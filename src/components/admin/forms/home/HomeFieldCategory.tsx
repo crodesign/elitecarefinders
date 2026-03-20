@@ -112,8 +112,8 @@ export function HomeFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-surface-input rounded-lg p-[3px] space-y-3">
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
+                            <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
                                 <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
                                     {field.options?.map((opt) => (
                                         <button
@@ -134,7 +134,7 @@ export function HomeFieldCategory({
                                                 : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                 }`}
                                         >
-                                            <span className="text-sm font-medium">{opt}</span>
+                                            <span className="text-sm font-medium pl-[5px]">{opt}</span>
                                             <div
                                                 className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                 style={roomDetails.customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
@@ -375,10 +375,43 @@ export function HomeFieldCategory({
                         {/* Multi Select */}
                         {field.type === 'multi' && (
                             categoryFields.length === 1 ? (
-                                field.name !== category.name ? (
+                                lighterCheckboxes ? (
+                                    <div className="space-y-2">
+                                        {field.options?.map((opt) => {
+                                            const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
+                                            const isSelected = currentValues.includes(opt);
+                                            return (
+                                                <button
+                                                    key={opt}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const updated = isSelected
+                                                            ? currentValues.filter(v => v !== opt)
+                                                            : [...currentValues, opt];
+                                                        setRoomDetails((prev: RoomDetails) => ({
+                                                            ...prev,
+                                                            customFields: { ...prev.customFields, [field.id]: updated }
+                                                        }));
+                                                    }}
+                                                    className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
+                                                        ? "bg-surface-hover text-content-primary"
+                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                        }`}
+                                                >
+                                                    <span className="text-sm font-medium pl-[5px]">{opt}</span>
+                                                    <div
+                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
+                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
+                                                    >
+                                                        {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
                                     <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
-                                        <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
-                                        <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
+                                        <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                             {field.options?.map((opt) => {
                                                 const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
                                                 const isSelected = currentValues.includes(opt);
@@ -411,40 +444,6 @@ export function HomeFieldCategory({
                                                 );
                                             })}
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className={`space-y-2 ${lighterCheckboxes ? "" : "max-h-64 overflow-y-auto pr-2"}`}>
-                                        {field.options?.map((opt) => {
-                                            const currentValues = (roomDetails.customFields[field.id] as string[]) || [];
-                                            const isSelected = currentValues.includes(opt);
-                                            return (
-                                                <button
-                                                    key={opt}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const updated = isSelected
-                                                            ? currentValues.filter(v => v !== opt)
-                                                            : [...currentValues, opt];
-                                                        setRoomDetails((prev: RoomDetails) => ({
-                                                            ...prev,
-                                                            customFields: { ...prev.customFields, [field.id]: updated }
-                                                        }));
-                                                    }}
-                                                    className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                        ? "bg-surface-hover text-content-primary"
-                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
-                                                        }`}
-                                                >
-                                                    <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                    <div
-                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                    >
-                                                        {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
                                     </div>
                                 )
                             ) : (
