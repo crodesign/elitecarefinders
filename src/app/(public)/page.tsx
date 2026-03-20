@@ -8,7 +8,8 @@ import {
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic } from '@/lib/public-db';
+import { VideoTestimonialsSection } from '@/components/public/VideoTestimonialsSection';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials } from '@/lib/public-db';
 import type { PublicSocialAccount } from '@/lib/public-db';
 import type { FacilityListingCard } from '@/lib/public-db';
 import type { HomeOfMonth } from '@/lib/public-db';
@@ -87,7 +88,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
@@ -95,6 +96,7 @@ export default async function HomePage() {
         getHomeOfMonth(),
         getHomepageSections(),
         getSocialAccountsPublic(),
+        getVideoTestimonials(),
     ]);
     const allEntryIds = [...new Set([
         ...homes.flatMap((h: any) => h.taxonomyEntryIds as string[]),
@@ -143,6 +145,7 @@ export default async function HomePage() {
         'about': <AboutSection key="about" />,
         'content': <ContentSection key="content" />,
         'testimonials': <TestimonialsWidget key="testimonials" />,
+        'video-testimonials': videoTestimonials.length > 0 ? <VideoTestimonialsSection key="video-testimonials" testimonials={videoTestimonials} /> : null,
         'cta': <BlueCTASection key="cta" />,
         'elite-standard': <EliteStandardSection key="elite-standard" />,
         'join-network': <JoinNetworkCTA key="join-network" />,

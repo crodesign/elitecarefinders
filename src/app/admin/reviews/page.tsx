@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus } from "lucide-react";
+import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
@@ -40,6 +40,7 @@ export default function ReviewsPage() {
 
     const SOURCE_OPTIONS = [
         { value: 'internal', label: 'Internal Source', icon: Heart, iconColor: 'text-red-500' },
+        { value: 'video', label: 'Internal Video', icon: Youtube, iconColor: 'text-red-600' },
         { value: 'google', label: 'Google', icon: GoogleIcon },
         { value: 'facebook', label: 'Facebook', icon: Facebook, iconColor: 'text-[#1877F2]' }
     ];
@@ -186,8 +187,17 @@ export default function ReviewsPage() {
         if (!editingReview) return;
 
         // Basic validation
-        if (!editingReview.authorName?.trim() || !editingReview.content?.trim()) {
-            showNotification("Error", "Name and Content are required.");
+        const isVideo = editingReview.source === 'video';
+        if (!editingReview.authorName?.trim()) {
+            showNotification("Error", "Author name is required.");
+            return;
+        }
+        if (isVideo && !editingReview.sourceLink?.trim()) {
+            showNotification("Error", "YouTube URL is required for video reviews.");
+            return;
+        }
+        if (!isVideo && !editingReview.content?.trim()) {
+            showNotification("Error", "Review content is required.");
             return;
         }
 
@@ -212,6 +222,7 @@ export default function ReviewsPage() {
                 author_photo_url: finalPhotoUrl || null,
                 images: editingReview.images || [],
                 source: editingReview.source?.trim() || 'internal',
+                source_link: editingReview.sourceLink?.trim() || null,
                 // Temporarily generic entity id for manually created reviews until linked
                 entity_id: editingReview.entityId || '00000000-0000-0000-0000-000000000000'
             };
@@ -266,7 +277,8 @@ export default function ReviewsPage() {
             fetchReviews();
         } catch (error: any) {
             console.error('Error saving review:', error);
-            showNotification("Error", "Failed to save review");
+            const msg = error?.message || error?.details || JSON.stringify(error);
+            showNotification("Error", `Failed to save review: ${msg}`);
         } finally {
             setIsSaving(false);
         }
@@ -714,6 +726,22 @@ export default function ReviewsPage() {
                             </div>
                         </div>
 
+                        {editingReview.source === 'video' && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
+                                    <Youtube className="h-3.5 w-3.5 text-red-600" />
+                                    YouTube URL
+                                </label>
+                                <input
+                                    type="url"
+                                    className="form-input w-full bg-surface-input text-content-primary p-3 rounded-md"
+                                    value={editingReview.sourceLink || ''}
+                                    onChange={(e) => setEditingReview({ ...editingReview, sourceLink: e.target.value })}
+                                    placeholder="https://www.youtube.com/watch?v=..."
+                                />
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">Review Content</label>
                             <textarea
@@ -724,7 +752,7 @@ export default function ReviewsPage() {
                             />
                         </div>
 
-                        <div className="space-y-4 pt-4 border-t border-ui-border">
+                        {editingReview.source !== 'video' && <div className="space-y-4 pt-4 border-t border-ui-border">
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
                                     <ImageIcon className="h-3.5 w-3.5" />
@@ -779,7 +807,7 @@ export default function ReviewsPage() {
                                     <p className="text-xs font-medium uppercase tracking-widest opacity-60">No images uploaded</p>
                                 </div>
                             )}
-                        </div>
+                        </div>}
                     </div>
                 )}
             </SlidePanel>

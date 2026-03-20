@@ -798,6 +798,7 @@ const DEFAULT_HOMEPAGE_SECTIONS = [
     { id: 'about', visible: true },
     { id: 'content', visible: true },
     { id: 'testimonials', visible: true },
+    { id: 'video-testimonials', visible: true },
     { id: 'cta', visible: true },
     { id: 'elite-standard', visible: true },
     { id: 'join-network', visible: false },
@@ -849,6 +850,7 @@ export interface PublicReview {
     content: string;
     createdAt: string;
     source: string | null;
+    sourceLink?: string | null;
 }
 
 export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ reviews: PublicReview[]; total: number }> {
@@ -874,4 +876,30 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
         })),
         total: count ?? 0,
     };
+}
+
+export async function getVideoTestimonials(): Promise<PublicReview[]> {
+    try {
+        noStore();
+        const db = getClient();
+        const { data, error } = await db
+            .from('reviews')
+            .select('id, author_name, author_photo_url, rating, content, source_link, created_at')
+            .eq('source', 'video')
+            .eq('status', 'approved')
+            .order('created_at', { ascending: false });
+        if (error || !data) return [];
+        return data.map((r: any) => ({
+            id: r.id,
+            authorName: r.author_name,
+            authorPhotoUrl: r.author_photo_url ?? null,
+            rating: r.rating,
+            content: r.content,
+            createdAt: r.created_at,
+            source: 'video',
+            sourceLink: r.source_link ?? null,
+        }));
+    } catch {
+        return [];
+    }
 }

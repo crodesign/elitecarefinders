@@ -12,6 +12,7 @@ const DEFAULT_SECTIONS = [
     { id: 'about', label: 'About Elite CareFinders', visible: true },
     { id: 'content', label: 'Body Content', visible: true },
     { id: 'testimonials', label: 'Testimonials — What Our Clients Say', visible: true },
+    { id: 'video-testimonials', label: 'Video Testimonials', visible: true },
     { id: 'cta', label: 'Call to Action', visible: true },
     { id: 'elite-standard', label: 'The Elite Standard', visible: true },
     { id: 'join-network', label: 'Join the Provider Network', visible: false },
