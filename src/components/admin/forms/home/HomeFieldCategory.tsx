@@ -190,8 +190,8 @@ export function HomeFieldCategory({
 
                         {/* Text Block (Textarea) */}
                         {field.type === 'textarea' && (
-                            <div className="bg-surface-input rounded-lg p-[3px] transition-all space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
+                            <div className="bg-surface-input rounded-lg p-[3px] transition-all" style={{ border: '2px solid var(--form-border-subtle)' }}>
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] mb-[3px]">{field.name}</label>
                                 <textarea
                                     value={roomDetails.customFields[field.id] as string || ""}
                                     onChange={(e) => {
