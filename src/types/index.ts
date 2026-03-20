@@ -65,7 +65,7 @@ export interface Facility extends BaseEntity {
     address: Address;
     licenseNumber: string;
     capacity: number;
-    taxonomyIds: string[]; // References to Taxonomies
+    taxonomyEntryIds: string[];
     status: 'published' | 'draft';
     seo?: SeoFields;
 }

@@ -68,11 +68,11 @@ export default async function LocationPage({ params, searchParams }: Props) {
     });
 
     // Resolve type labels for facilities
-    const facilityEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyIds))];
+    const facilityEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyEntryIds))];
     const facilitiesTaxEntries = facilityEntryIds.length > 0 ? await getTaxonomyEntriesByIds(facilityEntryIds) : [];
     const facilityTypeMap = new Map<string, string>();
     facilities.forEach(facility => {
-        const te = facility.taxonomyIds.map(id => facilitiesTaxEntries.find(e => e.id === id)).find(e => e?.taxonomySlug !== 'location');
+        const te = facility.taxonomyEntryIds.map(id => facilitiesTaxEntries.find(e => e.id === id)).find(e => e?.taxonomySlug !== 'location');
         if (te) facilityTypeMap.set(facility.id, te.name.replace(/ies$/, 'y').replace(/([^s])s$/, '$1'));
     });
 

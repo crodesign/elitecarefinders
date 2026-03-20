@@ -122,7 +122,7 @@ export default function FacilitiesPage() {
                     });
                 }
                 const allowed = data.filter(f =>
-                    (f.taxonomyIds || []).some((id: string) => expandedIds.has(id))
+                    (f.taxonomyEntryIds || []).some((id: string) => expandedIds.has(id))
                 );
                 setFacilities(allowed);
                 setFilteredFacilities(allowed);
@@ -173,7 +173,7 @@ export default function FacilitiesPage() {
 
         const usedIds = new Set<string>();
         facilities.forEach(f => {
-            f.taxonomyIds?.forEach(id => {
+            f.taxonomyEntryIds?.forEach(id => {
                 if (taxonomyEntries[id]?.taxonomyId === tax.id) usedIds.add(id);
             });
         });
@@ -259,10 +259,10 @@ export default function FacilitiesPage() {
             filtered = filtered.filter(f => f.title.toLowerCase().includes(nameFilter.toLowerCase()));
         }
         if (locationFilter) {
-            filtered = filtered.filter(f => f.taxonomyIds?.includes(locationFilter));
+            filtered = filtered.filter(f => f.taxonomyEntryIds?.includes(locationFilter));
         }
         if (typeFilter.length > 0) {
-            filtered = filtered.filter(f => f.taxonomyIds?.some(id => typeFilter.includes(id)));
+            filtered = filtered.filter(f => f.taxonomyEntryIds?.some(id => typeFilter.includes(id)));
         }
         if (sortByRecent) {
             filtered.sort((a, b) =>
@@ -518,7 +518,7 @@ export default function FacilitiesPage() {
                 const typeTaxonomy = taxonomies.find(t =>
                     t.singularName?.toLowerCase() === 'facility type' || t.pluralName?.toLowerCase() === 'facility types'
                 );
-                const typeEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
+                const typeEntry = facility.taxonomyEntryIds?.map(id => taxonomyEntries[id]).find(entry => entry && typeTaxonomy && entry.taxonomyId === typeTaxonomy.id);
                 return (
                     <div className="flex items-center text-sm text-content-secondary">
                         <Tag className="mr-1 h-3.5 w-3.5 hidden md:block" />
@@ -547,8 +547,8 @@ export default function FacilitiesPage() {
                 const locationTaxonomy = taxonomies.find(t =>
                     t.singularName?.toLowerCase() === 'location' || t.pluralName?.toLowerCase() === 'locations'
                 );
-                // Note: Using taxonomyIds for facilities (should be taxonomyEntryIds for consistency)
-                const locationEntry = facility.taxonomyIds?.map(id => taxonomyEntries[id]).find(entry => entry && locationTaxonomy && entry.taxonomyId === locationTaxonomy.id);
+                // Note: Using taxonomyEntryIds for facilities (should be taxonomyEntryIds for consistency)
+                const locationEntry = facility.taxonomyEntryIds?.map(id => taxonomyEntries[id]).find(entry => entry && locationTaxonomy && entry.taxonomyId === locationTaxonomy.id);
 
                 // Build full path (e.g., "Hawaii - Oahu - Aiea")
                 const buildPath = (entry: TaxonomyEntry | undefined): string => {

@@ -60,9 +60,7 @@ CREATE POLICY "Users can update accessible facilities" ON facilities
             OR
             (
                 get_user_role(auth.uid()) IN ('regional_manager', 'location_manager')
-                AND can_edit_by_location(auth.uid(), 
-                    ARRAY(SELECT jsonb_array_elements_text(taxonomy_ids)::UUID)
-                )
+                AND can_edit_by_location(auth.uid(), taxonomy_entry_ids)
             )
         )
     )
@@ -72,9 +70,7 @@ CREATE POLICY "Users can update accessible facilities" ON facilities
             OR
             (
                 get_user_role(auth.uid()) IN ('regional_manager', 'location_manager')
-                AND can_edit_by_location(auth.uid(), 
-                    ARRAY(SELECT jsonb_array_elements_text(taxonomy_ids)::UUID)
-                )
+                AND can_edit_by_location(auth.uid(), taxonomy_entry_ids)
             )
         )
     );

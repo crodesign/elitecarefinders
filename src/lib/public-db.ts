@@ -53,7 +53,7 @@ function transformFacility(data: any): Facility {
         ...data,
         address: data.address || { street: '', city: '', state: '', zip: '' },
         licenseNumber: data.license_number,
-        taxonomyIds: data.taxonomy_ids || [],
+        taxonomyEntryIds: data.taxonomy_entry_ids || data.taxonomy_ids || [],
         images: data.images || [],
         teamImages: data.team_images || [],
         cuisineImages: data.cuisine_images || [],
@@ -263,7 +263,7 @@ export async function getFeaturedFacilities(excludeSlug?: string): Promise<Featu
         title: row.title,
         image: row.images?.[0] || null,
         featuredLabel: row.featured_label || null,
-        taxonomyEntryIds: row.taxonomy_ids || [],
+        taxonomyEntryIds: row.taxonomy_entry_ids || row.taxonomy_ids || [],
     }));
 }
 
@@ -284,7 +284,7 @@ export interface FacilityListingCard {
     title: string;
     image: string | null;
     description: string;
-    taxonomyIds: string[];
+    taxonomyEntryIds: string[];
     capacity: number | null;
     isFeatured: boolean;
     isFacilityOfMonth: boolean;
@@ -361,18 +361,15 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
     const offset = (page - 1) * limit;
     let query = db
         .from('facilities')
-        .select('id, slug, title, images, description, taxonomy_ids, capacity, is_featured, is_facility_of_month', { count: 'exact' })
+        .select('id, slug, title, images, description, taxonomy_entry_ids, capacity, is_featured, is_facility_of_month', { count: 'exact' })
         .eq('status', 'published')
         .order('is_facility_of_month', { ascending: false })
         .order('is_featured', { ascending: false })
         .order('title')
         .range(offset, offset + limit - 1);
     if (q?.trim()) query = query.ilike('title', `%${q.trim()}%`);
-    if (locationEntryIds?.length) {
-        const orFilters = locationEntryIds.map(id => `taxonomy_ids.cs.${JSON.stringify([id])}`).join(',');
-        query = (query as any).or(orFilters);
-    }
-    if (typeEntryId) query = (query as any).filter('taxonomy_ids', 'cs', JSON.stringify([typeEntryId]));
+    if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
+    if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
     const { data, count, error } = await query;
     if (error || !data) return { items: [], total: 0 };
     return {
@@ -382,7 +379,7 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
             title: row.title,
             image: row.images?.[0] || null,
             description: row.description || '',
-            taxonomyIds: row.taxonomy_ids || [],
+            taxonomyEntryIds: row.taxonomy_entry_ids || [],
             capacity: row.capacity ?? null,
             isFeatured: row.is_featured || false,
             isFacilityOfMonth: row.is_facility_of_month || false,
@@ -718,14 +715,14 @@ export async function getLocationChildEntriesWithCounts(
     // 2 queries: fetch all listings under any of these IDs
     const [homesRes, facilitiesRes] = await Promise.all([
         (db.from('homes').select('taxonomy_entry_ids').eq('status', 'published') as any).overlaps('taxonomy_entry_ids', allIds),
-        (db.from('facilities').select('taxonomy_ids').eq('status', 'published') as any).or(allIds.map((id: string) => `taxonomy_ids.cs.${JSON.stringify([id])}`).join(',')),
+        (db.from('facilities').select('taxonomy_entry_ids').eq('status', 'published') as any).overlaps('taxonomy_entry_ids', allIds),
     ]);
 
     // Count per child island
     return children.map((child: any) => {
         const ids = new Set(childDescendants.get(child.id) || []);
         const homes = (homesRes.data || []).filter((h: any) => (h.taxonomy_entry_ids || []).some((id: string) => ids.has(id))).length;
-        const facilities = (facilitiesRes.data || []).filter((f: any) => (f.taxonomy_ids || []).some((id: string) => ids.has(id))).length;
+        const facilities = (facilitiesRes.data || []).filter((f: any) => (f.taxonomy_entry_ids || []).some((id: string) => ids.has(id))).length;
         return { id: child.id, name: child.name, slug: child.slug, homes, facilities };
     });
 }

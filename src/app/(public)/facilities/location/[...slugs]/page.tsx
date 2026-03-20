@@ -50,11 +50,11 @@ export default async function FacilitiesByLocationPage({ params, searchParams }:
     const activeLocationIds = neighborhood ? [neighborhood] : locationIds;
     const { items: facilities, total } = await getFacilityListings({ locationEntryIds: activeLocationIds, q: q || undefined, page, limit: LIMIT });
 
-    const allEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyIds))];
+    const allEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyEntryIds))];
     const allTaxEntries = allEntryIds.length > 0 ? await getTaxonomyEntriesByIds(allEntryIds) : [];
     const typeNameMap = new Map<string, string>();
     facilities.forEach(facility => {
-        const te = facility.taxonomyIds.map(id => allTaxEntries.find(e => e.id === id)).find(e => e?.taxonomySlug !== 'location');
+        const te = facility.taxonomyEntryIds.map(id => allTaxEntries.find(e => e.id === id)).find(e => e?.taxonomySlug !== 'location');
         if (te) typeNameMap.set(facility.id, te.name.replace(/ies$/, 'y').replace(/([^s])s$/, '$1'));
     });
 

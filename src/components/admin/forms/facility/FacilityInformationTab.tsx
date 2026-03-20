@@ -61,8 +61,8 @@ interface FacilityInformationTabProps {
     setEmail: Dispatch<SetStateAction<string>>;
     status: 'published' | 'draft';
     setStatus: Dispatch<SetStateAction<'published' | 'draft'>>;
-    taxonomyIds: string[];
-    setTaxonomyIds: Dispatch<SetStateAction<string[]>>;
+    taxonomyEntryIds: string[];
+    setTaxonomyEntryIds: Dispatch<SetStateAction<string[]>>;
     availableTaxonomies: TaxonomyWithEntries[];
     isFeatured: boolean;
     setIsFeatured: Dispatch<SetStateAction<boolean>>;
@@ -98,7 +98,7 @@ export function FacilityInformationTab({
     phone, setPhone,
     email, setEmail,
     status, setStatus,
-    taxonomyIds, setTaxonomyIds,
+    taxonomyEntryIds, setTaxonomyEntryIds,
     availableTaxonomies,
     isFeatured, setIsFeatured,
     hasFeaturedVideo, setHasFeaturedVideo,
@@ -236,7 +236,7 @@ export function FacilityInformationTab({
                                         return false;
                                     });
                                 };
-                                const selectedId = taxonomyIds.find(id =>
+                                const selectedId = taxonomyEntryIds.find(id =>
                                     findEntryInTree(taxonomy.entries, id)
                                 ) || "";
                                 const findNameInTree = (entries: any[], id: string): string => {
@@ -266,13 +266,13 @@ export function FacilityInformationTab({
                                                     value={selectedId}
                                                     className="w-44 text-sm"
                                                     onChange={(newId) => {
-                                                        const otherIds = taxonomyIds.filter(id =>
+                                                        const otherIds = taxonomyEntryIds.filter(id =>
                                                             !findEntryInTree(taxonomy.entries, id)
                                                         );
                                                         if (newId) {
-                                                            setTaxonomyIds([...otherIds, newId]);
+                                                            setTaxonomyEntryIds([...otherIds, newId]);
                                                         } else {
-                                                            setTaxonomyIds(otherIds);
+                                                            setTaxonomyEntryIds(otherIds);
                                                         }
                                                         setIsDirty(true);
                                                     }}

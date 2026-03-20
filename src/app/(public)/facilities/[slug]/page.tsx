@@ -43,7 +43,7 @@ export default async function FacilityDetailPage({ params }: Props) {
     if (!facility) notFound();
 
     const [taxonomyEntries, adjacent, featuredRaw] = await Promise.all([
-        getTaxonomyEntriesByIds(facility.taxonomyIds || []),
+        getTaxonomyEntriesByIds(facility.taxonomyEntryIds || []),
         getAdjacentFacility(facility.title),
         getFeaturedFacilities(facility.slug),
     ]);

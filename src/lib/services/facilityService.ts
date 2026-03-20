@@ -33,8 +33,7 @@ function transformFacility(facility: any): Facility {
         ...facility,
         address: facility.address || { street: "", city: "", state: "", zip: "" },
         licenseNumber: facility.license_number,
-        taxonomyIds: facility.taxonomy_ids || [],
-        taxonomyEntryIds: facility.taxonomy_entry_ids?.length ? facility.taxonomy_entry_ids : (facility.taxonomy_ids || []),
+        taxonomyEntryIds: facility.taxonomy_entry_ids || facility.taxonomy_ids || [],
         isFeatured: facility.is_featured,
         hasFeaturedVideo: facility.has_featured_video,
         isFacilityOfMonth: facility.is_facility_of_month,
@@ -98,7 +97,8 @@ export async function createFacility(facility: CreateFacilityInput): Promise<Fac
         address: facility.address,
         license_number: facility.licenseNumber,
         capacity: facility.capacity,
-        taxonomy_ids: facility.taxonomyIds,
+        taxonomy_entry_ids: facility.taxonomyEntryIds,
+        taxonomy_ids: facility.taxonomyEntryIds,
         status: facility.status || 'draft',
         is_featured: (facility as any).isFeatured || false,
         has_featured_video: (facility as any).hasFeaturedVideo || false,
@@ -137,7 +137,10 @@ export async function updateFacility(id: string, updates: Partial<Facility>): Pr
     if (updates.address !== undefined) dbUpdates.address = updates.address;
     if (updates.licenseNumber !== undefined) dbUpdates.license_number = updates.licenseNumber;
     if (updates.capacity !== undefined) dbUpdates.capacity = updates.capacity;
-    if (updates.taxonomyIds !== undefined) dbUpdates.taxonomy_ids = updates.taxonomyIds;
+    if (updates.taxonomyEntryIds !== undefined) {
+        dbUpdates.taxonomy_entry_ids = updates.taxonomyEntryIds;
+        dbUpdates.taxonomy_ids = updates.taxonomyEntryIds;
+    }
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.teamImages !== undefined) dbUpdates.team_images = updates.teamImages;

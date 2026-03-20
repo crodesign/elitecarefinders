@@ -174,7 +174,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
     // Status & Taxonomies
     const [status, setStatus] = useState<'published' | 'draft'>('published');
-    const [taxonomyIds, setTaxonomyIds] = useState<string[]>([]);
+    const [taxonomyEntryIds, setTaxonomyEntryIds] = useState<string[]>([]);
     const [availableTaxonomies, setAvailableTaxonomies] = useState<TaxonomyWithEntries[]>([]);
 
     // Promotions State
@@ -240,7 +240,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             };
 
             if (locationTaxonomy && locationTaxonomy.entries) {
-                const selectedEntryId = taxonomyIds.find(id => {
+                const selectedEntryId = taxonomyEntryIds.find(id => {
                     return !!findEntryAndPath(locationTaxonomy.entries, id);
                 });
 
@@ -277,7 +277,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         };
         fetchFolder();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state, city, taxonomyIds, availableTaxonomies, galleryFolderId, facility?.id]);
+    }, [state, city, taxonomyEntryIds, availableTaxonomies, galleryFolderId, facility?.id]);
 
     // Room Fields State (for Facility Details tab)
     const [roomCategories, setRoomCategories] = useState<RoomFieldCategory[]>([]);
@@ -385,7 +385,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setLicenseNumber(facility.licenseNumber || "");
                 setCapacity(facility.capacity || "");
                 setStatus(facility.status || 'published');
-                setTaxonomyIds(facility.taxonomyIds || []);
+                setTaxonomyEntryIds(facility.taxonomyEntryIds || []);
 
                 // Promotions
                 setIsFeatured((facility as any).isFeatured || false);
@@ -424,7 +424,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setLicenseNumber("");
                 setCapacity("");
                 setStatus('published');
-                setTaxonomyIds([]);
+                setTaxonomyEntryIds([]);
                 setStreet("");
                 setCity("");
                 setState("");
@@ -473,7 +473,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 // New Facility Mode
                 if (title || slug || description || licenseNumber || capacity) return true;
                 if (status !== 'published') return true;
-                if (taxonomyIds.length > 0) return true;
+                if (taxonomyEntryIds.length > 0) return true;
                 if (street || city || state || zip) return true;
                 if (phone || email) return true;
                 if (images.length > 0) return true;
@@ -501,7 +501,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
 
             if (status !== (facility.status || 'published')) return true;
 
-            if (!arraysEqual(taxonomyIds, facility.taxonomyIds || [])) return true;
+            if (!arraysEqual(taxonomyEntryIds, facility.taxonomyEntryIds || [])) return true;
             if (!arraysEqual(images, facility.images || [])) return true;
             if (!arraysEqual(teamImages, (facility as any).teamImages || [])) return true;
             if (!arraysEqual(cuisineImages, (facility as any).cuisineImages || [])) return true;
@@ -556,7 +556,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     }, [
         isOpen, facility, setIsDirty,
         title, slug, description, licenseNumber, capacity,
-        status, taxonomyIds, images, teamImages, cuisineImages, videos,
+        status, taxonomyEntryIds, images, teamImages, cuisineImages, videos,
         street, city, state, zip, phone, email,
         isFeatured, hasFeaturedVideo, isFacilityOfMonth, featuredLabel, facilityOfMonthDescription,
         roomDetails
@@ -678,7 +678,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 licenseNumber,
                 capacity: capacity === "" ? 0 : capacity,
                 status,
-                taxonomyIds,
+                taxonomyEntryIds,
                 address: {
                     street,
                     city,
@@ -724,7 +724,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                             }
                             return null;
                         };
-                        for (const tid of taxonomyIds) {
+                        for (const tid of taxonomyEntryIds) {
                             const p = findEntry(locationTaxonomy.entries, tid);
                             if (p && p.length > 0) {
                                 stateName = p[0].name;
@@ -793,8 +793,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setEmail={setEmail}
                         status={status}
                         setStatus={setStatus}
-                        taxonomyIds={taxonomyIds}
-                        setTaxonomyIds={setTaxonomyIds}
+                        taxonomyEntryIds={taxonomyEntryIds}
+                        setTaxonomyEntryIds={setTaxonomyEntryIds}
                         availableTaxonomies={availableTaxonomies}
                         isFeatured={isFeatured}
                         setIsFeatured={setIsFeatured}
@@ -909,8 +909,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         entries.some(e => e.id === id || (e.children && findEntryInTree(e.children, id)));
     const facilityTypeTaxonomy = availableTaxonomies.find(t => t.singularName === 'Facility Type' || t.name === 'Facility Type');
     const locationTaxonomy = availableTaxonomies.find(t => t.singularName === 'Location' || t.name === 'Location' || t.slug === 'location');
-    const hasFacilityType = facilityTypeTaxonomy ? taxonomyIds.some(id => findEntryInTree(facilityTypeTaxonomy.entries ?? [], id)) : true;
-    const hasLocation = locationTaxonomy ? taxonomyIds.some(id => findEntryInTree(locationTaxonomy.entries ?? [], id)) : true;
+    const hasFacilityType = facilityTypeTaxonomy ? taxonomyEntryIds.some(id => findEntryInTree(facilityTypeTaxonomy.entries ?? [], id)) : true;
+    const hasLocation = locationTaxonomy ? taxonomyEntryIds.some(id => findEntryInTree(locationTaxonomy.entries ?? [], id)) : true;
     const canCreate = !!title.trim() && hasFacilityType && hasLocation;
 
     return (

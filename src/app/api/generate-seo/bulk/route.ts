@@ -39,10 +39,10 @@ async function getInputForEntity(supabase: ReturnType<typeof createAdminClient>,
         };
     }
     if (contentType === 'facility') {
-        const { data } = await supabase.from('facilities').select('title, description, excerpt, address, taxonomy_ids').eq('id', id).single();
+        const { data } = await supabase.from('facilities').select('title, description, excerpt, address, taxonomy_entry_ids').eq('id', id).single();
         if (!data) return null;
         const addr = data.address as Record<string, string> | null;
-        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_ids || []);
+        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_entry_ids || []);
         return {
             contentType: 'facility',
             title: data.title ?? '',
