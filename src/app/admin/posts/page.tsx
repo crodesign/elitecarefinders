@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
-import { Plus, FileText, Pencil, Trash2, Search, Loader2, X, ExternalLink } from "lucide-react";
+import { Plus, FileText, Pencil, Trash2, Search, Loader2, X, ExternalLink, Sparkles } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { Post } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PostForm } from "@/components/admin/PostForm";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
+import { createClientComponentClient } from "@/lib/supabase";
 
 function timeAgo(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
@@ -67,9 +68,19 @@ export default function PostsPage() {
     const [nameFilter, setNameFilter] = useState('');
     const [postTypeFilter, setPostTypeFilter] = useState<string[]>([]);
 
+    const [missingCount, setMissingCount] = useState<number | null>(null);
+    const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+
+    const fetchMissingCount = useCallback(async () => {
+        const supabase = createClientComponentClient();
+        const { count } = await supabase.from('posts').select('id', { count: 'exact', head: true }).or('meta_title.is.null,meta_title.eq.').neq('status', 'draft');
+        setMissingCount(count ?? 0);
+    }, []);
+
     useEffect(() => {
         loadPosts();
-    }, []);
+        fetchMissingCount();
+    }, [fetchMissingCount]);
 
     useEffect(() => {
         const action = searchParams.get('action');
@@ -107,6 +118,32 @@ export default function PostsPage() {
         router.push('/admin/posts', { scroll: false });
     };
 
+    const triggerAutoSeo = (id: string) => {
+        fetch('/api/generate-seo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recordId: id, contentType: 'post' }),
+        }).then(() => fetchMissingCount()).catch(() => {});
+    };
+
+    const handleBulkSeo = async () => {
+        setIsBulkGenerating(true);
+        try {
+            const res = await fetch('/api/generate-seo/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contentType: 'post' }),
+            });
+            const result = await res.json();
+            showNotification("SEO Generated", `Generated ${result.generated} of ${result.total} posts`);
+            fetchMissingCount();
+        } catch {
+            showNotification("Error", "Bulk SEO generation failed");
+        } finally {
+            setIsBulkGenerating(false);
+        }
+    };
+
     const handleSave = async (data: Partial<Post>) => {
         try {
             let savedPost: Post;
@@ -116,6 +153,7 @@ export default function PostsPage() {
             } else {
                 savedPost = await createPost(data as any);
                 showNotification("Post Created", data.title || "Post created successfully");
+                if (savedPost.status !== 'draft') triggerAutoSeo(savedPost.id);
             }
 
             await loadPosts();
@@ -368,16 +406,28 @@ export default function PostsPage() {
                         <h1 className="text-xl md:text-2xl font-bold text-content-primary">Posts</h1>
                         <p className="text-xs md:text-sm text-content-secondary mt-1">Manage articles, resources, news, and recipes</p>
                     </div>
-                    <button
-                        onClick={handleOpenCreate}
-                        className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2 inline-flex items-center"
-                    >
-                        <Plus className="h-5 w-5 md:hidden" />
-                        <span className="hidden md:flex md:items-center md:gap-2">
-                            <Plus className="h-5 w-5" />
-                            New Post
-                        </span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {missingCount !== null && missingCount > 0 && (
+                            <button
+                                onClick={handleBulkSeo}
+                                disabled={isBulkGenerating}
+                                className="hidden md:flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-ui-border text-content-secondary hover:bg-surface-hover transition-colors disabled:opacity-50"
+                            >
+                                {isBulkGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                                {isBulkGenerating ? 'Generating…' : `Generate SEO (${missingCount})`}
+                            </button>
+                        )}
+                        <button
+                            onClick={handleOpenCreate}
+                            className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors md:px-4 md:py-2 inline-flex items-center"
+                        >
+                            <Plus className="h-5 w-5 md:hidden" />
+                            <span className="hidden md:flex md:items-center md:gap-2">
+                                <Plus className="h-5 w-5" />
+                                New Post
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2">

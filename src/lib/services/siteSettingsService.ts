@@ -172,3 +172,37 @@ export async function getSeoTemplates(): Promise<SeoTemplate[]> {
 export async function saveSeoTemplates(templates: SeoTemplate[]): Promise<void> {
     await saveSiteSetting("seo_templates", JSON.stringify(templates));
 }
+
+export interface HomepageSeoSettings {
+    metaTitle: string;
+    metaDescription: string;
+    ogTitle: string;
+    ogDescription: string;
+    ogImageUrl: string;
+    canonicalUrl: string;
+    schemaJson?: Record<string, unknown> | null;
+}
+
+export const DEFAULT_HOMEPAGE_SEO: HomepageSeoSettings = {
+    metaTitle: "Hawaii's Most Trusted Senior Living Advisors | Elite CareFinders",
+    metaDescription: 'Free RN-led consultation to help Hawaii families find trusted senior care homes and communities on Oahu, Maui, Kauai, and the Big Island. Expert guidance every step of the way.',
+    ogTitle: '',
+    ogDescription: '',
+    ogImageUrl: '',
+    canonicalUrl: '',
+    schemaJson: null,
+};
+
+export async function getHomepageSeo(): Promise<HomepageSeoSettings> {
+    const raw = await getSiteSetting("homepage_seo");
+    if (!raw?.trim()) return DEFAULT_HOMEPAGE_SEO;
+    try {
+        return { ...DEFAULT_HOMEPAGE_SEO, ...JSON.parse(raw) };
+    } catch {
+        return DEFAULT_HOMEPAGE_SEO;
+    }
+}
+
+export async function saveHomepageSeo(settings: HomepageSeoSettings): Promise<void> {
+    await saveSiteSetting("homepage_seo", JSON.stringify(settings));
+}

@@ -903,3 +903,20 @@ export async function getVideoTestimonials(): Promise<PublicReview[]> {
         return [];
     }
 }
+
+
+export async function getHomepageSeoSetting(): Promise<Record<string, string>> {
+    noStore();
+    try {
+        const supabase = getClient();
+        const { data } = await supabase
+            .from('site_settings')
+            .select('value')
+            .eq('key', 'homepage_seo')
+            .single();
+        if (!data?.value) return {};
+        return JSON.parse(data.value);
+    } catch {
+        return {};
+    }
+}

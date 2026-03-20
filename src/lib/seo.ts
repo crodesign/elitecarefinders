@@ -147,6 +147,56 @@ export function buildFacilityJsonLd(input: FacilityJsonLdInput): Record<string, 
     return base;
 }
 
+export interface HomepageJsonLdInput {
+    socialAccounts?: { platform: string; url: string }[];
+    schemaJsonOverride?: Record<string, unknown> | null;
+}
+
+export function buildHomepageJsonLd(input: HomepageJsonLdInput): Record<string, unknown>[] {
+    const { socialAccounts = [], schemaJsonOverride } = input;
+
+    const sameAs = socialAccounts.map(a => a.url).filter(Boolean);
+
+    const website: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE_NAME,
+        url: BASE_URL,
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: `${BASE_URL}/homes?q={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+        },
+    };
+
+    const organization: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: BASE_URL,
+        logo: `${BASE_URL}/images/logo.png`,
+        ...(sameAs.length > 0 ? { sameAs } : {}),
+    };
+
+    const localBusiness: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'LocalBusiness',
+        name: SITE_NAME,
+        url: BASE_URL,
+        telephone: '+1-808-445-4111',
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Honolulu',
+            addressRegion: 'HI',
+            addressCountry: 'US',
+        },
+        areaServed: ['Oahu', 'Maui', 'Kauai', 'Big Island'],
+        ...(schemaJsonOverride && typeof schemaJsonOverride === 'object' ? schemaJsonOverride : {}),
+    };
+
+    return [website, organization, localBusiness];
+}
+
 export interface PostJsonLdInput {
     title: string;
     description?: string | null;

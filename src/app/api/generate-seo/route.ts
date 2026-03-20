@@ -4,38 +4,51 @@ import { generateSeoWithGemini, type AiSeoInput } from '@/lib/ai-seo';
 
 type ContentType = 'home' | 'facility' | 'post';
 
+async function getTaxonomyNames(supabase: ReturnType<typeof createAdminClient>, ids: string[]): Promise<string[]> {
+    if (!ids || ids.length === 0) return [];
+    const { data } = await supabase
+        .from('taxonomy_entries')
+        .select('name')
+        .in('id', ids);
+    return data ? data.map((r: { name: string }) => r.name).filter(Boolean) : [];
+}
+
 async function getRecordForSeo(recordId: string, contentType: ContentType): Promise<AiSeoInput | null> {
     const supabase = createAdminClient();
 
     if (contentType === 'home') {
         const { data, error } = await supabase
             .from('homes')
-            .select('title, description, excerpt, address')
+            .select('title, description, excerpt, address, taxonomy_entry_ids')
             .eq('id', recordId)
             .single();
         if (error || !data) return null;
         const addr = data.address as Record<string, string> | null;
+        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_entry_ids || []);
         return {
             contentType: 'home',
             title: data.title ?? '',
             body: [data.description, data.excerpt].filter(Boolean).join('\n\n'),
             location: [addr?.city, addr?.state].filter(Boolean).join(', ') || undefined,
+            careTypes,
         };
     }
 
     if (contentType === 'facility') {
         const { data, error } = await supabase
             .from('facilities')
-            .select('title, description, excerpt, address')
+            .select('title, description, excerpt, address, taxonomy_entry_ids')
             .eq('id', recordId)
             .single();
         if (error || !data) return null;
         const addr = data.address as Record<string, string> | null;
+        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_entry_ids || []);
         return {
             contentType: 'facility',
             title: data.title ?? '',
             body: [data.description, data.excerpt].filter(Boolean).join('\n\n'),
             location: [addr?.city, addr?.state].filter(Boolean).join(', ') || undefined,
+            careTypes,
         };
     }
 

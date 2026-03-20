@@ -9,7 +9,9 @@ import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYou
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
 import { VideoTestimonialsSection } from '@/components/public/VideoTestimonialsSection';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials, getHomepageSeoSetting } from '@/lib/public-db';
+import { getHomepageSeo } from '@/lib/services/siteSettingsService';
+import { buildHomepageJsonLd } from '@/lib/seo';
 import type { PublicSocialAccount } from '@/lib/public-db';
 import type { FacilityListingCard } from '@/lib/public-db';
 import type { HomeOfMonth } from '@/lib/public-db';
@@ -23,10 +25,26 @@ const PHONE_HREF = 'tel:+18084454111';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
+const HOMEPAGE_DEFAULTS = {
     title: "Hawaii's Most Trusted Senior Living Advisors | Elite CareFinders",
     description: 'Free RN-led consultation to help Hawaii families find trusted senior care homes and communities on Oahu, Maui, Kauai, and the Big Island. Expert guidance every step of the way.',
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getHomepageSeoSetting();
+    const title = seo.metaTitle || HOMEPAGE_DEFAULTS.title;
+    const description = seo.metaDescription || HOMEPAGE_DEFAULTS.description;
+    return {
+        title,
+        description,
+        ...(seo.canonicalUrl && { alternates: { canonical: seo.canonicalUrl } }),
+        openGraph: {
+            title: seo.ogTitle || title,
+            description: seo.ogDescription || description,
+            ...(seo.ogImageUrl && { images: [seo.ogImageUrl] }),
+        },
+    };
+}
 
 
 const HERO_AWARDS = [
@@ -88,7 +106,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
@@ -97,7 +115,13 @@ export default async function HomePage() {
         getHomepageSections(),
         getSocialAccountsPublic(),
         getVideoTestimonials(),
+        getHomepageSeo(),
     ]);
+
+    const homepageJsonLd = buildHomepageJsonLd({
+        socialAccounts,
+        schemaJsonOverride: homepageSeoSettings.schemaJson ?? null,
+    });
     const allEntryIds = [...new Set([
         ...homes.flatMap((h: any) => h.taxonomyEntryIds as string[]),
         ...(homeOfMonth?.taxonomyEntryIds ?? []),
@@ -153,6 +177,13 @@ export default async function HomePage() {
 
     return (
         <>
+            {homepageJsonLd.map((schema, i) => (
+                <script
+                    key={i}
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+                />
+            ))}
             {/* Mobile-only social + share bar — not part of section ordering */}
             <div className="sm:hidden max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">

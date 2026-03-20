@@ -1,8 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Globe, Image, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle } from "lucide-react";
+import { Search, Globe, ToggleLeft, ToggleRight, Code, ChevronDown, ChevronUp, AlertCircle, Sparkles, HelpCircle, Info } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { SeoFields } from "@/types";
+import { SerpPreview } from "@/components/admin/seo/SerpPreview";
+import { OgCardPreview } from "@/components/admin/seo/OgCardPreview";
+import { scoreSeo, scoreBgColor } from "@/lib/seoScore";
+
+const BASE_URL = 'https://www.elitecarefinders.com';
 
 export interface SeoTabProps {
     seo: SeoFields;
@@ -17,6 +23,9 @@ export interface SeoTabProps {
     /** When set, shows the "Generate SEO with AI" button */
     recordId?: string;
     contentType?: 'home' | 'facility' | 'post';
+    /** Used to construct the preview URL when canonicalUrl is not set */
+    pathPrefix?: string;
+    slug?: string;
     /** When set, shows a dedicated Save SEO button */
     onSaveSeo?: () => Promise<void>;
 }
@@ -37,19 +46,37 @@ function CharCounter({ value, soft, hard }: { value: string; soft: number; hard?
     );
 }
 
-function FieldRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function InfoTooltip({ text }: { text: string }) {
+    return (
+        <Tooltip content={text} side="right" delayDuration={200}>
+            <span className="inline-flex items-center cursor-default text-content-muted hover:text-content-secondary transition-colors">
+                <Info className="h-3 w-3" />
+            </span>
+        </Tooltip>
+    );
+}
+
+function FieldRow({ label, tooltip, children }: { label: string; tooltip?: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-3 p-[3px] bg-surface-hover rounded-lg">
             <div className="sm:min-w-[140px] sm:pt-1.5">
-                <p className="text-sm font-medium text-content-secondary">{label}</p>
-                {hint && <p className="text-[10px] text-content-muted mt-0.5">{hint}</p>}
+                <p className="text-sm font-medium text-content-secondary flex items-center gap-1">
+                    {label}
+                    {tooltip && <InfoTooltip text={tooltip} />}
+                </p>
             </div>
-            <div className="sm:flex-1">{children}</div>
+            <div className="sm:flex-1 space-y-1">
+                {children}
+            </div>
         </div>
     );
 }
 
-export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, contentType, onSaveSeo }: SeoTabProps) {
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, contentType, pathPrefix, slug, onSaveSeo }: SeoTabProps) {
     const [schemaExpanded, setSchemaExpanded] = useState(false);
     const [schemaText, setSchemaText] = useState("");
     const [schemaError, setSchemaError] = useState<string | null>(null);
@@ -59,6 +86,8 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
     const [seoDirty, setSeoDirty] = useState(false);
     const [seoSaving, setSeoSaving] = useState(false);
     const [seoSaved, setSeoSaved] = useState(false);
+    const [scoreExpanded, setScoreExpanded] = useState(false);
+    const [primaryKeyword, setPrimaryKeyword] = useState<string | null>(null);
 
     // Sync schemaText with the seo.schemaJson prop (e.g. on form open)
     useEffect(() => {
@@ -122,6 +151,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
         if (!recordId || !contentType) return;
         setAiLoading(true);
         setAiError(null);
+        setPrimaryKeyword(null);
         try {
             const res = await fetch('/api/generate-seo', {
                 method: 'POST',
@@ -134,6 +164,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
             if (data.metaDescription) { onChange('metaDescription', data.metaDescription); setSeoDirty(true); setSeoSaved(false); }
             if (data.ogTitle) { onChange('ogTitle', data.ogTitle); setSeoDirty(true); setSeoSaved(false); }
             if (data.ogDescription) { onChange('ogDescription', data.ogDescription); setSeoDirty(true); setSeoSaved(false); }
+            if (data.primaryKeyword) setPrimaryKeyword(data.primaryKeyword);
             if (Array.isArray(data.faqs) && data.faqs.length > 0) setAiFaqs(data.faqs);
         } catch (err) {
             setAiError(err instanceof Error ? err.message : 'AI generation failed. Please try again.');
@@ -150,8 +181,52 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
     const canonicalVal = seo.canonicalUrl || "";
     const indexable = seo.indexable ?? true;
 
+    // Resolved values for previews
+    const serpTitle = metaTitleVal || defaults.title || '';
+    const serpDesc = metaDescVal || (defaults.description ? stripHtml(defaults.description) : '');
+    const serpUrl = canonicalVal || (pathPrefix && slug ? `${BASE_URL}/${pathPrefix}/${slug}` : BASE_URL);
+    const ogTitleResolved = ogTitleVal || metaTitleVal || defaults.title || '';
+    const ogDescResolved = ogDescVal || metaDescVal || (defaults.description ? stripHtml(defaults.description) : '');
+    const ogImageResolved = ogImageVal || defaults.ogImage || '';
+
+    // SEO score
+    const { score, total, missing } = scoreSeo(seo);
+
     return (
         <div className="space-y-5">
+
+            {/* Score header */}
+            <div className="bg-surface-input rounded-lg p-[5px]">
+                <button
+                    type="button"
+                    onClick={() => setScoreExpanded(v => !v)}
+                    className="w-full flex items-center justify-between p-[3px] bg-surface-hover rounded-lg hover:opacity-80 transition-opacity"
+                >
+                    <span className="text-sm font-medium text-content-primary">SEO Completeness</span>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${scoreBgColor(score)}`}>
+                            {score}/{total}
+                        </span>
+                        {scoreExpanded ? <ChevronUp className="h-3.5 w-3.5 text-content-muted" /> : <ChevronDown className="h-3.5 w-3.5 text-content-muted" />}
+                    </div>
+                </button>
+                {scoreExpanded && (
+                    <div className="px-[3px] pt-2 pb-[3px]">
+                        {missing.length === 0 ? (
+                            <p className="text-xs text-emerald-600 px-1">All fields complete.</p>
+                        ) : (
+                            <ul className="space-y-1">
+                                {missing.map(item => (
+                                    <li key={item} className="text-xs text-content-muted flex items-center gap-1.5 px-1">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-content-muted shrink-0" />
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* AI Generate */}
             {recordId && contentType && (
@@ -167,6 +242,11 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                             </p>
                         </div>
                         <div className="flex items-center gap-2 sm:shrink-0">
+                            {primaryKeyword && (
+                                <span className="text-[10px] text-content-muted bg-surface-input px-2 py-1 rounded-md">
+                                    Optimised for: <span className="text-content-secondary font-medium">{primaryKeyword}</span>
+                                </span>
+                            )}
                             <button
                                 type="button"
                                 onClick={handleGenerateSeo}
@@ -209,7 +289,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
 
                     <FieldRow
                         label="Meta Title"
-                        hint="~60 chars recommended"
+                        tooltip="The blue headline shown in Google search results. Include your primary service and location. Aim for 50–60 characters."
                     >
                         <div className="space-y-1">
                             <input
@@ -228,13 +308,13 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
 
                     <FieldRow
                         label="Meta Description"
-                        hint="~155–160 chars recommended"
+                        tooltip="The grey summary text below the title in Google. Should explain what the page offers and why to click. Aim for 140–160 characters."
                     >
                         <div className="space-y-1">
                             <textarea
                                 value={metaDescVal}
                                 onChange={e => set("metaDescription", e.target.value || null)}
-                                placeholder={defaults.description ? defaults.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) + "…" : "Auto-generated from description"}
+                                placeholder={defaults.description ? stripHtml(defaults.description).slice(0, 80) + "…" : "Auto-generated from description"}
                                 maxLength={320}
                                 rows={3}
                                 className="form-input px-3 py-2 w-full text-sm resize-none"
@@ -245,7 +325,10 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         </div>
                     </FieldRow>
 
-                    <FieldRow label="Canonical URL" hint="Leave blank to use the page URL">
+                    <FieldRow
+                        label="Canonical URL"
+                        tooltip="The definitive URL for this page. Leave blank unless this content exists at multiple URLs — it tells search engines which version to index."
+                    >
                         <input
                             type="url"
                             value={canonicalVal}
@@ -255,7 +338,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         />
                     </FieldRow>
 
-                    <FieldRow label="Indexable" hint="Allow search engines to index this page">
+                    <FieldRow label="Indexable" tooltip="When on, search engines can index and rank this page. Turn off to add a noindex directive — useful for drafts or duplicate content.">
                         <button
                             type="button"
                             onClick={() => set("indexable", !indexable)}
@@ -274,6 +357,8 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                             )}
                         </button>
                     </FieldRow>
+
+                    <SerpPreview title={serpTitle} description={serpDesc} url={serpUrl} />
                 </div>
 
                 {/* Open Graph / Social */}
@@ -283,7 +368,10 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         Social / Open Graph
                     </p>
 
-                    <FieldRow label="OG Title" hint="Leave blank to use Meta Title">
+                    <FieldRow
+                        label="OG Title"
+                        tooltip="The title shown when this page is shared on Facebook or LinkedIn. Leave blank to inherit the Meta Title."
+                    >
                         <div className="space-y-1">
                             <input
                                 type="text"
@@ -299,7 +387,10 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         </div>
                     </FieldRow>
 
-                    <FieldRow label="OG Description" hint="Leave blank to use Meta Description">
+                    <FieldRow
+                        label="OG Description"
+                        tooltip="The description shown in social share previews. Leave blank to inherit the Meta Description."
+                    >
                         <div className="space-y-1">
                             <textarea
                                 value={ogDescVal}
@@ -315,7 +406,10 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                         </div>
                     </FieldRow>
 
-                    <FieldRow label="OG Image URL" hint="Leave blank to use the main image">
+                    <FieldRow
+                        label="OG Image URL"
+                        tooltip="The image shown in social share previews. Recommended size: 1200×630px. Leave blank to use the entity's main image."
+                    >
                         <div className="space-y-1.5">
                             <input
                                 type="url"
@@ -324,21 +418,14 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                 placeholder={defaults.ogImage || "https://… or leave blank for main image"}
                                 className="form-input px-3 h-8 w-full text-sm font-mono"
                             />
-                            {(ogImageVal || defaults.ogImage) && (
-                                <div className="flex items-center gap-2">
-                                    <img
-                                        src={ogImageVal || defaults.ogImage}
-                                        alt="OG preview"
-                                        className="h-12 w-20 object-cover rounded border border-surface-hover"
-                                        onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                    />
-                                    <p className="text-[10px] text-content-muted">
-                                        {ogImageVal ? "Custom OG image" : "Default: main image"}
-                                    </p>
-                                </div>
-                            )}
                         </div>
                     </FieldRow>
+
+                    <OgCardPreview
+                        title={ogTitleResolved}
+                        description={ogDescResolved}
+                        imageUrl={ogImageResolved}
+                    />
                 </div>
             </div>
 
@@ -352,6 +439,7 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                     <span className="text-[10px] font-bold uppercase tracking-widest text-content-muted flex items-center gap-1.5">
                         <Code className="h-3 w-3" />
                         Advanced: JSON-LD Override
+                        <InfoTooltip text="Paste a valid JSON-LD object to merge with or override the auto-generated structured data. Leave blank to use defaults." />
                     </span>
                     {schemaExpanded ? <ChevronUp className="h-3.5 w-3.5 text-content-muted" /> : <ChevronDown className="h-3.5 w-3.5 text-content-muted" />}
                 </button>
@@ -359,9 +447,6 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                 {schemaExpanded && (
                     <div className="px-[5px] pb-[5px] space-y-2">
                         <div className="p-[3px] bg-surface-hover rounded-lg space-y-2">
-                            <p className="text-[10px] text-content-muted px-1">
-                                Paste a valid JSON-LD object here to merge with or override the auto-generated structured data. Leave blank to use defaults.
-                            </p>
                             <textarea
                                 value={schemaText}
                                 onChange={e => handleSchemaChange(e.target.value)}
