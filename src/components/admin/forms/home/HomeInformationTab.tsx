@@ -1,4 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
+'use client';
+
+import { Dispatch, SetStateAction, useState } from "react";
 import { Check, Ban, X, ChevronDown, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Taxonomy } from "@/types";
@@ -7,6 +9,8 @@ import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { US_STATES, FEATURED_LABELS } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
 import { Tooltip } from "@/components/ui/tooltip";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { createClientComponentClient } from "@/lib/supabase";
 
 const LOCK_TOOLTIP = "Only editable by a manager or admin";
 
@@ -60,6 +64,7 @@ export interface HomeInformationTabProps {
     setManagingTaxonomy: (taxonomy: Taxonomy | null) => void;
     setIsDirty: (value: boolean) => void;
     isLocalUser?: boolean;
+    currentId?: string;
 }
 
 export function HomeInformationTab({
@@ -89,8 +94,39 @@ export function HomeInformationTab({
     setManagingTaxonomy,
     setIsDirty,
     isLocalUser = false,
+    currentId,
 }: HomeInformationTabProps) {
+    const [conflictName, setConflictName] = useState<string | null>(null);
+
+    async function handleHomeOfMonthToggle(checked: boolean) {
+        if (!checked) {
+            setIsHomeOfMonth(false);
+            setIsDirty(true);
+            return;
+        }
+        try {
+            const supabase = createClientComponentClient();
+            const { data } = await supabase
+                .from('homes')
+                .select('title')
+                .eq('is_home_of_month', true)
+                .neq('id', currentId || '00000000-0000-0000-0000-000000000000')
+                .limit(1);
+            const existing = Array.isArray(data) ? data[0] : null;
+            if (existing?.title) {
+                setConflictName(existing.title);
+            } else {
+                setIsHomeOfMonth(true);
+                setIsDirty(true);
+            }
+        } catch {
+            setIsHomeOfMonth(true);
+            setIsDirty(true);
+        }
+    }
+
     return (
+        <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
             {/* Col B — Name + Description (order-2, wide) */}
             <div className="order-2 lg:col-span-2 flex flex-col h-full min-h-0">
@@ -524,7 +560,7 @@ export function HomeInformationTab({
                             </label>
                             <Switch
                                 checked={isHomeOfMonth}
-                                onCheckedChange={(checked) => { setIsHomeOfMonth(checked); setIsDirty(true); }}
+                                onCheckedChange={handleHomeOfMonthToggle}
                                 className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-surface-hover"
                             />
                         </div>
@@ -545,9 +581,23 @@ export function HomeInformationTab({
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
+            <AlertDialog open={!!conflictName} onOpenChange={(open) => { if (!open) setConflictName(null); }}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Replace Home of the Month?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <strong>{conflictName}</strong> is currently set as Home of the Month. Do you want to replace it with this home?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setConflictName(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { setIsHomeOfMonth(true); setIsDirty(true); setConflictName(null); }}>
+                            Replace
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }
-
-
-

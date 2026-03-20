@@ -847,6 +847,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setLabelSearch={setLabelSearch}
                         hasFeaturedVideo={hasFeaturedVideo}
                         setHasFeaturedVideo={setHasFeaturedVideo}
+                        currentId={home?.id}
                         isHomeOfMonth={isHomeOfMonth}
                         setIsHomeOfMonth={setIsHomeOfMonth}
                         homeOfMonthDescription={homeOfMonthDescription}

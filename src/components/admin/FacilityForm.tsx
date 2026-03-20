@@ -800,6 +800,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setIsFeatured={setIsFeatured}
                         hasFeaturedVideo={hasFeaturedVideo}
                         setHasFeaturedVideo={setHasFeaturedVideo}
+                        currentId={facility?.id}
                         isFacilityOfMonth={isFacilityOfMonth}
                         setIsFacilityOfMonth={setIsFacilityOfMonth}
                         featuredLabel={featuredLabel}

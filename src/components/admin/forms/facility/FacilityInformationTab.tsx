@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import dynamic from "next/dynamic";
 import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -17,6 +17,8 @@ const RichTextEditor = dynamic(
 import { US_STATES } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
 import { Tooltip } from "@/components/ui/tooltip";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { createClientComponentClient } from "@/lib/supabase";
 
 const LOCK_TOOLTIP = "Only editable by a manager or admin";
 
@@ -81,6 +83,7 @@ interface FacilityInformationTabProps {
     setIsDirty: (value: boolean) => void;
     setManagingTaxonomy: Dispatch<SetStateAction<Taxonomy | null>>;
     isLocalUser?: boolean;
+    currentId?: string;
 }
 
 export function FacilityInformationTab({
@@ -108,8 +111,39 @@ export function FacilityInformationTab({
     setIsDirty,
     setManagingTaxonomy,
     isLocalUser = false,
+    currentId,
 }: FacilityInformationTabProps) {
+    const [conflictName, setConflictName] = useState<string | null>(null);
+
+    async function handleFacilityOfMonthToggle(checked: boolean) {
+        if (!checked) {
+            setIsFacilityOfMonth(false);
+            setIsDirty(true);
+            return;
+        }
+        try {
+            const supabase = createClientComponentClient();
+            const { data } = await supabase
+                .from('facilities')
+                .select('title')
+                .eq('is_facility_of_month', true)
+                .neq('id', currentId || '00000000-0000-0000-0000-000000000000')
+                .limit(1);
+            const existing = Array.isArray(data) ? data[0] : null;
+            if (existing?.title) {
+                setConflictName(existing.title);
+            } else {
+                setIsFacilityOfMonth(true);
+                setIsDirty(true);
+            }
+        } catch {
+            setIsFacilityOfMonth(true);
+            setIsDirty(true);
+        }
+    }
+
     return (
+        <>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
             {/* Col B — Name + Description (order-2, wide) */}
             <div className="order-2 lg:col-span-2 flex flex-col h-full min-h-0">
@@ -488,7 +522,7 @@ export function FacilityInformationTab({
                             </label>
                             <Switch
                                 checked={isFacilityOfMonth}
-                                onCheckedChange={(checked) => { setIsFacilityOfMonth(checked); setIsDirty(true); }}
+                                onCheckedChange={handleFacilityOfMonthToggle}
                                 className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-surface-hover"
                             />
                         </div>
@@ -510,8 +544,23 @@ export function FacilityInformationTab({
                 </div>
             </div>
         </div>
+            <AlertDialog open={!!conflictName} onOpenChange={(open) => { if (!open) setConflictName(null); }}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Replace Facility of the Month?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <strong>{conflictName}</strong> is currently set as Facility of the Month. Do you want to replace it with this facility?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setConflictName(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { setIsFacilityOfMonth(true); setIsDirty(true); setConflictName(null); }}>
+                            Replace
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }
-
-
 

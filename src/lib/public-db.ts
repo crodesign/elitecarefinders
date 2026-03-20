@@ -840,3 +840,38 @@ export async function getSocialAccountsPublic(): Promise<PublicSocialAccount[]> 
         return all.filter(a => !a.hidden);
     } catch { return []; }
 }
+
+export interface PublicReview {
+    id: string;
+    authorName: string;
+    authorPhotoUrl: string | null;
+    rating: number;
+    content: string;
+    createdAt: string;
+    source: string | null;
+}
+
+export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ reviews: PublicReview[]; total: number }> {
+    const db = getClient();
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+    const { data, count, error } = await db
+        .from('reviews')
+        .select('id, author_name, author_photo_url, rating, content, created_at, source', { count: 'exact' })
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false })
+        .range(from, to);
+    if (error || !data) return { reviews: [], total: 0 };
+    return {
+        reviews: data.map((r: any) => ({
+            id: r.id,
+            authorName: r.author_name,
+            authorPhotoUrl: r.author_photo_url ?? null,
+            rating: r.rating,
+            content: r.content,
+            createdAt: r.created_at,
+            source: r.source ?? null,
+        })),
+        total: count ?? 0,
+    };
+}

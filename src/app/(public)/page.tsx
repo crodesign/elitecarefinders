@@ -430,7 +430,7 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
             <div className="max-w-6xl mx-auto px-5 py-16">
                 <div className="flex items-end justify-between mb-8">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Browse Featured</p>
                         <h2 className="text-3xl font-bold text-gray-900">Care Homes &amp; Foster Homes</h2>
                     </div>
                     <Link
@@ -536,7 +536,7 @@ function FeaturedFacilitiesSection({ facilities }: { facilities: FacilityListing
             <div className="max-w-6xl mx-auto px-5 py-16">
                 <div className="flex items-end justify-between mb-8">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Featured</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Browse Featured</p>
                         <h2 className="text-3xl font-bold text-gray-900">Senior Living Communities</h2>
                     </div>
                     <Link
