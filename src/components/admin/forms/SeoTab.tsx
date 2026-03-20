@@ -190,40 +190,42 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
     const ogImageResolved = ogImageVal || defaults.ogImage || '';
 
     // SEO score
-    const { score, total, missing } = scoreSeo(seo);
+    const { score, grade, criteria } = scoreSeo(seo);
 
     return (
         <div className="space-y-5">
 
-            {/* Score header */}
+            {/* SEO Quality Score */}
             <div className="bg-surface-input rounded-lg p-[5px]">
                 <button
                     type="button"
                     onClick={() => setScoreExpanded(v => !v)}
                     className="w-full flex items-center justify-between p-[3px] bg-surface-hover rounded-lg hover:opacity-80 transition-opacity"
                 >
-                    <span className="text-sm font-medium text-content-primary">SEO Completeness</span>
+                    <span className="text-sm font-medium text-content-primary">SEO Quality Score</span>
                     <div className="flex items-center gap-2">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${scoreBgColor(score)}`}>
-                            {score}/{total}
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${scoreBgColor(score)}`}>
+                            {grade} &middot; {score}/100
                         </span>
                         {scoreExpanded ? <ChevronUp className="h-3.5 w-3.5 text-content-muted" /> : <ChevronDown className="h-3.5 w-3.5 text-content-muted" />}
                     </div>
                 </button>
                 {scoreExpanded && (
-                    <div className="px-[3px] pt-2 pb-[3px]">
-                        {missing.length === 0 ? (
-                            <p className="text-xs text-emerald-600 px-1">All fields complete.</p>
-                        ) : (
-                            <ul className="space-y-1">
-                                {missing.map(item => (
-                                    <li key={item} className="text-xs text-content-muted flex items-center gap-1.5 px-1">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-content-muted shrink-0" />
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                    <div className="px-[3px] pt-2 pb-[3px] space-y-0.5">
+                        {criteria.map(c => (
+                            <div key={c.label} className="flex items-center gap-2 px-1 py-1">
+                                <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                                    c.status === 'good' ? 'bg-emerald-500' :
+                                    c.status === 'warn' ? 'bg-amber-500' : 'bg-red-500'
+                                }`} />
+                                <span className="text-xs font-medium text-content-secondary w-32 shrink-0">{c.label}</span>
+                                <span className="text-[10px] text-content-muted flex-1 min-w-0 truncate">{c.note}</span>
+                                <span className={`text-[10px] font-mono shrink-0 ${
+                                    c.points === c.maxPoints ? 'text-emerald-500' :
+                                    c.points > 0 ? 'text-amber-500' : 'text-red-400'
+                                }`}>{c.points}/{c.maxPoints}</span>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>

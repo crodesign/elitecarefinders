@@ -25,9 +25,9 @@ Rules:
 - No keyword stuffing or clickbait headlines.
 - Write for someone actively searching for care placement — use intent-focused language ("find", "trusted", "RN-guided", "compare", "near").
 - Always include the Hawaii island name (Oahu, Maui, Kauai, Big Island) and neighbourhood when location data is provided. Derive the island from the city if possible (e.g. Honolulu, Kailua, Pearl City → Oahu; Kahului, Lahaina → Maui; Lihue, Kapaa → Kauai; Hilo, Kona → Big Island).
-- Meta titles: ~50–60 characters, include location or keyword where natural.
-- Meta descriptions: 140–160 characters, describe the page value clearly, include a call to action.
-- OG title/description: written for social sharing, NOT identical to meta equivalents. Meta targets Google crawlers; OG targets social sharers scrolling a feed. OG should be warmer and more conversational.
+- Meta titles: EXACTLY 50–60 characters. Count every character including spaces. If under 50, add location or care type detail. If over 60, cut a word.
+- Meta descriptions: EXACTLY 140–160 characters. Count every character including spaces and punctuation before writing the JSON value. Build to 140+ by covering: (1) what makes this listing unique, (2) location, (3) a direct call to action. If you reach 160, stop at the nearest word boundary. Do not output a description shorter than 140 characters.
+- OG title/description: written for social sharing, NOT identical to meta equivalents. Meta targets Google crawlers; OG targets social sharers scrolling a feed. OG should be warmer and more conversational. Same length rules apply.
 - Output ONLY valid JSON. No markdown, no code fences, no explanation.`;
 
 function buildUserPrompt(input: AiSeoInput): string {
@@ -51,9 +51,9 @@ ${input.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 3000)
 Return a JSON object with exactly these fields:
 {
   "metaTitle": "50–60 chars, Google-optimised, includes island/neighbourhood and care type if natural",
-  "metaDescription": "140–160 chars, intent-focused, describes the page value and includes a call to action",
+  "metaDescription": "HARD REQUIREMENT: 140–160 characters exactly. Verify your character count. Cover what makes the listing special, the location, and a call to action.",
   "ogTitle": "Social-optimised title — different wording from metaTitle, warmer and conversational (50–60 chars)",
-  "ogDescription": "Social-optimised description — different from metaDescription, written for someone scrolling a social feed (140–160 chars)",
+  "ogDescription": "HARD REQUIREMENT: 140–160 characters exactly. Different wording from metaDescription — warmer, written for someone scrolling a social feed.",
   "primaryKeyword": "The single most targeted search phrase for this listing (e.g. 'adult foster homes Oahu' or 'memory care Maui')",
   "faqs": ${includeFaqs
         ? '[{"question":"...","answer":"..."}] — 3 to 5 questions a prospective resident or family member might ask about this listing'
@@ -64,6 +64,15 @@ Return a JSON object with exactly these fields:
 function sanitize(s: unknown, maxLen: number): string {
     if (typeof s !== 'string') return '';
     return s.trim().replace(/\s+/g, ' ').slice(0, maxLen);
+}
+
+// Trim a description to maxLen at a word boundary, appending ellipsis if trimmed
+function trimDescription(s: string, maxLen = 160): string {
+    s = s.trim().replace(/\s+/g, ' ');
+    if (s.length <= maxLen) return s;
+    const cut = s.slice(0, maxLen);
+    const lastSpace = cut.lastIndexOf(' ');
+    return (lastSpace > maxLen - 20 ? cut.slice(0, lastSpace) : cut) + '…';
 }
 
 function fallback(input: AiSeoInput): AiSeoOutput {
@@ -98,9 +107,9 @@ export async function generateSeoWithGemini(input: AiSeoInput): Promise<AiSeoOut
 
     return {
         metaTitle: sanitize(parsed.metaTitle, 120),
-        metaDescription: sanitize(parsed.metaDescription, 320),
+        metaDescription: trimDescription(sanitize(parsed.metaDescription, 320)),
         ogTitle: sanitize(parsed.ogTitle, 120),
-        ogDescription: sanitize(parsed.ogDescription, 320),
+        ogDescription: trimDescription(sanitize(parsed.ogDescription, 320)),
         primaryKeyword: parsed.primaryKeyword ? sanitize(parsed.primaryKeyword, 120) : undefined,
         faqs: Array.isArray(parsed.faqs)
             ? parsed.faqs
