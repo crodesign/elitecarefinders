@@ -261,7 +261,13 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                     type="button"
                                     onClick={handleSaveSeo}
                                     disabled={seoSaving || (!seoDirty && !seoSaved)}
-                                    className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-input text-content-primary hover:bg-surface-hover"
+                                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                        seoDirty
+                                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                            : seoSaved
+                                                ? 'bg-emerald-500/10 text-emerald-600'
+                                                : 'bg-surface-input text-content-primary hover:bg-surface-hover'
+                                    }`}
                                 >
                                     {seoSaved ? 'Saved' : seoSaving ? 'Saving…' : 'Save SEO'}
                                 </button>
@@ -336,6 +342,11 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                             placeholder="https://www.elitecarefinders.com/…"
                             className="form-input px-3 h-8 w-full text-sm font-mono"
                         />
+                        {!canonicalVal && pathPrefix && slug && (
+                            <p className="text-[10px] text-content-muted px-0.5 truncate">
+                                Auto: {BASE_URL}/{pathPrefix}/{slug}
+                            </p>
+                        )}
                     </FieldRow>
 
                     <FieldRow label="Indexable" tooltip="When on, search engines can index and rank this page. Turn off to add a noindex directive — useful for drafts or duplicate content.">
@@ -418,6 +429,19 @@ export function SeoTab({ seo, onChange, setIsDirty, defaults = {}, recordId, con
                                 placeholder={defaults.ogImage || "https://… or leave blank for main image"}
                                 className="form-input px-3 h-8 w-full text-sm font-mono"
                             />
+                            {ogImageResolved && (
+                                <div className="flex items-center gap-2">
+                                    <img
+                                        src={ogImageResolved}
+                                        alt=""
+                                        className="h-10 w-16 object-cover rounded border border-ui-border shrink-0"
+                                        onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+                                    />
+                                    {!ogImageVal && (
+                                        <span className="text-[10px] text-content-muted">Using main image</span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </FieldRow>
 
