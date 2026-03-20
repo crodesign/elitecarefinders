@@ -350,8 +350,7 @@ div.bg-surface-hover.rounded-lg {
 }
 
 div.bg-surface-input.rounded-lg {
-  border: 2px solid var(--form-border);
-  background-color: var(--form-bg);
+  background-color: var(--nav-active-bg);
 }
 
 /* ── Checkbox/radio option buttons ── */

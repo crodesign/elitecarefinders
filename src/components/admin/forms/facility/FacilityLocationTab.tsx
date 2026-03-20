@@ -48,17 +48,17 @@ export function FacilityLocationTab({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {/* Column 1: Levels of Care (Fixed) */}
             <div className="space-y-[10px]">
-                <div className="space-y-4">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    {(() => {
+                        const Icon = fixedFieldIcons["levelOfCare"] ? ICON_MAP[fixedFieldIcons["levelOfCare"]] : null;
+                        return (
+                            <h3 className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                                {Icon && <Icon className="h-4 w-4 text-accent" />}
+                                Levels of Care
+                            </h3>
+                        );
+                    })()}
                     <div className="bg-surface-hover rounded-lg p-[3px]">
-                        {(() => {
-                            const Icon = fixedFieldIcons["levelOfCare"] ? ICON_MAP[fixedFieldIcons["levelOfCare"]] : null;
-                            return (
-                                <div className="flex items-center gap-2">
-                                    {Icon && <Icon className="h-5 w-5 text-accent" />}
-                                    <label className="text-sm font-medium text-content-secondary block pt-[5px] pl-[5px] pb-[5px]">Levels of Care</label>
-                                </div>
-                            );
-                        })()}
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions
                                 .filter(o => o.fieldType === 'levelOfCare')
@@ -99,17 +99,17 @@ export function FacilityLocationTab({
                 </div>
 
                 {/* Languages Spoken (Fixed) */}
-                <div className="space-y-4">
+                <div className="bg-surface-input rounded-lg p-[5px]">
+                    {(() => {
+                        const Icon = fixedFieldIcons["language"] ? ICON_MAP[fixedFieldIcons["language"]] : null;
+                        return (
+                            <h3 className="text-sm font-medium text-content-secondary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
+                                {Icon && <Icon className="h-4 w-4 text-accent" />}
+                                Languages Spoken
+                            </h3>
+                        );
+                    })()}
                     <div className="bg-surface-hover rounded-lg p-[3px]">
-                        {(() => {
-                            const Icon = fixedFieldIcons["language"] ? ICON_MAP[fixedFieldIcons["language"]] : null;
-                            return (
-                                <div className="flex items-center gap-2">
-                                    {Icon && <Icon className="h-5 w-5 text-accent" />}
-                                    <label className="text-sm font-medium text-content-secondary block pt-[5px] pl-[5px] pb-[5px]">Languages Spoken</label>
-                                </div>
-                            );
-                        })()}
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions
                                 .filter(o => o.fieldType === 'language')
