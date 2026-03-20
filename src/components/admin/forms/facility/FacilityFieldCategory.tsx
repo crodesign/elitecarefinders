@@ -113,8 +113,8 @@ export function FacilityFieldCategory({
 
                         {/* Single Select */}
                         {field.type === 'single' && (
-                            <div className="bg-surface-input rounded-lg p-[3px] space-y-3">
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
+                            <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
                                 <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                                     {field.options?.map((opt) => (
                                         <button
@@ -136,7 +136,7 @@ export function FacilityFieldCategory({
                                                 : "bg-surface-hover hover:bg-surface-input text-content-secondary"
                                                 }`}
                                         >
-                                            <span className="text-sm font-medium">{opt}</span>
+                                            <span className="text-sm font-medium pl-[5px]">{opt}</span>
                                             <div
                                                 className={`w-4 h-4 rounded-full flex items-center justify-center ${customFields[field.id] === opt ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                                 style={customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
@@ -193,8 +193,8 @@ export function FacilityFieldCategory({
 
                         {/* Text Block (Textarea) */}
                         {field.type === 'textarea' && (
-                            <div className="bg-surface-hover rounded-lg p-[3px] transition-all space-y-2">
-                                <label className="text-sm font-medium text-content-secondary block pl-[5px]">{field.name}</label>
+                            <div className="bg-surface-input rounded-lg p-[3px] transition-all space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
+                                <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">{field.name}</label>
                                 <textarea
                                     value={customFields[field.id] as string || ""}
                                     onChange={(e) => {
