@@ -37,12 +37,12 @@ async function getRecordForSeo(recordId: string, contentType: ContentType): Prom
     if (contentType === 'facility') {
         const { data, error } = await supabase
             .from('facilities')
-            .select('title, description, excerpt, address, taxonomy_entry_ids')
+            .select('title, description, excerpt, address, taxonomy_ids')
             .eq('id', recordId)
             .single();
         if (error || !data) return null;
         const addr = data.address as Record<string, string> | null;
-        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_entry_ids || []);
+        const careTypes = await getTaxonomyNames(supabase, data.taxonomy_ids || []);
         return {
             contentType: 'facility',
             title: data.title ?? '',
