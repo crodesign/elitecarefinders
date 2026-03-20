@@ -29,7 +29,7 @@ export function SimpleSelect({ value, onChange, options, placeholder = "Select..
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`form-input w-full flex items-center justify-between px-2 py-1 ${textSize} h-full min-h-[28px]`}
+                className={`form-input w-full flex items-center justify-between px-2 py-1 ${textSize} h-full min-h-[28px]${isOpen ? " select-open" : ""}`}
             >
                 <span className={`truncate mr-2 ${value ? "text-content-primary" : "text-content-muted"}`}>
                     {value || placeholder}

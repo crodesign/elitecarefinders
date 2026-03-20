@@ -355,6 +355,22 @@ div.bg-surface-input.rounded-lg {
   background-color: var(--nav-active-bg);
 }
 
+/* ── Highlight row container when inner input/textarea focused ── */
+div.bg-surface-hover.rounded-lg:has(input:focus),
+div.bg-surface-hover.rounded-lg:has(textarea:focus) {
+  border-color: var(--accent) !important;
+}
+
+/* ── Highlight row container when SimpleSelect is open ── */
+div.bg-surface-hover.rounded-lg:has(button.form-input.select-open) {
+  border-color: var(--accent) !important;
+}
+
+/* ── SimpleSelect open state ── */
+button.form-input.select-open {
+  border-color: var(--accent) !important;
+}
+
 /* ── Checkbox/radio option buttons ── */
 button.bg-surface-input.w-full,
 button.bg-surface-hover.w-full {
