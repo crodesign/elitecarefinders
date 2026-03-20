@@ -9,7 +9,7 @@ import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { US_STATES, FEATURED_LABELS } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
 import { Tooltip } from "@/components/ui/tooltip";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { createClientComponentClient } from "@/lib/supabase";
 
 const LOCK_TOOLTIP = "Only editable by a manager or admin";
@@ -582,22 +582,14 @@ export function HomeInformationTab({
                 </div>
             </div>
         </div>
-            <AlertDialog open={!!conflictName} onOpenChange={(open) => { if (!open) setConflictName(null); }}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Replace Home of the Month?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            <strong>{conflictName}</strong> is currently set as Home of the Month. Do you want to replace it with this home?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setConflictName(null)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => { setIsHomeOfMonth(true); setIsDirty(true); setConflictName(null); }}>
-                            Replace
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmationModal
+                isOpen={!!conflictName}
+                onClose={() => setConflictName(null)}
+                onConfirm={() => { setIsHomeOfMonth(true); setIsDirty(true); setConflictName(null); }}
+                title="Replace Home of the Month?"
+                message={<><strong>{conflictName}</strong> is currently set as Home of the Month. Do you want to replace it with this home?</>}
+                confirmLabel="Replace"
+            />
         </>
     );
 }

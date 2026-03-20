@@ -17,7 +17,7 @@ const RichTextEditor = dynamic(
 import { US_STATES } from "@/lib/constants/formConstants";
 import { SimpleSelect } from "@/components/admin/SimpleSelect";
 import { Tooltip } from "@/components/ui/tooltip";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { createClientComponentClient } from "@/lib/supabase";
 
 const LOCK_TOOLTIP = "Only editable by a manager or admin";
@@ -544,22 +544,14 @@ export function FacilityInformationTab({
                 </div>
             </div>
         </div>
-            <AlertDialog open={!!conflictName} onOpenChange={(open) => { if (!open) setConflictName(null); }}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Replace Facility of the Month?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            <strong>{conflictName}</strong> is currently set as Facility of the Month. Do you want to replace it with this facility?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setConflictName(null)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => { setIsFacilityOfMonth(true); setIsDirty(true); setConflictName(null); }}>
-                            Replace
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmationModal
+                isOpen={!!conflictName}
+                onClose={() => setConflictName(null)}
+                onConfirm={() => { setIsFacilityOfMonth(true); setIsDirty(true); setConflictName(null); }}
+                title="Replace Facility of the Month?"
+                message={<><strong>{conflictName}</strong> is currently set as Facility of the Month. Do you want to replace it with this facility?</>}
+                confirmLabel="Replace"
+            />
         </>
     );
 }
