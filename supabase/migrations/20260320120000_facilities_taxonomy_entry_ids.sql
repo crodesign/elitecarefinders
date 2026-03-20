@@ -6,10 +6,10 @@
 ALTER TABLE facilities
     ADD COLUMN IF NOT EXISTS taxonomy_entry_ids uuid[];
 
--- 2. Copy existing data
+-- 2. Copy existing data (taxonomy_ids is jsonb, cast to uuid[])
 UPDATE facilities
-SET taxonomy_entry_ids = taxonomy_ids
-WHERE taxonomy_ids IS NOT NULL;
+SET taxonomy_entry_ids = ARRAY(SELECT jsonb_array_elements_text(taxonomy_ids)::uuid)
+WHERE taxonomy_ids IS NOT NULL AND jsonb_array_length(taxonomy_ids) > 0;
 
 -- 3. Recreate search function using taxonomy_entry_ids
 CREATE OR REPLACE FUNCTION search_facilities(keyword text)
