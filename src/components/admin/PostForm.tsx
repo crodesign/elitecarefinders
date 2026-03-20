@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Hash, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft, Search } from "lucide-react";
+import { Save, X, Plus, Trash2, Image as ImageIcon, FileText, Tags, Check, ChevronDown, ChevronUp, Youtube, Link, Utensils, ListOrdered, AlignLeft, Search } from "lucide-react";
 import { SlidePanel } from "./SlidePanel";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { useToast } from "@/hooks/use-toast";
@@ -631,46 +631,6 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                         )}
                     </div>
 
-                    {/* Dynamic Sections Based on Type */}
-                    {postType === 'news_events' && (
-                        <div className="bg-surface-input rounded-lg p-[5px] space-y-3 border-l-4 border-l-blue-500">
-                            <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px]">
-                                <Hash className="h-4 w-4 text-accent" />
-                                News &amp; Events Links
-                            </h3>
-
-                            <div className="space-y-2">
-                                {links.map((link, idx) => (
-                                    <div key={idx} className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={link.text}
-                                            onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, text: e.target.value } : l))}
-                                            className="form-input text-sm px-3 h-8 rounded-md flex-1"
-                                            placeholder="Display Text (e.g. Read original article)"
-                                        />
-                                        <input
-                                            type="text"
-                                            value={link.url}
-                                            onChange={(e) => setLinks(links.map((l, i) => i === idx ? { ...l, url: e.target.value } : l))}
-                                            className="form-input text-sm px-3 h-8 rounded-md flex-1"
-                                            placeholder="URL (e.g. https://...)"
-                                        />
-                                        <button type="button" onClick={() => setLinks(links.filter((_, i) => i !== idx))} className="btn-danger p-2 h-8">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setLinks([...links, { text: "", url: "" }])}
-                                    className="text-sm text-accent hover:text-accent-light flex items-center gap-1 font-medium mt-2"
-                                >
-                                    <Plus className="w-4 h-4" /> Add Link
-                                </button>
-                            </div>
-                        </div>
-                    )}
 
                 </div>
 
