@@ -156,8 +156,8 @@ export function FacilityRoomsTab({
                     </div>
 
                     {/* Room Types - multi-select */}
-                    <div className="bg-surface-input rounded-lg p-[3px] space-y-2">
-                        <label className="text-sm font-medium text-content-secondary block pl-[5px]">Room Types</label>
+                    <div className="bg-surface-input rounded-lg p-[3px] space-y-2" style={{ border: '2px solid var(--form-border-subtle)' }}>
+                        <label className="text-sm font-medium text-content-secondary block pl-[5px] pt-[2px] pb-0">Room Types</label>
                         <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                             {fixedFieldOptions.filter(o => o.fieldType === 'roomType').map((opt) => {
                                 const selected = (roomDetails.roomTypes || []).includes(opt.value);
@@ -175,7 +175,7 @@ export function FacilityRoomsTab({
                                         }}
                                         className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${selected ? "bg-surface-hover text-content-primary" : "bg-surface-hover hover:bg-surface-input text-content-secondary"}`}
                                     >
-                                        <span className="text-sm font-medium">{opt.value}</span>
+                                        <span className="text-sm font-medium pl-[5px]">{opt.value}</span>
                                         <div
                                             className={`w-4 h-4 rounded flex items-center justify-center ${selected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
                                             style={!selected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
