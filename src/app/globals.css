@@ -309,21 +309,14 @@ select,
   outline: none !important;
 }
 
-/* Focus: switch border to accent */
-input:not([type="checkbox"]):not([type="radio"]):focus,
+/* Focus: switch border to accent — must match specificity of the border rule above */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]):not(.overlay-input):focus,
 textarea:focus,
 select:focus,
 [role="combobox"]:focus,
 button.form-input:focus {
   border-color: var(--accent) !important;
   box-shadow: none !important;
-  outline: none !important;
-}
-
-/* Explicit focus accent for form-input elements */
-input.form-input:focus,
-textarea.form-input:focus {
-  border-color: var(--accent) !important;
   outline: none !important;
 }
 
