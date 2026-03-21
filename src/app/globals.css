@@ -550,7 +550,7 @@ button.bg-surface-hover.w-full:hover .lucide-x {
   }
 
   .dropdown-item.active {
-    background-color: var(--nav-active-bg);
+    background-color: var(--surface-hover);
     color: var(--content-primary);
   }
 
