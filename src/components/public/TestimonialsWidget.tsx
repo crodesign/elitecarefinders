@@ -39,6 +39,14 @@ export function TestimonialsWidget() {
                 </Link>
             </div>
             <div ref={containerRef} />
+            <div className="flex justify-center mt-8 sm:hidden">
+                <Link
+                    href="/reviews"
+                    className="text-sm font-semibold text-gray-500 hover:text-[#239ddb] transition-colors"
+                >
+                    View All Testimonials →
+                </Link>
+            </div>
         </section>
     );
 }
