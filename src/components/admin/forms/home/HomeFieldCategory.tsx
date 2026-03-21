@@ -130,19 +130,17 @@ export function HomeFieldCategory({
                                                 return { ...prev, customFields: newCustomFields };
                                             })}
                                             className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${roomDetails.customFields[field.id] === opt
-                                                ? "bg-surface-hover text-content-primary"
-                                                : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                ? "text-content-primary"
+                                                : "text-content-secondary hover:text-content-primary hover:bg-surface-hover"
                                                 }`}
+                                            style={roomDetails.customFields[field.id] === opt ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
                                         >
                                             <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                            <div
-                                                className={`w-4 h-4 rounded-full flex items-center justify-center ${roomDetails.customFields[field.id] === opt ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                style={roomDetails.customFields[field.id] !== opt ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                            >
-                                                {roomDetails.customFields[field.id] === opt
-                                                    ? <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                                                    : <X className="h-2.5 w-2.5 text-content-muted" />}
-                                            </div>
+                                            {roomDetails.customFields[field.id] === opt && (
+                                                <span className="flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                    <Check className="h-2.5 w-2.5 text-white" />
+                                                </span>
+                                            )}
                                         </button>
                                     ))}
                                 </div>
@@ -394,17 +392,17 @@ export function HomeFieldCategory({
                                                         }));
                                                     }}
                                                     className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                        ? "bg-surface-hover text-content-primary"
-                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                        ? "text-content-primary"
+                                                        : "text-content-secondary hover:text-content-primary hover:bg-surface-hover"
                                                         }`}
+                                                    style={isSelected ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
                                                 >
                                                     <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                    <div
-                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                    >
-                                                        {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                    </div>
+                                                    {isSelected && (
+                                                        <span className="flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                            <Check className="h-2.5 w-2.5 text-white" />
+                                                        </span>
+                                                    )}
                                                 </button>
                                             );
                                         })}
@@ -429,17 +427,17 @@ export function HomeFieldCategory({
                                                             }));
                                                         }}
                                                         className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                            ? "bg-surface-hover text-content-primary"
-                                                            : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                            ? "text-content-primary"
+                                                            : "text-content-secondary hover:text-content-primary hover:bg-surface-hover"
                                                             }`}
+                                                        style={isSelected ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
                                                     >
                                                         <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                        <div
-                                                            className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                            style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                        >
-                                                            {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                        </div>
+                                                        {isSelected && (
+                                                            <span className="flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                                <Check className="h-2.5 w-2.5 text-white" />
+                                                            </span>
+                                                        )}
                                                     </button>
                                                 );
                                             })}
@@ -467,17 +465,17 @@ export function HomeFieldCategory({
                                                         }));
                                                     }}
                                                     className={`w-full flex items-center justify-between p-[3px] rounded-lg text-left transition-all ${isSelected
-                                                        ? "bg-surface-hover text-content-primary"
-                                                        : "bg-surface-hover hover:bg-surface-input text-content-secondary"
+                                                        ? "text-content-primary"
+                                                        : "text-content-secondary hover:text-content-primary hover:bg-surface-hover"
                                                         }`}
+                                                    style={isSelected ? { backgroundColor: 'var(--nav-active-bg)' } : undefined}
                                                 >
                                                     <span className="text-sm font-medium pl-[5px]">{opt}</span>
-                                                    <div
-                                                        className={`w-4 h-4 rounded flex items-center justify-center ${isSelected ? "border border-emerald-500 bg-emerald-500 text-white" : ""}`}
-                                                        style={!isSelected ? { backgroundColor: 'var(--radio-indicator)' } : undefined}
-                                                    >
-                                                        {isSelected ? <Check className="h-3 w-3 text-white" /> : <X className="h-3 w-3 text-content-muted" />}
-                                                    </div>
+                                                    {isSelected && (
+                                                        <span className="flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center">
+                                                            <Check className="h-2.5 w-2.5 text-white" />
+                                                        </span>
+                                                    )}
                                                 </button>
                                             );
                                         })}
