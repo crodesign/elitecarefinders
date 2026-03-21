@@ -462,16 +462,24 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
     return (
         <section>
             <div className="max-w-6xl mx-auto px-5 py-16">
-                <div className="flex items-end justify-between mb-8">
+                <div className="flex items-end justify-between mb-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Browse Featured</p>
                         <h2 className="text-3xl font-bold text-gray-900">Care Homes &amp; Foster Homes</h2>
                     </div>
                     <Link
                         href="/homes"
-                        className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-[#239ddb] transition-colors"
+                        className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors"
                     >
-                        View All <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                        View All Homes <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                    </Link>
+                </div>
+                <div className="mb-8 sm:hidden">
+                    <Link
+                        href="/homes"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors"
+                    >
+                        View All Homes <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                     </Link>
                 </div>
 
@@ -549,14 +557,6 @@ function FeaturedHomesSection({ homes, typeNameMap }: { homes: any[]; typeNameMa
                     </div>
                 )}
 
-                <div className="mt-8 text-center sm:hidden">
-                    <Link
-                        href="/homes"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#239ddb] hover:underline"
-                    >
-                        View all homes <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
-                    </Link>
-                </div>
             </div>
         </section>
     );
@@ -568,16 +568,24 @@ function FeaturedFacilitiesSection({ facilities }: { facilities: FacilityListing
     return (
         <section>
             <div className="max-w-6xl mx-auto px-5 py-16">
-                <div className="flex items-end justify-between mb-8">
+                <div className="flex items-end justify-between mb-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Browse Featured</p>
                         <h2 className="text-3xl font-bold text-gray-900">Senior Living Communities</h2>
                     </div>
                     <Link
                         href="/facilities"
-                        className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-[#239ddb] transition-colors"
+                        className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors"
                     >
-                        View All <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                        View All Communities <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                    </Link>
+                </div>
+                <div className="mb-8 sm:hidden">
+                    <Link
+                        href="/facilities"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors"
+                    >
+                        View All Communities <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                     </Link>
                 </div>
 
@@ -650,14 +658,6 @@ function FeaturedFacilitiesSection({ facilities }: { facilities: FacilityListing
                     </div>
                 )}
 
-                <div className="mt-8 text-center sm:hidden">
-                    <Link
-                        href="/facilities"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#239ddb] hover:underline"
-                    >
-                        View all communities <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
-                    </Link>
-                </div>
             </div>
         </section>
     );
