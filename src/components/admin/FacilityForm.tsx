@@ -183,8 +183,6 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [isFacilityOfMonth, setIsFacilityOfMonth] = useState(false);
     const [featuredLabel, setFeaturedLabel] = useState("");
     const [isCustomLabelMode, setIsCustomLabelMode] = useState(false);
-    const [labelSearch, setLabelSearch] = useState("");
-    const [showLabelDropdown, setShowLabelDropdown] = useState(false);
     const [facilityOfMonthDescription, setFacilityOfMonthDescription] = useState("");
 
     // Taxonomy Management State
@@ -807,10 +805,6 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setFeaturedLabel={setFeaturedLabel}
                         isCustomLabelMode={isCustomLabelMode}
                         setIsCustomLabelMode={setIsCustomLabelMode}
-                        labelSearch={labelSearch}
-                        setLabelSearch={setLabelSearch}
-                        showLabelDropdown={showLabelDropdown}
-                        setShowLabelDropdown={setShowLabelDropdown}
                         facilityOfMonthDescription={facilityOfMonthDescription}
                         setFacilityOfMonthDescription={setFacilityOfMonthDescription}
                         setIsDirty={setIsDirty}

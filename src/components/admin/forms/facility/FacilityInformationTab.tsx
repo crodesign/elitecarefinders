@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction, useState } from "react";
 import dynamic from "next/dynamic";
-import { Building2, MapPin, Phone, Globe, Tags, Check, Ban, Plus, X, Layers, ChevronDown, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
+import { Building2, MapPin, Phone, Globe, Tags, Plus, X, Layers, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type { Facility, Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -74,10 +74,6 @@ interface FacilityInformationTabProps {
     setFeaturedLabel: Dispatch<SetStateAction<string>>;
     isCustomLabelMode: boolean;
     setIsCustomLabelMode: Dispatch<SetStateAction<boolean>>;
-    labelSearch: string;
-    setLabelSearch: Dispatch<SetStateAction<string>>;
-    showLabelDropdown: boolean;
-    setShowLabelDropdown: Dispatch<SetStateAction<boolean>>;
     facilityOfMonthDescription: string;
     setFacilityOfMonthDescription: Dispatch<SetStateAction<string>>;
     setIsDirty: (value: boolean) => void;
@@ -105,8 +101,6 @@ export function FacilityInformationTab({
     isFacilityOfMonth, setIsFacilityOfMonth,
     featuredLabel, setFeaturedLabel,
     isCustomLabelMode, setIsCustomLabelMode,
-    labelSearch, setLabelSearch,
-    showLabelDropdown, setShowLabelDropdown,
     facilityOfMonthDescription, setFacilityOfMonthDescription,
     setIsDirty,
     setManagingTaxonomy,
@@ -449,46 +443,13 @@ export function FacilityInformationTab({
                                         </>
                                     ) : (
                                         <>
-                                            <div className="relative">
-                                                <input
-                                                    type="text"
-                                                    value={showLabelDropdown ? labelSearch : featuredLabel || "None"}
-                                                    onChange={(e) => { setLabelSearch(e.target.value); setShowLabelDropdown(true); }}
-                                                    onFocus={() => { setLabelSearch(""); setShowLabelDropdown(true); }}
-                                                    onBlur={() => setTimeout(() => setShowLabelDropdown(false), 150)}
-                                                    onKeyDown={(e) => { if (e.key === "Escape") { setShowLabelDropdown(false); (e.target as HTMLInputElement).blur(); } }}
-                                                    placeholder="Select..."
-                                                    className="form-input w-36 pl-3 pr-8 h-8 text-sm"
-                                                />
-                                                <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-content-muted pointer-events-none transition-transform duration-200 ${showLabelDropdown ? "rotate-180" : ""}`} />
-                                                {showLabelDropdown && (
-                                                    <div className="absolute top-full right-0 mt-1 dropdown-menu z-50 min-w-[150px]">
-                                                        <div className="overflow-y-auto flex-1 p-1">
-                                                            <button type="button" onMouseDown={(e) => { e.preventDefault(); setFeaturedLabel(""); setIsDirty(true); setShowLabelDropdown(false); setLabelSearch(""); }}
-                                                                className="w-full text-left px-2 py-1.5 rounded text-sm text-content-secondary hover:bg-surface-hover hover:text-content-primary flex items-center gap-2">
-                                                                <Ban className="h-3.5 w-3.5" />
-                                                                <span>None</span>
-                                                                {!featuredLabel && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
-                                                            </button>
-                                                            {FEATURED_LABELS.filter(label => label.toLowerCase().includes(labelSearch.toLowerCase())).map(label => (
-                                                                <button key={label} type="button"
-                                                                    onMouseDown={(e) => { e.preventDefault(); setFeaturedLabel(label); setShowLabelDropdown(false); setLabelSearch(""); }}
-                                                                    className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center transition-colors ${featuredLabel === label ? "bg-surface-hover text-content-primary" : "text-content-secondary hover:bg-surface-hover hover:text-content-primary"}`}>
-                                                                    <span>{label}</span>
-                                                                    {featuredLabel === label && <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>}
-                                                                </button>
-                                                            ))}
-                                                            {!FEATURED_LABELS.includes(featuredLabel) && featuredLabel && (
-                                                                <button type="button" onMouseDown={(e) => { e.preventDefault(); setShowLabelDropdown(false); setLabelSearch(""); }}
-                                                                    className="w-full text-left px-2 py-1.5 rounded text-sm flex items-center bg-surface-hover text-content-primary">
-                                                                    <span>{featuredLabel} (custom)</span>
-                                                                    <span className="ml-auto flex-shrink-0 h-4 w-4 rounded bg-accent flex items-center justify-center"><Check className="h-2.5 w-2.5 text-white" /></span>
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <SimpleSelect
+                                                value={featuredLabel}
+                                                onChange={(val) => { setFeaturedLabel(val); setIsDirty(true); }}
+                                                options={FEATURED_LABELS}
+                                                placeholder="Select..."
+                                                className="w-36 text-sm"
+                                            />
                                             <button type="button" onClick={() => setIsCustomLabelMode(true)}
                                                 className="p-1 text-content-secondary hover:text-content-primary hover:bg-surface-hover rounded transition-colors">
                                                 <Plus className="h-3.5 w-3.5" />

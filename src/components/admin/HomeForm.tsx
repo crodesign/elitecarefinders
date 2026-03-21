@@ -323,8 +323,6 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [isHomeOfMonth, setIsHomeOfMonth] = useState(false);
     const [featuredLabel, setFeaturedLabel] = useState("");
     const [isCustomLabelMode, setIsCustomLabelMode] = useState(false);
-    const [labelSearch, setLabelSearch] = useState("");
-    const [showLabelDropdown, setShowLabelDropdown] = useState(false);
     const [homeOfMonthDescription, setHomeOfMonthDescription] = useState("");
 
     // Taxonomy Management State
@@ -841,10 +839,6 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setFeaturedLabel={setFeaturedLabel}
                         isCustomLabelMode={isCustomLabelMode}
                         setIsCustomLabelMode={setIsCustomLabelMode}
-                        showLabelDropdown={showLabelDropdown}
-                        setShowLabelDropdown={setShowLabelDropdown}
-                        labelSearch={labelSearch}
-                        setLabelSearch={setLabelSearch}
                         hasFeaturedVideo={hasFeaturedVideo}
                         setHasFeaturedVideo={setHasFeaturedVideo}
                         currentId={home?.id}
