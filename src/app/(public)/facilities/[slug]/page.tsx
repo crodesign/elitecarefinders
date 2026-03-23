@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuilding, faUsers, faHandHoldingHeart, faHeart, faShareNodes, faCheck, faXmark, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { getFacilityBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getMediaTitlesByUrls, getAdjacentFacility, getFeaturedFacilities } from '@/lib/public-db';
@@ -13,6 +14,10 @@ import { MySavedButton } from '@/components/public/MySavedButton';
 import { ShareButton } from '@/components/public/ShareButton';
 import { StickyEntityBar } from '@/components/public/StickyEntityBar';
 import { DiagonalReveal } from '@/components/public/DiagonalReveal';
+import { geocodeAddress } from '@/lib/geocode';
+import { NEIGHBORHOOD_COORDS } from '@/lib/neighborhood-coords';
+
+const EntityMap = dynamic(() => import('@/components/public/EntityMap'), { ssr: false });
 
 interface Props {
     params: { slug: string };
@@ -68,11 +73,19 @@ export default async function FacilityDetailPage({ params }: Props) {
     const addr = facility.address;
     const hasAddress = addr.street || addr.city;
 
-    const locationTaxName = taxonomyEntries.filter(e => e.taxonomySlug === 'location').map(e => e.name)[0];
+    const locationTaxEntry = taxonomyEntries.find(e => e.taxonomySlug === 'location');
+    const locationTaxName = locationTaxEntry?.name;
+    const locationTaxSlug = locationTaxEntry?.slug;
     const mapFallback = [addr.city, addr.state].filter(Boolean).join(', ') || (locationTaxName ? `${locationTaxName}, Hawaii` : 'Hawaii');
     const mapQuery = hasAddress
         ? [addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', ')
         : mapFallback;
+
+    const HAWAII_CENTER: [number, number] = [20.5, -157.5];
+    const geocoded = await geocodeAddress(mapQuery);
+    const neighborhoodCoords = locationTaxSlug ? NEIGHBORHOOD_COORDS[locationTaxSlug] : undefined;
+    const [mapLat, mapLng] = geocoded ?? neighborhoodCoords ?? HAWAII_CENTER;
+    const mapZoom = geocoded ? 15 : 13;
 
     const jsonLd = buildFacilityJsonLd({
         name: facility.title,
@@ -229,12 +242,9 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <iframe
-                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
-                                    className="w-full aspect-square rounded-lg border-0 mt-2"
-                                    loading="lazy"
-                                    allowFullScreen
-                                />
+                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
+                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -535,12 +545,9 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <iframe
-                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
-                                    className="w-full aspect-square rounded-lg border-0 mt-2"
-                                    loading="lazy"
-                                    allowFullScreen
-                                />
+                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
+                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                </div>
                             </div>
                         </div>
 

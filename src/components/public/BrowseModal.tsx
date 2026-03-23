@@ -60,8 +60,13 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
             setLocationStates(mapped);
             const hawaii = mapped.find(s => s.slug === 'hawaii');
             if (hawaii) {
-                const { data: islands } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
-                setHawaiiIslands((islands || []).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug })));
+                const { data: islands } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id);
+                const HIDDEN = new Set(['lanai', 'molokai']);
+                const ISLAND_ORDER = ['oahu', 'maui', 'big-island', 'kauai'];
+                setHawaiiIslands((islands || []).filter((r: any) => !HIDDEN.has(r.slug)).sort((a: any, b: any) => {
+                    const ai = ISLAND_ORDER.indexOf(a.slug); const bi = ISLAND_ORDER.indexOf(b.slug);
+                    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+                }).map((r: any) => ({ id: r.id, name: r.name, slug: r.slug })));
             }
         })();
     }, []);

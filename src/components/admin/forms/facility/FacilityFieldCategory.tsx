@@ -1,10 +1,15 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
-import { Check, X, Phone, Mail, ChevronUp, ChevronDown, DollarSign } from "lucide-react";
+import { Dispatch, SetStateAction, useState, useRef } from "react";
+import { Check, X, Phone, Mail, ChevronUp, ChevronDown, DollarSign, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { ICON_MAP } from "@/components/ui/IconPicker";
 import type { RoomDetails, RoomFieldCategory, RoomFieldDefinition } from "@/types";
 import { SimpleSelect } from "../../SimpleSelect";
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { formatDateForHawaii, parseHawaiiDate } from "@/lib/hawaiiDate";
 
 interface FacilityFieldCategoryProps {
     category: RoomFieldCategory;
@@ -40,10 +45,23 @@ export function FacilityFieldCategory({
         f.isActive &&
         (f.targetType === 'facility' || f.targetType === 'both')
     );
-    if (categoryFields.length === 0) return null;
-
     // Defensive fallback: ensure customFields is always defined
     const customFields = roomDetails.customFields || {};
+
+    const [dateCalendarMonth, setDateCalendarMonth] = useState<Record<string, Date>>({});
+    const dateCalendarCloseRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentYear = new Date().getFullYear();
+    const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => (currentYear - i).toString());
+
+    const getCalendarMonth = (fieldId: string) => {
+        if (dateCalendarMonth[fieldId]) return dateCalendarMonth[fieldId];
+        const val = customFields[fieldId] as string;
+        return val ? (parseHawaiiDate(val) || new Date()) : new Date();
+    };
+
+    if (categoryFields.length === 0) return null;
 
     return (
         <div className="bg-surface-input rounded-lg p-[5px]">
@@ -54,7 +72,7 @@ export function FacilityFieldCategory({
             <div className="space-y-2">
                 {categoryFields.map(field => (
                     <div key={field.id} className="space-y-1">
-                        {field.type !== 'boolean' && field.type !== 'single' && field.type !== 'multi' && field.type !== 'dropdown' && field.type !== 'text' && field.type !== 'textarea' && field.type !== 'number' && field.type !== 'phone' && field.type !== 'email' && field.type !== 'currency' && (
+                        {field.type !== 'boolean' && field.type !== 'single' && field.type !== 'multi' && field.type !== 'dropdown' && field.type !== 'text' && field.type !== 'textarea' && field.type !== 'number' && field.type !== 'phone' && field.type !== 'email' && field.type !== 'currency' && field.type !== 'date' && (
                             <label className="text-sm font-medium text-content-secondary pl-[5px]">{field.name}</label>
                         )}
 
@@ -324,6 +342,131 @@ export function FacilityFieldCategory({
                                         placeholder="example@email.com"
                                     />
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Date Field */}
+                        {field.type === 'date' && (
+                            <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg transition-all">
+                                <label className="text-sm font-medium text-content-secondary whitespace-nowrap pl-[5px]">{field.name}</label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className={cn(
+                                                "form-input flex items-center justify-start text-left font-normal px-3 py-1.5 text-sm w-40 h-8",
+                                                !customFields[field.id] && "text-content-muted"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {customFields[field.id]
+                                                ? (parseHawaiiDate(customFields[field.id] as string)
+                                                    ? format(parseHawaiiDate(customFields[field.id] as string)!, "MMM d, yyyy")
+                                                    : "Invalid date")
+                                                : "Pick a date"}
+                                        </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        className="w-auto p-0 bg-surface-secondary border-ui-border text-content-primary z-[200] [&_.rdp-caption_dropdowns]:!hidden [&_.rdp-caption_label]:!hidden [&_.rdp-nav]:!hidden [&_.rdp-dropdown]:!hidden [&_.rdp-head_cell]:text-content-muted"
+                                        align="start"
+                                    >
+                                        <PopoverClose ref={(el) => { dateCalendarCloseRefs.current[field.id] = el; }} className="hidden" />
+                                        <div className="p-3 pb-1 space-y-2">
+                                            <div className="flex justify-end">
+                                                <PopoverClose asChild>
+                                                    <button
+                                                        type="button"
+                                                        className="p-1 rounded-md hover:bg-surface-hover text-content-muted hover:text-content-primary transition-colors"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </PopoverClose>
+                                            </div>
+                                            <div className="flex items-center justify-between gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const prev = new Date(getCalendarMonth(field.id));
+                                                        prev.setMonth(prev.getMonth() - 1);
+                                                        setDateCalendarMonth(p => ({ ...p, [field.id]: prev }));
+                                                    }}
+                                                    className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
+                                                >
+                                                    <ChevronLeft className="h-4 w-4" />
+                                                </button>
+                                                <div className="flex gap-1.5 flex-1 justify-center">
+                                                    <SimpleSelect
+                                                        value={monthNames[getCalendarMonth(field.id).getMonth()]}
+                                                        onChange={(val: string) => {
+                                                            const idx = monthNames.indexOf(val);
+                                                            if (idx >= 0) {
+                                                                const updated = new Date(getCalendarMonth(field.id));
+                                                                updated.setMonth(idx);
+                                                                setDateCalendarMonth(p => ({ ...p, [field.id]: updated }));
+                                                            }
+                                                        }}
+                                                        options={monthNames}
+                                                        placeholder="Month"
+                                                        className="w-[110px]"
+                                                        textSize="text-xs"
+                                                    />
+                                                    <SimpleSelect
+                                                        value={getCalendarMonth(field.id).getFullYear().toString()}
+                                                        onChange={(val: string) => {
+                                                            const updated = new Date(getCalendarMonth(field.id));
+                                                            updated.setFullYear(parseInt(val));
+                                                            setDateCalendarMonth(p => ({ ...p, [field.id]: updated }));
+                                                        }}
+                                                        options={yearOptions}
+                                                        placeholder="Year"
+                                                        className="w-[70px]"
+                                                        textSize="text-xs"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const next = new Date(getCalendarMonth(field.id));
+                                                        next.setMonth(next.getMonth() + 1);
+                                                        setDateCalendarMonth(p => ({ ...p, [field.id]: next }));
+                                                    }}
+                                                    className="h-7 w-7 rounded-md inline-flex items-center justify-center transition-colors hover:bg-surface-hover text-content-primary"
+                                                >
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <Calendar
+                                            mode="single"
+                                            month={getCalendarMonth(field.id)}
+                                            onMonthChange={(month) => setDateCalendarMonth(p => ({ ...p, [field.id]: month }))}
+                                            selected={parseHawaiiDate(customFields[field.id] as string) || undefined}
+                                            onSelect={(date) => {
+                                                setIsDirty(true);
+                                                setRoomDetails((prev: RoomDetails) => ({
+                                                    ...prev,
+                                                    customFields: { ...prev.customFields, [field.id]: date ? formatDateForHawaii(date) : '' }
+                                                }));
+                                                if (date) dateCalendarCloseRefs.current[field.id]?.click();
+                                            }}
+                                            className="p-3 pt-0 pointer-events-auto"
+                                            classNames={{
+                                                caption: "!hidden",
+                                                caption_label: "!hidden",
+                                                caption_dropdowns: "!hidden",
+                                                dropdown_month: "!hidden",
+                                                dropdown_year: "!hidden",
+                                                nav: "!hidden",
+                                                day_selected: "bg-accent text-white hover:bg-accent focus:bg-accent focus:text-white",
+                                                day_today: "bg-surface-hover text-content-primary",
+                                                day_outside: "text-content-muted opacity-50",
+                                                day_disabled: "text-content-muted opacity-30",
+                                                day: cn("h-9 w-9 p-0 font-normal text-content-secondary aria-selected:opacity-100 hover:bg-surface-hover hover:text-content-primary rounded-md transition-colors"),
+                                                head_cell: "text-content-muted rounded-md w-9 font-normal text-[0.8rem] text-center",
+                                            }}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                         )}
 

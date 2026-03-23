@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faMagnifyingGlass, faCheck } from '@fortawesome/free-solid-svg-icons';
+
+const HIDDEN_SLUGS = new Set(['lanai', 'molokai']);
 
 interface LocationItem {
     id: string;
@@ -26,10 +29,18 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
     const [query, setQuery] = useState('');
     const ref = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const pathname = usePathname();
+
+    const visibleItems = items.filter(i => !HIDDEN_SLUGS.has(i.slug));
+
+    const selectedItem = visibleItems.find(item => {
+        const segment = '/hawaii/' + item.slug;
+        return pathname.includes(segment);
+    });
 
     const filtered = query.trim()
-        ? items.filter(i => i.name.toLowerCase().includes(query.toLowerCase()))
-        : items;
+        ? visibleItems.filter(i => i.name.toLowerCase().includes(query.toLowerCase()))
+        : visibleItems;
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -46,6 +57,9 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
         }
     }, [open]);
 
+    const isSelected = !!selectedItem;
+    const buttonLabel = selectedItem ? selectedItem.name : label;
+
     return (
         <div ref={ref} className="relative">
             <button
@@ -53,10 +67,12 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
                 className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border-2 transition-colors ${
                     open
                         ? 'bg-[#239ddb] text-white border-[#239ddb]'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-[#239ddb] hover:text-[#239ddb]'
+                        : isSelected
+                            ? 'bg-[#239ddb]/10 text-[#239ddb] border-[#239ddb]'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-[#239ddb] hover:text-[#239ddb]'
                 }`}
             >
-                <span>{label}</span>
+                <span>{buttonLabel}</span>
                 <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className="h-3 w-3 flex-shrink-0" />
             </button>
 
@@ -82,18 +98,26 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
                         {filtered.length === 0 ? (
                             <p className="text-xs text-gray-400 text-center py-4">No results</p>
                         ) : (
-                            filtered.map(item => (
-                                <Link
-                                    key={item.id}
-                                    href={`${basePath}/${item.slug}`}
-                                    onClick={() => { setOpen(false); onNavigate?.(); }}
-                                    className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors group"
-                                >
-                                    <span className="text-sm text-gray-700 group-hover:text-[#239ddb] transition-colors">
-                                        {item.name}
-                                    </span>
-                                </Link>
-                            ))
+                            filtered.map(item => {
+                                const isCurrent = selectedItem?.id === item.id;
+                                return (
+                                    <Link
+                                        key={item.id}
+                                        href={`${basePath}/${item.slug}`}
+                                        onClick={() => { setOpen(false); onNavigate?.(); }}
+                                        className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-colors group ${
+                                            isCurrent ? 'bg-[#239ddb]/10' : 'hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <span className={`text-sm transition-colors ${isCurrent ? 'text-[#239ddb] font-semibold' : 'text-gray-700 group-hover:text-[#239ddb]'}`}>
+                                            {item.name}
+                                        </span>
+                                        {isCurrent && (
+                                            <FontAwesomeIcon icon={faCheck} className="h-3 w-3 text-[#239ddb] flex-shrink-0" />
+                                        )}
+                                    </Link>
+                                );
+                            })
                         )}
                     </div>
                 </div>

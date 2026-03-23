@@ -294,6 +294,15 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
     const db = getClient();
     const { typeEntryId, locationEntryIds, q, page = 1, limit = 24, excludeHomeOfMonth = false } = opts;
     const offset = (page - 1) * limit;
+
+    let matchingIds: string[] | null = null;
+    if (q?.trim()) {
+        const { data: rpcData } = await db.rpc('search_homes', { keyword: q.trim() });
+        const ids: string[] = (rpcData || []).filter((r: any) => r.status === 'published').map((r: any) => r.id);
+        if (ids.length === 0) return { items: [], total: 0 };
+        matchingIds = ids;
+    }
+
     let query = db
         .from('homes')
         .select('id, slug, title, images, description, taxonomy_entry_ids, is_featured, is_home_of_month', { count: 'exact' })
@@ -304,7 +313,7 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
         .order('title')
         .range(offset, offset + limit - 1);
     if (excludeHomeOfMonth) query = query.eq('is_home_of_month', false);
-    if (q?.trim()) query = query.ilike('title', `%${q.trim()}%`);
+    if (matchingIds !== null) query = query.in('id', matchingIds);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
     if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
     const { data, count, error } = await query;
@@ -359,6 +368,15 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
     const db = getClient();
     const { typeEntryId, locationEntryIds, q, page = 1, limit = 24 } = opts;
     const offset = (page - 1) * limit;
+
+    let matchingIds: string[] | null = null;
+    if (q?.trim()) {
+        const { data: rpcData } = await db.rpc('search_facilities', { keyword: q.trim() });
+        const ids: string[] = (rpcData || []).filter((r: any) => r.status === 'published').map((r: any) => r.id);
+        if (ids.length === 0) return { items: [], total: 0 };
+        matchingIds = ids;
+    }
+
     let query = db
         .from('facilities')
         .select('id, slug, title, images, description, taxonomy_entry_ids, capacity, is_featured, is_facility_of_month', { count: 'exact' })
@@ -367,7 +385,7 @@ export async function getFacilityListings(opts: { typeEntryId?: string; location
         .order('is_featured', { ascending: false })
         .order('title')
         .range(offset, offset + limit - 1);
-    if (q?.trim()) query = query.ilike('title', `%${q.trim()}%`);
+    if (matchingIds !== null) query = query.in('id', matchingIds);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
     if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
     const { data, count, error } = await query;
@@ -738,8 +756,13 @@ export async function getHawaiiNeighborhoodsGrouped(): Promise<IslandWithNeighbo
     const db = getClient();
     const { data: hawaii } = await db.from('taxonomy_entries').select('id').eq('slug', 'hawaii').maybeSingle();
     if (!hawaii) return [];
-    const { data: islands } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id).order('name');
-    if (!islands?.length) return [];
+    const { data: islandsRaw } = await db.from('taxonomy_entries').select('id, name, slug').eq('parent_id', hawaii.id);
+    if (!islandsRaw?.length) return [];
+    const ISLAND_ORDER = ['oahu', 'maui', 'big-island', 'kauai'];
+    const islands = [...islandsRaw].sort((a: any, b: any) => {
+        const ai = ISLAND_ORDER.indexOf(a.slug); const bi = ISLAND_ORDER.indexOf(b.slug);
+        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
     const islandIds = islands.map((i: any) => i.id);
     const { data: neighborhoods } = await db.from('taxonomy_entries').select('id, name, slug, parent_id').in('parent_id', islandIds).order('name');
     return islands.map((island: any) => ({

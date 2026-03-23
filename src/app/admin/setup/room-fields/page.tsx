@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Plus, Bed, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign, Eye, EyeOff } from "lucide-react";
+import { Plus, Bed, GripVertical, Pencil, Trash2, X, Check, ChevronDown, ChevronRight, Home, Building2, Layers, ToggleLeft, CircleDot, CheckSquare, Type, List, ChevronsUp, ChevronsDown, AlignLeft, Hash, Phone, Mail, DollarSign, Eye, EyeOff, CalendarIcon } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import type { RoomFieldCategory, RoomFieldDefinition, RoomFixedFieldOption, FixedFieldType, Taxonomy } from "@/types";
 import {
@@ -78,8 +78,8 @@ function SortableFieldItem({
     handleTogglePublic: (id: string, isPublic: boolean) => void;
     editFieldName: string;
     setEditFieldName: (val: string) => void;
-    editFieldType: "boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "dropdown";
-    setEditFieldType: (val: "boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "dropdown") => void;
+    editFieldType: "boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "date" | "dropdown";
+    setEditFieldType: (val: "boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "date" | "dropdown") => void;
     editFieldTarget: 'home' | 'facility' | 'both';
     setEditFieldTarget: (val: 'home' | 'facility' | 'both') => void;
     editFieldOptions: string[];
@@ -211,6 +211,7 @@ function SortableFieldItem({
             {field.type === "number" && <Hash className="h-4 w-4 text-white" />}
             {field.type === "phone" && <Phone className="h-4 w-4 text-white" />}
             {field.type === "email" && <Mail className="h-4 w-4 text-white" />}
+            {field.type === "date" && <CalendarIcon className="h-4 w-4 text-white" />}
             {field.type === "currency" && <DollarSign className="h-4 w-4 text-white" />}
             {field.type === "dropdown" && <List className="h-4 w-4 text-white" />}
             <span className="flex-1 text-sm text-content-secondary">{field.name}</span>
@@ -568,7 +569,7 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const isActive = ['text', 'textarea', 'number', 'currency', 'phone', 'email'].includes(value);
+    const isActive = ['text', 'textarea', 'number', 'currency', 'phone', 'email', 'date'].includes(value);
 
     const options = [
         { id: 'text', label: 'Text', icon: Type },
@@ -577,6 +578,7 @@ function FieldTypeSelector({ value, onChange }: { value: string, onChange: (val:
         { id: 'currency', label: 'Currency', icon: DollarSign },
         { id: 'phone', label: 'Phone', icon: Phone },
         { id: 'email', label: 'Email', icon: Mail },
+        { id: 'date', label: 'Date', icon: CalendarIcon },
     ];
 
     const currentOption = options.find(o => o.id === value) || options[0];
@@ -655,14 +657,14 @@ export default function RoomFieldsPage() {
     // Field definitions state
     const [addingFieldToCategory, setAddingFieldToCategory] = useState<string | null>(null);
     const [newFieldName, setNewFieldName] = useState("");
-    const [newFieldType, setNewFieldType] = useState<"boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "dropdown">("boolean");
+    const [newFieldType, setNewFieldType] = useState<"boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "date" | "dropdown">("boolean");
     const [newFieldTarget, setNewFieldTarget] = useState<'home' | 'facility' | 'both'>('both');
     const [newFieldOptions, setNewFieldOptions] = useState<string[]>([]);
 
     // Editing Field State
     const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
     const [editFieldName, setEditFieldName] = useState("");
-    const [editFieldType, setEditFieldType] = useState<"boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "dropdown">("boolean");
+    const [editFieldType, setEditFieldType] = useState<"boolean" | "single" | "multi" | "text" | "textarea" | "number" | "currency" | "phone" | "email" | "date" | "dropdown">("boolean");
     const [editFieldTarget, setEditFieldTarget] = useState<'home' | 'facility' | 'both'>('both');
     const [editFieldOptions, setEditFieldOptions] = useState<string[]>([]);
 

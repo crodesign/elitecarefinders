@@ -26,7 +26,7 @@ interface FieldDefinitionRow {
     id: string;
     name: string;
     slug: string;
-    type: 'boolean' | 'single' | 'multi' | 'text' | 'textarea' | 'number' | 'currency' | 'phone' | 'email' | 'dropdown';
+    type: 'boolean' | 'single' | 'multi' | 'text' | 'textarea' | 'number' | 'currency' | 'phone' | 'email' | 'date' | 'dropdown';
     target_type: 'home' | 'facility' | 'both';
     options: string[] | null;
     category_id: string;
@@ -214,7 +214,7 @@ export async function getRoomFieldDefinitionsByCategory(
 
 export interface CreateFieldDefinitionInput {
     name: string;
-    type: 'boolean' | 'single' | 'multi' | 'text' | 'textarea' | 'number' | 'currency' | 'phone' | 'email' | 'dropdown';
+    type: 'boolean' | 'single' | 'multi' | 'text' | 'textarea' | 'number' | 'currency' | 'phone' | 'email' | 'date' | 'dropdown';
     targetType: 'home' | 'facility' | 'both';
     options?: string[];
     categoryId: string;
