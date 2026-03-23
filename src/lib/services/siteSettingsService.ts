@@ -71,7 +71,7 @@ export async function saveAnalyticsSettings(settings: AnalyticsSettings): Promis
     await saveSiteSetting("analytics_settings", JSON.stringify(settings));
 }
 
-export type SocialPlatform = 'facebook' | 'instagram' | 'x' | 'linkedin' | 'pinterest' | 'youtube' | 'tiktok' | 'threads';
+export type SocialPlatform = 'facebook' | 'instagram' | 'x' | 'linkedin' | 'pinterest' | 'youtube' | 'tiktok' | 'threads' | 'phone' | 'email';
 
 export const SOCIAL_PLATFORMS: { value: SocialPlatform; label: string }[] = [
     { value: 'facebook',  label: 'Facebook' },
@@ -82,6 +82,8 @@ export const SOCIAL_PLATFORMS: { value: SocialPlatform; label: string }[] = [
     { value: 'youtube',   label: 'YouTube' },
     { value: 'tiktok',    label: 'TikTok' },
     { value: 'threads',   label: 'Threads' },
+    { value: 'phone',     label: 'Phone' },
+    { value: 'email',     label: 'Email' },
 ];
 
 export interface SocialAccount {

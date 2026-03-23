@@ -391,10 +391,10 @@ export default function GeneralSettingsPage() {
                                     />
                                 </div>
                                 <input
-                                    type="url"
+                                    type={account.platform === 'email' ? 'email' : account.platform === 'phone' ? 'tel' : 'url'}
                                     value={account.url}
                                     onChange={e => updateSocial(account.id, { url: e.target.value })}
-                                    placeholder="https://"
+                                    placeholder={account.platform === 'email' ? 'hello@example.com' : account.platform === 'phone' ? '+1 (808) 000-0000' : 'https://'}
                                     className="form-input flex-1 min-w-0 text-xs px-2 py-1 !bg-surface-secondary"
                                 />
                                 <button
