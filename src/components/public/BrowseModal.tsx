@@ -21,7 +21,15 @@ const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
     youtube:   faYoutube,
     tiktok:    faTiktok,
     threads:   faThreads,
+    phone:     faPhone,
+    email:     faEnvelope,
 };
+
+function socialHref(platform: SocialPlatform, url: string): string {
+    if (platform === 'phone') return `tel:${url.replace(/\s+/g, '')}`;
+    if (platform === 'email') return `mailto:${url}`;
+    return url;
+}
 
 interface TaxEntry { id: string; name: string; slug: string; }
 
@@ -206,9 +214,9 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                 {socialAccounts.map(account => (
                                     <a
                                         key={account.id}
-                                        href={account.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                        href={socialHref(account.platform, account.url)}
+                                        target={account.platform === 'phone' || account.platform === 'email' ? undefined : '_blank'}
+                                        rel={account.platform === 'phone' || account.platform === 'email' ? undefined : 'noopener noreferrer'}
                                         className="flex items-center justify-center w-8 h-8 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
                                         aria-label={account.platform}
                                     >

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faArrowRight, faStar, faTrophy, faHouse, faBuilding,
+    faArrowRight, faStar, faTrophy, faHouse, faBuilding, faPhone, faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
@@ -92,7 +92,15 @@ const SOCIAL_ICON_MAP: Record<string, typeof faFacebookF> = {
     youtube: faYoutube,
     tiktok: faTiktok,
     threads: faThreads,
+    phone: faPhone,
+    email: faEnvelope,
 };
+
+function socialHref(platform: string, url: string): string {
+    if (platform === 'phone') return `tel:${url.replace(/\s+/g, '')}`;
+    if (platform === 'email') return `mailto:${url}`;
+    return url;
+}
 
 function shuffleArray<T>(arr: T[]): T[] {
     const a = [...arr];
@@ -193,9 +201,9 @@ export default async function HomePage() {
                         return (
                             <a
                                 key={account.id}
-                                href={account.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={socialHref(account.platform, account.url)}
+                                target={account.platform === 'phone' || account.platform === 'email' ? undefined : '_blank'}
+                                rel={account.platform === 'phone' || account.platform === 'email' ? undefined : 'noopener noreferrer'}
                                 aria-label={account.platform}
                                 className="flex items-center justify-center w-8 h-8 rounded-md border-2 border-gray-200 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
                             >
