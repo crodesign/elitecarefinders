@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ? [...entry.ancestors, entry.name].join(', ')
         : params.slugs.join(', ');
     return {
-        title: `Homes & Communities in ${locationLabel}`,
+        title: `Homes & Communities of ${locationLabel}`,
         description: `Browse care homes and senior living communities in ${entry?.name ?? params.slugs.at(-1)} listed with Elite CareFinders.`,
     };
 }
@@ -106,7 +106,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
 
     const locationName = entry?.name ?? slugs.at(-1) ?? 'This Location';
     const locationParts = entry ? [...entry.ancestors, entry.name] : undefined;
-    const pageTitle = `Homes & Communities in ${locationName}`;
+    const pageTitle = `Homes & Communities of ${locationName}`;
 
     return (
         <>

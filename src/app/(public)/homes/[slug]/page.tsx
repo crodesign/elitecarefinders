@@ -82,7 +82,7 @@ export default async function HomeDetailPage({ params }: Props) {
     const geocoded = await geocodeAddress(mapQuery);
     const neighborhoodCoords = locationTaxSlug ? NEIGHBORHOOD_COORDS[locationTaxSlug] : undefined;
     const [mapLat, mapLng] = geocoded ?? neighborhoodCoords ?? HAWAII_CENTER;
-    const mapZoom = geocoded ? 15 : 13;
+    const mapZoom = geocoded ? (hasAddress ? 15 : 13) : (hasAddress ? 13 : 11);
 
     // Fetch media captions for gallery + team images + cuisine images
     const allImageUrls = [...home.images, ...(home.teamImages || []), ...(home.cuisineImages || [])];
@@ -255,8 +255,11 @@ export default async function HomeDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
-                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                <div className="mt-2">
+                                    <div className="w-full aspect-square rounded-lg overflow-hidden">
+                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                    </div>
+                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mt-1">Location is approximate</p>}
                                 </div>
                             </div>
                         </div>
@@ -566,8 +569,11 @@ export default async function HomeDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
-                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                <div className="mt-2">
+                                    <div className="w-full aspect-square rounded-lg overflow-hidden">
+                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                    </div>
+                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mt-1">Location is approximate</p>}
                                 </div>
                             </div>
                         </div>

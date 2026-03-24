@@ -85,7 +85,7 @@ export default async function FacilityDetailPage({ params }: Props) {
     const geocoded = await geocodeAddress(mapQuery);
     const neighborhoodCoords = locationTaxSlug ? NEIGHBORHOOD_COORDS[locationTaxSlug] : undefined;
     const [mapLat, mapLng] = geocoded ?? neighborhoodCoords ?? HAWAII_CENTER;
-    const mapZoom = geocoded ? 15 : 13;
+    const mapZoom = geocoded ? (hasAddress ? 15 : 13) : (hasAddress ? 13 : 11);
 
     const jsonLd = buildFacilityJsonLd({
         name: facility.title,
