@@ -111,14 +111,13 @@ export async function POST(request: NextRequest) {
         let urlThumb: string | undefined;
 
         if (isConvertible) {
-            // Auto-rotate based on EXIF orientation, then resize (capped at 1940px) + convert to webp
-            const COPYRIGHT = 'Elite CareFinders';
-            const EXIF = { exif: { IFD0: { Copyright: COPYRIGHT } } };
-            const { data: origBuf, info: origInfo } = await sharp(buffer)
-                .rotate()
+            // Auto-rotate pixels from EXIF orientation, strip ALL metadata (no .withMetadata()).
+            const cleanBuf = await sharp(buffer).rotate().toBuffer();
+
+            const { data: origBuf, info: origInfo } = await sharp(cleanBuf)
                 .resize(1940, 1940, { fit: "inside" })
                 .webp({ quality: 90 })
-                .withMetadata(EXIF)
+                .withExif({ IFD0: { Copyright: "Elite CareFinders" } })
                 .toBuffer({ resolveWithObject: true });
 
             width = origInfo.width;
@@ -132,9 +131,9 @@ export async function POST(request: NextRequest) {
             const thumbFilename  = `${stem}-100x100.webp`;
 
             const [largeBuf, mediumBuf, thumbBuf] = await Promise.all([
-                sharp(buffer).rotate().resize(500, 500,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).withMetadata(EXIF).toBuffer(),
-                sharp(buffer).rotate().resize(200, 200,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).withMetadata(EXIF).toBuffer(),
-                sharp(buffer).rotate().resize(100, 100,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).withMetadata(EXIF).toBuffer(),
+                sharp(cleanBuf).resize(500, 500,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
+                sharp(cleanBuf).resize(200, 200,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
+                sharp(cleanBuf).resize(100, 100,  { fit: "cover", position: "centre" }).webp({ quality: 85 }).toBuffer(),
             ]);
 
             await Promise.all([
