@@ -22,9 +22,10 @@ interface Props {
     items: LocationItem[];
     basePath: string; // e.g. '/location/hawaii' or '/location'
     onNavigate?: () => void; // called when a link is clicked (e.g. to close a parent modal)
+    showSearch?: boolean;
 }
 
-export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate }: Props) {
+export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate, showSearch = true }: Props) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const ref = useRef<HTMLDivElement>(null);
@@ -79,19 +80,21 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
             {open && (
                 <div className="absolute top-full left-0 mt-2 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-72">
                     {/* Search input */}
-                    <div className="p-3 border-b border-gray-100">
-                        <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={query}
-                                onChange={e => setQuery(e.target.value)}
-                                placeholder={placeholder}
-                                className="flex-1 text-sm bg-white outline-none text-gray-700 placeholder-gray-400 min-w-0 px-3 py-2 rounded-lg"
-                            />
-                            <FontAwesomeIcon icon={faMagnifyingGlass} className="h-3.5 w-3.5 text-gray-400 flex-shrink-0 mx-3" />
+                    {showSearch && (
+                        <div className="p-3 border-b border-gray-100">
+                            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={query}
+                                    onChange={e => setQuery(e.target.value)}
+                                    placeholder={placeholder}
+                                    className="flex-1 text-sm bg-white outline-none text-gray-700 placeholder-gray-400 min-w-0 px-3 py-2 rounded-lg"
+                                />
+                                <FontAwesomeIcon icon={faMagnifyingGlass} className="h-3.5 w-3.5 text-gray-400 flex-shrink-0 mx-3" />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Results list */}
                     <div className="overflow-y-auto max-h-64 p-2">
@@ -109,8 +112,11 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
                                             isCurrent ? 'bg-[#239ddb]/10' : 'hover:bg-gray-50'
                                         }`}
                                     >
-                                        <span className={`text-sm transition-colors ${isCurrent ? 'text-[#239ddb] font-semibold' : 'text-gray-700 group-hover:text-[#239ddb]'}`}>
-                                            {item.name}
+                                        <span className="flex items-center gap-2 min-w-0">
+                                            <img src={`/images/states/${item.slug}.svg`} alt="" aria-hidden="true" className="h-5 w-5 object-contain flex-shrink-0 opacity-70" />
+                                            <span className={`text-sm transition-colors ${isCurrent ? 'text-[#239ddb] font-semibold' : 'text-gray-700 group-hover:text-[#239ddb]'}`}>
+                                                {item.name}
+                                            </span>
                                         </span>
                                         {isCurrent && (
                                             <FontAwesomeIcon icon={faCheck} className="h-3 w-3 text-[#239ddb] flex-shrink-0" />

@@ -143,6 +143,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
                     bedroomOptions={bedroomOptions}
                     bathroomOptions={bathroomOptions}
                     showerOptions={showerOptions}
+                    showViewToggle
                     mapSlot={mapPins.length > 0 ? (
                         <NeighborhoodMap
                             pins={mapPins}
@@ -174,7 +175,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
                 {/* Care Homes section */}
                 <section>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
-                        <h2 className="flex items-center gap-2 text-lg font-bold text-gray-800">
+                        <h2 className="flex items-start gap-2 text-lg font-bold text-gray-800">
                             <span className="flex items-center justify-center w-7 h-7 rounded bg-[#239ddb]">
                                 <FontAwesomeIcon icon={faHouse} className="h-3.5 w-3.5 text-white" />
                             </span>
@@ -207,7 +208,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
                 {/* Senior Living Communities section */}
                 <section>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
-                        <h2 className="flex items-center gap-2 text-lg font-bold text-gray-800">
+                        <h2 className="flex items-start gap-2 text-lg font-bold text-gray-800">
                             <span className="flex items-center justify-center w-7 h-7 rounded bg-[#239ddb]">
                                 <FontAwesomeIcon icon={faBuilding} className="h-3.5 w-3.5 text-white" />
                             </span>

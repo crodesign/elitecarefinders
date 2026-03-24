@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faXmark, faSliders } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faXmark, faSliders, faBorderAll, faList } from '@fortawesome/free-solid-svg-icons';
 import { SearchableLocationDropdown } from '@/components/public/SearchableLocationDropdown';
 import { TypeFilterDropdown } from '@/components/public/TypeFilterDropdown';
 import { RoomFeaturesFilter } from '@/components/public/RoomFeaturesFilter';
@@ -19,16 +19,25 @@ interface Props {
     bedroomOptions?: string[];
     bathroomOptions?: string[];
     showerOptions?: string[];
+    showViewToggle?: boolean;
 }
 
-export function ListingFilterBar({ islands, basePath, mapSlot, homeTypes = [], facilityTypes = [], bedroomOptions = [], bathroomOptions = [], showerOptions = [] }: Props) {
+export function ListingFilterBar({ islands, basePath, mapSlot, homeTypes = [], facilityTypes = [], bedroomOptions = [], bathroomOptions = [], showerOptions = [], showViewToggle }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
     const { startFilterTransition } = useFilterPending();
 
     const [query, setQuery] = useState(searchParams.get('q') || '');
     const [filtersOpen, setFiltersOpen] = useState(false);
     const currentView = searchParams.get('view') || '';
+
+    function setView(v: 'grid' | 'list') {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('view', v);
+        params.delete('page');
+        router.push(`${pathname}?${params.toString()}`);
+    }
 
     function buildUrl(q: string) {
         const p = new URLSearchParams();
@@ -96,29 +105,51 @@ export function ListingFilterBar({ islands, basePath, mapSlot, homeTypes = [], f
                     )}
                 </div>
 
-                <div className="flex items-center justify-center gap-3 flex-1 lg:flex-none lg:justify-start">
+                <div className="flex items-center justify-center gap-3 w-full lg:w-auto lg:flex-none lg:justify-start">
                     <SearchableLocationDropdown
                         label="Hawaii Islands"
-                        placeholder="Search islands..."
                         items={islands.filter(i => i.slug !== 'lanai' && i.slug !== 'molokai')}
                         basePath="/location/hawaii"
+                        showSearch={false}
                     />
 
                     {typeDropdown}
-
-                    {hasRoomFeatures && (
-                        <button
-                            onClick={() => setFiltersOpen(v => !v)}
-                            className={`lg:hidden flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border-2 transition-colors ${
-                                filtersOpen || hasActiveRoomFilters
-                                    ? 'bg-[#239ddb]/10 text-[#239ddb] border-[#239ddb]'
-                                    : 'bg-white text-gray-700 border-gray-200 hover:border-[#239ddb] hover:text-[#239ddb]'
-                            }`}
-                        >
-                            <FontAwesomeIcon icon={faSliders} className="h-3.5 w-3.5" />
-                        </button>
-                    )}
                 </div>
+
+                {(hasRoomFeatures || showViewToggle) && (
+                    <div className="flex items-center justify-center gap-2 w-full lg:hidden">
+                        {hasRoomFeatures && (
+                            <button
+                                onClick={() => setFiltersOpen(v => !v)}
+                                className={`flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-lg border-2 transition-colors ${
+                                    filtersOpen || hasActiveRoomFilters
+                                        ? 'bg-[#239ddb]/10 text-[#239ddb] border-[#239ddb]'
+                                        : 'bg-white text-gray-700 border-gray-200 hover:border-[#239ddb] hover:text-[#239ddb]'
+                                }`}
+                            >
+                                <FontAwesomeIcon icon={faSliders} className="h-3.5 w-3.5" />
+                            </button>
+                        )}
+                        {showViewToggle && (
+                            <div className="flex items-center gap-1 bg-white border-2 border-gray-200 rounded-lg p-1">
+                                <button
+                                    onClick={() => setView('grid')}
+                                    className={`p-1.5 rounded transition-colors ${currentView === 'grid' || currentView === '' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
+                                    aria-label="Grid view"
+                                >
+                                    <FontAwesomeIcon icon={faBorderAll} className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => setView('list')}
+                                    className={`p-1.5 rounded transition-colors ${currentView === 'list' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
+                                    aria-label="List view"
+                                >
+                                    <FontAwesomeIcon icon={faList} className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {hasRoomFeatures && (
