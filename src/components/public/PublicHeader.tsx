@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faHeart, faRightFromBracket, faComments, faBars, faChevronDown, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faHeart, faRightFromBracket, faComments, faBars, faChevronDown, faPhone, faEnvelope, faShareNodes } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { ConsultationModal } from './ConsultationModal';
@@ -13,7 +13,7 @@ import { BrowseModal } from './BrowseModal';
 import { ResourcesModal } from './ResourcesModal';
 import { MobileNavModal } from './MobileNavModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
+import { getSocialAccounts, getHomepageSeo, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
 
 const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
     facebook:  faFacebookF,
@@ -26,7 +26,18 @@ const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
     threads:   faThreads,
     phone:     faPhone,
     email:     faEnvelope,
+    share:     faShareNodes,
 };
+
+async function handleShare(title: string, text: string) {
+    const url = window.location.origin;
+    if (navigator.share) {
+        try { await navigator.share({ title, text, url }); } catch { /* cancelled */ }
+    } else {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+    }
+}
 
 function socialHref(platform: SocialPlatform, url: string): string {
     if (platform === 'phone') return `tel:${url.replace(/\s+/g, '')}`;
@@ -40,6 +51,8 @@ export function PublicHeader() {
     const [showResources, setShowResources] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [homepageTitle, setHomepageTitle] = useState('EliteCareFinders');
+    const [homepageText, setHomepageText] = useState('');
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,6 +61,10 @@ export function PublicHeader() {
 
     useEffect(() => {
         getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => !a.hidden)));
+        getHomepageSeo().then(seo => {
+            if (seo.metaTitle) setHomepageTitle(seo.metaTitle);
+            if (seo.metaDescription) setHomepageText(seo.metaDescription);
+        });
     }, []);
 
     useEffect(() => {
@@ -129,6 +146,17 @@ export function PublicHeader() {
                         {socialAccounts.length > 0 && (
                             <div className="hidden sm:flex items-center gap-1 mr-1">
                                 {socialAccounts.map(account => (
+                                    account.platform === 'share' ? (
+                                        <button
+                                            key={account.id}
+                                            type="button"
+                                            onClick={() => handleShare(homepageTitle, homepageText)}
+                                            className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                            aria-label="Share"
+                                        >
+                                            <FontAwesomeIcon icon={SOCIAL_ICON_MAP.share} className="h-3.5 w-3.5" />
+                                        </button>
+                                    ) : (
                                     <a
                                         key={account.id}
                                         href={socialHref(account.platform, account.url)}
@@ -139,6 +167,7 @@ export function PublicHeader() {
                                     >
                                         <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
                                     </a>
+                                    )
                                 ))}
                             </div>
                         )}

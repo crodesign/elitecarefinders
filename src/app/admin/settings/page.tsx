@@ -390,6 +390,9 @@ export default function GeneralSettingsPage() {
                                         className="[&_button]:!bg-surface-secondary"
                                     />
                                 </div>
+                                {account.platform === 'share' ? (
+                                    <span className="flex-1 min-w-0 text-xs px-2 py-1 text-content-muted italic">Shares the current page URL</span>
+                                ) : (
                                 <input
                                     type={account.platform === 'email' ? 'email' : account.platform === 'phone' ? 'tel' : 'url'}
                                     value={account.url}
@@ -397,6 +400,7 @@ export default function GeneralSettingsPage() {
                                     placeholder={account.platform === 'email' ? 'hello@example.com' : account.platform === 'phone' ? '+1 (808) 000-0000' : 'https://'}
                                     className="form-input flex-1 min-w-0 text-xs px-2 py-1 !bg-surface-secondary"
                                 />
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => updateSocial(account.id, { hidden: !account.hidden })}

@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
         openGraph: {
             title: seo.ogTitle || title,
             description: seo.ogDescription || description,
-            ...(seo.ogImageUrl && { images: [seo.ogImageUrl] }),
+            images: [seo.ogImageUrl || `${R2}/ECF_Rose-couple-consultation-edited-by-Rose_02.17.25_RG-scaled.webp`],
         },
     };
 }

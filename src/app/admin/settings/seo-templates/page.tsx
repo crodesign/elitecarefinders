@@ -227,6 +227,7 @@ export default function SeoTemplatesPage() {
                                     placeholder="https://..."
                                     className="form-input px-3 h-8 w-full text-sm"
                                 />
+                                <p className="text-[10px] text-content-muted">Must be an absolute URL (https://…) for share previews to work.</p>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-medium text-content-secondary">Canonical URL</label>

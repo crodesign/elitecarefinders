@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faBookOpen, faBars, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faBookOpen, faBars, faLocationDot, faShareNodes } from '@fortawesome/free-solid-svg-icons';
 import { SearchableLocationDropdown } from '@/components/public/SearchableLocationDropdown';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
-import { getSocialAccounts, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
+import { getSocialAccounts, getHomepageSeo, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
 
 const HOME_TYPE_TAX_ID = '286967ff-a897-4529-9c25-6f452f77f0d7';
 const FACILITY_TYPE_TAX_ID = 'aaff7539-60ec-448d-ae56-5ee8763917f6';
@@ -23,12 +23,23 @@ const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
     threads:   faThreads,
     phone:     faPhone,
     email:     faEnvelope,
+    share:     faShareNodes,
 };
 
 function socialHref(platform: SocialPlatform, url: string): string {
     if (platform === 'phone') return `tel:${url.replace(/\s+/g, '')}`;
     if (platform === 'email') return `mailto:${url}`;
     return url;
+}
+
+async function handleShare(title: string, text: string) {
+    const url = window.location.origin;
+    if (navigator.share) {
+        try { await navigator.share({ title, text, url }); } catch { /* cancelled */ }
+    } else {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+    }
 }
 
 interface TaxEntry { id: string; name: string; slug: string; }
@@ -41,6 +52,8 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
     const [homeTypes, setHomeTypes] = useState<TaxEntry[]>([]);
     const [facilityTypes, setFacilityTypes] = useState<TaxEntry[]>([]);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+    const [homepageTitle, setHomepageTitle] = useState('EliteCareFinders');
+    const [homepageText, setHomepageText] = useState('');
     const [locationStates, setLocationStates] = useState<TaxEntry[]>([]);
     const [hawaiiIslands, setHawaiiIslands] = useState<TaxEntry[]>([]);
 
@@ -59,6 +72,10 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
             });
 
         getSocialAccounts().then(accounts => setSocialAccounts(accounts));
+        getHomepageSeo().then(seo => {
+            if (seo.metaTitle) setHomepageTitle(seo.metaTitle);
+            if (seo.metaDescription) setHomepageText(seo.metaDescription);
+        });
 
         (async () => {
             const { data: tax } = await supabase.from('taxonomies').select('id').eq('slug', 'location').maybeSingle();
@@ -212,6 +229,17 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                         {socialAccounts.length > 0 && (
                             <div className="flex flex-wrap gap-2 content-start">
                                 {socialAccounts.map(account => (
+                                    account.platform === 'share' ? (
+                                        <button
+                                            key={account.id}
+                                            type="button"
+                                            onClick={() => handleShare(homepageTitle, homepageText)}
+                                            className="flex items-center justify-center w-8 h-8 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                            aria-label="Share"
+                                        >
+                                            <FontAwesomeIcon icon={SOCIAL_ICON_MAP.share} className="h-3.5 w-3.5" />
+                                        </button>
+                                    ) : (
                                     <a
                                         key={account.id}
                                         href={socialHref(account.platform, account.url)}
@@ -222,6 +250,7 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                                     >
                                         <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
                                     </a>
+                                    )
                                 ))}
                             </div>
                         )}

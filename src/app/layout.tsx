@@ -9,6 +9,7 @@ import { cookies } from "next/headers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://elitecarefinders.com'),
     title: "Elite CareFinders",
     description: "Senior Living Advisors",
     icons: {
