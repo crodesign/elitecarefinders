@@ -290,9 +290,20 @@ export interface FacilityListingCard {
     isFacilityOfMonth: boolean;
 }
 
-export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; q?: string; page?: number; limit?: number; excludeHomeOfMonth?: boolean } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
+export async function getPublicFixedFieldOptions(fieldType: string): Promise<string[]> {
     const db = getClient();
-    const { typeEntryId, locationEntryIds, q, page = 1, limit = 24, excludeHomeOfMonth = false } = opts;
+    const { data } = await db
+        .from('room_fixed_field_options')
+        .select('value')
+        .eq('field_type', fieldType)
+        .eq('is_active', true)
+        .order('display_order');
+    return (data || []).map((r: any) => r.value as string);
+}
+
+export async function getHomeListings(opts: { typeEntryId?: string; locationEntryIds?: string[]; q?: string; page?: number; limit?: number; excludeHomeOfMonth?: boolean; bedroomTypes?: string[]; bathroomTypes?: string[]; showerTypes?: string[] } = {}): Promise<{ items: HomeListingCard[]; total: number }> {
+    const db = getClient();
+    const { typeEntryId, locationEntryIds, q, page = 1, limit = 24, excludeHomeOfMonth = false, bedroomTypes, bathroomTypes, showerTypes } = opts;
     const offset = (page - 1) * limit;
 
     let matchingIds: string[] | null = null;
@@ -316,6 +327,12 @@ export async function getHomeListings(opts: { typeEntryId?: string; locationEntr
     if (matchingIds !== null) query = query.in('id', matchingIds);
     if (locationEntryIds?.length) query = (query as any).overlaps('taxonomy_entry_ids', locationEntryIds);
     if (typeEntryId) query = query.contains('taxonomy_entry_ids', [typeEntryId]);
+    if (bedroomTypes?.length === 1) query = (query as any).filter('room_details->>bedroomType', 'eq', bedroomTypes[0]);
+    else if (bedroomTypes && bedroomTypes.length > 1) query = (query as any).filter('room_details->>bedroomType', 'in', `(${bedroomTypes.join(',')})`);
+    if (bathroomTypes?.length === 1) query = (query as any).filter('room_details->>bathroomType', 'eq', bathroomTypes[0]);
+    else if (bathroomTypes && bathroomTypes.length > 1) query = (query as any).filter('room_details->>bathroomType', 'in', `(${bathroomTypes.join(',')})`);
+    if (showerTypes?.length === 1) query = (query as any).filter('room_details->>showerType', 'eq', showerTypes[0]);
+    else if (showerTypes && showerTypes.length > 1) query = (query as any).filter('room_details->>showerType', 'in', `(${showerTypes.join(',')})`);
     const { data, count, error } = await query;
     if (error || !data) return { items: [], total: 0 };
     return {

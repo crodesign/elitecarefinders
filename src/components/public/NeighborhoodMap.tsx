@@ -105,7 +105,7 @@ export function NeighborhoodMap({ pins, islandSlug, center }: Props) {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className="relative w-full h-full min-h-[320px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm isolate">
+        <div className="relative w-full h-full min-h-[320px] overflow-hidden isolate">
             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossOrigin="" />
             <div ref={containerRef} className="w-full h-full" />
             <div className="absolute bottom-2 left-2 z-[1000] bg-white/90 rounded-lg px-3 py-1.5 text-xs text-gray-500 shadow-sm pointer-events-none">

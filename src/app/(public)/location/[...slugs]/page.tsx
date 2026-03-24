@@ -4,12 +4,14 @@ import dynamic from 'next/dynamic';
 import { permanentRedirect } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faBuilding, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { getHomeListings, getFacilityListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds, getHawaiiNeighborhoodsGrouped, getLocationChildEntriesWithCounts } from '@/lib/public-db';
+import { getHomeListings, getFacilityListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds, getHawaiiNeighborhoodsGrouped, getLocationChildEntriesWithCounts, getBrowseNavTypes, getPublicFixedFieldOptions } from '@/lib/public-db';
 import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
+import { FilterPendingProvider } from '@/components/public/FilterPendingProvider';
+import { FilterLoadingOverlay } from '@/components/public/FilterLoadingOverlay';
 import { NEIGHBORHOOD_COORDS } from '@/lib/neighborhood-coords';
 import type { NeighborhoodPin } from '@/components/public/NeighborhoodMap';
 
@@ -22,7 +24,7 @@ const SECTION_LIMIT = 12;
 
 interface Props {
     params: { slugs: string[] };
-    searchParams: { q?: string; view?: string } & Record<string, string>;
+    searchParams: { q?: string; view?: string; type?: string } & Record<string, string>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -39,6 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LocationPage({ params, searchParams }: Props) {
     const { slugs } = params;
     const q = searchParams.q || '';
+    const typeSlug = searchParams.type || '';
+    const bedroomFilter = searchParams.bedroom ? searchParams.bedroom.split(',').filter(Boolean) : [];
+    const bathroomFilter = searchParams.bathroom ? searchParams.bathroom.split(',').filter(Boolean) : [];
+    const showerFilter = searchParams.shower ? searchParams.shower.split(',').filter(Boolean) : [];
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
     const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
     const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
@@ -56,11 +62,18 @@ export default async function LocationPage({ params, searchParams }: Props) {
     const isIslandPage = slugs.length === 2 && slugs[0] === 'hawaii';
     const islandSlug = isIslandPage ? slugs[1] : null;
 
-    const [locationIds, islands, neighborhoodCounts] = await Promise.all([
+    const [locationIds, islands, neighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         entry ? getLocationDescendantIds(entry.id) : Promise.resolve(undefined),
         getHawaiiNeighborhoodsGrouped(),
         islandSlug ? getLocationChildEntriesWithCounts(islandSlug) : Promise.resolve([]),
+        getBrowseNavTypes(),
+        getPublicFixedFieldOptions('bedroom'),
+        getPublicFixedFieldOptions('bathroom'),
+        getPublicFixedFieldOptions('shower'),
     ]);
+
+    const selectedHomeType = homeTypes.find(t => t.slug === typeSlug);
+    const selectedFacilityType = facilityTypes.find(t => t.slug === typeSlug);
 
     // Build map pins from neighborhood counts + coordinate lookup
     const mapPins: NeighborhoodPin[] = islandSlug
@@ -78,8 +91,8 @@ export default async function LocationPage({ params, searchParams }: Props) {
     const mapCenter: [number, number] = (islandSlug && ISLAND_CENTERS[islandSlug]) ? ISLAND_CENTERS[islandSlug] : [21.3069, -157.8583];
 
     const [homesResult, facilitiesResult] = await Promise.all([
-        getHomeListings({ locationEntryIds: locationIds, q: q || undefined, page: 1, limit: SECTION_LIMIT }),
-        getFacilityListings({ locationEntryIds: locationIds, q: q || undefined, page: 1, limit: SECTION_LIMIT }),
+        selectedFacilityType ? Promise.resolve({ items: [], total: 0 }) : getHomeListings({ locationEntryIds: locationIds, q: q || undefined, typeEntryId: selectedHomeType?.id, bedroomTypes: bedroomFilter.length ? bedroomFilter : undefined, bathroomTypes: bathroomFilter.length ? bathroomFilter : undefined, showerTypes: showerFilter.length ? showerFilter : undefined, page: 1, limit: SECTION_LIMIT }),
+        selectedHomeType ? Promise.resolve({ items: [], total: 0 }) : getFacilityListings({ locationEntryIds: locationIds, q: q || undefined, typeEntryId: selectedFacilityType?.id, page: 1, limit: SECTION_LIMIT }),
     ]);
 
     const { items: homes, total: homesTotal } = homesResult;
@@ -109,6 +122,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
     const pageTitle = `Homes & Communities of ${locationName}`;
 
     return (
+        <FilterPendingProvider>
         <>
             <ListingHero
                 title={pageTitle}
@@ -124,6 +138,11 @@ export default async function LocationPage({ params, searchParams }: Props) {
                 <ListingFilterBar
                     islands={islands}
                     basePath={`/location/${locationSlug}`}
+                    homeTypes={homeTypes}
+                    facilityTypes={facilityTypes}
+                    bedroomOptions={bedroomOptions}
+                    bathroomOptions={bathroomOptions}
+                    showerOptions={showerOptions}
                     mapSlot={mapPins.length > 0 ? (
                         <NeighborhoodMap
                             pins={mapPins}
@@ -134,6 +153,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
                 />
             </div>
 
+            <FilterLoadingOverlay>
             {grandTotal === 0 ? (
                 <div className="max-w-6xl mx-auto px-5 pb-8">
                     <div className="text-center py-16 bg-gray-50 rounded-2xl">
@@ -153,17 +173,16 @@ export default async function LocationPage({ params, searchParams }: Props) {
 
                 {/* Care Homes section */}
                 <section>
-                    <div className="flex items-center justify-between mb-5">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
                         <h2 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             <span className="flex items-center justify-center w-7 h-7 rounded bg-[#239ddb]">
                                 <FontAwesomeIcon icon={faHouse} className="h-3.5 w-3.5 text-white" />
                             </span>
                             Care Homes &amp; Adult Foster Homes
-                            <span className="text-sm font-normal text-gray-400 ml-1">({homesTotal})</span>
                         </h2>
                         {homesTotal > SECTION_LIMIT && (
-                            <Link href={`/homes/location/${locationSlug}`} className="text-sm text-[#239ddb] font-semibold hover:underline">
-                                View all {homesTotal} →
+                            <Link href={`/homes/location/${locationSlug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors self-start">
+                                View all {homesTotal} <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                             </Link>
                         )}
                     </div>
@@ -175,9 +194,9 @@ export default async function LocationPage({ params, searchParams }: Props) {
                             <HomeListingGrid homes={homes} typeNameMap={homeTypeMap} gridClass={gridClass} listClass={listClass} />
                             {homesTotal > SECTION_LIMIT && (
                                 <div className="mt-6 text-center">
-                                    <Link href={`/homes/location/${locationSlug}`} className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-[#239ddb] text-[#239ddb] rounded-lg text-sm font-semibold hover:bg-[#239ddb] hover:text-white transition-colors">
+                                    <Link href={`/homes/location/${locationSlug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors">
                                         View all {homesTotal} homes of {locationName}
-                                        <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
+                                        <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>
                             )}
@@ -187,17 +206,16 @@ export default async function LocationPage({ params, searchParams }: Props) {
 
                 {/* Senior Living Communities section */}
                 <section>
-                    <div className="flex items-center justify-between mb-5">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
                         <h2 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             <span className="flex items-center justify-center w-7 h-7 rounded bg-[#239ddb]">
                                 <FontAwesomeIcon icon={faBuilding} className="h-3.5 w-3.5 text-white" />
                             </span>
                             Senior Living Communities
-                            <span className="text-sm font-normal text-gray-400 ml-1">({facilitiesTotal})</span>
                         </h2>
                         {facilitiesTotal > SECTION_LIMIT && (
-                            <Link href={`/facilities/location/${locationSlug}`} className="text-sm text-[#239ddb] font-semibold hover:underline">
-                                View all {facilitiesTotal} →
+                            <Link href={`/facilities/location/${locationSlug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors self-start">
+                                View all {facilitiesTotal} <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                             </Link>
                         )}
                     </div>
@@ -209,9 +227,9 @@ export default async function LocationPage({ params, searchParams }: Props) {
                             <FacilityListingGrid facilities={facilities} typeNameMap={facilityTypeMap} gridClass={gridClass} listClass={listClass} />
                             {facilitiesTotal > SECTION_LIMIT && (
                                 <div className="mt-6 text-center">
-                                    <Link href={`/facilities/location/${locationSlug}`} className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-[#239ddb] text-[#239ddb] rounded-lg text-sm font-semibold hover:bg-[#239ddb] hover:text-white transition-colors">
+                                    <Link href={`/facilities/location/${locationSlug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#239ddb] text-white rounded-lg px-4 py-2 hover:bg-[#1a7fb8] transition-colors">
                                         View all {facilitiesTotal} communities of {locationName}
-                                        <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
+                                        <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>
                             )}
@@ -220,6 +238,8 @@ export default async function LocationPage({ params, searchParams }: Props) {
                 </section>
             </div>
             )}
+            </FilterLoadingOverlay>
         </>
+        </FilterPendingProvider>
     );
 }
