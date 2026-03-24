@@ -14,14 +14,17 @@ interface FavoriteButtonProps {
     entityTitle?: string;
     entityImage?: string;
     className?: string;
+    iconOnly?: boolean;
 }
 
-export function FavoriteButton({ type, entityId, entitySlug, entityTitle, entityImage, className = '' }: FavoriteButtonProps) {
+export function FavoriteButton({ type, entityId, entitySlug, entityTitle, entityImage, className = '', iconOnly }: FavoriteButtonProps) {
     const { isFavorited, toggleFavorite, user, openAuthModal } = useFavorites();
     const [pending, setPending] = useState(false);
     const saved = isFavorited(type, entityId);
 
-    const handleClick = async () => {
+    const handleClick = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (pending) return;
         if (!user && !saved) {
             openAuthModal();
@@ -31,6 +34,23 @@ export function FavoriteButton({ type, entityId, entitySlug, entityTitle, entity
         await toggleFavorite({ type, entityId, entitySlug, entityTitle, entityImage });
         setPending(false);
     };
+
+    if (iconOnly) {
+        return (
+            <button
+                type="button"
+                onClick={handleClick}
+                disabled={pending}
+                className={`flex items-center justify-center p-1.5 rounded-md bg-white shadow-sm transition-colors disabled:opacity-50 group/btn ${className}`}
+                aria-label={saved ? 'Remove from favorites' : 'Add to favorites'}
+            >
+                <FontAwesomeIcon
+                    icon={saved ? faHeart : faHeartOutline}
+                    className={`h-4 w-4 transition-colors ${saved ? 'text-rose-500' : 'text-gray-400 group-hover/btn:text-rose-400'}`}
+                />
+            </button>
+        );
+    }
 
     return (
         <button

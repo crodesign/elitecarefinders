@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuilding, faStar, faArrowRight, faUsers, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import type { FacilityListingCard } from '@/lib/public-db';
+import { FavoriteButton } from '@/components/public/FavoriteButton';
 
 interface Props {
     facilities: FacilityListingCard[];
@@ -19,7 +20,7 @@ export function FacilityListingGrid({ facilities, typeNameMap, gridClass, listCl
                     <Link
                         key={facility.id}
                         href={`/facilities/${facility.slug}`}
-                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${facility.isFacilityOfMonth ? 'bg-amber-50 hover:bg-white' : facility.isFeatured ? 'bg-green-50 hover:bg-white' : 'bg-gray-100 hover:bg-gray-50'}`}
+                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${facility.isFacilityOfMonth ? 'bg-amber-50' : facility.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
                     >
                         <div className="relative w-32 sm:w-40 self-stretch flex-shrink-0">
                             {facility.image ? (
@@ -48,6 +49,15 @@ export function FacilityListingGrid({ facilities, typeNameMap, gridClass, listCl
                                     )}
                                 </div>
                             )}
+                            <FavoriteButton
+                                type="facility"
+                                entityId={facility.id}
+                                entitySlug={facility.slug}
+                                entityTitle={facility.title}
+                                entityImage={facility.image ?? undefined}
+                                iconOnly
+                                className="absolute top-1 right-1 z-20"
+                            />
                         </div>
                         <div className="flex flex-col flex-1 p-3 min-w-0">
                             <h2 className="text-sm font-bold text-gray-900 leading-snug mb-0.5 group-hover:text-[#239ddb] transition-colors line-clamp-2">
@@ -114,6 +124,15 @@ export function FacilityListingGrid({ facilities, typeNameMap, gridClass, listCl
                                     )}
                                 </div>
                             )}
+                            <FavoriteButton
+                                type="facility"
+                                entityId={facility.id}
+                                entitySlug={facility.slug}
+                                entityTitle={facility.title}
+                                entityImage={facility.image ?? undefined}
+                                iconOnly
+                                className="absolute top-2 right-2 z-20"
+                            />
                         </div>
                         <div className="flex flex-col flex-1 p-4">
                             <h2 className="text-base font-bold text-gray-900 leading-snug mb-1 group-hover:text-[#239ddb] transition-colors">

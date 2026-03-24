@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faStar, faArrowRight, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import type { HomeListingCard } from '@/lib/public-db';
+import { FavoriteButton } from '@/components/public/FavoriteButton';
 
 interface Props {
     homes: HomeListingCard[];
@@ -19,7 +20,7 @@ export function HomeListingGrid({ homes, typeNameMap, gridClass, listClass }: Pr
                     <Link
                         key={home.id}
                         href={`/homes/${home.slug}`}
-                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${home.isHomeOfMonth ? 'bg-amber-50 hover:bg-white' : home.isFeatured ? 'bg-green-50 hover:bg-white' : 'bg-gray-100 hover:bg-gray-50'}`}
+                        className={`group flex rounded-xl overflow-hidden hover:shadow-md transition-all ${home.isHomeOfMonth ? 'bg-amber-50' : home.isFeatured ? 'bg-green-50' : 'bg-gray-100'}`}
                     >
                         <div className="relative w-32 sm:w-40 self-stretch flex-shrink-0">
                             {home.image ? (
@@ -48,6 +49,15 @@ export function HomeListingGrid({ homes, typeNameMap, gridClass, listClass }: Pr
                                     )}
                                 </div>
                             )}
+                            <FavoriteButton
+                                type="home"
+                                entityId={home.id}
+                                entitySlug={home.slug}
+                                entityTitle={home.title}
+                                entityImage={home.image ?? undefined}
+                                iconOnly
+                                className="absolute top-1 right-1 z-20"
+                            />
                         </div>
                         <div className="flex flex-col flex-1 p-3 min-w-0">
                             <h2 className="text-sm font-bold text-gray-900 leading-snug mb-0.5 group-hover:text-[#239ddb] transition-colors line-clamp-2">
@@ -108,6 +118,15 @@ export function HomeListingGrid({ homes, typeNameMap, gridClass, listClass }: Pr
                                     )}
                                 </div>
                             )}
+                            <FavoriteButton
+                                type="home"
+                                entityId={home.id}
+                                entitySlug={home.slug}
+                                entityTitle={home.title}
+                                entityImage={home.image ?? undefined}
+                                iconOnly
+                                className="absolute top-2 right-2 z-20"
+                            />
                         </div>
                         <div className="flex flex-col flex-1 p-4">
                             <h2 className="text-base font-bold text-gray-900 leading-snug mb-1 group-hover:text-[#239ddb] transition-colors">
