@@ -9,6 +9,8 @@ import { HeartLoader } from "@/components/ui/HeartLoader";
 import { getSeoTemplates, saveSeoTemplates, type SeoTemplate, getHomepageSeo, saveHomepageSeo, type HomepageSeoSettings, DEFAULT_HOMEPAGE_SEO } from "@/lib/services/siteSettingsService";
 import { createClientComponentClient } from "@/lib/supabase";
 import { buildHomepageJsonLd } from "@/lib/seo";
+import { SerpPreview } from "@/components/admin/seo/SerpPreview";
+import { OgCardPreview } from "@/components/admin/seo/OgCardPreview";
 
 function CharCounter({ value, soft }: { value: string; soft: number }) {
     const len = value.length;
@@ -236,6 +238,20 @@ export default function SeoTemplatesPage() {
                                     className="form-input px-3 h-8 w-full text-sm"
                                 />
                             </div>
+                        </div>
+
+                        {/* Previews */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <SerpPreview
+                                title={homepageSeo.metaTitle}
+                                description={homepageSeo.metaDescription}
+                                url={homepageSeo.canonicalUrl || 'https://www.elitecarefinders.com'}
+                            />
+                            <OgCardPreview
+                                title={homepageSeo.ogTitle || homepageSeo.metaTitle}
+                                description={homepageSeo.ogDescription || homepageSeo.metaDescription}
+                                imageUrl={homepageSeo.ogImageUrl || undefined}
+                            />
                         </div>
 
                         {/* Structured Data */}
