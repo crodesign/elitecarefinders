@@ -50,7 +50,6 @@ export function NeighborhoodMap({ pins, islandSlug, center }: Props) {
                 zoom: 10,
                 scrollWheelZoom: false,
                 dragging: !L.Browser.mobile,
-                tap: false,
                 zoomControl: true,
             });
 
