@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faBuilding, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faBuilding, faHeart, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { getBrowseNavTypes } from '@/lib/public-db';
 
 export async function PublicFooter() {
@@ -25,6 +25,16 @@ export async function PublicFooter() {
                         <p className="text-sm text-gray-500 max-w-xs">
                             Helping Hawaii families find trusted senior care homes and communities with personalized, no-cost guidance.
                         </p>
+                        <div className="flex flex-col gap-2 mt-4 text-xs text-gray-600">
+                            <a href="tel:+18084454111" className="flex items-center gap-2 hover:text-[#239ddb] transition-colors">
+                                <FontAwesomeIcon icon={faPhone} className="h-3 w-3 text-[#239ddb]" />
+                                (808) 445-4111
+                            </a>
+                            <a href="mailto:info@elitecarefinders.com" className="flex items-center gap-2 hover:text-[#239ddb] transition-colors">
+                                <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3 text-[#239ddb]" />
+                                info@elitecarefinders.com
+                            </a>
+                        </div>
                     </div>
 
                     {/* Company */}
