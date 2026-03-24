@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
-import { getHomeListings, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getHomeListings, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped, getPublicFixedFieldOptions } from '@/lib/public-db';
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
@@ -26,9 +26,12 @@ export default async function HomesListingPage({ searchParams }: Props) {
     const q = searchParams.q?.trim() || undefined;
     const neighborhood = searchParams.neighborhood || undefined;
 
-    const [{ items: homes, total }, islands] = await Promise.all([
+    const [{ items: homes, total }, islands, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getHomeListings({ page, limit: LIMIT, q, locationEntryIds: neighborhood ? [neighborhood] : undefined }),
         getHawaiiNeighborhoodsGrouped(),
+        getPublicFixedFieldOptions('bedroom'),
+        getPublicFixedFieldOptions('bathroom'),
+        getPublicFixedFieldOptions('shower'),
     ]);
 
     const allEntryIds = [...new Set(homes.flatMap(h => h.taxonomyEntryIds))];
@@ -61,7 +64,7 @@ export default async function HomesListingPage({ searchParams }: Props) {
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
-                <ListingFilterBar islands={islands} basePath="/homes" />
+                <ListingFilterBar islands={islands} basePath="/homes" bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} showViewToggle collapsibleFilters />
 
                 {homes.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">

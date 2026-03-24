@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faBuilding } from '@fortawesome/free-solid-svg-icons';
-import { getFacilityListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getFacilityListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped, getPublicFixedFieldOptions } from '@/lib/public-db';
 import { ListingHero } from '@/components/public/ListingHero';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
@@ -29,9 +29,12 @@ export default async function FacilitiesByTypePage({ params, searchParams }: Pro
     const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
     const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
 
-    const [typeEntry, islands] = await Promise.all([
+    const [typeEntry, islands, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getTaxonomyEntryBySlug(typeSlug),
         getHawaiiNeighborhoodsGrouped(),
+        getPublicFixedFieldOptions('bedroom'),
+        getPublicFixedFieldOptions('bathroom'),
+        getPublicFixedFieldOptions('shower'),
     ]);
 
     const { items: facilities, total } = await getFacilityListings({
@@ -77,7 +80,7 @@ export default async function FacilitiesByTypePage({ params, searchParams }: Pro
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
-                <ListingFilterBar islands={islands} basePath={basePath} />
+                <ListingFilterBar islands={islands} basePath={basePath} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} showViewToggle collapsibleFilters />
 
                 {facilities.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">

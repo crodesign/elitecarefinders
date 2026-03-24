@@ -13,9 +13,10 @@ interface SectionProps {
     options: string[];
     active: string[];
     onToggle: (value: string) => void;
+    twoColOnly?: boolean;
 }
 
-function Section({ label, icon, options, active, onToggle }: SectionProps) {
+function Section({ label, icon, options, active, onToggle, twoColOnly }: SectionProps) {
     if (options.length === 0) return null;
     return (
         <div>
@@ -25,7 +26,7 @@ function Section({ label, icon, options, active, onToggle }: SectionProps) {
                 </span>
                 {label}
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+            <div className={`grid gap-1.5 ${twoColOnly ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
                 {options.map(opt => {
                     const isActive = active.includes(opt);
                     return (
@@ -52,9 +53,10 @@ interface Props {
     bathroomOptions: string[];
     showerOptions: string[];
     basePath: string;
+    columns?: boolean;
 }
 
-export function RoomFeaturesFilter({ bedroomOptions, bathroomOptions, showerOptions, basePath }: Props) {
+export function RoomFeaturesFilter({ bedroomOptions, bathroomOptions, showerOptions, basePath, columns }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { startFilterTransition } = useFilterPending();
@@ -72,6 +74,16 @@ export function RoomFeaturesFilter({ bedroomOptions, bathroomOptions, showerOpti
         else p.delete(paramKey);
         const str = p.toString();
         startFilterTransition(() => router.push(str ? `${basePath}?${str}` : basePath));
+    }
+
+    if (columns) {
+        return (
+            <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <Section label="Bedroom Type" icon={faBed} paramKey="bedroom" options={bedroomOptions} active={activeBedroomTypes} onToggle={v => toggle('bedroom', activeBedroomTypes, v)} twoColOnly />
+                <Section label="Bathroom Type" icon={faBath} paramKey="bathroom" options={bathroomOptions} active={activeBathroomTypes} onToggle={v => toggle('bathroom', activeBathroomTypes, v)} twoColOnly />
+                <Section label="Shower Type" icon={faShower} paramKey="shower" options={showerOptions} active={activeShowerTypes} onToggle={v => toggle('shower', activeShowerTypes, v)} twoColOnly />
+            </div>
+        );
     }
 
     return (

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faBuilding } from '@fortawesome/free-solid-svg-icons';
-import { getFacilityListings, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getFacilityListings, getTaxonomyEntriesByIds, getHawaiiNeighborhoodsGrouped, getPublicFixedFieldOptions } from '@/lib/public-db';
 import { ListingHero } from '@/components/public/ListingHero';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
@@ -26,9 +26,12 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
     const q = searchParams.q?.trim() || undefined;
     const neighborhood = searchParams.neighborhood || undefined;
 
-    const [{ items: facilities, total }, islands] = await Promise.all([
+    const [{ items: facilities, total }, islands, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getFacilityListings({ page, limit: LIMIT, q, locationEntryIds: neighborhood ? [neighborhood] : undefined }),
         getHawaiiNeighborhoodsGrouped(),
+        getPublicFixedFieldOptions('bedroom'),
+        getPublicFixedFieldOptions('bathroom'),
+        getPublicFixedFieldOptions('shower'),
     ]);
 
     const allEntryIds = [...new Set(facilities.flatMap(f => f.taxonomyEntryIds))];
@@ -61,7 +64,7 @@ export default async function FacilitiesListingPage({ searchParams }: Props) {
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
-                <ListingFilterBar islands={islands} basePath="/facilities" />
+                <ListingFilterBar islands={islands} basePath="/facilities" bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} showViewToggle collapsibleFilters />
 
                 {facilities.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
