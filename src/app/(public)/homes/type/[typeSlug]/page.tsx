@@ -6,6 +6,8 @@ import { getHomeListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds, getHa
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
+import { FilterPendingProvider } from '@/components/public/FilterPendingProvider';
+import { FilterLoadingOverlay } from '@/components/public/FilterLoadingOverlay';
 
 const LIMIT = 24;
 
@@ -68,6 +70,7 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
     }
 
     return (
+        <FilterPendingProvider>
         <>
             <ListingHero
                 title={pageTitle}
@@ -82,6 +85,7 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
             <div className="max-w-6xl mx-auto px-5 py-8">
                 <ListingFilterBar islands={islands} basePath={basePath} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} showViewToggle collapsibleFilters />
 
+            <FilterLoadingOverlay>
                 {homes.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faHouse} className="h-12 w-12 mb-4 opacity-30" />
@@ -119,7 +123,9 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
                         )}
                     </div>
                 )}
+            </FilterLoadingOverlay>
             </div>
         </>
+        </FilterPendingProvider>
     );
 }

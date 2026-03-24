@@ -8,7 +8,7 @@ const DEFAULT_SECTIONS = [
     { id: 'featured-homes', label: 'Featured Care Homes & Foster Homes', visible: true },
     { id: 'featured-facilities', label: 'Featured Senior Living Communities', visible: true },
     { id: 'home-of-month', label: 'Home of the Month', visible: true },
-    { id: 'search', label: 'Search Section', visible: true },
+    { id: 'search', label: 'Search & Map Section', visible: true },
     { id: 'about', label: 'About Elite CareFinders', visible: true },
     { id: 'content', label: 'Body Content', visible: true },
     { id: 'testimonials', label: 'Testimonials — What Our Clients Say', visible: true },

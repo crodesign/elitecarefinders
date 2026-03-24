@@ -9,7 +9,9 @@ import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYou
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
 import { VideoTestimonialsSection } from '@/components/public/VideoTestimonialsSection';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials, getHomepageSeoSetting } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials, getHomepageSeoSetting, getLocationChildEntriesWithCounts, getBrowseNavTypes, getPublicFixedFieldOptions } from '@/lib/public-db';
+import { NEIGHBORHOOD_COORDS } from '@/lib/neighborhood-coords';
+import type { NeighborhoodPin } from '@/components/public/NeighborhoodMap';
 import { getHomepageSeo } from '@/lib/services/siteSettingsService';
 import { buildHomepageJsonLd } from '@/lib/seo';
 import type { PublicSocialAccount } from '@/lib/public-db';
@@ -114,7 +116,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings, oahuNeighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
@@ -124,7 +126,16 @@ export default async function HomePage() {
         getSocialAccountsPublic(),
         getVideoTestimonials(),
         getHomepageSeo(),
+        getLocationChildEntriesWithCounts('oahu'),
+        getBrowseNavTypes(),
+        getPublicFixedFieldOptions('bedroom'),
+        getPublicFixedFieldOptions('bathroom'),
+        getPublicFixedFieldOptions('shower'),
     ]);
+
+    const searchMapPins: NeighborhoodPin[] = oahuNeighborhoodCounts
+        .filter(n => (n.homes + n.facilities) > 0 && NEIGHBORHOOD_COORDS[n.slug])
+        .map(n => ({ ...n, lat: NEIGHBORHOOD_COORDS[n.slug][0], lng: NEIGHBORHOOD_COORDS[n.slug][1] }));
 
     const homepageJsonLd = buildHomepageJsonLd({
         socialAccounts,
@@ -173,7 +184,7 @@ export default async function HomePage() {
                 locationNames={homeOfMonthLocationNames}
             />
         ) : null,
-        'search': <SearchSection key="search" islands={hawaiiIslandsWithNeighborhoods} />,
+        'search': <SearchSection key="search" islands={hawaiiIslandsWithNeighborhoods} mapPins={searchMapPins} homeTypes={homeTypes} facilityTypes={facilityTypes} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} />,
         'about': <AboutSection key="about" />,
         'content': <ContentSection key="content" />,
         'testimonials': <TestimonialsWidget key="testimonials" />,

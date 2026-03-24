@@ -8,6 +8,8 @@ import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
+import { FilterPendingProvider } from '@/components/public/FilterPendingProvider';
+import { FilterLoadingOverlay } from '@/components/public/FilterLoadingOverlay';
 
 const LIMIT = 24;
 
@@ -74,6 +76,7 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
     }
 
     return (
+        <FilterPendingProvider>
         <>
             <ListingHero
                 title={pageTitle}
@@ -89,6 +92,7 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
             <div className="max-w-6xl mx-auto px-5 py-8">
                 <ListingFilterBar islands={islands} basePath={basePath} />
 
+            <FilterLoadingOverlay>
                 {homes.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faHouse} className="h-12 w-12 mb-4 opacity-30" />
@@ -126,7 +130,9 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
                         )}
                     </div>
                 )}
+            </FilterLoadingOverlay>
             </div>
         </>
+        </FilterPendingProvider>
     );
 }

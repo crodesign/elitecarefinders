@@ -140,7 +140,7 @@ export default async function ResourcePostPage({ params }: Props) {
                     {/* Content */}
                     {post.content ? (
                         <div
-                            className="prose prose-gray max-w-none prose-a:text-[#239ddb] prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed"
+                            className="prose prose-gray max-w-none prose-a:text-[#239ddb] prose-headings:font-bold prose-headings:text-gray-900 prose-h3:text-[1.875rem] prose-h4:text-[1.1rem] prose-p:text-gray-700 prose-p:leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
                     ) : (

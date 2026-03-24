@@ -442,7 +442,7 @@ export default async function HomeDetailPage({ params }: Props) {
                                     About This Home
                                 </h2>
                                 <div
-                                    className="prose prose-sm prose-gray max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-xs prose-headings:mb-2 prose-p:text-gray-700 prose-p:leading-relaxed prose-ul:pl-5 prose-li:text-gray-700 prose-strong:text-gray-900"
+                                    className="prose prose-sm prose-gray max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-xs prose-headings:mb-2 prose-h3:text-lg prose-h4:text-sm prose-p:text-gray-700 prose-p:leading-relaxed prose-ul:pl-5 prose-li:text-gray-700 prose-strong:text-gray-900"
                                     dangerouslySetInnerHTML={{ __html: home.description }}
                                 />
                             </section>

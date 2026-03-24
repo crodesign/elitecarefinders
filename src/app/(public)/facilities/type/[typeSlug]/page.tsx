@@ -6,6 +6,8 @@ import { getFacilityListings, getTaxonomyEntryBySlug, getTaxonomyEntriesByIds, g
 import { ListingHero } from '@/components/public/ListingHero';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
 import { ListingFilterBar } from '@/components/public/ListingFilterBar';
+import { FilterPendingProvider } from '@/components/public/FilterPendingProvider';
+import { FilterLoadingOverlay } from '@/components/public/FilterLoadingOverlay';
 
 const LIMIT = 24;
 
@@ -68,6 +70,7 @@ export default async function FacilitiesByTypePage({ params, searchParams }: Pro
     }
 
     return (
+        <FilterPendingProvider>
         <>
             <ListingHero
                 title={pageTitle}
@@ -82,6 +85,7 @@ export default async function FacilitiesByTypePage({ params, searchParams }: Pro
             <div className="max-w-6xl mx-auto px-5 py-8">
                 <ListingFilterBar islands={islands} basePath={basePath} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} showViewToggle collapsibleFilters />
 
+            <FilterLoadingOverlay>
                 {facilities.length === 0 ? (
                     <div className="text-center py-16 text-gray-400">
                         <FontAwesomeIcon icon={faBuilding} className="h-12 w-12 mb-4 opacity-30" />
@@ -119,7 +123,9 @@ export default async function FacilitiesByTypePage({ params, searchParams }: Pro
                         )}
                     </div>
                 )}
+            </FilterLoadingOverlay>
             </div>
         </>
+        </FilterPendingProvider>
     );
 }
