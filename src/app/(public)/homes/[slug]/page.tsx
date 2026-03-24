@@ -256,10 +256,10 @@ export default async function HomeDetailPage({ params }: Props) {
                                     </div>
                                 )}
                                 <div className="mt-2">
-                                    <div className="w-full aspect-square rounded-lg overflow-hidden">
+                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mb-2">Location is approximate</p>}
+                                    <div className="-mx-5 -mb-5 overflow-hidden rounded-b-xl aspect-square">
                                         <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
                                     </div>
-                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mt-1">Location is approximate</p>}
                                 </div>
                             </div>
                         </div>
@@ -570,10 +570,10 @@ export default async function HomeDetailPage({ params }: Props) {
                                     </div>
                                 )}
                                 <div className="mt-2">
-                                    <div className="w-full aspect-square rounded-lg overflow-hidden">
+                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mb-2">Location is approximate</p>}
+                                    <div className="-mx-5 -mb-5 overflow-hidden rounded-b-xl aspect-square">
                                         <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
                                     </div>
-                                    {!hasAddress && <p className="text-xs text-gray-400 text-center mt-1">Location is approximate</p>}
                                 </div>
                             </div>
                         </div>

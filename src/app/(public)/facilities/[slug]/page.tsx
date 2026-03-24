@@ -242,7 +242,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
+                                <div className="-mx-5 -mb-5 mt-2 overflow-hidden rounded-b-xl aspect-square">
                                     <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
                                 </div>
                             </div>
@@ -545,7 +545,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="w-full aspect-square rounded-lg overflow-hidden mt-2">
+                                <div className="-mx-5 -mb-5 mt-2 overflow-hidden rounded-b-xl aspect-square">
                                     <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
                                 </div>
                             </div>

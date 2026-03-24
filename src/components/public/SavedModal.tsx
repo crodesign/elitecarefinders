@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faHeart, faHouse, faBuilding, faFileAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faHeart, faHouse, faBuilding, faFileAlt, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import type { Favorite } from '@/types';
 
@@ -40,7 +40,7 @@ function SavedCard({ item, onRemove, onClose }: { item: Favorite; onRemove: () =
                     </div>
                 )}
             </Link>
-            <div className="p-3">
+            <div className="p-3 text-center">
                 <Link href={path} onClick={onClose} className="block text-sm text-gray-800 hover:text-[#239ddb] transition-colors line-clamp-2 leading-tight">
                     {item.entityTitle ?? item.entitySlug}
                 </Link>
@@ -48,10 +48,10 @@ function SavedCard({ item, onRemove, onClose }: { item: Favorite; onRemove: () =
             <button
                 type="button"
                 onClick={onRemove}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white flex items-center justify-center shadow-sm transition-colors"
+                className="absolute top-2 right-2 p-1.5 rounded-md bg-white text-gray-400 hover:text-red-500 flex items-center justify-center shadow-sm transition-colors"
                 aria-label="Remove from saved"
             >
-                <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
+                <FontAwesomeIcon icon={faTrashCan} className="h-3 w-3" />
             </button>
         </div>
     );

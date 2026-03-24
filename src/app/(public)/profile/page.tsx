@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faHouse, faBuilding, faFileAlt, faTrash, faUser, faKey, faCheck, faEye, faEyeSlash, faPencil, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faHouse, faBuilding, faFileAlt, faUser, faKey, faCheck, faEye, faEyeSlash, faPencil, faArrowUpRightFromSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { Upload } from 'lucide-react';
 import { ImageCropModal } from '@/components/admin/ImageCropModal';
 import { useFavorites } from '@/contexts/FavoritesContext';
@@ -45,7 +45,7 @@ function FavoriteCard({ item, onRemove }: { item: Favorite; onRemove: () => void
                     </div>
                 )}
             </Link>
-            <div className="p-3">
+            <div className="p-3 text-center">
                 <Link href={path} className="block text-sm text-gray-800 hover:text-[#239ddb] transition-colors line-clamp-2 leading-tight">
                     {item.entityTitle ?? item.entitySlug}
                 </Link>
@@ -53,10 +53,10 @@ function FavoriteCard({ item, onRemove }: { item: Favorite; onRemove: () => void
             <button
                 type="button"
                 onClick={onRemove}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 text-gray-400 hover:text-red-500 hover:bg-white flex items-center justify-center shadow-sm transition-colors"
+                className="absolute top-2 right-2 p-1.5 rounded-md bg-white text-gray-400 hover:text-red-500 flex items-center justify-center shadow-sm transition-colors"
                 aria-label="Remove from saved"
             >
-                <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
+                <FontAwesomeIcon icon={faTrashCan} className="h-3 w-3" />
             </button>
         </div>
     );
