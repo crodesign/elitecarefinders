@@ -25,7 +25,7 @@ function Section({ label, icon, options, active, onToggle }: SectionProps) {
                 </span>
                 {label}
             </div>
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                 {options.map(opt => {
                     const isActive = active.includes(opt);
                     return (

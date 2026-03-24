@@ -111,6 +111,7 @@ export function NeighborhoodMap({ pins, islandSlug, center }: Props) {
             <div ref={containerRef} className="w-full h-full" />
             <div className="absolute bottom-2 left-2 z-[1000] bg-white/90 rounded-lg px-3 py-1.5 text-xs text-gray-500 shadow-sm pointer-events-none">
                 Click a pin to browse that neighborhood
+                <span className="sm:hidden block mt-0.5">Use two fingers to scroll and zoom</span>
             </div>
         </div>
     );
