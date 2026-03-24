@@ -14,6 +14,7 @@ interface FacilityGalleryTabProps {
     setCuisineImages?: Dispatch<SetStateAction<string[]>>;
     setIsDirty: (value: boolean) => void;
     isDirty: boolean;
+    entityId?: string;
 }
 
 export function FacilityGalleryTab({
@@ -27,6 +28,7 @@ export function FacilityGalleryTab({
     setCuisineImages,
     setIsDirty,
     isDirty,
+    entityId,
 }: FacilityGalleryTabProps) {
     return (
         <div className="sm:flex sm:flex-col sm:flex-1 sm:min-h-0">
@@ -41,6 +43,8 @@ export function FacilityGalleryTab({
                     title={`${title} Image Library`}
                     className="sm:flex-1 sm:min-h-0"
                     isDirty={isDirty}
+                    entityType="facility"
+                    entityId={entityId}
                     galleries={[
                         {
                             id: "main",

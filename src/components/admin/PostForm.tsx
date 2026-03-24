@@ -406,6 +406,8 @@ export function PostForm({ isOpen, onClose, onSave, post }: PostFormProps) {
                             ) : `${title || "Post"} Image Library`}
                             dropzoneText="this post"
                             className="flex-1 min-h-0"
+                            entityType="post"
+                            entityId={post?.id}
                             galleries={postType === 'recipes' ? undefined : [
                                 {
                                     id: "main",

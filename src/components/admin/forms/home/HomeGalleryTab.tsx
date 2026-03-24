@@ -12,6 +12,7 @@ interface HomeGalleryTabProps {
     title: string;
     setIsDirty: (value: boolean) => void;
     isDirty: boolean;
+    entityId?: string;
 }
 
 export function HomeGalleryTab({
@@ -25,6 +26,7 @@ export function HomeGalleryTab({
     title,
     setIsDirty,
     isDirty,
+    entityId,
 }: HomeGalleryTabProps) {
     return (
         <div className="sm:flex sm:flex-col sm:flex-1 sm:min-h-0">
@@ -39,6 +41,8 @@ export function HomeGalleryTab({
                     title={`${title} Image Library`}
                     className="sm:flex-1 sm:min-h-0"
                     isDirty={isDirty}
+                    entityType="home"
+                    entityId={entityId}
                     galleries={[
                         {
                             id: "main",

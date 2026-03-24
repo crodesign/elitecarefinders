@@ -920,6 +920,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         title={title}
                         setIsDirty={setIsDirty}
                         isDirty={isDirty}
+                        entityId={home?.id}
                     />
                 );
             case "videos":

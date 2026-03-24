@@ -860,6 +860,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setCuisineImages={setCuisineImages}
                         setIsDirty={setIsDirty}
                         isDirty={isDirty}
+                        entityId={facility?.id}
                     />
                 );
             case "provider":

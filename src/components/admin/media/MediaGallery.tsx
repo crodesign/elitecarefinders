@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, X, LayoutGrid, Images } from "lucide-react";
+import { Upload, X, LayoutGrid, Images, Trash2 } from "lucide-react";
 import { StockImagePicker } from "@/components/admin/media/StockImagePicker";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { MediaItem, MediaFolder } from "@/types";
@@ -50,15 +50,19 @@ interface MediaGalleryProps {
     stepImageMap?: Record<string, number>;
     entityName?: string;
     showStockImages?: boolean;
+    entityType?: "home" | "facility" | "post";
+    entityId?: string;
 }
 
-export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap, entityName, showStockImages = false }: MediaGalleryProps) {
+export function MediaGallery({ folderId, title = "Media Gallery", className = "", onMediaSelect, folders = [], galleries, isDirty = false, dropzoneText, featuredImageUrl, stepImageMap, entityName, showStockImages = false, entityType, entityId }: MediaGalleryProps) {
     const [activeGalleryId, setActiveGalleryId] = useState<"main" | "team" | "cuisine">("main");
     const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+    const [isDeletingAll, setIsDeletingAll] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const [showStockPicker, setShowStockPicker] = useState(false);
@@ -234,6 +238,31 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
         });
     };
 
+    const handleDeleteAll = async () => {
+        setIsDeletingAll(true);
+        try {
+            await Promise.all(mediaItems.map(item => deleteMediaItem(item.id)));
+            if (galleries) {
+                galleries.forEach(g => g.onChange([]));
+            }
+            if (entityType && entityId) {
+                await fetch("/api/entities/clear-gallery", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ entityType, entityId }),
+                });
+            }
+            showNotification("All images deleted");
+            await loadMedia();
+            setShowDeleteAllModal(false);
+        } catch (err) {
+            console.error("Delete all failed:", err);
+            showNotification("Delete failed", "Could not delete all images.");
+        } finally {
+            setIsDeletingAll(false);
+        }
+    };
+
     const handleRemoveBrokenImages = () => {
         const activeGallery = galleries?.find(g => g.id === activeGalleryId);
         if (!activeGallery) return;
@@ -290,6 +319,19 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                     </div>
                 </div>
             )}
+
+            {/* Delete All Modal */}
+            <ConfirmationModal
+                isOpen={showDeleteAllModal}
+                onClose={() => setShowDeleteAllModal(false)}
+                onConfirm={handleDeleteAll}
+                title="Delete All Images"
+                message={`This will permanently delete all ${mediaItems.length} image(s) from the library. This cannot be undone.`}
+                confirmLabel="Delete All"
+                cancelLabel="Cancel"
+                isDangerous={true}
+                isLoading={isDeletingAll}
+            />
 
             {/* Broken Images Modal */}
             <ConfirmationModal
@@ -411,13 +453,22 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                         </button>
                     )}
                     {mediaItems.length > 0 && (
-                        <button
-                            type="button"
-                            onClick={() => setShowUploadModal(true)}
-                            className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors shrink-0"
-                        >
-                            <Upload className="h-4 w-4" />
-                        </button>
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => setShowDeleteAllModal(true)}
+                                className="p-2 bg-surface-hover text-content-secondary hover:bg-red-500 hover:text-white rounded-lg transition-colors shrink-0"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowUploadModal(true)}
+                                className="p-2 bg-accent hover:bg-accent-light text-white rounded-lg transition-colors shrink-0"
+                            >
+                                <Upload className="h-4 w-4" />
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
