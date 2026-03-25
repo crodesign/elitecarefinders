@@ -155,8 +155,8 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
     // ── Step 1 — Where? ────────────────────────────────────────────────────────
     if (step === 1) {
         return (
-            <section className="max-w-6xl mx-auto px-5 py-10">
-                <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+            <section className="max-w-6xl mx-auto px-5 py-8">
+                <div className="bg-gray-100 rounded-2xl p-5">
                     <StepDots current={1} />
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-2">
                         Where would you like to find care?
@@ -171,14 +171,14 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                             <button
                                 key={island.slug}
                                 onClick={() => handleIslandChange(island.slug)}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                                     selectedIsland === island.slug
                                         ? 'bg-[#239ddb] text-white shadow-sm'
                                         : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
                                 }`}
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={`/images/states/${island.slug}.svg`} alt="" className="w-5 h-5 flex-none" />
+                                <img src={`/images/states/${island.slug}.svg`} alt="" className="w-5 h-5 flex-none rounded" />
                                 {island.name}
                             </button>
                         ))}
@@ -211,14 +211,14 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                             />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-2 mb-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
                             {neighborhoods.map(n => {
                                 const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
                                 return (
                                     <button
                                         key={n.slug}
                                         onClick={() => selectNeighborhood(n.slug)}
-                                        className="group flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
+                                        className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
                                     >
                                         <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
                                             {n.name}
@@ -255,8 +255,8 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
 
     if (step === 2) {
         return (
-            <section className="max-w-6xl mx-auto px-5 py-10">
-                <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+            <section className="max-w-6xl mx-auto px-5 py-8">
+                <div className="bg-gray-100 rounded-2xl p-5">
                     <StepDots current={2} />
                     <SelectionSummary items={[locationSummary]} />
 
@@ -265,14 +265,14 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                     </h2>
                     <p className="text-center text-gray-400 text-sm mb-8">Optional — you can choose more than one</p>
 
-                    <div className="space-y-2 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
                         {[...facilityTypes, ...homeTypes].map(t => {
                             const active = selectedTypes.includes(t.slug);
                             return (
                                 <button
                                     key={t.slug}
                                     onClick={() => toggleType(t.slug)}
-                                    className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
+                                    className={`w-full text-left rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
                                 >
                                     <div className="flex items-start gap-3">
                                         <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
@@ -317,8 +317,8 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
     const step3Summary = [locationSummary, ...typeNames];
 
     return (
-        <section className="max-w-6xl mx-auto px-5 py-10">
-            <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+        <section className="max-w-6xl mx-auto px-5 py-8">
+            <div className="bg-gray-100 rounded-2xl p-5">
                 <StepDots current={3} />
                 <SelectionSummary items={step3Summary} />
 
@@ -341,7 +341,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(bedroom, setBedroom, opt)}
-                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
                                             bedroom.includes(opt)
                                                 ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
                                                 : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
@@ -365,7 +365,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(bathroom, setBathroom, opt)}
-                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
                                             bathroom.includes(opt)
                                                 ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
                                                 : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
@@ -389,7 +389,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(shower, setShower, opt)}
-                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
                                             shower.includes(opt)
                                                 ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
                                                 : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
