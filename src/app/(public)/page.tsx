@@ -17,7 +17,7 @@ import { buildHomepageJsonLd } from '@/lib/seo';
 import type { PublicSocialAccount } from '@/lib/public-db';
 import type { FacilityListingCard } from '@/lib/public-db';
 import type { HomeOfMonth } from '@/lib/public-db';
-import { SearchSection } from '@/components/public/SearchSection';
+import { HomepageWizard } from '@/components/public/HomepageWizard';
 import { JoinNetworkCTA } from '@/components/public/JoinNetworkCTA';
 import { MobileShareButton } from '@/components/public/MobileShareButton';
 
@@ -116,7 +116,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings, oahuNeighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings, oahuNeighborhoodCounts, mauiNeighborhoodCounts, bigIslandNeighborhoodCounts, kauaiNeighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
@@ -127,11 +127,21 @@ export default async function HomePage() {
         getVideoTestimonials(),
         getHomepageSeo(),
         getLocationChildEntriesWithCounts('oahu'),
+        getLocationChildEntriesWithCounts('maui'),
+        getLocationChildEntriesWithCounts('big-island'),
+        getLocationChildEntriesWithCounts('kauai'),
         getBrowseNavTypes(),
         getPublicFixedFieldOptions('bedroom'),
         getPublicFixedFieldOptions('bathroom'),
         getPublicFixedFieldOptions('shower'),
     ]);
+
+    const allIslandCounts: Record<string, typeof oahuNeighborhoodCounts> = {
+        oahu: oahuNeighborhoodCounts,
+        maui: mauiNeighborhoodCounts,
+        'big-island': bigIslandNeighborhoodCounts,
+        kauai: kauaiNeighborhoodCounts,
+    };
 
     const searchMapPins: NeighborhoodPin[] = oahuNeighborhoodCounts
         .filter(n => (n.homes + n.facilities) > 0 && NEIGHBORHOOD_COORDS[n.slug])
@@ -184,7 +194,7 @@ export default async function HomePage() {
                 locationNames={homeOfMonthLocationNames}
             />
         ) : null,
-        'search': <SearchSection key="search" islands={hawaiiIslandsWithNeighborhoods} mapPins={searchMapPins} homeTypes={homeTypes} facilityTypes={facilityTypes} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} />,
+        'search': <HomepageWizard key="search" islands={hawaiiIslandsWithNeighborhoods} islandCounts={allIslandCounts} mapPins={searchMapPins} homeTypes={homeTypes} facilityTypes={facilityTypes} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} />,
         'about': <AboutSection key="about" />,
         'content': <ContentSection key="content" />,
         'testimonials': <TestimonialsWidget key="testimonials" />,

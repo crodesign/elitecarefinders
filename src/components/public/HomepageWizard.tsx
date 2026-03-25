@@ -1,0 +1,453 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faChevronLeft, faBed, faBath, faShower, faHouse, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import type { NeighborhoodPin } from '@/components/public/NeighborhoodMap';
+import { HeartLoader } from '@/components/ui/HeartLoader';
+
+const DynamicMap = dynamic(() => import('@/components/public/NeighborhoodMap'), {
+    ssr: false,
+    loading: () => <div className="w-full h-full min-h-[360px] bg-gray-100 rounded-xl animate-pulse" />,
+});
+
+const ISLAND_CENTERS: Record<string, [number, number]> = {
+    oahu: [21.4389, -158.0001],
+    maui: [20.796, -156.331],
+    'big-island': [19.596, -155.435],
+    kauai: [22.054, -159.537],
+};
+
+const CARE_DESCRIPTIONS: Record<string, string> = {
+    'adult-foster-home': 'Small family home with personal, round-the-clock care',
+    'adult-foster': 'Small family home with personal, round-the-clock care',
+    'residential-care-home': 'Home-like setting with full-time caregivers on site',
+    'care-home': 'Home-like setting with full-time caregivers on site',
+    'assisted-living': 'Apartment-style community with on-site support staff',
+    'memory-care': 'Specialized support for dementia and memory conditions',
+    'independent-living': 'Active senior community with optional care services',
+    'nursing-facility': 'Skilled nursing care with 24/7 medical supervision',
+    'nursing-home': 'Skilled nursing care with 24/7 medical supervision',
+    'adult-day-care': 'Daytime programs and activities with professional supervision',
+};
+
+function getCareIcon(slug: string, name: string) {
+    const s = (slug + name).toLowerCase();
+    if (s.includes('foster') || s.includes('residential') || s.includes('care home')) return faHouse;
+    return faBuilding;
+}
+
+function careDesc(slug: string): string {
+    return CARE_DESCRIPTIONS[slug] ?? 'Quality senior care with professional support';
+}
+
+function StepDots({ current }: { current: number }) {
+    return (
+        <div className="flex items-center gap-2 justify-center mb-8">
+            {[1, 2, 3].map(n => (
+                <div
+                    key={n}
+                    className={`rounded-full transition-all duration-300 ${n === current ? 'w-7 h-3 bg-[#239ddb]' : 'w-3 h-3 bg-gray-200'}`}
+                />
+            ))}
+        </div>
+    );
+}
+
+function SelectionPill({ label }: { label: string }) {
+    return (
+        <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-[#239ddb] text-sm font-medium border border-blue-100">
+            {label}
+        </span>
+    );
+}
+
+function SelectionSummary({ items }: { items: string[] }) {
+    if (items.length === 0) return null;
+    return (
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            {items.map((item, i) => <SelectionPill key={i} label={item} />)}
+        </div>
+    );
+}
+
+interface Neighborhood { id: string; name: string; slug: string; }
+interface Island { id: string; name: string; slug: string; neighborhoods: Neighborhood[]; }
+interface CareType { id: string; name: string; slug: string; }
+interface NeighborhoodCount { id: string; name: string; slug: string; homes: number; facilities: number; }
+
+interface Props {
+    islands: Island[];
+    islandCounts: Record<string, NeighborhoodCount[]>;
+    mapPins: NeighborhoodPin[];
+    homeTypes: CareType[];
+    facilityTypes: CareType[];
+    bedroomOptions: string[];
+    bathroomOptions: string[];
+    showerOptions: string[];
+}
+
+export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, facilityTypes, bedroomOptions, bathroomOptions, showerOptions }: Props) {
+    const router = useRouter();
+    const [step, setStep] = useState<1 | 2 | 3>(1);
+    const [selectedIsland, setSelectedIsland] = useState('oahu');
+    const [selectedNeighborhood, setSelectedNeighborhood] = useState<string | null>(null);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [bedroom, setBedroom] = useState<string[]>([]);
+    const [bathroom, setBathroom] = useState<string[]>([]);
+    const [shower, setShower] = useState<string[]>([]);
+    const [showMap, setShowMap] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    const countMap = useMemo(
+        () => new Map((islandCounts[selectedIsland] ?? []).map(c => [c.slug, c.homes + c.facilities])),
+        [islandCounts, selectedIsland]
+    );
+    const facilityTypeSlugs = useMemo(() => new Set(facilityTypes.map(t => t.slug)), [facilityTypes]);
+
+    const currentIsland = islands.find(i => i.slug === selectedIsland);
+
+    const neighborhoods = useMemo(() => {
+        const ns = currentIsland?.neighborhoods ?? [];
+        if (islandCounts[selectedIsland]) {
+            return ns.filter(n => (countMap.get(n.slug) ?? 0) > 0);
+        }
+        return ns;
+    }, [currentIsland, selectedIsland, islandCounts, countMap]);
+
+    function toggleType(slug: string) {
+        setSelectedTypes(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
+    }
+
+    function toggleChip(arr: string[], setArr: (v: string[]) => void, val: string) {
+        setArr(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
+    }
+
+    function buildUrl(): string {
+        const params = new URLSearchParams();
+        if (bedroom.length) params.set('bedroom', bedroom.join(','));
+        if (bathroom.length) params.set('bathroom', bathroom.join(','));
+        if (shower.length) params.set('shower', shower.join(','));
+        if (selectedTypes.length === 1) params.set('type', selectedTypes[0]);
+        const qs = params.size > 0 ? `?${params.toString()}` : '';
+
+        if (selectedNeighborhood) {
+            return `/location/hawaii/${selectedIsland}/${selectedNeighborhood}${qs}`;
+        }
+        const facilityOnly = selectedTypes.length > 0 && selectedTypes.every(t => facilityTypeSlugs.has(t));
+        return facilityOnly ? `/facilities${qs}` : `/homes${qs}`;
+    }
+
+    function selectNeighborhood(slug: string) {
+        setSelectedNeighborhood(slug);
+        setStep(2);
+    }
+
+    function handleIslandChange(slug: string) {
+        setSelectedIsland(slug);
+        setSelectedNeighborhood(null);
+        setShowMap(false);
+    }
+
+    // ── Step 1 — Where? ────────────────────────────────────────────────────────
+    if (step === 1) {
+        return (
+            <section className="max-w-6xl mx-auto px-5 py-10">
+                <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+                    <StepDots current={1} />
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-2">
+                        Where would you like to find care?
+                    </h2>
+                    <p className="text-center text-gray-400 text-sm mb-8">
+                        Choose a neighborhood to see what&apos;s available nearby
+                    </p>
+
+                    {/* Island tabs + Map toggle */}
+                    <div className="flex items-center gap-2 mb-6 flex-wrap">
+                        {islands.map(island => (
+                            <button
+                                key={island.slug}
+                                onClick={() => handleIslandChange(island.slug)}
+                                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                    selectedIsland === island.slug
+                                        ? 'bg-[#239ddb] text-white shadow-sm'
+                                        : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                                }`}
+                            >
+                                {island.name}
+                            </button>
+                        ))}
+                        {selectedIsland === 'oahu' && (
+                            <button
+                                onClick={() => setShowMap(v => !v)}
+                                className={`ml-auto px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border-2 ${
+                                    showMap
+                                        ? 'border-[#239ddb] text-[#239ddb] bg-blue-50'
+                                        : 'border-gray-200 bg-white text-gray-500 shadow-sm hover:border-[#239ddb] hover:text-[#239ddb]'
+                                }`}
+                            >
+                                {showMap ? 'Grid view' : 'Map view'}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Map or Neighborhood grid */}
+                    {showMap && selectedIsland === 'oahu' ? (
+                        <div className="rounded-xl overflow-hidden mb-6" style={{ height: 380 }}>
+                            <DynamicMap
+                                pins={mapPins}
+                                islandSlug={selectedIsland}
+                                center={ISLAND_CENTERS[selectedIsland]}
+                                onPinClick={pin => selectNeighborhood(pin.slug)}
+                            />
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
+                            {neighborhoods.map(n => {
+                                const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
+                                return (
+                                    <button
+                                        key={n.slug}
+                                        onClick={() => selectNeighborhood(n.slug)}
+                                        className="group flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
+                                            {n.name}
+                                        </span>
+                                        {count !== null && count > 0 && (
+                                            <span className="ml-3 flex-none text-xs font-semibold bg-gray-100 group-hover:bg-blue-50 group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">
+                                                {count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    <div className="text-center">
+                        <button
+                            onClick={() => setStep(2)}
+                            className="text-sm text-gray-400 hover:text-[#239ddb] transition-colors inline-flex items-center gap-1.5"
+                        >
+                            Browse all on {currentIsland?.name ?? 'island'}
+                            <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // ── Step 2 — What kind of care? ────────────────────────────────────────────
+    const islandName = islands.find(i => i.slug === selectedIsland)?.name ?? selectedIsland;
+    const neighborhoodName = currentIsland?.neighborhoods.find(n => n.slug === selectedNeighborhood)?.name;
+    const locationSummary = neighborhoodName ? `${islandName} — ${neighborhoodName}` : islandName;
+
+    if (step === 2) {
+        return (
+            <section className="max-w-6xl mx-auto px-5 py-10">
+                <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+                    <StepDots current={2} />
+                    <SelectionSummary items={[locationSummary]} />
+
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-2">
+                        What kind of care are you looking for?
+                    </h2>
+                    <p className="text-center text-gray-400 text-sm mb-8">Optional — you can choose more than one</p>
+
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                        {/* Column 1 — Communities */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Senior Living Communities</p>
+                            {facilityTypes.map(t => {
+                                const active = selectedTypes.includes(t.slug);
+                                return (
+                                    <button
+                                        key={t.slug}
+                                        onClick={() => toggleType(t.slug)}
+                                        className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
+                                                <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
+                                            </div>
+                                            <div>
+                                                <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
+                                                <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {/* Column 2 — Care Homes */}
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Care Homes &amp; Foster Homes</p>
+                            {homeTypes.map(t => {
+                                const active = selectedTypes.includes(t.slug);
+                                return (
+                                    <button
+                                        key={t.slug}
+                                        onClick={() => toggleType(t.slug)}
+                                        className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
+                                                <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
+                                            </div>
+                                            <div>
+                                                <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
+                                                <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3">
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <button
+                                onClick={() => setStep(1)}
+                                className="flex items-center gap-2 border-2 border-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-xl hover:border-gray-300 hover:bg-gray-100 transition-all"
+                            >
+                                <FontAwesomeIcon icon={faChevronLeft} className="h-3.5 w-3.5" />
+                                Back
+                            </button>
+                            <button
+                                onClick={() => setStep(3)}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#239ddb] text-white font-semibold px-8 py-3 rounded-xl hover:opacity-90 transition-opacity"
+                            >
+                                Continue
+                                <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // ── Step 3 — Room preferences ──────────────────────────────────────────────
+    const allTypes = [...facilityTypes, ...homeTypes];
+    const typeNames = selectedTypes.map(slug => allTypes.find(t => t.slug === slug)?.name).filter(Boolean) as string[];
+    const step3Summary = [locationSummary, ...typeNames];
+
+    return (
+        <section className="max-w-6xl mx-auto px-5 py-10">
+            <div className="bg-gray-100 rounded-2xl p-6 sm:p-10">
+                <StepDots current={3} />
+                <SelectionSummary items={step3Summary} />
+
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-1">
+                    Any room preferences?
+                </h2>
+                <p className="text-center text-gray-400 text-sm mb-10">
+                    Optional — leave blank if you&apos;re not sure
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+                    {bedroomOptions.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <FontAwesomeIcon icon={faBed} className="h-4 w-4 text-[#239ddb]" />
+                                <span className="text-sm font-semibold text-gray-700">Bed size</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {bedroomOptions.map(opt => (
+                                    <button
+                                        key={opt}
+                                        onClick={() => toggleChip(bedroom, setBedroom, opt)}
+                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                            bedroom.includes(opt)
+                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
+                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                        }`}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {bathroomOptions.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <FontAwesomeIcon icon={faBath} className="h-4 w-4 text-[#239ddb]" />
+                                <span className="text-sm font-semibold text-gray-700">Bathroom</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {bathroomOptions.map(opt => (
+                                    <button
+                                        key={opt}
+                                        onClick={() => toggleChip(bathroom, setBathroom, opt)}
+                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                            bathroom.includes(opt)
+                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
+                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                        }`}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {showerOptions.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <FontAwesomeIcon icon={faShower} className="h-4 w-4 text-[#239ddb]" />
+                                <span className="text-sm font-semibold text-gray-700">Shower</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {showerOptions.map(opt => (
+                                    <button
+                                        key={opt}
+                                        onClick={() => toggleChip(shower, setShower, opt)}
+                                        className={`py-3 rounded-xl border-2 font-medium text-sm transition-all ${
+                                            shower.includes(opt)
+                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
+                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                        }`}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center justify-end gap-3">
+                    <button
+                        onClick={() => setStep(2)}
+                        className="flex items-center gap-2 border-2 border-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-xl hover:border-gray-300 hover:bg-gray-100 transition-all"
+                    >
+                        <FontAwesomeIcon icon={faChevronLeft} className="h-3.5 w-3.5" />
+                        Back
+                    </button>
+                    <button
+                        onClick={() => { setIsNavigating(true); router.push(buildUrl()); }}
+                        className="flex items-center justify-center gap-2 bg-[#239ddb] text-white font-bold px-10 py-3 rounded-xl hover:opacity-90 transition-opacity shadow-sm"
+                    >
+                        Find Care Homes
+                        <FontAwesomeIcon icon={faArrowRight} className="h-4 w-4" />
+                    </button>
+                </div>
+            </div>
+            {isNavigating && (
+                <div className="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div style={{ '--accent': '#239ddb' } as React.CSSProperties}>
+                        <HeartLoader size={16} />
+                    </div>
+                </div>
+            )}
+        </section>
+    );
+}

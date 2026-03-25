@@ -25,9 +25,10 @@ interface Props {
     pins: NeighborhoodPin[];
     islandSlug: string;
     center: [number, number];
+    onPinClick?: (pin: NeighborhoodPin) => void;
 }
 
-export function NeighborhoodMap({ pins, islandSlug, center }: Props) {
+export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
     const router = useRouter();
@@ -90,7 +91,13 @@ export function NeighborhoodMap({ pins, islandSlug, center }: Props) {
 
                 const marker = L.marker([pin.lat, pin.lng], { icon });
                 marker.bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -size / 2 + 4] });
-                marker.on('click', () => router.push(`/location/hawaii/${islandSlug}/${pin.slug}`));
+                marker.on('click', () => {
+                    if (onPinClick) {
+                        onPinClick(pin);
+                    } else {
+                        router.push(`/location/hawaii/${islandSlug}/${pin.slug}`);
+                    }
+                });
                 marker.addTo(map);
             });
 
