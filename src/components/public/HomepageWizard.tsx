@@ -21,28 +21,14 @@ const ISLAND_CENTERS: Record<string, [number, number]> = {
     kauai: [22.054, -159.537],
 };
 
-const CARE_DESCRIPTIONS: Record<string, string> = {
-    'adult-foster-home': 'Small family home with personal, round-the-clock care',
-    'adult-foster': 'Small family home with personal, round-the-clock care',
-    'residential-care-home': 'Home-like setting with full-time caregivers on site',
-    'care-home': 'Home-like setting with full-time caregivers on site',
-    'assisted-living': 'Apartment-style community with on-site support staff',
-    'memory-care': 'Specialized support for dementia and memory conditions',
-    'independent-living': 'Active senior community with optional care services',
-    'nursing-facility': 'Skilled nursing care with 24/7 medical supervision',
-    'nursing-home': 'Skilled nursing care with 24/7 medical supervision',
-    'adult-day-care': 'Daytime programs and activities with professional supervision',
-};
-
-function getCareIcon(slug: string, name: string) {
-    const s = (slug + name).toLowerCase();
-    if (s.includes('foster') || s.includes('residential') || s.includes('care home')) return faHouse;
-    return faBuilding;
-}
-
-function careDesc(slug: string): string {
-    return CARE_DESCRIPTIONS[slug] ?? 'Quality senior care with professional support';
-}
+const WIZARD_CARE_TYPES = [
+    { slugs: ['independent-living'], name: 'Independent Living', desc: 'Active senior community with optional care services', icon: faBuilding },
+    { slugs: ['assisted-living'], name: 'Assisted Living', desc: 'Apartment-style community with on-site support staff', icon: faBuilding },
+    { slugs: ['memory-care'], name: 'Memory Care', desc: 'Specialized support for dementia and memory conditions', icon: faBuilding },
+    { slugs: ['adult-residential-care-homes'], name: 'Care Homes', desc: 'Home-like setting with full-time caregivers on site', icon: faHouse },
+    { slugs: ['adult-foster-homes'], name: 'Foster Homes', desc: 'Community Care Foster Family Homes', icon: faHouse },
+    { slugs: ['intermediate-care-facility', 'skilled-nursing-facility'], name: 'Intermediate Care & Skilled Nursing Facilities', desc: 'Skilled nursing care with 24/7 medical supervision', icon: faBuilding },
+];
 
 function StepDots({ current }: { current: number }) {
     return (
@@ -106,7 +92,11 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
         () => new Map((islandCounts[selectedIsland] ?? []).map(c => [c.slug, c.homes + c.facilities])),
         [islandCounts, selectedIsland]
     );
-    const facilityTypeSlugs = useMemo(() => new Set(facilityTypes.map(t => t.slug)), [facilityTypes]);
+    const facilityTypeSlugs = useMemo(() => {
+        const s = new Set(facilityTypes.map(t => t.slug));
+        s.add('memory-care');
+        return s;
+    }, [facilityTypes]);
 
     const currentIsland = islands.find(i => i.slug === selectedIsland);
 
@@ -118,8 +108,13 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
         return ns;
     }, [currentIsland, selectedIsland, islandCounts, countMap]);
 
-    function toggleType(slug: string) {
-        setSelectedTypes(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
+    function toggleType(slugs: string[]) {
+        const isActive = slugs.some(s => selectedTypes.includes(s));
+        if (isActive) {
+            setSelectedTypes(prev => prev.filter(s => !slugs.includes(s)));
+        } else {
+            setSelectedTypes(prev => [...prev, ...slugs.filter(s => !prev.includes(s))]);
+        }
     }
 
     function toggleChip(arr: string[], setArr: (v: string[]) => void, val: string) {
@@ -265,22 +260,22 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                     </h2>
                     <p className="text-center text-gray-400 text-sm mb-8">Optional — you can choose more than one</p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
-                        {[...facilityTypes, ...homeTypes].map(t => {
-                            const active = selectedTypes.includes(t.slug);
+                    <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-3 sm:grid-flow-col gap-2 mb-8">
+                        {WIZARD_CARE_TYPES.map(t => {
+                            const active = t.slugs.some(s => selectedTypes.includes(s));
                             return (
                                 <button
-                                    key={t.slug}
-                                    onClick={() => toggleType(t.slug)}
+                                    key={t.slugs[0]}
+                                    onClick={() => toggleType(t.slugs)}
                                     className={`w-full text-left rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
                                 >
                                     <div className="flex items-start gap-3">
                                         <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
-                                            <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
+                                            <FontAwesomeIcon icon={t.icon} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
                                         </div>
                                         <div>
                                             <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
-                                            <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
+                                            <span className="block text-xs text-gray-400 leading-snug">{t.desc}</span>
                                         </div>
                                     </div>
                                 </button>
@@ -312,8 +307,9 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
     }
 
     // ── Step 3 — Room preferences ──────────────────────────────────────────────
-    const allTypes = [...facilityTypes, ...homeTypes];
-    const typeNames = selectedTypes.map(slug => allTypes.find(t => t.slug === slug)?.name).filter(Boolean) as string[];
+    const typeNames = WIZARD_CARE_TYPES
+        .filter(t => t.slugs.some(s => selectedTypes.includes(s)))
+        .map(t => t.name);
     const step3Summary = [locationSummary, ...typeNames];
 
     return (
@@ -341,10 +337,10 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(bedroom, setBedroom, opt)}
-                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl font-medium text-sm shadow-sm hover:shadow-md transition-shadow ${
                                             bedroom.includes(opt)
-                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
-                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                                ? 'bg-blue-50 ring-2 ring-[#239ddb] text-[#239ddb]'
+                                                : 'bg-white text-gray-600'
                                         }`}
                                     >
                                         {opt}
@@ -365,10 +361,10 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(bathroom, setBathroom, opt)}
-                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl font-medium text-sm shadow-sm hover:shadow-md transition-shadow ${
                                             bathroom.includes(opt)
-                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
-                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                                ? 'bg-blue-50 ring-2 ring-[#239ddb] text-[#239ddb]'
+                                                : 'bg-white text-gray-600'
                                         }`}
                                     >
                                         {opt}
@@ -389,10 +385,10 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                                     <button
                                         key={opt}
                                         onClick={() => toggleChip(shower, setShower, opt)}
-                                        className={`py-2 rounded-xl border-2 font-medium text-sm transition-all ${
+                                        className={`py-2 rounded-xl font-medium text-sm shadow-sm hover:shadow-md transition-shadow ${
                                             shower.includes(opt)
-                                                ? 'border-[#239ddb] bg-blue-50 text-[#239ddb]'
-                                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#239ddb]'
+                                                ? 'bg-blue-50 ring-2 ring-[#239ddb] text-[#239ddb]'
+                                                : 'bg-white text-gray-600'
                                         }`}
                                     >
                                         {opt}
