@@ -49,32 +49,31 @@ export function ResourcesModal({ onClose }: ResourcesModalProps) {
 
             {/* Scrolling card */}
             <div className="modal-content-slide-in flex-1 overflow-y-auto w-full pb-6">
-                <div className="max-w-[480px] mx-5 sm:mx-auto bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl" onClick={e => e.stopPropagation()}>
+                <div className="max-w-[480px] mx-5 sm:mx-auto bg-white pt-6 px-6 shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
 
-                    <ul className="space-y-1">
+                    <div className="flex flex-col gap-2">
                         {POST_TYPE_CONFIG.map(pt => {
                             const icon = ICON_MAP[pt.icon] ?? faBook;
                             return (
-                                <li key={pt.postType}>
-                                    <Link
-                                        href={`/resources/${pt.slug}`}
-                                        onClick={onClose}
-                                        className="group flex items-start gap-3 py-2.5 px-3 -mx-3 rounded-lg hover:bg-gray-100 transition-colors"
-                                    >
-                                        <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#239ddb]/10 text-[#239ddb] shrink-0 mt-0.5 group-hover:bg-[#239ddb] group-hover:text-white transition-colors">
-                                            <FontAwesomeIcon icon={icon} className="h-3.5 w-3.5" />
-                                        </span>
-                                        <span>
-                                            <span className="block text-sm font-semibold text-gray-800 group-hover:text-[#239ddb] transition-colors">{pt.label}</span>
-                                            <span className="block text-xs text-gray-400 mt-0.5">{pt.description}</span>
-                                        </span>
-                                    </Link>
-                                </li>
+                                <Link
+                                    key={pt.postType}
+                                    href={`/resources/${pt.slug}`}
+                                    onClick={onClose}
+                                    className="group w-full text-left rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition-shadow flex items-start gap-3"
+                                >
+                                    <div className="flex-none w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 group-hover:bg-[#239ddb] transition-colors">
+                                        <FontAwesomeIcon icon={icon} className="h-4 w-4 text-gray-500 group-hover:text-white transition-colors" />
+                                    </div>
+                                    <div>
+                                        <span className="block font-semibold text-sm leading-snug mb-0.5 text-gray-800 group-hover:text-[#239ddb] transition-colors">{pt.label}</span>
+                                        <span className="block text-xs text-gray-400 leading-snug">{pt.description}</span>
+                                    </div>
+                                </Link>
                             );
                         })}
-                    </ul>
+                    </div>
 
-                    <div className="pt-4 mt-2 border-t border-gray-100">
+                    <div className="-mx-6 px-6 pt-4 pb-6 mt-2 bg-gray-100 rounded-b-2xl">
                         <Link
                             href="/resources"
                             onClick={onClose}
@@ -83,7 +82,7 @@ export function ResourcesModal({ onClose }: ResourcesModalProps) {
                             <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
                                 <FontAwesomeIcon icon={faBookOpen} className="h-3 w-3 text-white" />
                             </span>
-                            All Resources
+                            View All Resources
                         </Link>
                     </div>
                 </div>

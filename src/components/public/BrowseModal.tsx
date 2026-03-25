@@ -3,14 +3,21 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faBrain, faLocationDot, faShareNodes } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faLocationDot, faShareNodes } from '@fortawesome/free-solid-svg-icons';
 import { SearchableLocationDropdown } from '@/components/public/SearchableLocationDropdown';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { getSocialAccounts, getHomepageSeo, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
 
-const HOME_TYPE_TAX_ID = '286967ff-a897-4529-9c25-6f452f77f0d7';
-const FACILITY_TYPE_TAX_ID = 'aaff7539-60ec-448d-ae56-5ee8763917f6';
+const NAV_CARE_TYPES = [
+    { href: '/facilities/type/independent-living',       name: 'Independent Living',                          desc: 'Active senior community with optional care services',     icon: faBuilding },
+    { href: '/facilities/type/assisted-living',          name: 'Assisted Living',                             desc: 'Apartment-style community with on-site support staff',    icon: faBuilding },
+    { href: '/facilities/type/memory-care',              name: 'Memory Care',                                 desc: 'Specialized support for dementia and memory conditions',  icon: faBuilding },
+    { href: '/homes/type/adult-residential-care-homes',  name: 'Care Homes',                                  desc: 'Home-like setting with full-time caregivers on site',     icon: faHouse },
+    { href: '/homes/type/adult-foster-homes',            name: 'Foster Homes',                                desc: 'Community Care Foster Family Homes',                      icon: faHouse },
+    { href: '/facilities/type/intermediate-care-facility', name: 'Intermediate Care & Skilled Nursing Facilities', desc: 'Skilled nursing care with 24/7 medical supervision', icon: faBuilding },
+];
+
 
 const SOCIAL_ICON_MAP: Record<SocialPlatform, typeof faFacebookF> = {
     facebook:  faFacebookF,
@@ -49,8 +56,6 @@ interface BrowseModalProps {
 }
 
 export function BrowseModal({ onClose }: BrowseModalProps) {
-    const [homeTypes, setHomeTypes] = useState<TaxEntry[]>([]);
-    const [facilityTypes, setFacilityTypes] = useState<TaxEntry[]>([]);
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
     const [homepageTitle, setHomepageTitle] = useState('EliteCareFinders');
     const [homepageText, setHomepageText] = useState('');
@@ -58,19 +63,6 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
     const [hawaiiIslands, setHawaiiIslands] = useState<TaxEntry[]>([]);
 
     useEffect(() => {
-        const supabase = createClientComponentClient();
-        supabase
-            .from('taxonomy_entries')
-            .select('id, name, slug, taxonomy_id')
-            .in('taxonomy_id', [HOME_TYPE_TAX_ID, FACILITY_TYPE_TAX_ID])
-            .order('display_order', { ascending: true, nullsFirst: false })
-            .order('name')
-            .then(({ data }) => {
-                if (!data) return;
-                setHomeTypes(data.filter(e => e.taxonomy_id === HOME_TYPE_TAX_ID));
-                setFacilityTypes(data.filter(e => e.taxonomy_id === FACILITY_TYPE_TAX_ID));
-            });
-
         getSocialAccounts().then(accounts => setSocialAccounts(accounts));
         getHomepageSeo().then(seo => {
             if (seo.metaTitle) setHomepageTitle(seo.metaTitle);
@@ -78,6 +70,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
         });
 
         (async () => {
+            const supabase = createClientComponentClient();
             const { data: tax } = await supabase.from('taxonomies').select('id').eq('slug', 'location').maybeSingle();
             if (!tax) return;
             const { data: states } = await supabase.from('taxonomy_entries').select('id, name, slug').eq('taxonomy_id', tax.id).is('parent_id', null).order('name');
@@ -127,78 +120,24 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
             <div className="modal-content-slide-in flex-1 overflow-y-auto w-full pb-6">
                 <div className="max-w-[480px] mx-5 sm:mx-auto bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.15)] rounded-b-2xl" onClick={e => e.stopPropagation()}>
 
-                    {/* Facilities section */}
-                    <div className="mb-6">
-                        <Link href="/facilities" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
-                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
-                                <FontAwesomeIcon icon={faBuilding} className="h-3 w-3 text-white" />
-                            </span>
-                            Senior Living Communities
-                        </Link>
-                        <ul className="space-y-0.5 pl-7">
-                            {facilityTypes.map(type => (
-                                <li key={type.id}>
-                                    <Link
-                                        href={`/facilities/type/${type.slug}`}
-                                        onClick={onClose}
-                                        className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
-                                    >
-                                        {type.name}
-                                    </Link>
-                                </li>
-                            ))}
-                            <li>
-                                <Link
-                                    href="/facilities"
-                                    onClick={onClose}
-                                    className="block text-sm font-semibold text-gray-500 hover:text-[#239ddb] py-0.5 transition-colors"
-                                >
-                                    View all Communities →
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Homes section */}
-                    <div className="mb-6">
-                        <Link href="/homes" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] mb-3 transition-colors">
-                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
-                                <FontAwesomeIcon icon={faHouse} className="h-3 w-3 text-white" />
-                            </span>
-                            Care Homes &amp; Adult Foster Homes
-                        </Link>
-                        <ul className="space-y-0.5 pl-7">
-                            {homeTypes.map(type => (
-                                <li key={type.id}>
-                                    <Link
-                                        href={`/homes/type/${type.slug}`}
-                                        onClick={onClose}
-                                        className="block text-sm text-gray-700 hover:text-[#239ddb] py-0.5 transition-colors"
-                                    >
-                                        {type.name}
-                                    </Link>
-                                </li>
-                            ))}
-                            <li>
-                                <Link
-                                    href="/homes"
-                                    onClick={onClose}
-                                    className="block text-sm font-semibold text-gray-500 hover:text-[#239ddb] py-0.5 transition-colors"
-                                >
-                                    View all Homes →
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Memory Care section */}
-                    <div className="mb-6">
-                        <Link href="/facilities/type/memory-care" onClick={onClose} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#239ddb] transition-colors">
-                            <span className="flex items-center justify-center w-5 h-5 rounded bg-[#239ddb] shrink-0">
-                                <FontAwesomeIcon icon={faBrain} className="h-3 w-3 text-white" />
-                            </span>
-                            Memory Care
-                        </Link>
+                    {/* Care type cards */}
+                    <div className="flex flex-col gap-2 mb-6">
+                        {NAV_CARE_TYPES.map(t => (
+                            <Link
+                                key={t.href}
+                                href={t.href}
+                                onClick={onClose}
+                                className="group w-full text-left rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition-shadow flex items-start gap-3"
+                            >
+                                <div className="flex-none w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 group-hover:bg-[#239ddb] transition-colors">
+                                    <FontAwesomeIcon icon={t.icon} className="h-4 w-4 text-gray-500 group-hover:text-white transition-colors" />
+                                </div>
+                                <div>
+                                    <span className="block font-semibold text-sm leading-snug mb-0.5 text-gray-800 group-hover:text-[#239ddb] transition-colors">{t.name}</span>
+                                    <span className="block text-xs text-gray-400 leading-snug">{t.desc}</span>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
 
                     {/* Location section */}
