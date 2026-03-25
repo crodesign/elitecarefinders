@@ -25,7 +25,7 @@ export async function PUT(request: Request) {
 
     const { error } = await supabaseAdmin
         .from('site_settings')
-        .upsert({ key: 'featured_video_order', value: order, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        .upsert({ key: 'featured_video_order', value: JSON.stringify(order), updated_at: new Date().toISOString() }, { onConflict: 'key' });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

@@ -42,7 +42,13 @@ export async function GET() {
         .eq('key', 'homepage_sections')
         .maybeSingle();
 
-    const saved: { id: string; visible: boolean }[] = Array.isArray(data?.value) ? data.value : [];
+    const rawSections = data?.value;
+    let saved: { id: string; visible: boolean }[] = [];
+    if (Array.isArray(rawSections)) {
+        saved = rawSections;
+    } else if (typeof rawSections === 'string' && rawSections) {
+        try { saved = JSON.parse(rawSections); } catch { saved = []; }
+    }
 
     let sections;
     if (saved.length > 0) {
@@ -78,7 +84,7 @@ export async function PUT(request: Request) {
     console.log('[sections PUT] writing', toStore.length, 'sections to DB');
     const { error } = await auth.supabaseAdmin
         .from('site_settings')
-        .upsert({ key: 'homepage_sections', value: toStore, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        .upsert({ key: 'homepage_sections', value: JSON.stringify(toStore), updated_at: new Date().toISOString() }, { onConflict: 'key' });
 
     console.log('[sections PUT] upsert error:', error?.message ?? 'none');
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

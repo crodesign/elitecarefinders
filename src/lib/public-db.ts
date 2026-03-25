@@ -507,7 +507,13 @@ export async function getFeaturedVideoItems(): Promise<FeaturedVideoItem[]> {
         if (v?.url) raw.push({ videoUrl: v.url, thumbnailUrl: v.thumbnailUrl || null, entityImage: row.images?.[0] || null, caption: v.caption || null, entityTitle: row.title, entitySlug: row.slug, entityType: 'facility' });
     });
 
-    const savedOrder: { entityType: string; entitySlug: string }[] = settingsRes.data?.value || [];
+    const rawOrder = settingsRes.data?.value;
+    let savedOrder: { entityType: string; entitySlug: string }[] = [];
+    if (Array.isArray(rawOrder)) {
+        savedOrder = rawOrder;
+    } else if (typeof rawOrder === 'string' && rawOrder) {
+        try { savedOrder = JSON.parse(rawOrder); } catch { savedOrder = []; }
+    }
     if (!savedOrder.length) return raw;
 
     const ordered: FeaturedVideoItem[] = [];

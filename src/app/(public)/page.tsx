@@ -104,15 +104,6 @@ function socialHref(platform: string, url: string): string {
     return url;
 }
 
-function shuffleArray<T>(arr: T[]): T[] {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
@@ -178,7 +169,7 @@ export default async function HomePage() {
             .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i);
     }
 
-    const videoItems = shuffleArray(featuredVideos).slice(0, 8);
+    const videoItems = featuredVideos.slice(0, 8);
 
     const sectionComponents: Record<string, React.ReactNode> = {
         'hero': <HeroSection key="hero" />,

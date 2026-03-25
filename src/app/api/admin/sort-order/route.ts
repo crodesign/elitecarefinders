@@ -78,7 +78,13 @@ export async function GET() {
     });
 
     // Apply saved video order
-    const savedOrder: { entityType: string; entitySlug: string }[] = settingsRes.data?.value || [];
+    const rawVideoOrder = settingsRes.data?.value;
+    let savedOrder: { entityType: string; entitySlug: string }[] = [];
+    if (Array.isArray(rawVideoOrder)) {
+        savedOrder = rawVideoOrder;
+    } else if (typeof rawVideoOrder === 'string' && rawVideoOrder) {
+        try { savedOrder = JSON.parse(rawVideoOrder); } catch { savedOrder = []; }
+    }
     const orderedVideos: any[] = [];
     for (const entry of savedOrder) {
         const found = rawVideos.find(v => v.entityType === entry.entityType && v.entitySlug === entry.entitySlug);
