@@ -204,7 +204,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                             />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
+                        <div className="grid grid-cols-2 gap-2 mb-6">
                             {neighborhoods.map(n => {
                                 const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
                                 return (
@@ -258,55 +258,27 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                     </h2>
                     <p className="text-center text-gray-400 text-sm mb-8">Optional — you can choose more than one</p>
 
-                    <div className="grid grid-cols-2 gap-6 mb-8">
-                        {/* Column 1 — Communities */}
-                        <div className="space-y-2">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Senior Living Communities</p>
-                            {facilityTypes.map(t => {
-                                const active = selectedTypes.includes(t.slug);
-                                return (
-                                    <button
-                                        key={t.slug}
-                                        onClick={() => toggleType(t.slug)}
-                                        className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
-                                                <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
-                                            </div>
-                                            <div>
-                                                <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
-                                                <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
-                                            </div>
+                    <div className="space-y-2 mb-8">
+                        {[...facilityTypes, ...homeTypes].map(t => {
+                            const active = selectedTypes.includes(t.slug);
+                            return (
+                                <button
+                                    key={t.slug}
+                                    onClick={() => toggleType(t.slug)}
+                                    className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
+                                            <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
                                         </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                        {/* Column 2 — Care Homes */}
-                        <div className="space-y-2">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Care Homes &amp; Foster Homes</p>
-                            {homeTypes.map(t => {
-                                const active = selectedTypes.includes(t.slug);
-                                return (
-                                    <button
-                                        key={t.slug}
-                                        onClick={() => toggleType(t.slug)}
-                                        className={`w-full text-left rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow ${active ? 'bg-blue-50 ring-2 ring-[#239ddb]' : 'bg-white'}`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div className={`flex-none w-9 h-9 rounded-lg flex items-center justify-center ${active ? 'bg-[#239ddb]' : 'bg-gray-100'}`}>
-                                                <FontAwesomeIcon icon={getCareIcon(t.slug, t.name)} className={`h-4 w-4 ${active ? 'text-white' : 'text-gray-500'}`} />
-                                            </div>
-                                            <div>
-                                                <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
-                                                <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
-                                            </div>
+                                        <div>
+                                            <span className={`block font-semibold text-sm leading-snug mb-0.5 ${active ? 'text-[#239ddb]' : 'text-gray-800'}`}>{t.name}</span>
+                                            <span className="block text-xs text-gray-400 leading-snug">{careDesc(t.slug)}</span>
                                         </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
 
                     <div className="flex items-center justify-end gap-3">
