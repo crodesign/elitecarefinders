@@ -13,6 +13,7 @@ const DynamicMap = dynamic(() => import('@/components/public/NeighborhoodMap'), 
     loading: () => <div className="w-full h-full min-h-[360px] bg-gray-100 rounded-xl animate-pulse" />,
 });
 
+
 const ISLAND_CENTERS: Record<string, [number, number]> = {
     oahu: [21.4389, -158.0001],
     maui: [20.796, -156.331],
@@ -164,25 +165,31 @@ export function HomepageWizard({ islands, islandCounts, mapPins, homeTypes, faci
                         Choose a neighborhood to see what&apos;s available nearby
                     </p>
 
-                    {/* Island tabs + Map toggle */}
-                    <div className="flex items-center gap-2 mb-6 flex-wrap">
+                    {/* Island tabs */}
+                    <div className="flex flex-wrap justify-center gap-2 mb-3">
                         {islands.map(island => (
                             <button
                                 key={island.slug}
                                 onClick={() => handleIslandChange(island.slug)}
-                                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                                     selectedIsland === island.slug
                                         ? 'bg-[#239ddb] text-white shadow-sm'
                                         : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
                                 }`}
                             >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={`/images/states/${island.slug}.svg`} alt="" className="w-5 h-5 flex-none" />
                                 {island.name}
                             </button>
                         ))}
+                    </div>
+
+                    {/* Map toggle */}
+                    <div className="flex justify-center mb-6">
                         {selectedIsland === 'oahu' && (
                             <button
                                 onClick={() => setShowMap(v => !v)}
-                                className={`ml-auto px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border-2 ${
+                                className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all border-2 ${
                                     showMap
                                         ? 'border-[#239ddb] text-[#239ddb] bg-blue-50'
                                         : 'border-gray-200 bg-white text-gray-500 shadow-sm hover:border-[#239ddb] hover:text-[#239ddb]'
