@@ -39,7 +39,7 @@ interface Props {
 export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
     const router = useRouter();
     const [selectedIsland, setSelectedIsland] = useState('oahu');
-    const [showMap, setShowMap] = useState(false);
+    const [hoveredNeighborhood, setHoveredNeighborhood] = useState<string | null>(null);
     const [isNavigating, setIsNavigating] = useState(false);
 
     const countMap = useMemo(
@@ -64,7 +64,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
 
     function handleIslandChange(slug: string) {
         setSelectedIsland(slug);
-        setShowMap(false);
+        setHoveredNeighborhood(null);
     }
 
     return (
@@ -73,12 +73,12 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-2">
                     Where would you like to find care?
                 </h2>
-                <p className="text-center text-gray-400 text-sm mb-8">
+                <p className="text-center text-gray-400 text-sm mb-6">
                     Choose a neighborhood to see what&apos;s available nearby
                 </p>
 
                 {/* Island tabs */}
-                <div className="flex flex-wrap justify-center gap-2 mb-3">
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
                     {islands.map(island => (
                         <button
                             key={island.slug}
@@ -96,64 +96,65 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                     ))}
                 </div>
 
-                {/* Map toggle */}
-                <div className="flex justify-center mb-6">
-                    {selectedIsland === 'oahu' && (
-                        <button
-                            onClick={() => setShowMap(v => !v)}
-                            className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all border-2 ${
-                                showMap
-                                    ? 'border-[#239ddb] text-[#239ddb] bg-blue-50'
-                                    : 'border-gray-200 bg-white text-gray-500 shadow-sm hover:border-[#239ddb] hover:text-[#239ddb]'
-                            }`}
-                        >
-                            {showMap ? 'Grid view' : 'Map view'}
-                        </button>
-                    )}
-                </div>
+                {/* Side-by-side: neighborhoods left, map right */}
+                <div className="flex flex-col md:flex-row gap-4">
+                    {/* Neighborhoods */}
+                    <div className="flex-1 min-w-0 flex flex-col">
+                        {neighborhoods.length === 0 && (
+                            <div className="flex-1 flex items-center justify-center py-12 text-center">
+                                <div>
+                                    <p className="text-gray-500 font-semibold text-sm mb-1">No listings yet on this island</p>
+                                    <p className="text-gray-400 text-xs">Check back soon — we&apos;re adding more locations.</p>
+                                </div>
+                            </div>
+                        )}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+                            {neighborhoods.map(n => {
+                                const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
+                                return (
+                                    <button
+                                        key={n.slug}
+                                        onClick={() => navigate(`/location/hawaii/${selectedIsland}/${n.slug}`)}
+                                        onMouseEnter={() => setHoveredNeighborhood(n.slug)}
+                                        onMouseLeave={() => setHoveredNeighborhood(null)}
+                                        className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
+                                            {n.name}
+                                        </span>
+                                        {count !== null && count > 0 && (
+                                            <span className="ml-3 flex-none text-xs font-semibold bg-gray-100 group-hover:bg-blue-50 group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">
+                                                {count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {neighborhoods.length > 0 && (
+                            <div className="mt-auto">
+                                <button
+                                    onClick={() => navigate(`/location/hawaii/${selectedIsland}`)}
+                                    className="text-sm text-gray-400 hover:text-[#239ddb] transition-colors inline-flex items-center gap-1.5"
+                                >
+                                    Browse all on {currentIsland?.name ?? 'island'}
+                                    <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
-                {/* Map or Neighborhood grid */}
-                {showMap && selectedIsland === 'oahu' ? (
-                    <div className="rounded-xl overflow-hidden mb-6" style={{ height: 380 }}>
+                    {/* Map */}
+                    <div className="md:w-1/2 flex-none rounded-xl overflow-hidden" style={{ height: 360 }}>
                         <DynamicMap
+                            key={selectedIsland}
                             pins={mapPins}
                             islandSlug={selectedIsland}
                             center={ISLAND_CENTERS[selectedIsland]}
                             onPinClick={pin => navigate(`/location/hawaii/${selectedIsland}/${pin.slug}`)}
+                            highlightedSlug={hoveredNeighborhood}
                         />
                     </div>
-                ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-                        {neighborhoods.map(n => {
-                            const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
-                            return (
-                                <button
-                                    key={n.slug}
-                                    onClick={() => navigate(`/location/hawaii/${selectedIsland}/${n.slug}`)}
-                                    className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
-                                >
-                                    <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
-                                        {n.name}
-                                    </span>
-                                    {count !== null && count > 0 && (
-                                        <span className="ml-3 flex-none text-xs font-semibold bg-gray-100 group-hover:bg-blue-50 group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">
-                                            {count}
-                                        </span>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-                )}
-
-                <div className="text-center">
-                    <button
-                        onClick={() => navigate(`/location/hawaii/${selectedIsland}`)}
-                        className="text-sm text-gray-400 hover:text-[#239ddb] transition-colors inline-flex items-center gap-1.5"
-                    >
-                        Browse all on {currentIsland?.name ?? 'island'}
-                        <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
-                    </button>
                 </div>
             </div>
             {isNavigating && (

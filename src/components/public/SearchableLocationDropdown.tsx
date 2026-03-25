@@ -23,9 +23,11 @@ interface Props {
     basePath: string; // e.g. '/location/hawaii' or '/location'
     onNavigate?: () => void; // called when a link is clicked (e.g. to close a parent modal)
     showSearch?: boolean;
+    onSelect?: (item: LocationItem) => void; // when provided, items call this instead of navigating
+    selectedSlug?: string; // externally controlled selection (used with onSelect)
 }
 
-export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate, showSearch = true }: Props) {
+export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate, showSearch = true, onSelect, selectedSlug }: Props) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const ref = useRef<HTMLDivElement>(null);
@@ -35,6 +37,7 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
     const visibleItems = items.filter(i => !HIDDEN_SLUGS.has(i.slug));
 
     const selectedItem = visibleItems.find(item => {
+        if (selectedSlug !== undefined) return item.slug === selectedSlug;
         const segment = '/hawaii/' + item.slug;
         return pathname.includes(segment);
     });
@@ -65,14 +68,18 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen(v => !v)}
-                className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border-2 transition-colors ${
+                className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg transition-colors ${
                     open
-                        ? 'bg-[#239ddb] text-white border-[#239ddb]'
+                        ? 'bg-[#239ddb] text-white'
                         : isSelected
-                            ? 'bg-[#239ddb]/10 text-[#239ddb] border-[#239ddb]'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-[#239ddb] hover:text-[#239ddb]'
+                            ? 'bg-[#239ddb] text-white shadow-sm'
+                            : 'bg-white text-gray-700 hover:text-[#239ddb]'
                 }`}
             >
+                {selectedItem && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={`/images/states/${selectedItem.slug}.svg`} alt="" className="w-4 h-4 flex-none rounded" />
+                )}
                 <span>{buttonLabel}</span>
                 <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className="h-3 w-3 flex-shrink-0" />
             </button>
@@ -103,15 +110,9 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
                         ) : (
                             filtered.map(item => {
                                 const isCurrent = selectedItem?.id === item.id;
-                                return (
-                                    <Link
-                                        key={item.id}
-                                        href={`${basePath}/${item.slug}`}
-                                        onClick={() => { setOpen(false); onNavigate?.(); }}
-                                        className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-colors group ${
-                                            isCurrent ? 'bg-[#239ddb]/10' : 'hover:bg-gray-50'
-                                        }`}
-                                    >
+                                const rowClass = `flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-colors group w-full text-left ${isCurrent ? 'bg-[#239ddb]/10' : 'hover:bg-gray-50'}`;
+                                const inner = (
+                                    <>
                                         <span className="flex items-center gap-2 min-w-0">
                                             <img src={`/images/states/${item.slug}.svg`} alt="" aria-hidden="true" className="h-5 w-5 object-contain flex-shrink-0 opacity-70" />
                                             <span className={`text-sm transition-colors ${isCurrent ? 'text-[#239ddb] font-semibold' : 'text-gray-700 group-hover:text-[#239ddb]'}`}>
@@ -121,6 +122,25 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
                                         {isCurrent && (
                                             <FontAwesomeIcon icon={faCheck} className="h-3 w-3 text-[#239ddb] flex-shrink-0" />
                                         )}
+                                    </>
+                                );
+                                return onSelect ? (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => { setOpen(false); onSelect(item); }}
+                                        className={rowClass}
+                                    >
+                                        {inner}
+                                    </button>
+                                ) : (
+                                    <Link
+                                        key={item.id}
+                                        href={`${basePath}/${item.slug}`}
+                                        onClick={() => { setOpen(false); onNavigate?.(); }}
+                                        className={rowClass}
+                                    >
+                                        {inner}
                                     </Link>
                                 );
                             })

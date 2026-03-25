@@ -21,16 +21,25 @@ const ISLAND_BOUNDS: Record<string, [[number, number], [number, number]]> = {
     kauai:        [[21.872, -159.788], [22.236, -159.286]],
 };
 
+function pinHtml(size: number, total: number, highlighted: boolean): string {
+    const bg = highlighted ? '#22c55e' : '#239ddb';
+    const scale = highlighted ? 'transform:scale(1.2);' : '';
+    return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-weight:700;font-family:sans-serif;font-size:${size <= 30 ? 11 : 12}px;line-height:1;transition:background 0.15s,transform 0.15s;${scale}">${total}</div>`;
+}
+
 interface Props {
     pins: NeighborhoodPin[];
     islandSlug: string;
     center: [number, number];
     onPinClick?: (pin: NeighborhoodPin) => void;
+    highlightedSlug?: string | null;
 }
 
-export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props) {
+export function NeighborhoodMap({ pins, islandSlug, center, onPinClick, highlightedSlug }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
+    const markersRef = useRef<Record<string, { marker: any; total: number; size: number }>>({});
+    const LRef = useRef<any>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -38,6 +47,7 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props)
 
         import('leaflet').then(L => {
             if (!containerRef.current) return;
+            LRef.current = L;
             delete (containerRef.current as any)._leaflet_id;
             delete (L.Icon.Default.prototype as any)._getIconUrl;
             L.Icon.Default.mergeOptions({
@@ -71,14 +81,7 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props)
                     className: '',
                     iconSize: [size, size],
                     iconAnchor: [size / 2, size / 2],
-                    html: `<div style="
-                        width:${size}px;height:${size}px;border-radius:50%;
-                        background:#239ddb;border:3px solid #fff;
-                        box-shadow:0 2px 6px rgba(0,0,0,0.3);
-                        display:flex;align-items:center;justify-content:center;
-                        cursor:pointer;color:#fff;font-weight:700;
-                        font-family:sans-serif;font-size:${size <= 30 ? 11 : 12}px;line-height:1;
-                    ">${total}</div>`,
+                    html: pinHtml(size, total, false),
                 });
 
                 const tooltipHtml = `
@@ -99,6 +102,7 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props)
                     }
                 });
                 marker.addTo(map);
+                markersRef.current[pin.slug] = { marker, total, size };
             });
 
             mapRef.current = map;
@@ -109,8 +113,24 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick }: Props)
                 mapRef.current.remove();
                 mapRef.current = null;
             }
+            markersRef.current = {};
+            LRef.current = null;
         };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Update pin colours when highlighted slug changes
+    useEffect(() => {
+        const L = LRef.current;
+        if (!L) return;
+        Object.entries(markersRef.current).forEach(([slug, { marker, total, size }]) => {
+            marker.setIcon(L.divIcon({
+                className: '',
+                iconSize: [size, size],
+                iconAnchor: [size / 2, size / 2],
+                html: pinHtml(size, total, slug === highlightedSlug),
+            }));
+        });
+    }, [highlightedSlug]);
 
     return (
         <div className="relative w-full h-full min-h-[320px] overflow-hidden isolate">

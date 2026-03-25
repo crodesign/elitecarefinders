@@ -73,7 +73,7 @@ export function ResourcesModal({ onClose }: ResourcesModalProps) {
                         })}
                     </div>
 
-                    <div className="-mx-6 px-6 pt-4 pb-6 mt-2 bg-gray-100 rounded-b-2xl">
+                    <div className="-mx-6 px-6 py-4 mt-4 bg-gray-100 rounded-b-2xl">
                         <Link
                             href="/resources"
                             onClick={onClose}
