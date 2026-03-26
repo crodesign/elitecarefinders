@@ -105,10 +105,10 @@ function EntityPanel({ name, manageHref, createHref, icon: Icon, published, unpu
                 <h3 className="text-content-primary font-semibold text-sm flex-1 min-w-0 truncate">{name}</h3>
                 {!loading && (
                     <>
-                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full bg-accent text-white flex-shrink-0">
+                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-accent text-white flex-shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-white/70 inline-block" />{published}
                         </span>
-                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full bg-surface-input text-content-muted flex-shrink-0">
+                        <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-surface-input text-content-muted flex-shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-content-muted/50 inline-block" />{unpublished}
                         </span>
                     </>
