@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faPhone, faEnvelope, faHouse, faBuilding, faShareNodes, faLocationDot, faList } from '@fortawesome/free-solid-svg-icons';
 import { SearchableLocationDropdown } from '@/components/public/SearchableLocationDropdown';
 import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYoutube, faTiktok, faThreads } from '@fortawesome/free-brands-svg-icons';
 import { createClientComponentClient } from '@/lib/supabase';
 import { getSocialAccounts, getHomepageSeo, type SocialAccount, type SocialPlatform } from '@/lib/services/siteSettingsService';
+import { HeartLoader } from '@/components/ui/HeartLoader';
 import { NEIGHBORHOOD_COORDS } from '@/lib/neighborhood-coords';
 import dynamic from 'next/dynamic';
 
@@ -96,6 +96,7 @@ interface BrowseModalProps {
 
 export function BrowseModal({ onClose }: BrowseModalProps) {
     const router = useRouter();
+    const pathname = usePathname();
     const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
     const [homepageTitle, setHomepageTitle] = useState('EliteCareFinders');
     const [homepageText, setHomepageText] = useState('');
@@ -108,6 +109,12 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
     const [viewPhase, setViewPhase] = useState<'idle' | 'exit' | 'enter'>('idle');
     const pendingAction = useRef<(() => void | Promise<void>) | null>(null);
     const [isClosing, setIsClosing] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    function navigate(url: string) {
+        setIsNavigating(true);
+        router.push(url);
+    }
     const handleCloseRef = useRef<() => void>(() => {});
 
     handleCloseRef.current = () => {
@@ -137,6 +144,12 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
             return () => clearTimeout(t);
         }
     }, [viewPhase]);
+
+    useEffect(() => {
+        setSelectedIsland(null);
+        setNeighborhoods([]);
+        setShowMap(false);
+    }, [pathname]);
 
     async function handleIslandSelect(item: { id: string; name: string; slug: string }) {
         transitionTo(async () => {
@@ -199,6 +212,14 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
     }, []);
 
     return (
+        <>
+        {isNavigating && (
+            <div className="fixed inset-0 bg-white/70 backdrop-blur-sm z-[300] flex items-center justify-center">
+                <div style={{ '--accent': '#239ddb' } as React.CSSProperties}>
+                    <HeartLoader size={16} />
+                </div>
+            </div>
+        )}
         <div className="fixed inset-0 z-[200] bg-white/50 backdrop-blur-md flex flex-col pt-14" onClick={handleClose}>
             {/* Full-width blue top bar */}
             <div className="absolute top-0 inset-x-0 h-14 bg-[#239ddb] flex items-center justify-center px-4 shadow-md z-10" onClick={e => e.stopPropagation()}>
@@ -232,7 +253,8 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                             basePath="/location/hawaii"
                                             showSearch={false}
                                             onSelect={handleIslandSelect}
-                                            selectedSlug={selectedIsland?.slug}
+                                            selectedSlug={selectedIsland?.slug ?? null}
+                                            hideBorder
                                         />
                                     )}
                                     {selectedIsland && (
@@ -281,7 +303,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                             .map(n => ({ ...n, lat: NEIGHBORHOOD_COORDS[n.slug][0], lng: NEIGHBORHOOD_COORDS[n.slug][1] }))}
                                         islandSlug={selectedIsland.slug}
                                         center={ISLAND_CENTERS[selectedIsland.slug] ?? [21.4389, -158.0001]}
-                                        onPinClick={pin => { router.push(`/location/hawaii/${selectedIsland.slug}/${pin.slug}`); handleClose(); }}
+                                        onPinClick={pin => { navigate(`/location/hawaii/${selectedIsland.slug}/${pin.slug}`); }}
                                     />
                                 </div>
                             ) : (
@@ -292,7 +314,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                             return (
                                                 <button
                                                     key={n.slug}
-                                                    onClick={() => { router.push(`/location/hawaii/${selectedIsland.slug}/${n.slug}`); handleClose(); }}
+                                                    onClick={() => { navigate(`/location/hawaii/${selectedIsland.slug}/${n.slug}`); }}
                                                     className="group flex items-center justify-between bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
                                                 >
                                                     <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">{n.name}</span>
@@ -305,7 +327,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                     </div>
                                     <div className="mt-3 flex justify-center">
                                         <button
-                                            onClick={() => { router.push(`/location/hawaii/${selectedIsland.slug}`); handleClose(); }}
+                                            onClick={() => { navigate(`/location/hawaii/${selectedIsland.slug}`); }}
                                             className="text-sm text-gray-400 hover:text-[#239ddb] transition-colors inline-flex items-center gap-1.5"
                                         >
                                             View all on {selectedIsland.name}
@@ -318,10 +340,10 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                     ) : (
                         <div className="flex flex-col gap-2 mb-4">
                             {NAV_CARE_TYPES.map(t => (
-                                <Link
+                                <button
                                     key={t.href}
-                                    href={t.href}
-                                    onClick={handleClose}
+                                    type="button"
+                                    onClick={() => navigate(t.href)}
                                     className="group w-full text-left rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition-shadow flex items-start gap-3"
                                 >
                                     <div className="flex-none w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 group-hover:bg-[#239ddb] transition-colors">
@@ -331,7 +353,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                         <span className="block font-semibold text-sm leading-snug mb-0.5 text-gray-800 group-hover:text-[#239ddb] transition-colors">{t.name}</span>
                                         <span className="block text-xs text-gray-400 leading-snug">{t.desc}</span>
                                     </div>
-                                </Link>
+                                </button>
                             ))}
                         </div>
                     )}
@@ -381,5 +403,6 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                 </div>
             </div>
         </div>
+        </>
     );
 }

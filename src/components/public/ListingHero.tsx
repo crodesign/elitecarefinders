@@ -1,10 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBorderAll, faList } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface ListingHeroProps {
@@ -22,31 +20,11 @@ interface ListingHeroProps {
 
 export function ListingHero({ title, total, icon, heroImageSrc, backHref, backLabel, typeName, typeNameParts, bgSvg = '/images/site/hibiscus-bg.svg', showViewToggle }: ListingHeroProps) {
     const [ready, setReady] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const explicitView = searchParams.get('view');
-    const currentView = explicitView || (isMobile ? 'list' : 'grid');
 
     useEffect(() => {
         const raf = requestAnimationFrame(() => setReady(true));
         return () => cancelAnimationFrame(raf);
     }, []);
-
-    useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth < 640);
-        check();
-        window.addEventListener('resize', check);
-        return () => window.removeEventListener('resize', check);
-    }, []);
-
-    function setView(v: 'grid' | 'list') {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('view', v);
-        params.delete('page');
-        router.push(`${pathname}?${params.toString()}`);
-    }
 
     return (
         <div className="max-w-6xl mx-auto -mt-[10px] px-[5px]">
@@ -93,24 +71,6 @@ export function ListingHero({ title, total, icon, heroImageSrc, backHref, backLa
                         <p className="mt-2 text-white/70 text-sm pl-[44px] sm:pl-0">{total} listings available</p>
                     )}
 
-                    {showViewToggle && (
-                        <div className="absolute bottom-3 right-4 hidden sm:flex items-center gap-1">
-                            <button
-                                onClick={() => setView('grid')}
-                                className={`p-1.5 rounded transition-colors ${currentView === 'grid' ? 'bg-white/25 text-white' : 'text-white/40 hover:text-white/70'}`}
-                                aria-label="Grid view"
-                            >
-                                <FontAwesomeIcon icon={faBorderAll} className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={() => setView('list')}
-                                className={`p-1.5 rounded transition-colors ${currentView === 'list' ? 'bg-white/25 text-white' : 'text-white/40 hover:text-white/70'}`}
-                                aria-label="List view"
-                            >
-                                <FontAwesomeIcon icon={faList} className="h-4 w-4" />
-                            </button>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

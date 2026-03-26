@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import { permanentRedirect } from 'next/navigation';
-import { getFacilityListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getFacilityListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds } from '@/lib/public-db';
 import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
 import { FacilityListingGrid } from '@/components/public/FacilityListingGrid';
@@ -44,10 +44,7 @@ export default async function FacilitiesByLocationPage({ params, searchParams }:
         if (fullPath) permanentRedirect(`/facilities/location/${fullPath.join('/')}`);
     }
 
-    const [locationIds, islands] = await Promise.all([
-        entry ? getLocationDescendantIds(entry.id) : Promise.resolve(undefined),
-        getHawaiiNeighborhoodsGrouped(),
-    ]);
+    const locationIds = entry ? await getLocationDescendantIds(entry.id) : undefined;
 
     const activeLocationIds = neighborhood ? [neighborhood] : locationIds;
     const { items: facilities, total } = await getFacilityListings({ locationEntryIds: activeLocationIds, q: q || undefined, page, limit: LIMIT });
@@ -90,7 +87,7 @@ export default async function FacilitiesByLocationPage({ params, searchParams }:
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
-                <ListingFilterBar islands={islands} basePath={basePath} />
+                <ListingFilterBar basePath={basePath} showViewToggle />
 
             <FilterLoadingOverlay>
                 {facilities.length === 0 ? (

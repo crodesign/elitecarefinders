@@ -60,6 +60,13 @@ export function PublicHeader() {
     const pathname = usePathname();
 
     useEffect(() => {
+        setShowBrowse(false);
+        setShowResources(false);
+        setShowConsultation(false);
+        document.body.style.overflow = '';
+    }, [pathname]);
+
+    useEffect(() => {
         getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => !a.hidden)));
         getHomepageSeo().then(seo => {
             if (seo.metaTitle) setHomepageTitle(seo.metaTitle);

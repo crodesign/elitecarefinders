@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faHouse } from '@fortawesome/free-solid-svg-icons';
 import { permanentRedirect } from 'next/navigation';
-import { getHomeListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds, getHawaiiNeighborhoodsGrouped } from '@/lib/public-db';
+import { getHomeListings, getTaxonomyEntriesByIds, getLocationEntryByPath, findFullLocationPath, getLocationDescendantIds } from '@/lib/public-db';
 import { getLocationSvg } from '@/lib/location-svgs';
 import { ListingHero } from '@/components/public/ListingHero';
 import { HomeListingGrid } from '@/components/public/HomeListingGrid';
@@ -44,10 +44,7 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
         if (fullPath) permanentRedirect(`/homes/location/${fullPath.join('/')}`);
     }
 
-    const [locationIds, islands] = await Promise.all([
-        entry ? getLocationDescendantIds(entry.id) : Promise.resolve(undefined),
-        getHawaiiNeighborhoodsGrouped(),
-    ]);
+    const locationIds = entry ? await getLocationDescendantIds(entry.id) : undefined;
 
     const activeLocationIds = neighborhood ? [neighborhood] : locationIds;
     const { items: homes, total } = await getHomeListings({ locationEntryIds: activeLocationIds, q: q || undefined, page, limit: LIMIT });
@@ -90,7 +87,7 @@ export default async function HomesByLocationPage({ params, searchParams }: Prop
             />
 
             <div className="max-w-6xl mx-auto px-5 py-8">
-                <ListingFilterBar islands={islands} basePath={basePath} />
+                <ListingFilterBar basePath={basePath} showViewToggle />
 
             <FilterLoadingOverlay>
                 {homes.length === 0 ? (

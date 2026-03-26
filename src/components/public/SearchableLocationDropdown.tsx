@@ -24,10 +24,11 @@ interface Props {
     onNavigate?: () => void; // called when a link is clicked (e.g. to close a parent modal)
     showSearch?: boolean;
     onSelect?: (item: LocationItem) => void; // when provided, items call this instead of navigating
-    selectedSlug?: string; // externally controlled selection (used with onSelect)
+    selectedSlug?: string | null; // externally controlled: string = selected, null = controlled+empty, undefined = use pathname
+    hideBorder?: boolean;
 }
 
-export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate, showSearch = true, onSelect, selectedSlug }: Props) {
+export function SearchableLocationDropdown({ label, placeholder = 'Search...', items, basePath, onNavigate, showSearch = true, onSelect, selectedSlug, hideBorder = false }: Props) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const ref = useRef<HTMLDivElement>(null);
@@ -68,12 +69,12 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen(v => !v)}
-                className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 text-sm font-semibold rounded-lg transition-colors ${hideBorder ? 'px-4 py-2' : 'px-4 py-[7px] border-2'} ${
                     open
-                        ? 'bg-[#239ddb] text-white'
+                        ? `bg-[#239ddb] text-white${hideBorder ? '' : ' border-[#239ddb]'}`
                         : isSelected
-                            ? 'bg-[#239ddb] text-white shadow-sm'
-                            : 'bg-white text-gray-700 hover:text-[#239ddb]'
+                            ? `bg-[#239ddb] text-white shadow-sm${hideBorder ? '' : ' border-[#239ddb]'}`
+                            : `bg-white text-gray-700 hover:text-[#239ddb]${hideBorder ? '' : ' border-gray-200'}`
                 }`}
             >
                 {selectedItem && (
@@ -85,7 +86,7 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
             </button>
 
             {open && (
-                <div className="absolute top-full left-0 mt-2 z-20 bg-white rounded-xl shadow-xl border border-gray-100 w-72">
+                <div className="absolute top-full left-0 mt-2 z-50 bg-white rounded-xl shadow-xl border border-gray-100 w-72">
                     {/* Search input */}
                     {showSearch && (
                         <div className="p-3 border-b border-gray-100">

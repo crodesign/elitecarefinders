@@ -243,6 +243,17 @@ body {
   padding: 0;
 }
 
+/* Light-context pages (public site + admin light mode):
+   data-theme="light" is on an inner div, not <html>, so :root gives dark values.
+   Use :has() to detect and override body bg + scrollbar colors. */
+html:has([data-theme="light"]) body {
+  background-color: #ffffff;
+}
+html:has([data-theme="light"]) {
+  --scrollbar-thumb: #c0c0c0;
+  --scrollbar-thumb-hover: #a0a0a0;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
@@ -250,7 +261,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
