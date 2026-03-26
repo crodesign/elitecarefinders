@@ -69,12 +69,12 @@ export function SearchableLocationDropdown({ label, placeholder = 'Search...', i
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen(v => !v)}
-                className={`flex items-center gap-2 text-sm font-semibold rounded-lg transition-colors ${hideBorder ? 'px-4 py-2' : 'px-4 py-[7px] border-2'} ${
+                className={`flex items-center gap-2 text-sm font-semibold rounded-lg transition-colors ${hideBorder ? 'px-4 py-2' : 'px-4 h-[38px] border-2'} ${
                     open
                         ? `bg-[#239ddb] text-white${hideBorder ? '' : ' border-[#239ddb]'}`
                         : isSelected
                             ? `bg-[#239ddb] text-white shadow-sm${hideBorder ? '' : ' border-[#239ddb]'}`
-                            : `bg-white text-gray-700 hover:text-[#239ddb]${hideBorder ? '' : ' border-gray-200'}`
+                            : `bg-white text-gray-700 hover:text-[#239ddb]${hideBorder ? '' : ' border-gray-300'}`
                 }`}
             >
                 {selectedItem && (

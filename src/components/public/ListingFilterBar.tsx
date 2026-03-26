@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faXmark, faBorderAll, faList } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faBorderAll, faList } from '@fortawesome/free-solid-svg-icons';
 import { useFilterPending } from '@/components/public/FilterPendingProvider';
 import { SearchableLocationDropdown } from '@/components/public/SearchableLocationDropdown';
 import type { IslandWithNeighborhoods, BrowseNavEntry } from '@/lib/public-db';
@@ -74,6 +74,7 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
     const { startFilterTransition } = useFilterPending();
 
     const [query, setQuery] = useState(searchParams.get('q') || '');
+    const [searchFocused, setSearchFocused] = useState(false);
     const currentView = searchParams.get('view') || '';
 
     const [islandList, setIslandList] = useState<TaxEntry[]>([]);
@@ -140,17 +141,17 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
     const activeQuery = searchParams.get('q') || '';
 
     const viewToggleButtons = showViewToggle ? (
-        <div className="flex items-center gap-1 bg-white border-2 border-gray-200 rounded-lg p-1 flex-shrink-0">
+        <div className="flex items-center gap-1 bg-white border-2 border-gray-300 rounded-lg px-1 flex-shrink-0 h-[38px]">
             <button
                 onClick={() => setView('grid')}
-                className={`p-1.5 rounded transition-colors ${currentView === 'grid' || currentView === '' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
+                className={`py-[3px] px-1.5 rounded transition-colors ${currentView === 'grid' || currentView === '' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
                 aria-label="Grid view"
             >
                 <FontAwesomeIcon icon={faBorderAll} className="h-3.5 w-3.5" />
             </button>
             <button
                 onClick={() => setView('list')}
-                className={`p-1.5 rounded transition-colors ${currentView === 'list' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
+                className={`py-[3px] px-1.5 rounded transition-colors ${currentView === 'list' ? 'bg-[#239ddb] text-white' : 'text-gray-400 hover:text-gray-700'}`}
                 aria-label="List view"
             >
                 <FontAwesomeIcon icon={faList} className="h-3.5 w-3.5" />
@@ -167,6 +168,8 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
                             type="text"
                             value={query}
                             onChange={e => setQuery(e.target.value)}
+                            onFocus={() => setSearchFocused(true)}
+                            onBlur={() => setSearchFocused(false)}
                             placeholder="Search by keyword..."
                             className="w-full min-w-0 border-l border-t border-b border-gray-300 rounded-l-lg px-3 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 focus:border-[#239ddb] bg-white"
                             style={{ borderRight: 'none' }}
@@ -174,9 +177,10 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
                         <button
                             type="submit"
                             aria-label="Search"
-                            className="flex items-center justify-center bg-[#239ddb] text-white px-3 py-2 rounded-r-lg hover:bg-[#1b8ac4] transition-colors"
+                            className={`flex items-center justify-center px-2 py-[3px] rounded-r-lg border border-l-0 ${searchFocused ? 'bg-[#239ddb] border-[#239ddb] text-white hover:bg-[#1b8ac4]' : 'bg-gray-300 border-gray-300 text-gray-500'}`}
                         >
-                            <FontAwesomeIcon icon={faArrowRight} className="h-4 w-4" />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2.svg" alt="" className="h-8 w-8" />
                         </button>
                     </form>
 
@@ -238,11 +242,11 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
                                         <button
                                             key={n.slug}
                                             onClick={() => startFilterTransition(() => router.push(neighborhoodHref(n.slug, selectedIsland.slug)))}
-                                            className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 hover:shadow-md transition-shadow text-left"
+                                            className="group flex items-center justify-between bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow text-left"
                                         >
                                             <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors truncate">{n.name}</span>
                                             {total > 0 && (
-                                                <span className="ml-2 flex-none text-xs font-semibold bg-gray-100 group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-0.5 transition-colors">{total}</span>
+                                                <span className="ml-2 flex-none text-xs font-semibold bg-white group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">{total}</span>
                                             )}
                                         </button>
                                     );
