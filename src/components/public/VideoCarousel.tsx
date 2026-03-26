@@ -86,7 +86,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
 
                 {/* Right: 2-col grid — natural height drives both columns */}
                 {items.length > 1 && (
-                    <div className="lg:w-[40%] flex-shrink-0 grid grid-cols-2 gap-2">
+                    <div className="lg:w-[28%] flex-shrink-0 grid grid-cols-2 gap-2">
                         {items.map((v, i) => {
                             const vid = getYouTubeId(v.videoUrl);
                             const thumb = v.entityImage || v.thumbnailUrl || (vid ? `https://img.youtube.com/vi/${vid}/mqdefault.jpg` : null);
@@ -95,25 +95,26 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
                                 <button
                                     key={i}
                                     onClick={() => select(i)}
-                                    className={`relative rounded-xl overflow-hidden aspect-video group ${isActive ? 'ring-2 ring-[#239ddb] ring-offset-1' : ''}`}
+                                    className={`rounded-xl group bg-gray-100 shadow-sm hover:shadow-md transition-shadow text-left ${isActive ? 'ring-2 ring-[#239ddb] ring-offset-1' : ''}`}
                                 >
-                                    <div className="absolute inset-0 bg-gray-100" />
-                                    {thumb && (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={thumb} alt={v.entityTitle} className={`absolute inset-0 w-full h-full object-cover ${!isActive ? 'group-hover:scale-[1.04] transition-transform duration-200' : ''}`} />
-                                    )}
-                                    {!isActive && <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />}
-                                    {isActive && <div className="absolute inset-0 bg-[#239ddb]/20" />}
-                                    <div className="absolute bottom-0 left-[20px] right-[20px] bg-white rounded-t-lg px-2 py-1.5 text-center">
-                                        <span className="text-gray-900 text-[10px] font-medium line-clamp-1 leading-tight">{v.entityTitle}</span>
-                                    </div>
-                                    {!isActive && (
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-90 transition-opacity">
-                                            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center">
-                                                <svg className="w-6 h-6 text-[#239ddb] ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                    <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
+                                        {thumb && (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={thumb} alt={v.entityTitle} className={`absolute inset-0 w-full h-full object-cover ${!isActive ? 'group-hover:scale-[1.04] transition-transform duration-200' : ''}`} />
+                                        )}
+                                        {!isActive && <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />}
+                                        {isActive && <div className="absolute inset-0 bg-[#239ddb]/20" />}
+                                        {!isActive && (
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-[#239ddb] ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
+                                    <div className="px-2 py-1.5 text-center">
+                                        <span className="text-gray-900 text-xs font-medium line-clamp-1 leading-tight">{v.entityTitle}</span>
+                                    </div>
                                 </button>
                             );
                         })}

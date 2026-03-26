@@ -237,9 +237,9 @@ function GalleryModal({ items, onClose, onImageClick }: {
                             {videos.map((item, i) => {
                                 const vertical = !isDirectVideo(item.url) && isVerticalYouTube(item.url);
                                 return (
-                                    <div key={`video-${i}`} className={vertical ? 'py-2' : undefined}>
+                                    <div key={`video-${i}`} className={`rounded-lg overflow-hidden border border-gray-100 bg-white shadow-sm${vertical ? ' py-2' : ''}`}>
                                     <div
-                                        className="relative bg-black rounded-lg overflow-hidden"
+                                        className="relative bg-black"
                                         style={vertical
                                             ? { width: 'calc(70vh * 9 / 16)', maxWidth: '100%', aspectRatio: '9/16', margin: '0 auto' }
                                             : undefined}
@@ -261,14 +261,12 @@ function GalleryModal({ items, onClose, onImageClick }: {
                                                 allowFullScreen
                                             />
                                         )}
-                                        {item.caption && (
-                                            <div className="absolute bottom-0 left-0 right-0 px-5 pointer-events-none">
-                                                <div className="rounded-t-lg bg-white px-3 py-1.5 text-sm text-gray-800 font-medium text-center">
-                                                    {item.caption}
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
+                                    {item.caption && (
+                                        <div className="px-3 py-2 text-sm text-gray-800 font-medium text-center">
+                                            {item.caption}
+                                        </div>
+                                    )}
                                     </div>
                                 );
                             })}
@@ -283,23 +281,21 @@ function GalleryModal({ items, onClose, onImageClick }: {
                                     key={`image-${i}`}
                                     type="button"
                                     onClick={() => onImageClick(globalIndex)}
-                                    className={`group w-full bg-gray-50 rounded-lg overflow-hidden  text-left cursor-zoom-in ${i === 0 ? 'sm:col-span-2' : ''}`}
+                                    className={`group w-full rounded-lg border border-gray-100 bg-white shadow-sm text-left cursor-zoom-in ${i === 0 ? 'sm:col-span-2' : ''}`}
                                 >
-                                    <div className="relative w-full overflow-hidden bg-gray-200/50" style={{ paddingBottom: '100%' }}>
+                                    <div className="relative w-full overflow-hidden bg-gray-200/50 rounded-t-lg" style={{ paddingBottom: '100%' }}>
                                         <img
                                             src={item.url}
                                             alt={item.alt || ''}
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                                             loading={i < 2 ? 'eager' : 'lazy'}
                                         />
-                                        {item.caption && (
-                                            <div className="absolute bottom-0 left-0 right-0 px-5">
-                                                <div className="rounded-t-lg bg-white px-3 py-1.5 text-sm text-gray-800 font-medium text-center">
-                                                    {item.caption}
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
+                                    {item.caption && (
+                                        <div className="px-3 py-2 text-sm text-gray-800 font-medium text-center">
+                                            {item.caption}
+                                        </div>
+                                    )}
                                 </button>
                             ))}
                         </div>

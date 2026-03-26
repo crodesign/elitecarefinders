@@ -364,14 +364,14 @@ export default async function FacilityDetailPage({ params }: Props) {
                                                 const caption = mediaCaptions[url];
                                                 const memberTitle = teamTitles[url];
                                                 return (
-                                                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
-                                                        <img src={url} alt={caption || `Team member ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                                                    <div key={i} className="rounded-lg overflow-hidden bg-white border border-gray-100 shadow-sm">
+                                                        <div className="aspect-square overflow-hidden bg-gray-200">
+                                                            <img src={url} alt={caption || `Team member ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                                                        </div>
                                                         {(caption || memberTitle) && (
-                                                            <div className="absolute bottom-0 left-0 right-0 px-[15px]">
-                                                                <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 text-center leading-tight">
-                                                                    {caption && <p className="font-medium truncate">{caption}</p>}
-                                                                    {memberTitle && <p className="text-gray-500 mt-0.5">{memberTitle}</p>}
-                                                                </div>
+                                                            <div className="px-2 py-1.5 text-xs text-gray-800 text-center leading-tight">
+                                                                {caption && <p className="font-medium truncate">{caption}</p>}
+                                                                {memberTitle && <p className="text-gray-500 mt-0.5">{memberTitle}</p>}
                                                             </div>
                                                         )}
                                                     </div>
@@ -455,13 +455,13 @@ export default async function FacilityDetailPage({ params }: Props) {
                                     {cuisineImageUrls.map((url, i) => {
                                         const caption = mediaCaptions[url];
                                         return (
-                                            <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200">
-                                                <img src={url} alt={caption || `Cuisine ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                                            <div key={i} className="rounded-lg overflow-hidden bg-white border border-gray-100 shadow-sm">
+                                                <div className="aspect-square overflow-hidden bg-gray-200">
+                                                    <img src={url} alt={caption || `Cuisine ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                                                </div>
                                                 {caption && (
-                                                    <div className="absolute bottom-0 left-0 right-0 px-[15px]">
-                                                        <div className="rounded-t-md bg-[#f0f8fc] px-2 py-1 text-xs text-gray-800 font-medium text-center truncate">
-                                                            {caption}
-                                                        </div>
+                                                    <div className="px-2 py-1.5 text-xs text-gray-800 font-medium text-center truncate">
+                                                        {caption}
                                                     </div>
                                                 )}
                                             </div>
