@@ -95,7 +95,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
                                 <button
                                     key={i}
                                     onClick={() => select(i)}
-                                    className={`rounded-xl group bg-gray-100 shadow-sm hover:shadow-md transition-shadow text-left ${isActive ? 'ring-2 ring-[#239ddb] ring-offset-1' : ''}`}
+                                    className={`rounded-xl group bg-gray-100 shadow-sm transition-shadow text-left ${isActive ? 'ring-2 ring-[#239ddb] ring-offset-1 cursor-default' : 'hover:shadow-md'}`}
                                 >
                                     <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
                                         {thumb && (
@@ -113,7 +113,7 @@ export function VideoCarousel({ items }: { items: FeaturedVideoItem[] }) {
                                         )}
                                     </div>
                                     <div className="px-2 py-1.5 text-center">
-                                        <span className="text-gray-900 text-xs font-medium line-clamp-1 leading-tight">{v.entityTitle}</span>
+                                        <span className={`text-xs font-medium line-clamp-1 leading-tight transition-colors ${isActive ? 'text-gray-900' : 'text-gray-900 group-hover:text-[#239ddb]'}`}>{v.entityTitle}</span>
                                     </div>
                                 </button>
                             );
