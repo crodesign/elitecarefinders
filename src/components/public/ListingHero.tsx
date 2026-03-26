@@ -43,7 +43,7 @@ export function ListingHero({ title, total, icon, heroImageSrc, backHref, backLa
                     }}
                 />
                 <div className="relative px-5 pt-10 pb-[30px] text-left sm:text-center text-white">
-                    <h1 className="text-3xl sm:text-4xl font-bold leading-tight flex items-start justify-start sm:justify-center gap-3">
+                    <h1 className="text-2xl sm:text-4xl font-bold leading-tight flex items-start justify-start sm:justify-center gap-3">
                         {heroImageSrc
                             ? <img src={heroImageSrc} alt="" aria-hidden="true" className="h-10 w-auto opacity-90 rounded-sm" />
                             : icon && <FontAwesomeIcon icon={icon} className="h-8 w-8 opacity-80" />

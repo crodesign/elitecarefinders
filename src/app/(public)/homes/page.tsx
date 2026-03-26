@@ -23,8 +23,8 @@ export const metadata: Metadata = {
 export default async function HomesListingPage({ searchParams }: Props) {
     const page = Math.max(1, parseInt(searchParams.page || '1', 10));
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
-    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
-    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
+    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'grid';
+    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'hidden';
     const q = searchParams.q?.trim() || undefined;
     const neighborhood = searchParams.neighborhood || undefined;
 

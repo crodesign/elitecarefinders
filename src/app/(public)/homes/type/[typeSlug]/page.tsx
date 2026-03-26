@@ -28,8 +28,8 @@ export default async function HomesByTypePage({ params, searchParams }: Props) {
     const q = searchParams.q || '';
     const neighborhood = searchParams.neighborhood || '';
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
-    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
-    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
+    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'grid';
+    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'hidden';
 
     const [typeEntry, islands, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
         getTaxonomyEntryBySlug(typeSlug),

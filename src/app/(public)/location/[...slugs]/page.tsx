@@ -35,8 +35,8 @@ export default async function LocationPage({ params, searchParams }: Props) {
     const q = searchParams.q || '';
     const typeSlug = searchParams.type || '';
     const explicitView = searchParams.view === 'list' ? 'list' : searchParams.view === 'grid' ? 'grid' : null;
-    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'hidden sm:grid';
-    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'grid sm:hidden';
+    const gridClass = explicitView === 'grid' ? 'grid' : explicitView === 'list' ? 'hidden' : 'grid';
+    const listClass = explicitView === 'list' ? 'grid' : explicitView === 'grid' ? 'hidden' : 'hidden';
 
     const entry = await getLocationEntryByPath(slugs);
     if (!entry && slugs.length === 2) {
