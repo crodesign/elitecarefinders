@@ -1340,7 +1340,7 @@ export default function RoomFieldsPage() {
                                                                                             disabled={!newFieldName.trim()}
                                                                                             className="p-1.5 bg-accent text-white rounded hover:bg-accent-light disabled:opacity-50"
                                                                                         >
-                                                                                            <Plus className="h-4 w-4" />
+                                                                                            <Check className="h-4 w-4" />
                                                                                         </button>
                                                                                         <button
                                                                                             onClick={() => setAddingFieldToCategory(null)}
