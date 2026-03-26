@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Monitor, PanelLeft, Home } from "lucide-react";
+import { Check, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Monitor, PanelLeft, Smartphone } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     getInjectedScripts, saveInjectedScripts, ScriptEntry,
     getAnalyticsSettings, saveAnalyticsSettings, AnalyticsSettings,
     getSocialAccounts, saveSocialAccounts, SocialAccount, SocialPlatform, SOCIAL_PLATFORMS,
 } from "@/lib/services/siteSettingsService";
+import { Tooltip } from "@/components/ui/tooltip";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -247,7 +248,7 @@ export default function GeneralSettingsPage() {
 
                     <div className="flex justify-end">
                         <button type="button" onClick={handleSaveScripts} disabled={isSavingScripts} className="btn-primary flex items-center gap-2">
-                            {isSavingScripts ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            {isSavingScripts ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                             Save
                         </button>
                     </div>
@@ -367,7 +368,7 @@ export default function GeneralSettingsPage() {
 
                     <div className="flex justify-end">
                         <button type="button" onClick={handleSaveAnalytics} disabled={isSavingAnalytics} className="btn-primary flex items-center gap-2">
-                            {isSavingAnalytics ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            {isSavingAnalytics ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                             Save
                         </button>
                     </div>
@@ -418,30 +419,30 @@ export default function GeneralSettingsPage() {
                                 />
                                 )}
                                 {([
-                                    { key: 'header', Icon: Monitor, label: 'Header' },
-                                    { key: 'popup',  Icon: PanelLeft, label: 'Popups' },
-                                    { key: 'home',   Icon: Home,    label: 'Home'   },
-                                ] as const).map(({ key, Icon, label }) => {
+                                    { key: 'header', Icon: Monitor,    showLabel: 'Show in Desktop Header',  hideLabel: 'Hide from Desktop Header'  },
+                                    { key: 'popup',  Icon: PanelLeft,  showLabel: 'Show in Popup Navs',      hideLabel: 'Hide from Popup Navs'      },
+                                    { key: 'home',   Icon: Smartphone, showLabel: 'Show in Mobile Home Bar', hideLabel: 'Hide from Mobile Home Bar' },
+                                ] as const).map(({ key, Icon, showLabel, hideLabel }) => {
                                     const active = account.locations
                                         ? account.locations[key] !== false
                                         : !account.hidden;
                                     return (
-                                        <button
-                                            key={key}
-                                            type="button"
-                                            title={`${active ? 'Hide from' : 'Show in'} ${label}`}
-                                            onClick={() => {
-                                                const base = account.locations ?? {
-                                                    header: !account.hidden,
-                                                    popup:  !account.hidden,
-                                                    home:   !account.hidden,
-                                                };
-                                                updateSocial(account.id, { locations: { ...base, [key]: !active } });
-                                            }}
-                                            className={`p-1 rounded flex-shrink-0 transition-colors ${active ? 'text-accent' : 'text-content-muted opacity-30 hover:opacity-70'}`}
-                                        >
-                                            <Icon className="h-3.5 w-3.5" />
-                                        </button>
+                                        <Tooltip key={key} content={active ? hideLabel : showLabel} side="top" delayDuration={200}>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const base = account.locations ?? {
+                                                        header: !account.hidden,
+                                                        popup:  !account.hidden,
+                                                        home:   !account.hidden,
+                                                    };
+                                                    updateSocial(account.id, { locations: { ...base, [key]: !active } });
+                                                }}
+                                                className={`p-1 rounded flex-shrink-0 transition-colors ${active ? 'text-accent' : 'text-content-muted opacity-30 hover:opacity-70'}`}
+                                            >
+                                                <Icon className="h-3.5 w-3.5" />
+                                            </button>
+                                        </Tooltip>
                                     );
                                 })}
                                 <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -478,7 +479,7 @@ export default function GeneralSettingsPage() {
 
                     <div className="flex justify-end">
                         <button type="button" onClick={handleSaveSocial} disabled={isSavingSocial} className="btn-primary flex items-center gap-2">
-                            {isSavingSocial ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                            {isSavingSocial ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                             Save
                         </button>
                     </div>

@@ -152,30 +152,49 @@ export function PublicHeader() {
                         {/* Social Media links */}
                         {socialAccounts.length > 0 && (
                             <div className="hidden sm:flex items-center gap-1 mr-1">
-                                {socialAccounts.map(account => (
-                                    account.platform === 'share' ? (
-                                        <button
+                                {socialAccounts.map(account => {
+                                    if (account.platform === 'share') {
+                                        return (
+                                            <button
+                                                key={account.id}
+                                                type="button"
+                                                onClick={() => handleShare(homepageTitle, homepageText)}
+                                                className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
+                                                aria-label="Share"
+                                            >
+                                                <FontAwesomeIcon icon={SOCIAL_ICON_MAP.share} className="h-3.5 w-3.5" />
+                                            </button>
+                                        );
+                                    }
+                                    if (account.platform === 'phone' || account.platform === 'email') {
+                                        return (
+                                            <div key={account.id} className="relative group">
+                                                <span
+                                                    className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 group-hover:border-[#239ddb] group-hover:text-[#239ddb] transition-colors cursor-default"
+                                                    aria-label={account.platform}
+                                                >
+                                                    <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
+                                                </span>
+                                                <div className="absolute right-0 top-full mt-2 hidden group-hover:block bg-white rounded-xl shadow-lg border border-gray-100 px-3.5 py-2.5 whitespace-nowrap z-50 pointer-events-none">
+                                                    <p className="text-[10px] text-gray-400 mb-0.5">{account.platform === 'phone' ? 'Call us' : 'Email us'}</p>
+                                                    <p className="text-sm font-medium text-gray-700">{account.url}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <a
                                             key={account.id}
-                                            type="button"
-                                            onClick={() => handleShare(homepageTitle, homepageText)}
+                                            href={socialHref(account.platform, account.url)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
-                                            aria-label="Share"
+                                            aria-label={account.platform}
                                         >
-                                            <FontAwesomeIcon icon={SOCIAL_ICON_MAP.share} className="h-3.5 w-3.5" />
-                                        </button>
-                                    ) : (
-                                    <a
-                                        key={account.id}
-                                        href={socialHref(account.platform, account.url)}
-                                        target={account.platform === 'phone' || account.platform === 'email' ? undefined : '_blank'}
-                                        rel={account.platform === 'phone' || account.platform === 'email' ? undefined : 'noopener noreferrer'}
-                                        className="flex items-center justify-center w-7 h-7 rounded-md border-2 border-gray-300 text-gray-400 hover:border-[#239ddb] hover:text-[#239ddb] transition-colors"
-                                        aria-label={account.platform}
-                                    >
-                                        <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
-                                    </a>
-                                    )
-                                ))}
+                                            <FontAwesomeIcon icon={SOCIAL_ICON_MAP[account.platform]} className="h-3.5 w-3.5" />
+                                        </a>
+                                    );
+                                })}
                             </div>
                         )}
                         {/* Profile / Auth icon */}
