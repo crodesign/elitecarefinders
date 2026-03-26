@@ -5,7 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw, Info } from "lucide-react";
 import Link from "next/link";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 
@@ -31,6 +31,7 @@ interface CountryData { country: string; sessions: number; }
 interface CityData { city: string; sessions: number; }
 interface KeywordData { keyword: string; sessions: number; }
 interface NVRData { type: string; sessions: number; }
+interface OrganicQueryData { query: string; clicks: number; impressions: number; position: number; }
 interface AnalyticsData {
     summary: Summary;
     traffic: TrafficPoint[];
@@ -42,6 +43,8 @@ interface AnalyticsData {
     countries: CountryData[];
     cities: CityData[];
     keywords: KeywordData[];
+    organicQueries: OrganicQueryData[];
+    searchConsoleError?: string | null;
     newVsReturning: NVRData[];
     charts: { traffic: boolean; topPages: boolean; sources: boolean; };
 }
@@ -97,6 +100,24 @@ const tooltipStyle = {
     color: "var(--content-primary)",
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
 };
+
+function InfoTooltip({ text }: { text: string }) {
+    return (
+        <span className="relative group/info inline-flex items-center cursor-default">
+            <Info className="h-3 w-3 text-content-muted/40 group-hover/info:text-content-muted transition-colors" />
+            <span
+                className="pointer-events-none absolute left-0 top-full mt-1.5 w-60 rounded-lg px-3 py-2 text-xs text-content-primary leading-relaxed opacity-0 group-hover/info:opacity-100 transition-opacity z-50 normal-case tracking-normal font-normal"
+                style={{
+                    background: "var(--surface-secondary)",
+                    border: "1px solid rgba(128,128,128,0.25)",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                }}
+            >
+                {text}
+            </span>
+        </span>
+    );
+}
 
 // ─── Preset ranges ────────────────────────────────────────────────────────────
 
@@ -335,7 +356,7 @@ export function AnalyticsDashboard() {
 
     // ── Derived values ─────────────────────────────────────────────────────────
 
-    const { summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, cities, keywords, newVsReturning, charts } = data;
+    const { summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, cities, keywords, organicQueries, searchConsoleError, newVsReturning, charts } = data;
 
     const engagementRate = summary.sessions.value > 0
         ? (summary.engagedSessions.value / summary.sessions.value) * 100
@@ -391,8 +412,14 @@ export function AnalyticsDashboard() {
 
             {/* Traffic chart */}
             {charts.traffic && formattedTraffic.length > 0 && (
-                <div className="card p-6">
-                    <h3 className="text-sm font-semibold text-content-primary mb-5">Traffic Over Time</h3>
+                <div className="card">
+                    <div className="px-6 pt-6 pb-3" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                        <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
+                            Traffic Over Time
+                            <InfoTooltip text="Daily sessions and pageviews across the selected date range. Sessions count each visit; pageviews count every page loaded within those visits." />
+                        </h3>
+                    </div>
+                    <div className="px-6 pb-6 pt-5">
                     <ResponsiveContainer width="100%" height={200}>
                         <AreaChart data={formattedTraffic} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
                             <defs>
@@ -421,25 +448,32 @@ export function AnalyticsDashboard() {
                             </span>
                         ))}
                     </div>
+                    </div>
                 </div>
             )}
 
-            {/* Top Pages + Sources + Keywords */}
+            {/* Top Pages + Sources + Keywords + Organic Queries */}
             {(charts.topPages || charts.sources) && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     {charts.topPages && topPages.length > 0 && (
-                        <div className="card p-6">
-                            <h3 className="text-sm font-semibold text-content-primary mb-4">Top Pages</h3>
-                            <div className="space-y-3">
+                        <div className="card h-[430px] flex flex-col">
+                            <div className="px-6 pt-6 pb-3 flex-shrink-0">
+                                <h3 className="text-xs font-semibold text-content-muted uppercase tracking-wide flex items-center gap-1.5">
+                                    Top Pages
+                                    <InfoTooltip text="Your most visited pages ranked by total pageviews. Bounce rate shows the percentage of visitors who left without clicking to another page." />
+                                </h3>
+                            </div>
+                            <div className="px-6 pb-2 flex-shrink-0 grid grid-cols-[1fr_44px_48px]" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                                <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide">Page</span>
+                                <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Views</span>
+                                <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Bounce</span>
+                            </div>
+                            <div className="flex-1 overflow-y-auto px-6 pb-2">
                                 {topPages.map((p, i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <span className="text-xs text-content-muted font-mono w-4 flex-shrink-0 text-right">{i + 1}</span>
-                                        <RankedBar
-                                            label={p.page}
-                                            value={p.views}
-                                            max={maxPageViews}
-                                            sub={p.bounceRate > 0 ? `${(p.bounceRate * 100).toFixed(0)}% bounce` : undefined}
-                                        />
+                                    <div key={i} className="grid grid-cols-[1fr_44px_48px] py-2 border-b border-ui-border last:border-0">
+                                        <span className="text-xs text-content-primary truncate pr-2">{p.page}</span>
+                                        <span className="text-xs text-content-secondary tabular-nums text-right">{p.views.toLocaleString()}</span>
+                                        <span className="text-xs text-content-muted tabular-nums text-right">{p.bounceRate > 0 ? `${(p.bounceRate * 100).toFixed(0)}%` : '—'}</span>
                                     </div>
                                 ))}
                             </div>
@@ -447,18 +481,23 @@ export function AnalyticsDashboard() {
                     )}
 
                     {charts.sources && sources.length > 0 && (
-                        <div className="card p-6">
-                            <h3 className="text-sm font-semibold text-content-primary mb-4">Traffic Sources</h3>
-                            <div className="space-y-3">
+                        <div className="card h-[430px] flex flex-col">
+                            <div className="px-6 pt-6 pb-3 flex-shrink-0" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                                <h3 className="text-xs font-semibold text-content-muted uppercase tracking-wide flex items-center gap-1.5">
+                                    Traffic Sources
+                                    <InfoTooltip text="How visitors arrive at your site — organic search, direct, social media, email, referrals, etc. Sub-items show the individual sources within each channel." />
+                                </h3>
+                            </div>
+                            <div className="flex-1 overflow-y-auto px-6 pb-6">
                                 {sources.map((s, i) => {
                                     const subs = (sourceDetail ?? [])
                                         .filter(d => d.channel === s.source)
                                         .slice(0, 4);
                                     return (
-                                        <div key={i}>
+                                        <div key={i} className={i > 0 ? 'mt-2 border-t border-ui-border pt-2' : 'pt-2'}>
                                             <RankedBar label={s.source || "Direct"} value={s.sessions} max={maxSessions} />
                                             {subs.length > 0 && (
-                                                <div className="ml-2 mt-1.5 space-y-1 pl-2 border-l border-ui-border">
+                                                <div className="ml-2 mt-1 space-y-1 pl-2 border-l border-ui-border">
                                                     {subs.map((d, j) => (
                                                         <div key={j} className="flex items-center justify-between gap-2">
                                                             <span className="text-[11px] text-content-muted truncate">{d.source}</span>
@@ -474,25 +513,79 @@ export function AnalyticsDashboard() {
                         </div>
                     )}
 
-                    <div className="card p-6">
-                        <h3 className="text-sm font-semibold text-content-primary mb-4">Top Keywords</h3>
+                    <div className="card h-[430px] flex flex-col">
+                        <div className="px-6 pt-6 pb-3 flex-shrink-0">
+                            <h3 className="text-xs font-semibold text-content-muted uppercase tracking-wide flex items-center gap-1.5">
+                                Top On Site Searches
+                                <InfoTooltip text="Terms visitors typed into your site's internal search box. Shows what people are actively looking for once they're on the site." />
+                            </h3>
+                        </div>
                         {keywords && keywords.length > 0 ? (
-                            <div className="space-y-3">
-                                {keywords.map((k, i) => (
-                                    <div key={i} className="flex items-center gap-3">
-                                        <span className="text-xs text-content-muted font-mono w-4 flex-shrink-0 text-right">{i + 1}</span>
-                                        <RankedBar label={k.keyword} value={k.sessions} max={maxKeyword} />
-                                    </div>
-                                ))}
-                            </div>
+                            <>
+                                <div className="px-6 pb-2 flex-shrink-0 grid grid-cols-[1fr_56px]" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide">Search Term</span>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Sessions</span>
+                                </div>
+                                <div className="flex-1 overflow-y-auto px-6 pb-6">
+                                    {keywords.map((k, i) => (
+                                        <div key={i} className="grid grid-cols-[1fr_56px] py-2 border-b border-ui-border last:border-0">
+                                            <span className="text-xs text-content-primary truncate pr-2">{k.keyword}</span>
+                                            <span className="text-xs text-content-secondary tabular-nums text-right">{k.sessions.toLocaleString()}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
                         ) : (
-                            <p className="text-xs text-content-muted leading-relaxed">
-                                No keyword data available. Enable{" "}
-                                <a href="https://support.google.com/analytics/answer/1012264" target="_blank" rel="noreferrer" className="text-accent hover:underline">site search tracking</a>{" "}
-                                in GA4 or link a Google Ads account to populate this section.
-                            </p>
+                            <div className="flex-1 px-6 pb-6">
+                                <p className="text-xs text-content-muted leading-relaxed">
+                                    No keyword data available. Enable{" "}
+                                    <a href="https://support.google.com/analytics/answer/1012264" target="_blank" rel="noreferrer" className="text-accent hover:underline">site search tracking</a>{" "}
+                                    in GA4 or link a Google Ads account to populate this section.
+                                </p>
+                            </div>
                         )}
                     </div>
+
+                    {/* Organic Search Queries (Search Console) */}
+                    <div className="card h-[430px] flex flex-col">
+                        <div className="px-6 pt-6 pb-3 flex-shrink-0">
+                            <h3 className="text-xs font-semibold text-content-muted uppercase tracking-wide flex items-center gap-1.5">
+                                Organic Queries
+                                <InfoTooltip text="Google search terms that led visitors to your site, sourced from Google Search Console. Clicks = visits from that query. Impressions = how many times it appeared in results. Position = average rank in search results." />
+                            </h3>
+                            <p className="text-xs text-content-muted mt-0.5">via Search Console</p>
+                        </div>
+                        {organicQueries && organicQueries.length > 0 ? (
+                            <>
+                                <div className="px-6 pb-2 flex-shrink-0 grid grid-cols-[1fr_48px_56px_38px]" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide">Query</span>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Clicks</span>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Impr.</span>
+                                    <span className="text-[10px] font-medium text-content-muted uppercase tracking-wide text-right">Pos.</span>
+                                </div>
+                                <div className="flex-1 overflow-y-auto px-6 pb-6">
+                                    {organicQueries.map((q, i) => (
+                                        <div key={i} className="grid grid-cols-[1fr_48px_56px_38px] py-2 border-b border-ui-border last:border-0">
+                                            <span className="text-xs text-content-primary truncate pr-2">{q.query}</span>
+                                            <span className="text-xs text-content-secondary tabular-nums text-right">{q.clicks.toLocaleString()}</span>
+                                            <span className="text-xs text-content-muted tabular-nums text-right">{q.impressions.toLocaleString()}</span>
+                                            <span className={`text-xs tabular-nums text-right ${q.position <= 3 ? 'text-emerald-500' : q.position <= 10 ? 'text-accent' : 'text-content-muted'}`}>{q.position}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex-1 px-6 pb-6">
+                                <p className="text-xs leading-relaxed" style={{ color: searchConsoleError ? 'var(--color-red-400, #f87171)' : undefined }}>
+                                    {searchConsoleError
+                                        ? searchConsoleError
+                                        : <>No data yet. Add your Search Console site URL in{" "}<a href="/admin/settings" className="text-accent hover:underline">Analytics Settings</a>.</>
+                                    }
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             )}
 
@@ -501,9 +594,14 @@ export function AnalyticsDashboard() {
 
                 {/* Devices */}
                 {devices.length > 0 && (
-                    <div className="card p-6">
-                        <h3 className="text-sm font-semibold text-content-primary mb-4">Devices</h3>
-                        <div className="flex items-center gap-4">
+                    <div className="card">
+                        <div className="px-6 pt-6 pb-3" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                            <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
+                                Devices
+                                <InfoTooltip text="Breakdown of sessions by device type — desktop, mobile, or tablet. Mobile sub-items show the iOS vs Android split." />
+                            </h3>
+                        </div>
+                        <div className="px-6 py-4 flex items-center gap-4">
                             <ResponsiveContainer width={110} height={110}>
                                 <PieChart>
                                     <Pie data={devices} dataKey="sessions" nameKey="device" cx="50%" cy="50%" innerRadius={28} outerRadius={52}>
@@ -549,9 +647,14 @@ export function AnalyticsDashboard() {
 
                 {/* New vs Returning */}
                 {(newVisitors > 0 || returnVisitors > 0) && (
-                    <div className="card p-6">
-                        <h3 className="text-sm font-semibold text-content-primary mb-4">New vs Returning</h3>
-                        <div className="flex items-center gap-4">
+                    <div className="card">
+                        <div className="px-6 pt-6 pb-3" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                            <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
+                                New vs Returning
+                                <InfoTooltip text="Whether visitors are first-time users or have been to the site before. Determined by browser/device recognition — returning counts the same device visiting again." />
+                            </h3>
+                        </div>
+                        <div className="px-6 py-4 flex items-center gap-4">
                             <ResponsiveContainer width={110} height={110}>
                                 <PieChart>
                                     <Pie
@@ -587,14 +690,19 @@ export function AnalyticsDashboard() {
 
                 {/* Top Countries */}
                 {countries.length > 0 && (
-                    <div className="card p-6">
-                        <h3 className="text-sm font-semibold text-content-primary mb-4 flex items-center gap-2">
-                            <Globe className="h-3.5 w-3.5 text-content-muted" />
-                            Top Countries
-                        </h3>
-                        <div className="space-y-3">
+                    <div className="card">
+                        <div className="px-6 pt-6 pb-3" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                            <h3 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                                <Globe className="h-3.5 w-3.5 text-content-muted" />
+                                Top Countries
+                                <InfoTooltip text="Countries generating the most sessions during the selected period. Useful for understanding the geographic reach of your audience." />
+                            </h3>
+                        </div>
+                        <div className="px-6 pb-4">
                             {countries.slice(0, 6).map((c, i) => (
-                                <RankedBar key={i} label={c.country} value={c.sessions} max={maxCountry} />
+                                <div key={i} className="py-2 border-b border-ui-border last:border-0">
+                                    <RankedBar label={c.country} value={c.sessions} max={maxCountry} />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -602,15 +710,23 @@ export function AnalyticsDashboard() {
 
                 {/* Top Cities */}
                 {cities && cities.length > 0 && (
-                    <div className="card p-6">
-                        <h3 className="text-sm font-semibold text-content-primary mb-4">Top Cities</h3>
-                        <div className="space-y-3">
+                    <div className="card">
+                        <div className="px-6 pt-6 pb-3" style={{ borderBottom: '2px solid rgba(128,128,128,0.2)' }}>
+                            <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
+                                Top Cities
+                                <InfoTooltip text="Cities generating the most sessions. Based on IP geolocation — useful for identifying local demand and where to focus regional marketing." />
+                            </h3>
+                        </div>
+                        <div className="px-6 pb-4">
                             {cities.slice(0, 6).map((c, i) => (
-                                <RankedBar key={i} label={c.city} value={c.sessions} max={maxCity} />
+                                <div key={i} className="py-2 border-b border-ui-border last:border-0">
+                                    <RankedBar label={c.city} value={c.sessions} max={maxCity} />
+                                </div>
                             ))}
                         </div>
                     </div>
                 )}
+
             </div>
 
         </div>

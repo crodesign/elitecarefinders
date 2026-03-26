@@ -43,6 +43,7 @@ export async function saveInjectedScripts(scripts: ScriptEntry[]): Promise<void>
 export interface AnalyticsSettings {
     propertyId: string;
     serviceAccountJson: string;
+    searchConsoleSiteUrl: string;
     charts: {
         traffic: boolean;
         topPages: boolean;
@@ -53,6 +54,7 @@ export interface AnalyticsSettings {
 const DEFAULT_ANALYTICS: AnalyticsSettings = {
     propertyId: '',
     serviceAccountJson: '',
+    searchConsoleSiteUrl: '',
     charts: { traffic: true, topPages: true, sources: true },
 };
 

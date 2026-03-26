@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HeadInjector } from "@/components/HeadInjector";
@@ -90,6 +91,17 @@ export default async function RootLayout({
         >
             <head />
             <body className={inter.className}>
+                {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+                    <>
+                        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
+                        <Script id="ga-init" strategy="afterInteractive">{`
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+                        `}</Script>
+                    </>
+                )}
                 <HeadInjector />
                 <AuthProvider>
                     {children}

@@ -34,6 +34,7 @@ export default function GeneralSettingsPage() {
     const [analytics, setAnalytics] = useState<AnalyticsSettings>({
         propertyId: '',
         serviceAccountJson: '',
+        searchConsoleSiteUrl: '',
         charts: { traffic: true, topPages: true, sources: true },
     });
     const [isSavingAnalytics, setIsSavingAnalytics] = useState(false);
@@ -325,6 +326,21 @@ export default function GeneralSettingsPage() {
                         )}
                         <p className="text-xs text-content-muted">
                             Click &ldquo;Browse properties&rdquo; to auto-detect, or enter the numeric Property ID manually (GA4 Admin &rarr; Property Details).
+                        </p>
+                    </div>
+
+                    {/* Search Console Site URL */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-content-secondary">Search Console Site URL</label>
+                        <input
+                            type="text"
+                            value={analytics.searchConsoleSiteUrl ?? ''}
+                            onChange={e => setAnalytics(prev => ({ ...prev, searchConsoleSiteUrl: e.target.value }))}
+                            placeholder="https://www.elitecarefinders.com"
+                            className="form-input w-full px-3 py-2 text-sm"
+                        />
+                        <p className="text-xs text-content-muted">
+                            Enter the exact URL as registered in Google Search Console. Grant the service account access as an owner/user in Search Console.
                         </p>
                     </div>
 

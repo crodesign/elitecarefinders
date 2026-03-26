@@ -50,15 +50,16 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: settingsRow } = await supabase.from('site_settings').select('value').eq('key', 'analytics_settings').single();
-    let settings: { propertyId?: string; serviceAccountJson?: string; charts?: Record<string, boolean> } = {};
+    let settings: { propertyId?: string; serviceAccountJson?: string; searchConsoleSiteUrl?: string; charts?: Record<string, boolean> } = {};
     try { settings = JSON.parse(settingsRow?.value || '{}'); } catch { return NextResponse.json({ error: 'Invalid settings' }, { status: 500 }); }
     if (!settings.propertyId || !settings.serviceAccountJson) return NextResponse.json({ error: 'Not configured' }, { status: 404 });
 
     let credentials: object;
     try { credentials = JSON.parse(settings.serviceAccountJson); } catch { return NextResponse.json({ error: 'Invalid service account JSON' }, { status: 500 }); }
 
-    const auth = new google.auth.GoogleAuth({ credentials, scopes: ['https://www.googleapis.com/auth/analytics.readonly'] });
+    const auth = new google.auth.GoogleAuth({ credentials, scopes: ['https://www.googleapis.com/auth/analytics.readonly', 'https://www.googleapis.com/auth/webmasters.readonly'] });
     const analyticsdata = google.analyticsdata({ version: 'v1beta', auth });
+    const searchconsole = google.searchconsole({ version: 'v1', auth });
 
     const url = new URL(request.url);
     const startDate = url.searchParams.get('start') || '30daysAgo';
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
             // [1] Summary previous period
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate: prev.startDate, endDate: prev.endDate }], metrics: SUMMARY_METRICS } }),
             // [2] Traffic time series
-            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'date' }], metrics: [{ name: 'sessions' }, { name: 'screenPageViews' }], orderBys: [{ dimension: { dimensionName: 'date' } }] } }),
+            analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'date' }], metrics: [{ name: 'sessions' }, { name: 'screenPageViews' }], orderBys: [{ dimension: { dimensionName: 'date' } }], limit: '366' } }),
             // [3] Top pages
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'pagePath' }], metrics: [{ name: 'screenPageViews' }, { name: 'bounceRate' }], orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }], limit: '10' } }),
             // [4] Sources
@@ -104,6 +105,10 @@ export async function GET(request: NextRequest) {
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'operatingSystem' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: '6' } }),
             // [12] Source detail: channel + source
             analyticsdata.properties.runReport({ property, requestBody: { dateRanges: [{ startDate, endDate }], dimensions: [{ name: 'sessionDefaultChannelGroup' }, { name: 'sessionSource' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: '30' } }),
+            // [13] Search Console organic queries (requires YYYY-MM-DD dates)
+            settings.searchConsoleSiteUrl
+                ? searchconsole.searchanalytics.query({ siteUrl: settings.searchConsoleSiteUrl, requestBody: { startDate: toISODate(parseDateParam(startDate)), endDate: toISODate(parseDateParam(endDate)), dimensions: ['query'], rowLimit: 20, dataState: 'all' } })
+                : Promise.resolve(null),
         ]);
 
         const cur = settled(results[0])?.rows?.[0];
@@ -182,7 +187,20 @@ export async function GET(request: NextRequest) {
             sessions: parseInt(r.metricValues?.[0]?.value || '0'),
         }));
 
-        return NextResponse.json({ summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, newVsReturning, cities, keywords, charts: settings.charts });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const scResult13 = results[13] as PromiseSettledResult<any>;
+        const searchConsoleError = scResult13.status === 'rejected' ? String(scResult13.reason?.message || scResult13.reason) : null;
+        const scRows: any[] = scResult13.status === 'fulfilled' ? (scResult13.value?.data?.rows ?? []) : [];
+        const organicQueries = scRows
+            .filter((r: { keys?: string[] }) => r.keys?.[0] && r.keys[0] !== '(not provided)')
+            .map((r: { keys: string[]; clicks?: number; impressions?: number; position?: number }) => ({
+                query: r.keys[0],
+                clicks: r.clicks ?? 0,
+                impressions: r.impressions ?? 0,
+                position: r.position ? Math.round(r.position * 10) / 10 : 0,
+            }));
+
+        return NextResponse.json({ summary, traffic, topPages, sources, sourceDetail, devices, mobileOS, countries, newVsReturning, cities, keywords, organicQueries, searchConsoleError, charts: settings.charts });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'GA4 API error';
         return NextResponse.json({ error: message }, { status: 500 });
