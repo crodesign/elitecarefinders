@@ -882,8 +882,8 @@ export async function getSocialAccountsPublic(): Promise<PublicSocialAccount[]> 
     const { data } = await db.from('site_settings').select('value').eq('key', 'social_accounts').maybeSingle();
     if (!data?.value) return [];
     try {
-        const all = JSON.parse(data.value) as (PublicSocialAccount & { hidden?: boolean })[];
-        return all.filter(a => !a.hidden);
+        const all = JSON.parse(data.value) as (PublicSocialAccount & { hidden?: boolean; locations?: { home?: boolean } })[];
+        return all.filter(a => a.locations ? a.locations.home !== false : !a.hidden);
     } catch { return []; }
 }
 

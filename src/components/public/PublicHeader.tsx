@@ -67,7 +67,7 @@ export function PublicHeader() {
     }, [pathname]);
 
     useEffect(() => {
-        getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => !a.hidden)));
+        getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => a.locations ? a.locations.header !== false : !a.hidden)));
         getHomepageSeo().then(seo => {
             if (seo.metaTitle) setHomepageTitle(seo.metaTitle);
             if (seo.metaDescription) setHomepageText(seo.metaDescription);

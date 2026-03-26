@@ -175,7 +175,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
     }
 
     useEffect(() => {
-        getSocialAccounts().then(accounts => setSocialAccounts(accounts));
+        getSocialAccounts().then(accounts => setSocialAccounts(accounts.filter(a => a.locations ? a.locations.popup !== false : !a.hidden)));
         getHomepageSeo().then(seo => {
             if (seo.metaTitle) setHomepageTitle(seo.metaTitle);
             if (seo.metaDescription) setHomepageText(seo.metaDescription);

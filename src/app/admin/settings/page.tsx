@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Eye, EyeOff } from "lucide-react";
+import { Save, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Monitor, PanelLeft, Home } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     getInjectedScripts, saveInjectedScripts, ScriptEntry,
@@ -417,14 +417,33 @@ export default function GeneralSettingsPage() {
                                     className="form-input flex-1 min-w-0 text-xs px-2 py-1 !bg-surface-secondary"
                                 />
                                 )}
-                                <button
-                                    type="button"
-                                    onClick={() => updateSocial(account.id, { hidden: !account.hidden })}
-                                    className={`p-1 rounded flex-shrink-0 transition-colors ${account.hidden ? 'text-content-muted opacity-40 hover:opacity-100' : 'text-content-muted hover:text-content-primary'}`}
-                                    aria-label={account.hidden ? "Show" : "Hide"}
-                                >
-                                    {account.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                                </button>
+                                {([
+                                    { key: 'header', Icon: Monitor, label: 'Header' },
+                                    { key: 'popup',  Icon: PanelLeft, label: 'Popups' },
+                                    { key: 'home',   Icon: Home,    label: 'Home'   },
+                                ] as const).map(({ key, Icon, label }) => {
+                                    const active = account.locations
+                                        ? account.locations[key] !== false
+                                        : !account.hidden;
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            title={`${active ? 'Hide from' : 'Show in'} ${label}`}
+                                            onClick={() => {
+                                                const base = account.locations ?? {
+                                                    header: !account.hidden,
+                                                    popup:  !account.hidden,
+                                                    home:   !account.hidden,
+                                                };
+                                                updateSocial(account.id, { locations: { ...base, [key]: !active } });
+                                            }}
+                                            className={`p-1 rounded flex-shrink-0 transition-colors ${active ? 'text-accent' : 'text-content-muted opacity-30 hover:opacity-70'}`}
+                                        >
+                                            <Icon className="h-3.5 w-3.5" />
+                                        </button>
+                                    );
+                                })}
                                 <div className="flex items-center gap-0.5 flex-shrink-0">
                                     <button
                                         type="button"

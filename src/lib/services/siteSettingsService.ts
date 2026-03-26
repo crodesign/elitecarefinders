@@ -93,7 +93,17 @@ export interface SocialAccount {
     id: string;
     platform: SocialPlatform;
     url: string;
-    hidden?: boolean;
+    hidden?: boolean; // legacy
+    locations?: {
+        header?: boolean;
+        popup?: boolean;
+        home?: boolean;
+    };
+}
+
+export function socialVisibleIn(account: SocialAccount, location: 'header' | 'popup' | 'home'): boolean {
+    if (account.locations) return account.locations[location] !== false;
+    return !account.hidden;
 }
 
 export async function getSocialAccounts(): Promise<SocialAccount[]> {
