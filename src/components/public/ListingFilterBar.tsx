@@ -162,8 +162,8 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
     return (
         <div className="mb-8 flex flex-col gap-3">
                 {/* Search row */}
-                <div className="flex gap-3 items-center">
-                    <form onSubmit={handleSearch} className="flex flex-1 min-w-0">
+                <div className="flex flex-wrap gap-3 items-center">
+                    <form onSubmit={handleSearch} className="flex w-full sm:flex-1 sm:w-auto min-w-0">
                         <input
                             type="text"
                             value={query}
@@ -184,30 +184,32 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
                         </button>
                     </form>
 
-                    {islandList.length > 0 && (
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <SearchableLocationDropdown
-                                label="Find by Location"
-                                items={islandList}
-                                basePath="/location/hawaii"
-                                showSearch={false}
-                                onSelect={handleIslandSelect}
-                                selectedSlug={selectedIsland?.slug ?? null}
-                            />
-                            {selectedIsland && (
-                                <button
-                                    type="button"
-                                    onClick={clearIsland}
-                                    className="flex items-center justify-center w-7 h-7 rounded-md bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors flex-shrink-0"
-                                    aria-label="Clear island"
-                                >
-                                    <FontAwesomeIcon icon={faXmark} className="h-3 w-3" />
-                                </button>
-                            )}
-                        </div>
-                    )}
+                    <div className="flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto flex-shrink-0">
+                        {islandList.length > 0 && (
+                            <div className="flex items-center gap-1.5">
+                                <SearchableLocationDropdown
+                                    label="Find by Location"
+                                    items={islandList}
+                                    basePath="/location/hawaii"
+                                    showSearch={false}
+                                    onSelect={handleIslandSelect}
+                                    selectedSlug={selectedIsland?.slug ?? null}
+                                />
+                                {selectedIsland && (
+                                    <button
+                                        type="button"
+                                        onClick={clearIsland}
+                                        className="flex items-center justify-center w-7 h-7 rounded-md bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors flex-shrink-0"
+                                        aria-label="Clear island"
+                                    >
+                                        <FontAwesomeIcon icon={faXmark} className="h-3 w-3" />
+                                    </button>
+                                )}
+                            </div>
+                        )}
 
-                    {viewToggleButtons}
+                        {viewToggleButtons}
+                    </div>
                 </div>
 
                 {/* Active search tag */}
@@ -242,9 +244,9 @@ export function ListingFilterBar({ basePath, showViewToggle }: Props) {
                                         <button
                                             key={n.slug}
                                             onClick={() => startFilterTransition(() => router.push(neighborhoodHref(n.slug, selectedIsland.slug)))}
-                                            className="group flex items-center justify-between bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow text-left"
+                                            className="group flex items-start justify-between text-left bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
                                         >
-                                            <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors truncate">{n.name}</span>
+                                            <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">{n.name}</span>
                                             {total > 0 && (
                                                 <span className="ml-2 flex-none text-xs font-semibold bg-white group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">{total}</span>
                                             )}

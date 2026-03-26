@@ -315,7 +315,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                                 <button
                                                     key={n.slug}
                                                     onClick={() => { navigate(`/location/hawaii/${selectedIsland.slug}/${n.slug}`); }}
-                                                    className="group flex items-center justify-between bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
+                                                    className="group flex items-start justify-between text-left bg-gray-100 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
                                                 >
                                                     <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">{n.name}</span>
                                                     {total > 0 && (
