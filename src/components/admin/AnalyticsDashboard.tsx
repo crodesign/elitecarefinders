@@ -511,7 +511,6 @@ export function AnalyticsDashboard() {
                                             <Cell key={i} fill={DEVICE_COLORS[i % DEVICE_COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toLocaleString(), "Sessions"]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="flex-1 space-y-2">
@@ -565,7 +564,6 @@ export function AnalyticsDashboard() {
                                         <Cell fill="var(--accent)" />
                                         <Cell fill="#10b981" />
                                     </Pie>
-                                    <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toLocaleString(), "Sessions"]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="flex-1 space-y-3">
