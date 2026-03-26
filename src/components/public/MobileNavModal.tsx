@@ -377,9 +377,9 @@ export function MobileNavModal({ onClose }: MobileNavModalProps) {
                     </div>
 
                     {/* Footer: social + contact */}
-                    <div className="-mx-6 px-6 py-4 bg-gray-100 rounded-b-2xl flex gap-6">
+                    <div className="-mx-6 px-6 py-4 bg-gray-100 rounded-b-2xl flex flex-col items-center gap-3">
                         {socialAccounts.length > 0 && (
-                            <div className="flex flex-wrap gap-2 content-start">
+                            <div className="flex flex-wrap justify-center gap-2">
                                 {socialAccounts.map(account => (
                                     account.platform === 'share' ? (
                                         <button
