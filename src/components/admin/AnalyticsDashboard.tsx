@@ -87,7 +87,7 @@ const DEVICE_ICONS: Record<string, typeof Monitor> = {
     tablet: Tablet,
 };
 
-const DEVICE_COLORS = ["var(--accent)", "#a78bfa", "#34d399", "#f59e0b"];
+const DEVICE_COLORS = ["var(--accent)", "#10b981", "#34d399", "#f59e0b"];
 
 const tooltipStyle = {
     background: "var(--surface-secondary)",
@@ -401,8 +401,8 @@ export function AnalyticsDashboard() {
                                     <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                                 </linearGradient>
                                 <linearGradient id="gradPageviews" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.2} />
-                                    <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--ui-border)" vertical={false} />
@@ -410,11 +410,11 @@ export function AnalyticsDashboard() {
                             <YAxis tick={{ fontSize: 11, fill: "var(--content-muted)" }} tickLine={false} axisLine={false} width={36} />
                             <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "var(--ui-border-hover)" }} />
                             <Area type="monotone" dataKey="sessions"  stroke="var(--accent)" strokeWidth={2} fill="url(#gradSessions)"  dot={false} name="Sessions" />
-                            <Area type="monotone" dataKey="pageviews" stroke="#a78bfa"        strokeWidth={2} fill="url(#gradPageviews)" dot={false} name="Pageviews" />
+                            <Area type="monotone" dataKey="pageviews" stroke="#10b981"        strokeWidth={2} fill="url(#gradPageviews)" dot={false} name="Pageviews" />
                         </AreaChart>
                     </ResponsiveContainer>
                     <div className="flex items-center gap-4 mt-3 justify-end">
-                        {[{ color: "var(--accent)", label: "Sessions" }, { color: "#a78bfa", label: "Pageviews" }].map(({ color, label }) => (
+                        {[{ color: "var(--accent)", label: "Sessions" }, { color: "#10b981", label: "Pageviews" }].map(({ color, label }) => (
                             <span key={label} className="flex items-center gap-1.5 text-xs text-content-muted">
                                 <span className="w-3 h-0.5 rounded-full inline-block" style={{ background: color }} />
                                 {label}
@@ -563,7 +563,7 @@ export function AnalyticsDashboard() {
                                         dataKey="value" cx="50%" cy="50%" innerRadius={28} outerRadius={52}
                                     >
                                         <Cell fill="var(--accent)" />
-                                        <Cell fill="#a78bfa" />
+                                        <Cell fill="#10b981" />
                                     </Pie>
                                     <Tooltip contentStyle={tooltipStyle} formatter={(v) => [Number(v).toLocaleString(), "Sessions"]} />
                                 </PieChart>
@@ -571,7 +571,7 @@ export function AnalyticsDashboard() {
                             <div className="flex-1 space-y-3">
                                 {[
                                     { label: "New",       value: newVisitors,    color: "var(--accent)" },
-                                    { label: "Returning", value: returnVisitors, color: "#a78bfa" },
+                                    { label: "Returning", value: returnVisitors, color: "#10b981" },
                                 ].map(({ label, value, color }) => (
                                     <div key={label} className="flex items-center gap-2">
                                         <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
