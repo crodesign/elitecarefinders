@@ -79,10 +79,14 @@ export default async function HomeDetailPage({ params }: Props) {
         : mapFallback;
 
     const HAWAII_CENTER: [number, number] = [20.5, -157.5];
-    const geocoded = await geocodeAddress(mapQuery);
+    const storedCoords = home.address?.coordinates;
+    const geocoded = storedCoords
+        ? [storedCoords.lat, storedCoords.lng] as [number, number]
+        : await geocodeAddress(mapQuery);
     const neighborhoodCoords = locationTaxSlug ? NEIGHBORHOOD_COORDS[locationTaxSlug] : undefined;
     const [mapLat, mapLng] = geocoded ?? neighborhoodCoords ?? HAWAII_CENTER;
-    const mapZoom = geocoded ? (hasAddress ? 15 : 13) : (hasAddress ? 13 : 11);
+    const circleMode = !hasAddress;
+    const mapZoom = circleMode ? 12 : (storedCoords ? 15 : (geocoded ? 15 : 13));
 
     // Fetch media captions for gallery + team images + cuisine images
     const allImageUrls = [...home.images, ...(home.teamImages || []), ...(home.cuisineImages || [])];
@@ -258,7 +262,7 @@ export default async function HomeDetailPage({ params }: Props) {
                                 <div className="mt-2">
                                     {!hasAddress && <p className="text-xs text-gray-400 text-center mb-2">Location is approximate</p>}
                                     <div className="-mx-5 -mb-5 overflow-hidden rounded-b-xl aspect-square">
-                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} circleMode={circleMode} neighborhoodSlug={circleMode ? (locationTaxSlug ?? undefined) : undefined} />
                                     </div>
                                 </div>
                             </div>
@@ -572,7 +576,7 @@ export default async function HomeDetailPage({ params }: Props) {
                                 <div className="mt-2">
                                     {!hasAddress && <p className="text-xs text-gray-400 text-center mb-2">Location is approximate</p>}
                                     <div className="-mx-5 -mb-5 overflow-hidden rounded-b-xl aspect-square">
-                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                        <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} circleMode={circleMode} neighborhoodSlug={circleMode ? (locationTaxSlug ?? undefined) : undefined} />
                                     </div>
                                 </div>
                             </div>

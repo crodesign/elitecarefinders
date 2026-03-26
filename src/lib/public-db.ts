@@ -65,6 +65,7 @@ function transformFacility(data: any): Facility {
 }
 
 export async function getHomeBySlug(slug: string): Promise<Home | null> {
+    noStore();
     const db = getClient();
     const { data, error } = await db
         .from('homes')
@@ -77,6 +78,7 @@ export async function getHomeBySlug(slug: string): Promise<Home | null> {
 }
 
 export async function getFacilityBySlug(slug: string): Promise<Facility | null> {
+    noStore();
     const db = getClient();
     const { data, error } = await db
         .from('facilities')

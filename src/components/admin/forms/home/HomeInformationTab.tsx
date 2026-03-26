@@ -1,7 +1,9 @@
 'use client';
 
-import { Dispatch, SetStateAction, useState } from "react";
-import { X, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home, Star, Video, Trophy, AlignLeft, FileText, Lock } from "lucide-react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import dynamic from "next/dynamic";
+import { X, Plus, MapPin, Phone, Globe, Tags, Layers, Hash, Home, Star, Video, Trophy, AlignLeft, FileText, Lock, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Taxonomy } from "@/types";
 import { TaxonomySelector } from "../../TaxonomySelector";
@@ -11,6 +13,8 @@ import { SimpleSelect } from "@/components/admin/SimpleSelect";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { createClientComponentClient } from "@/lib/supabase";
+
+const MapPicker = dynamic(() => import("@/components/admin/MapPicker"), { ssr: false });
 
 const LOCK_TOOLTIP = "Only editable by a manager or admin";
 
@@ -48,6 +52,10 @@ export interface HomeInformationTabProps {
     setState: (value: string) => void;
     zip: string;
     setZip: (value: string) => void;
+    coordLat: number | null;
+    setCoordLat: (value: number | null) => void;
+    coordLng: number | null;
+    setCoordLng: (value: number | null) => void;
     phone: string;
     setPhone: (value: string) => void;
     email: string;
@@ -59,6 +67,7 @@ export interface HomeInformationTabProps {
     setTaxonomyEntryIds: (value: string[]) => void;
     setManagingTaxonomy: (taxonomy: Taxonomy | null) => void;
     setIsDirty: (value: boolean) => void;
+    onSave?: (lat: number | null, lng: number | null) => Promise<void>;
     isLocalUser?: boolean;
     currentId?: string;
 }
@@ -80,6 +89,8 @@ export function HomeInformationTab({
     city, setCity,
     state, setState,
     zip, setZip,
+    coordLat, setCoordLat,
+    coordLng, setCoordLng,
     phone, setPhone,
     email, setEmail,
     status, setStatus,
@@ -87,10 +98,51 @@ export function HomeInformationTab({
     taxonomyEntryIds, setTaxonomyEntryIds,
     setManagingTaxonomy,
     setIsDirty,
+    onSave,
     isLocalUser = false,
     currentId,
 }: HomeInformationTabProps) {
     const [conflictName, setConflictName] = useState<string | null>(null);
+    const [showMapPicker, setShowMapPicker] = useState(false);
+    const [geocoding, setGeocoding] = useState(false);
+    const [geocodeError, setGeocodeError] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
+    // Local modal state — isolated from form dirty state until "Update" is clicked
+    const [localLat, setLocalLat] = useState<number | null>(null);
+    const [localLng, setLocalLng] = useState<number | null>(null);
+
+    useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
+
+    async function handleGeocode() {
+        const query = [street, city, state, zip].filter(Boolean).join(', ');
+        if (!query) return;
+        setGeocoding(true);
+        setGeocodeError(null);
+        try {
+            const res = await fetch(`/api/admin/geocode?q=${encodeURIComponent(query)}`);
+            if (res.ok) {
+                const data = await res.json();
+                setLocalLat(data.lat);
+                setLocalLng(data.lng);
+            } else {
+                setGeocodeError("No result found. Try a more complete address.");
+            }
+        } catch {
+            setGeocodeError("Geocode request failed.");
+        }
+        setGeocoding(false);
+    }
+
+    useEffect(() => {
+        if (showMapPicker) {
+            setLocalLat(coordLat);
+            setLocalLng(coordLng);
+            if (coordLat === null) {
+                handleGeocode();
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showMapPicker]);
 
     async function handleHomeOfMonthToggle(checked: boolean) {
         if (!checked) {
@@ -308,23 +360,36 @@ export function HomeInformationTab({
                             Location
                             <Tooltip content={LOCK_TOOLTIP} side="right"><Lock className="h-3 w-3 text-content-muted cursor-help" /></Tooltip>
                         </h3>
-                        {/* Show Address Toggle */}
                         {!isLocalUser && (
-                            <div className="flex items-center bg-surface-input rounded-lg p-0.5">
-                                <button
-                                    type="button"
-                                    onClick={() => { setShowAddress(false); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Private
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => { setShowAddress(true); setIsDirty(true); }}
-                                    className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
-                                >
-                                    Public
-                                </button>
+                            <div className="flex items-center gap-2">
+                                {/* Adjust Map button — only when an address exists */}
+                                {(street || city) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMapPicker(v => !v)}
+                                        className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md transition-all ${showMapPicker ? "bg-accent text-white" : coordLat !== null ? "bg-green-600/10 text-green-700 hover:bg-green-600/20" : "text-content-muted hover:text-content-secondary hover:bg-surface-hover"}`}
+                                    >
+                                        <MapPin className="h-3 w-3" />
+                                        {coordLat !== null ? "Map Pinned" : "Adjust Map"}
+                                    </button>
+                                )}
+                                {/* Show Address Toggle */}
+                                <div className="flex items-center bg-surface-input rounded-lg p-0.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowAddress(false); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${!showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Private
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowAddress(true); setIsDirty(true); }}
+                                        className={`px-3 py-1 text-[10px] font-medium rounded-md transition-all ${showAddress ? "bg-accent text-white shadow-sm" : "text-content-muted hover:text-content-secondary"}`}
+                                    >
+                                        Public
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -380,6 +445,7 @@ export function HomeInformationTab({
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Contact Section */}
@@ -551,6 +617,82 @@ export function HomeInformationTab({
                 message={<><strong>{conflictName}</strong> is currently set as Home of the Month. Do you want to replace it with this home?</>}
                 confirmLabel="Replace"
             />
+            {mounted && showMapPicker && !isLocalUser && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 backdrop-blur-sm transition-opacity"
+                        style={{ backgroundColor: 'var(--glass-overlay)' }}
+                        onClick={() => setShowMapPicker(false)}
+                    />
+                    <div className="relative w-full max-w-lg bg-surface-secondary rounded-xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-base font-semibold text-content-primary flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-accent" />
+                                Adjust Map Position
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={() => setShowMapPicker(false)}
+                                className="text-content-secondary hover:text-content-primary transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            <button
+                                type="button"
+                                onClick={handleGeocode}
+                                disabled={geocoding}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-surface-hover hover:bg-surface-input text-content-secondary transition-colors disabled:opacity-50"
+                            >
+                                {geocoding ? <Loader2 className="h-3 w-3 animate-spin" /> : <MapPin className="h-3 w-3" />}
+                                Geocode from address
+                            </button>
+                            {geocodeError && <p className="text-[10px] text-red-500">{geocodeError}</p>}
+                            {localLat !== null && localLng !== null && (
+                                <>
+                                    <MapPicker
+                                        lat={localLat}
+                                        lng={localLng}
+                                        onChange={(lat, lng) => { setLocalLat(lat); setLocalLng(lng); }}
+                                    />
+                                    <div className="flex items-center justify-between px-1">
+                                        <p className="text-[10px] text-content-muted">
+                                            Drag pin or click map to adjust.{' '}
+                                            <button
+                                                type="button"
+                                                onClick={() => { setLocalLat(null); setLocalLng(null); }}
+                                                className="text-accent hover:underline"
+                                            >
+                                                Clear
+                                            </button>
+                                            {' '}to revert to auto-geocoding.
+                                        </p>
+                                        <p className="text-[10px] font-mono text-content-muted">{localLat.toFixed(5)}, {localLng.toFixed(5)}</p>
+                                    </div>
+                                </>
+                            )}
+                            <div className="flex justify-end pt-2">
+                                <button
+                                    type="button"
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
+                                        setCoordLat(localLat);
+                                        setCoordLng(localLng);
+                                        setIsDirty(true);
+                                        setShowMapPicker(false);
+                                        await onSave?.(localLat, localLng);
+                                    }}
+                                    className="px-4 py-2 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
+                                >
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </>
     );
 }

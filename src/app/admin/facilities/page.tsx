@@ -731,6 +731,7 @@ export default function FacilitiesPage() {
                 onClose={handleCloseForm}
                 onSave={handleSave}
                 facility={editingFacility}
+                onEntityUpdated={(updated) => setEditingFacility(updated)}
             />
 
             <ConfirmationModal

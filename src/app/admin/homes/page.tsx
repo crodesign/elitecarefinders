@@ -753,6 +753,7 @@ export default function HomesPage() {
                 onClose={handleCloseForm}
                 onSave={handleSave}
                 home={editingHome}
+                onEntityUpdated={(updated) => setEditingHome(updated)}
             />
 
             <ConfirmationModal

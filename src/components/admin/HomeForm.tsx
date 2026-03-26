@@ -17,7 +17,7 @@ import type {
     SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
-import { updateHomeSeo } from "@/lib/services/homeService";
+import { updateHome, updateHomeSeo } from "@/lib/services/homeService";
 import {
     getTaxonomyEntries,
     createTaxonomyEntry,
@@ -55,6 +55,7 @@ interface HomeFormProps {
     onClose: () => void;
     onSave: (data: Partial<HomeType>) => Promise<void>;
     home?: HomeType | null;
+    onEntityUpdated?: (home: HomeType) => void;
 }
 
 type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider" | "seo";
@@ -78,7 +79,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // ... (existing imports)
 
-export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
+export function HomeForm({ isOpen, onClose, onSave, home, onEntityUpdated }: HomeFormProps) {
     const { isLocalUser, isLocationManager } = useAuth();
     const isFieldLocked = isLocalUser || isLocationManager;
     const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
@@ -234,7 +235,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                     street,
                     city,
                     state,
-                    zip
+                    zip,
+                    ...(coordLat !== null && coordLng !== null ? { coordinates: { lat: coordLat, lng: coordLng } } : {}),
                 },
                 images: finalImages,
                 teamImages: finalTeamImages,
@@ -311,6 +313,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [zip, setZip] = useState("");
+    const [coordLat, setCoordLat] = useState<number | null>(null);
+    const [coordLng, setCoordLng] = useState<number | null>(null);
 
     // Status & Taxonomies
     const [status, setStatus] = useState<'published' | 'draft'>('published');
@@ -560,6 +564,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setCity(home.address?.city || "");
                 setState(home.address?.state || "");
                 setZip(home.address?.zip || "");
+                setCoordLat(home.address?.coordinates?.lat ?? null);
+                setCoordLng(home.address?.coordinates?.lng ?? null);
 
                 // Room Details
                 setRoomDetails(home.roomDetails || { customFields: {} });
@@ -595,6 +601,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                 setCity("");
                 setState("");
                 setZip("");
+                setCoordLat(null);
+                setCoordLng(null);
 
                 setIsFeatured(false);
                 setHasFeaturedVideo(false);
@@ -719,6 +727,8 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
             if (check(city !== (home.address?.city || ""), "city", city, home.address?.city)) return true;
             if (check(state !== (home.address?.state || ""), "state", state, home.address?.state)) return true;
             if (check(zip !== (home.address?.zip || ""), "zip", zip, home.address?.zip)) return true;
+            if (coordLat !== (home.address?.coordinates?.lat ?? null)) return true;
+            if (coordLng !== (home.address?.coordinates?.lng ?? null)) return true;
 
             // Promotions
             if (check(isFeatured !== (home.isFeatured || false), "isFeatured", isFeatured, home.isFeatured)) return true;
@@ -751,7 +761,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         title, slug, description, phone, email,
         displayReferenceNumber, showAddress, status,
         taxonomyEntryIds, images, videos,
-        street, city, state, zip,
+        street, city, state, zip, coordLat, coordLng,
         isFeatured, hasFeaturedVideo, isHomeOfMonth, featuredLabel, homeOfMonthDescription,
         roomDetails
     ]);
@@ -811,6 +821,25 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
         }
     };
 
+    const handleSaveCoordsOnly = async (lat: number | null, lng: number | null) => {
+        if (!home?.id) return;
+        try {
+            const addressPayload = {
+                street,
+                city,
+                state,
+                zip,
+                ...(lat !== null && lng !== null ? { coordinates: { lat, lng } } : {}),
+            };
+            const updated = await updateHome(home.id, { address: addressPayload });
+            onEntityUpdated?.(updated);
+            showNotification("Map Position Saved", lat !== null ? "Pin position updated" : "Pin cleared — will use auto-geocoding");
+        } catch (e) {
+            console.error('[HomeForm] Failed to save map coordinates:', e);
+            showNotification("Save Failed", "Could not save map position. Check console.");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await handleSaveInternal();
@@ -856,6 +885,10 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setState={setState}
                         zip={zip}
                         setZip={setZip}
+                        coordLat={coordLat}
+                        setCoordLat={setCoordLat}
+                        coordLng={coordLng}
+                        setCoordLng={setCoordLng}
                         phone={phone}
                         setPhone={setPhone}
                         email={email}
@@ -867,6 +900,7 @@ export function HomeForm({ isOpen, onClose, onSave, home }: HomeFormProps) {
                         setTaxonomyEntryIds={setTaxonomyEntryIds}
                         setManagingTaxonomy={setManagingTaxonomy}
                         setIsDirty={setIsDirty}
+                        onSave={handleSaveCoordsOnly}
                     />
                 );
             case "rooms":

@@ -82,10 +82,14 @@ export default async function FacilityDetailPage({ params }: Props) {
         : mapFallback;
 
     const HAWAII_CENTER: [number, number] = [20.5, -157.5];
-    const geocoded = await geocodeAddress(mapQuery);
+    const storedCoords = facility.address?.coordinates;
+    const geocoded = storedCoords
+        ? [storedCoords.lat, storedCoords.lng] as [number, number]
+        : await geocodeAddress(mapQuery);
     const neighborhoodCoords = locationTaxSlug ? NEIGHBORHOOD_COORDS[locationTaxSlug] : undefined;
     const [mapLat, mapLng] = geocoded ?? neighborhoodCoords ?? HAWAII_CENTER;
-    const mapZoom = geocoded ? (hasAddress ? 15 : 13) : (hasAddress ? 13 : 11);
+    const circleMode = !hasAddress;
+    const mapZoom = circleMode ? 12 : (storedCoords ? 15 : (geocoded ? 15 : 13));
 
     const jsonLd = buildFacilityJsonLd({
         name: facility.title,
@@ -199,7 +203,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                     {/* Mobile-only: CTA + details before main content */}
                     <div className="lg:hidden space-y-6">
                         <EntityCTAButtons entityName={facility.title} entityType="facility" />
-                        <div className="bg-gray-100 rounded-xl p-5">
+                        <div className="bg-gray-100 rounded-xl pt-5 px-5">
                             <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                 <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
                                     <FontAwesomeIcon icon={faBuilding} className="h-4 w-4 text-white" />
@@ -242,8 +246,8 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="-mx-5 -mb-5 mt-2 overflow-hidden rounded-b-xl aspect-square">
-                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                <div className="-mx-5 overflow-hidden rounded-b-xl aspect-square">
+                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} circleMode={circleMode} neighborhoodSlug={circleMode ? (locationTaxSlug ?? undefined) : undefined} />
                                 </div>
                             </div>
                         </div>
@@ -502,7 +506,7 @@ export default async function FacilityDetailPage({ params }: Props) {
                         <EntityCTAButtons entityName={facility.title} entityType="facility" />
 
                         {/* Facility Details */}
-                        <div className="bg-gray-100 rounded-xl p-5">
+                        <div className="bg-gray-100 rounded-xl pt-5 px-5">
                             <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
                                 <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
                                     <FontAwesomeIcon icon={faBuilding} className="h-4 w-4 text-white" />
@@ -545,8 +549,8 @@ export default async function FacilityDetailPage({ params }: Props) {
                                         <p className="text-sm text-gray-900">{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
                                     </div>
                                 )}
-                                <div className="-mx-5 -mb-5 mt-2 overflow-hidden rounded-b-xl aspect-square">
-                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} />
+                                <div className="-mx-5 overflow-hidden rounded-b-xl aspect-square">
+                                    <EntityMap lat={mapLat} lng={mapLng} zoom={mapZoom} circleMode={circleMode} neighborhoodSlug={circleMode ? (locationTaxSlug ?? undefined) : undefined} />
                                 </div>
                             </div>
                         </div>

@@ -16,7 +16,7 @@ import type {
     SeoFields
 } from "@/types";
 import { getTaxonomies } from "@/lib/services/taxonomyService";
-import { updateFacilitySeo } from "@/lib/services/facilityService";
+import { updateFacility, updateFacilitySeo } from "@/lib/services/facilityService";
 import {
     getTaxonomyEntries,
     createTaxonomyEntry,
@@ -59,6 +59,7 @@ interface FacilityFormProps {
     onClose: () => void;
     onSave: (data: Partial<Facility>) => Promise<void>;
     facility?: Facility | null;
+    onEntityUpdated?: (facility: Facility) => void;
 }
 
 type TabId = "information" | "rooms" | "location" | "gallery" | "videos" | "provider" | "seo";
@@ -102,7 +103,7 @@ interface TaxonomyWithEntries extends Taxonomy {
     entries: any[];
 }
 
-export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityFormProps) {
+export function FacilityForm({ isOpen, onClose, onSave, facility, onEntityUpdated }: FacilityFormProps) {
     const { isLocalUser, isLocationManager } = useAuth();
     const isFieldLocked = isLocalUser || isLocationManager;
     const { isDirty, setIsDirty, registerSaveHandler } = useUnsavedChanges();
@@ -167,6 +168,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [zip, setZip] = useState("");
+    const [coordLat, setCoordLat] = useState<number | null>(null);
+    const [coordLng, setCoordLng] = useState<number | null>(null);
 
     // Contact State
     const [phone, setPhone] = useState("");
@@ -398,6 +401,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setCity(facility.address?.city || "");
                 setState(facility.address?.state || "");
                 setZip(facility.address?.zip || "");
+                setCoordLat(facility.address?.coordinates?.lat ?? null);
+                setCoordLng(facility.address?.coordinates?.lng ?? null);
 
                 // Contact
                 setPhone((facility as any).phone || "");
@@ -426,12 +431,14 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                 setStreet("");
                 setCity("");
                 setState("");
+                setZip("");
+                setCoordLat(null);
+                setCoordLng(null);
 
                 // Images
                 setImages([]);
                 setTeamImages([]);
                 setCuisineImages([]);
-                setZip("");
                 setRoomDetails({ customFields: {} });
                 // Reset contact
                 setPhone("");
@@ -509,6 +516,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
             if (city !== (facility.address?.city || "")) return true;
             if (state !== (facility.address?.state || "")) return true;
             if (zip !== (facility.address?.zip || "")) return true;
+            if (coordLat !== (facility.address?.coordinates?.lat ?? null)) return true;
+            if (coordLng !== (facility.address?.coordinates?.lng ?? null)) return true;
 
             if (phone !== ((facility as any).phone || "")) return true;
             if (email !== ((facility as any).email || "")) return true;
@@ -555,7 +564,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         isOpen, facility, setIsDirty,
         title, slug, description, licenseNumber, capacity,
         status, taxonomyEntryIds, images, teamImages, cuisineImages, videos,
-        street, city, state, zip, phone, email,
+        street, city, state, zip, coordLat, coordLng, phone, email,
         isFeatured, hasFeaturedVideo, isFacilityOfMonth, featuredLabel, facilityOfMonthDescription,
         roomDetails
     ]);
@@ -681,7 +690,8 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                     street,
                     city,
                     state,
-                    zip
+                    zip,
+                    ...(coordLat !== null && coordLng !== null ? { coordinates: { lat: coordLat, lng: coordLng } } : {}),
                 },
                 // Contact
                 ...({
@@ -757,6 +767,25 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
         }
     };
 
+    const handleSaveCoordsOnly = async (lat: number | null, lng: number | null) => {
+        if (!facility?.id) return;
+        try {
+            const addressPayload = {
+                street,
+                city,
+                state,
+                zip,
+                ...(lat !== null && lng !== null ? { coordinates: { lat, lng } } : {}),
+            };
+            const updated = await updateFacility(facility.id, { address: addressPayload });
+            onEntityUpdated?.(updated);
+            showNotification("Map Position Saved", lat !== null ? "Pin position updated" : "Pin cleared — will use auto-geocoding");
+        } catch (e) {
+            console.error('[FacilityForm] Failed to save map coordinates:', e);
+            showNotification("Save Failed", "Could not save map position. Check console.");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await handleSaveInternal();
@@ -785,6 +814,10 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         setState={setState}
                         zip={zip}
                         setZip={setZip}
+                        coordLat={coordLat}
+                        setCoordLat={setCoordLat}
+                        coordLng={coordLng}
+                        setCoordLng={setCoordLng}
                         phone={phone}
                         setPhone={setPhone}
                         email={email}
@@ -808,6 +841,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility }: FacilityForm
                         facilityOfMonthDescription={facilityOfMonthDescription}
                         setFacilityOfMonthDescription={setFacilityOfMonthDescription}
                         setIsDirty={setIsDirty}
+                        onSave={handleSaveCoordsOnly}
                         setManagingTaxonomy={setManagingTaxonomy}
                     />
                 );
