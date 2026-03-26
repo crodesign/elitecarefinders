@@ -187,7 +187,6 @@ export async function GET(request: NextRequest) {
             sessions: parseInt(r.metricValues?.[0]?.value || '0'),
         }));
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const scResult13 = results[13] as PromiseSettledResult<any>;
         const searchConsoleError = scResult13.status === 'rejected' ? String(scResult13.reason?.message || scResult13.reason) : null;
         const scRows: any[] = scResult13.status === 'fulfilled' ? (scResult13.value?.data?.rows ?? []) : [];
