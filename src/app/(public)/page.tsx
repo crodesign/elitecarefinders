@@ -702,6 +702,19 @@ function ContentSection() {
 
                 {/* Left column */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center bg-gray-100 rounded-2xl p-5 lg:bg-transparent lg:rounded-none lg:p-0">
+                    <div className="flex flex-col items-center mb-6 lg:pr-8">
+                        <img
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                            alt="Senior Living Community Partners"
+                            className="max-w-full h-auto"
+                        />
+                        <span
+                            className="mt-2 text-center text-gray-600 font-medium"
+                            style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
+                        >
+                            Senior Living Community Partners
+                        </span>
+                    </div>
                     <h2
                         className="text-[#239ddb] text-center mb-6 lg:pr-8 font-bold lg:font-extralight"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.1, letterSpacing: '-0.3px' }}

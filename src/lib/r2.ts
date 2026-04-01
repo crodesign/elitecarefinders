@@ -62,11 +62,16 @@ export async function r2Delete(filename: string): Promise<void> {
 
 export async function r2Rename(oldFilename: string, newFilename: string): Promise<void> {
     // R2/S3 has no rename — copy then delete
+    // Use REPLACE directive with explicit ContentType to avoid R2 quirks
+    // where COPY may not preserve ContentType, resulting in broken images
+    const contentType = getMimeType(newFilename);
     await r2Client.send(new CopyObjectCommand({
         Bucket: R2_BUCKET,
         CopySource: `${R2_BUCKET}/${toR2Key(oldFilename)}`,
         Key: toR2Key(newFilename),
-        MetadataDirective: "COPY",
+        MetadataDirective: "REPLACE",
+        ContentType: contentType,
+        CacheControl: "public, max-age=31536000, immutable",
     }));
     await r2Delete(oldFilename);
 }
