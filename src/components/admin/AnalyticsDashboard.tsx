@@ -5,7 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw, Info } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Globe, Monitor, Smartphone, Tablet, Calendar, RefreshCw, Info, Heart, Search, Mail, Share2, Link2, Megaphone, Video, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 
@@ -91,6 +91,126 @@ const DEVICE_ICONS: Record<string, typeof Monitor> = {
 };
 
 const DEVICE_COLORS = ["var(--accent)", "#10b981", "#34d399", "#f59e0b"];
+
+// ─── Traffic source icons ────────────────────────────────────────────────────
+
+const SOURCE_CHANNEL_ICONS: Record<string, LucideIcon> = {
+    direct: Heart,
+    "organic search": Search,
+    "paid search": Megaphone,
+    "organic social": Share2,
+    "paid social": Megaphone,
+    referral: Link2,
+    email: Mail,
+    "organic video": Video,
+};
+
+function BrandIcon({ name, className }: { name: string; className?: string }) {
+    const n = name.toLowerCase().replace(/\.com$/, "");
+    const size = 14;
+    const cls = className ?? "";
+    switch (n) {
+        case "google":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+            );
+        case "bing":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M5 3v16.5l4.5 2.5 7-4v-4l-7-2.5V3z" fill="#008373"/>
+                    <path d="M9.5 21.5l7-4v-4l-7 2.5z" fill="#00A68E" opacity={0.8}/>
+                </svg>
+            );
+        case "duckduckgo":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <circle cx="12" cy="12" r="10" fill="#DE5833"/>
+                    <circle cx="10" cy="10" r="2" fill="white"/>
+                    <circle cx="14" cy="10" r="2" fill="white"/>
+                </svg>
+            );
+        case "facebook":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.875V12h3.328l-.532 3.47h-2.796v8.385C19.612 22.954 24 17.99 24 12z" fill="#1877F2"/>
+                </svg>
+            );
+        case "instagram":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#FD5"/><stop offset="50%" stopColor="#FF543E"/><stop offset="100%" stopColor="#C837AB"/></linearGradient></defs>
+                    <rect width="24" height="24" rx="6" fill="url(#ig)"/>
+                    <circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="1.5"/>
+                    <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+                </svg>
+            );
+        case "twitter":
+        case "x":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
+                </svg>
+            );
+        case "linkedin":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="#0A66C2"/>
+                </svg>
+            );
+        case "pinterest":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" fill="#E60023"/>
+                </svg>
+            );
+        case "youtube":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" fill="#FF0000"/>
+                    <path d="M9.545 15.568V8.432L15.818 12z" fill="white"/>
+                </svg>
+            );
+        case "yahoo":
+            return (
+                <svg viewBox="0 0 24 24" width={size} height={size} className={cls}>
+                    <path d="M14.54 4l-3.97 9.2L6.6 4H1l7.2 14.27V24h4.62v-5.73L20 4h-5.46z" fill="#6001D2"/>
+                    <circle cx="20.5" cy="21" r="2.5" fill="#6001D2"/>
+                </svg>
+            );
+        default:
+            return null;
+    }
+}
+
+const BRAND_ALIASES: Record<string, string> = {
+    google: "google", bing: "bing", duckduckgo: "duckduckgo",
+    facebook: "facebook", "m.facebook": "facebook",
+    instagram: "instagram", ig: "instagram",
+    twitter: "twitter", x: "x",
+    linkedin: "linkedin", pinterest: "pinterest", youtube: "youtube",
+    yahoo: "yahoo",
+};
+
+function getSourceIcon(channelOrSource: string, size: string = "h-3.5 w-3.5"): React.ReactNode {
+    const n = channelOrSource.toLowerCase().replace(/\.com$/, "");
+    const brand = BRAND_ALIASES[n];
+    if (brand) return <BrandIcon name={brand} className={`${size} flex-shrink-0`} />;
+    const Icon = SOURCE_CHANNEL_ICONS[n];
+    if (Icon) return <Icon className={`${size} text-content-muted flex-shrink-0`} />;
+    return null;
+}
+
+function getChannelIcon(channel: string, size: string = "h-3.5 w-3.5"): React.ReactNode {
+    const key = channel.toLowerCase();
+    const Icon = SOURCE_CHANNEL_ICONS[key];
+    if (Icon) return <Icon className={`${size} text-content-muted flex-shrink-0`} />;
+    return null;
+}
 
 const tooltipStyle = {
     background: "var(--surface-secondary)",
@@ -498,14 +618,19 @@ export function AnalyticsDashboard() {
                                     const subs = (sourceDetail ?? [])
                                         .filter(d => d.channel === s.source)
                                         .slice(0, 4);
+                                    const label = s.source || "Direct";
                                     return (
                                         <div key={i} className={i > 0 ? 'mt-2 border-t border-ui-border pt-2' : 'pt-2'}>
-                                            <RankedBar label={s.source || "Direct"} value={s.sessions} max={maxSessions} />
+                                            <div className="flex items-start gap-1.5">
+                                                <span className="mt-[1px]">{getChannelIcon(label)}</span>
+                                                <RankedBar label={label} value={s.sessions} max={maxSessions} />
+                                            </div>
                                             {subs.length > 0 && (
                                                 <div className="ml-2 mt-1 space-y-1 pl-2 border-l border-ui-border">
                                                     {subs.map((d, j) => (
-                                                        <div key={j} className="flex items-center justify-between gap-2">
-                                                            <span className="text-[11px] text-content-muted truncate">{d.source}</span>
+                                                        <div key={j} className="flex items-center gap-1.5">
+                                                            {getSourceIcon(d.source, "h-3 w-3")}
+                                                            <span className="text-[11px] text-content-muted truncate flex-1">{d.source}</span>
                                                             <span className="text-[11px] text-content-muted tabular-nums flex-shrink-0">{d.sessions.toLocaleString()}</span>
                                                         </div>
                                                     ))}
