@@ -921,10 +921,10 @@ function EliteStandardSection() {
 function AboutSection() {
     return (
         <section className="max-w-6xl mx-auto px-5 py-8">
-            <div className="bg-gray-100 rounded-2xl p-5 flex flex-col lg:flex-row gap-5 items-center">
+            <div className="bg-gray-100 rounded-2xl p-5 flex flex-col gap-5">
 
-                {/* Left: text */}
-                <div className="flex-1 min-w-0">
+                {/* Text */}
+                <div>
                     <p
                         className="mb-1 text-center lg:text-left"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: '20px', fontWeight: 500, color: '#191b21' }}
@@ -939,32 +939,73 @@ function AboutSection() {
                     </p>
                 </div>
 
-                {/* Images: side by side on mobile, stacked inline on desktop */}
-                <div className="flex flex-col sm:flex-row lg:contents gap-3 w-full lg:w-auto">
-                    {/* Rose photo + caption */}
-                    <div className="flex-1 lg:flex-shrink-0 relative lg:w-56 rounded-lg overflow-hidden">
+                {/* Images: 4 in a row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {/* Rose photo */}
+                    <div className="rounded-xl bg-white shadow-sm overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/images/site/Rose-10-25.webp"
                             alt="Rose Guillermo Gallego RN — Founder &amp; Owner"
                             className="w-full object-cover"
                         />
-                        <div className="absolute bottom-0 left-[15px] right-[15px] bg-gray-100 rounded-t-xl px-3 py-2 text-center">
-                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Rose Guillermo Gallego RN</p>
-                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Founder &amp; Owner</p>
-                            <p className="m-0" style={{ fontFamily: 'var(--font-montserrat)', fontSize: '12px', fontWeight: 500, lineHeight: 1.3, color: '#191b21' }}>Senior Care Advisor</p>
+                        <div className="px-2 py-1 text-center leading-[1.1]">
+                            <span className="text-xs font-medium text-gray-900">Rose Guillermo Gallego RN</span>
+                            <br /><span className="text-xs font-medium text-gray-900">Founder &amp; Owner</span>
+                            <br /><span className="text-xs font-medium text-gray-900">Senior Care Advisor</span>
                         </div>
                     </div>
 
                     {/* Cover photo */}
-                    <div className="flex-1 lg:flex-shrink-0 lg:w-56">
+                    <a href="https://www.eldercarereview.com/elite-carefinders" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/images/site/Elite-CareFinders_Cover-2025a.webp"
-                            alt="Elite CareFinders Hawaii senior care placement company 2025"
-                            className="w-full object-cover rounded-lg"
+                            alt="Senior Placement Company of the Year — Elder Care Review"
+                            className="w-full object-cover"
                         />
-                    </div>
+                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
+                            <div className="flex-1 text-center">
+                                <span className="text-xs font-medium text-gray-900">Senior Placement Company of the Year</span>
+                                <br /><span className="text-xs font-medium text-gray-900 italic">Elder Care Review</span>
+                            </div>
+                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </div>
+                    </a>
+
+                    {/* Advisory services */}
+                    <a href="https://senior-living-solutions.eldercarereview.com/vendor/elite-carefinders-elite-solutions-for-loved-ones-cid-91-mid-14.html" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-6.png"
+                            alt="Top Senior Living Services Provider — Elder Care Review"
+                            className="w-full object-cover"
+                        />
+                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
+                            <div className="flex-1 text-center">
+                                <span className="text-xs font-medium text-gray-900">Top Senior Living Services Provider</span>
+                                <br /><span className="text-xs font-medium text-gray-900 italic">Elder Care Review</span>
+                            </div>
+                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </div>
+                    </a>
+
+                    {/* Innovator of the Year */}
+                    <a href="https://theceoviews.com/elite-carefinders-enhancing-senior-living-experience-with-personalized-consultation/" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-ceo-views-2024-innovator-of-the-year.png"
+                            alt="Innovator of the Year — The CEO Views"
+                            className="w-full object-cover"
+                        />
+                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
+                            <div className="flex-1 text-center">
+                                <span className="text-xs font-medium text-gray-900">Innovator of the Year</span>
+                                <br /><span className="text-xs font-medium text-gray-900 italic">The CEO Views</span>
+                            </div>
+                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </div>
+                    </a>
                 </div>
 
             </div>
