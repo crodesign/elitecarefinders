@@ -743,7 +743,7 @@ export function AnalyticsDashboard() {
                                         innerRadius={36}
                                         outerRadius={62}
                                         strokeWidth={0}
-                                        label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; index: number; device: string; sessions: number }) => {
+                                        label={(props: any) => {
                                             const { cx, cy, midAngle, outerRadius: or, index, device, sessions } = props;
                                             const RADIAN = Math.PI / 180;
                                             const sin = Math.sin(-midAngle * RADIAN);
@@ -809,7 +809,7 @@ export function AnalyticsDashboard() {
                                         innerRadius={36}
                                         outerRadius={62}
                                         strokeWidth={0}
-                                        label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; index: number; name: string; value: number }) => {
+                                        label={(props: any) => {
                                             const { cx, cy, midAngle, outerRadius: or, index, name, value } = props;
                                             const NVR_COLORS = ["var(--accent)", "#10b981"];
                                             const RADIAN = Math.PI / 180;
