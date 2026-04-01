@@ -470,10 +470,15 @@ export function AnalyticsDashboard() {
                             </div>
                             <div className="flex-1 overflow-y-auto px-6 pb-2">
                                 {topPages.map((p, i) => (
-                                    <div key={i} className="grid grid-cols-[1fr_44px_48px] py-2 border-b border-ui-border last:border-0">
-                                        <span className="text-xs text-content-primary truncate pr-2">{p.page}</span>
-                                        <span className="text-xs text-content-secondary tabular-nums text-right">{p.views.toLocaleString()}</span>
-                                        <span className="text-xs text-content-muted tabular-nums text-right">{p.bounceRate > 0 ? `${(p.bounceRate * 100).toFixed(0)}%` : '—'}</span>
+                                    <div key={i} className="py-2">
+                                        <div className="grid grid-cols-[1fr_44px_48px]">
+                                            <span className="text-xs text-content-primary truncate pr-2">{p.page}</span>
+                                            <span className="text-xs text-content-secondary tabular-nums text-right">{p.views.toLocaleString()}</span>
+                                            <span className="text-xs text-content-muted tabular-nums text-right">{p.bounceRate > 0 ? `${(p.bounceRate * 100).toFixed(0)}%` : '—'}</span>
+                                        </div>
+                                        <div className="mt-1.5 h-[2px] w-full rounded-full" style={{ background: "var(--ui-border)" }}>
+                                            <div className="h-full rounded-full" style={{ width: `${Math.min((p.bounceRate || 0) * 100, 100)}%`, background: p.bounceRate >= 0.7 ? '#ef4444' : p.bounceRate >= 0.4 ? '#f59e0b' : '#10b981' }} />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -601,46 +606,57 @@ export function AnalyticsDashboard() {
                                 <InfoTooltip text="Breakdown of sessions by device type — desktop, mobile, or tablet. Mobile sub-items show the iOS vs Android split." />
                             </h3>
                         </div>
-                        <div className="px-6 py-4 flex items-center gap-4">
-                            <ResponsiveContainer width={110} height={110}>
+                        <div className="px-6 py-4">
+                            <ResponsiveContainer width="100%" height={200}>
                                 <PieChart>
-                                    <Pie data={devices} dataKey="sessions" nameKey="device" cx="50%" cy="50%" innerRadius={28} outerRadius={52}>
+                                    <Pie
+                                        data={devices}
+                                        dataKey="sessions"
+                                        nameKey="device"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={36}
+                                        outerRadius={62}
+                                        strokeWidth={0}
+                                        label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; index: number; device: string; sessions: number }) => {
+                                            const { cx, cy, midAngle, outerRadius: or, index, device, sessions } = props;
+                                            const RADIAN = Math.PI / 180;
+                                            const sin = Math.sin(-midAngle * RADIAN);
+                                            const cos = Math.cos(-midAngle * RADIAN);
+                                            const ex = cx + (or + 14) * cos;
+                                            const ey = cy + (or + 14) * sin;
+                                            const tx = cx + (or + 22) * cos;
+                                            const ty = cy + (or + 22) * sin;
+                                            const anchor = tx > cx ? "start" : "end";
+                                            const pct = ((sessions / totalDevices) * 100).toFixed(1);
+                                            const isMobile = device.toLowerCase() === "mobile";
+                                            const osLine = isMobile && mobileOSFiltered.length > 0
+                                                ? mobileOSFiltered.map(r => `${r.os} ${((r.sessions / totalMobileOS) * 100).toFixed(0)}%`).join(" · ")
+                                                : null;
+                                            const color = DEVICE_COLORS[index % DEVICE_COLORS.length];
+                                            return (
+                                                <g>
+                                                    <line x1={cx + or * cos} y1={cy + or * sin} x2={ex} y2={ey} stroke="var(--content-muted)" strokeWidth={1} />
+                                                    <circle cx={ex} cy={ey} r={4} fill={color} />
+                                                    <text x={tx} y={ty} textAnchor={anchor} dominantBaseline="central" style={{ fontSize: 11, fontWeight: 600, fill: "var(--content-primary)", textTransform: "uppercase" as const, letterSpacing: "0.03em" }}>
+                                                        {device} {pct}%
+                                                    </text>
+                                                    {osLine && (
+                                                        <text x={tx} y={ty + 13} textAnchor={anchor} dominantBaseline="central" style={{ fontSize: 10, fill: "var(--content-muted)" }}>
+                                                            {osLine}
+                                                        </text>
+                                                    )}
+                                                </g>
+                                            );
+                                        }}
+                                        labelLine={false}
+                                    >
                                         {devices.map((_, i) => (
                                             <Cell key={i} fill={DEVICE_COLORS[i % DEVICE_COLORS.length]} />
                                         ))}
                                     </Pie>
                                 </PieChart>
                             </ResponsiveContainer>
-                            <div className="flex-1 space-y-2">
-                                {devices.map((d, i) => {
-                                    const Icon = DEVICE_ICONS[d.device.toLowerCase()] ?? Monitor;
-                                    const pct = ((d.sessions / totalDevices) * 100).toFixed(1);
-                                    const isMobile = d.device.toLowerCase() === "mobile";
-                                    return (
-                                        <div key={i}>
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: DEVICE_COLORS[i % DEVICE_COLORS.length] }} />
-                                                <Icon className="h-3.5 w-3.5 text-content-muted flex-shrink-0" />
-                                                <span className="text-xs text-content-secondary capitalize flex-1">{d.device}</span>
-                                                <span className="text-xs text-content-muted tabular-nums">{pct}%</span>
-                                            </div>
-                                            {isMobile && mobileOSFiltered.length > 0 && (
-                                                <div className="ml-6 mt-1 space-y-1">
-                                                    {mobileOSFiltered.map((r, j) => (
-                                                        <div key={j} className="flex items-center gap-1.5">
-                                                            <span className="w-1 h-1 rounded-full bg-content-muted/40 flex-shrink-0" />
-                                                            <span className="text-[11px] text-content-muted flex-1">{r.os}</span>
-                                                            <span className="text-[11px] text-content-muted tabular-nums">
-                                                                {mobileSessions > 0 ? `${((r.sessions / totalMobileOS) * 100).toFixed(0)}%` : "—"}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
                         </div>
                     </div>
                 )}
@@ -654,36 +670,50 @@ export function AnalyticsDashboard() {
                                 <InfoTooltip text="Whether visitors are first-time users or have been to the site before. Determined by browser/device recognition — returning counts the same device visiting again." />
                             </h3>
                         </div>
-                        <div className="px-6 py-4 flex items-center gap-4">
-                            <ResponsiveContainer width={110} height={110}>
+                        <div className="px-6 py-4">
+                            <ResponsiveContainer width="100%" height={200}>
                                 <PieChart>
                                     <Pie
                                         data={[
                                             { name: "New", value: newVisitors },
                                             { name: "Returning", value: returnVisitors },
                                         ]}
-                                        dataKey="value" cx="50%" cy="50%" innerRadius={28} outerRadius={52}
+                                        dataKey="value"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={36}
+                                        outerRadius={62}
+                                        strokeWidth={0}
+                                        label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; index: number; name: string; value: number }) => {
+                                            const { cx, cy, midAngle, outerRadius: or, index, name, value } = props;
+                                            const NVR_COLORS = ["var(--accent)", "#10b981"];
+                                            const RADIAN = Math.PI / 180;
+                                            const sin = Math.sin(-midAngle * RADIAN);
+                                            const cos = Math.cos(-midAngle * RADIAN);
+                                            const ex = cx + (or + 14) * cos;
+                                            const ey = cy + (or + 14) * sin;
+                                            const tx = cx + (or + 22) * cos;
+                                            const ty = cy + (or + 22) * sin;
+                                            const anchor = tx > cx ? "start" : "end";
+                                            const pct = ((value / nvrTotal) * 100).toFixed(1);
+                                            const color = NVR_COLORS[index];
+                                            return (
+                                                <g>
+                                                    <line x1={cx + or * cos} y1={cy + or * sin} x2={ex} y2={ey} stroke="var(--content-muted)" strokeWidth={1} />
+                                                    <circle cx={ex} cy={ey} r={4} fill={color} />
+                                                    <text x={tx} y={ty} textAnchor={anchor} dominantBaseline="central" style={{ fontSize: 11, fontWeight: 600, fill: "var(--content-primary)", textTransform: "uppercase" as const, letterSpacing: "0.03em" }}>
+                                                        {name} {pct}%
+                                                    </text>
+                                                </g>
+                                            );
+                                        }}
+                                        labelLine={false}
                                     >
                                         <Cell fill="var(--accent)" />
                                         <Cell fill="#10b981" />
                                     </Pie>
                                 </PieChart>
                             </ResponsiveContainer>
-                            <div className="flex-1 space-y-3">
-                                {[
-                                    { label: "New",       value: newVisitors,    color: "var(--accent)" },
-                                    { label: "Returning", value: returnVisitors, color: "#10b981" },
-                                ].map(({ label, value, color }) => (
-                                    <div key={label} className="flex items-center gap-2">
-                                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                                        <div>
-                                            <div className="text-[11px] text-content-muted">{label}</div>
-                                            <div className="text-sm font-semibold text-content-primary tabular-nums">{value.toLocaleString()}</div>
-                                            <div className="text-[11px] text-content-muted">{((value / nvrTotal) * 100).toFixed(1)}%</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 )}
