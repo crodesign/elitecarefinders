@@ -772,7 +772,7 @@ function ContentSection() {
                             className="mb-2 text-center text-[#239ddb] font-medium uppercase tracking-wide"
                             style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 18px)' }}
                         >
-                            Senior Living Community Partners
+                            OUR Senior Living Community Partners
                         </span>
                         <img
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
@@ -834,7 +834,7 @@ function ContentSection() {
                     className="mb-2 text-center text-[#239ddb] font-medium uppercase tracking-wide"
                     style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 18px)' }}
                 >
-                    Senior Living Community Partners
+                    OUR Senior Living Community Partners
                 </span>
                 <img
                     src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
