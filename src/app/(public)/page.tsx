@@ -698,38 +698,10 @@ const ELITE_STANDARDS = [
 function ContentSection() {
     return (
         <section className="max-w-6xl mx-auto px-5 py-12">
-            {/* Partners image — mobile: above section content */}
-            <div className="flex flex-col items-center mb-6 lg:hidden">
-                <img
-                    src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
-                    alt="Senior Living Community Partners"
-                    className="max-w-full h-auto"
-                />
-                <span
-                    className="mt-2 text-center text-gray-600 font-medium"
-                    style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
-                >
-                    Senior Living Community Partners
-                </span>
-            </div>
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 mb-[30px] lg:mb-0">
 
                 {/* Left column */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center bg-gray-100 rounded-2xl p-5 lg:bg-transparent lg:rounded-none lg:p-0">
-                    {/* Partners image — desktop: inside left column */}
-                    <div className="hidden lg:flex flex-col items-center mb-6 lg:pr-8">
-                        <img
-                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
-                            alt="Senior Living Community Partners"
-                            className="max-w-full h-auto"
-                        />
-                        <span
-                            className="mt-2 text-center text-gray-600 font-medium"
-                            style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
-                        >
-                            Senior Living Community Partners
-                        </span>
-                    </div>
                     <h2
                         className="text-[#239ddb] text-center mb-6 lg:pr-8 font-bold lg:font-extralight"
                         style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.1, letterSpacing: '-0.3px' }}
@@ -794,6 +766,20 @@ function ContentSection() {
                             </a>
                         </div>
                     </div>
+                    {/* Partners image — desktop: bottom of left column */}
+                    <div className="hidden lg:flex flex-col items-center mt-6 lg:pr-8">
+                        <span
+                            className="mb-2 text-center text-[#239ddb] font-medium uppercase tracking-wide"
+                            style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 18px)' }}
+                        >
+                            Senior Living Community Partners
+                        </span>
+                        <img
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                            alt="Senior Living Community Partners"
+                            className="max-w-full h-auto"
+                        />
+                    </div>
                 </div>
 
                 {/* Right column: services image + features */}
@@ -830,7 +816,7 @@ function ContentSection() {
                                         </h3>
                                         <p
                                             className="m-0"
-                                            style={{ fontFamily: 'var(--font-montserrat)', fontSize: '16px', fontWeight: 400, lineHeight: 1.4, color: '#737373' }}
+                                            style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(16px, 1.5vw, 20px)', fontWeight: 400, lineHeight: 1.4, color: '#737373' }}
                                         >
                                             {f.desc}
                                         </p>
@@ -841,6 +827,20 @@ function ContentSection() {
                     </div>
                 </div>
 
+            </div>
+            {/* Partners image — mobile: bottom of section */}
+            <div className="flex flex-col items-center mt-6 lg:hidden">
+                <span
+                    className="mb-2 text-center text-[#239ddb] font-medium uppercase tracking-wide"
+                    style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(14px, 1.5vw, 18px)' }}
+                >
+                    Senior Living Community Partners
+                </span>
+                <img
+                    src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                    alt="Senior Living Community Partners"
+                    className="max-w-full h-auto"
+                />
             </div>
         </section>
     );
