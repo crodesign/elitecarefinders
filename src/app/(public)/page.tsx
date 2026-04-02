@@ -985,53 +985,62 @@ function AboutSection() {
                     </div>
 
                     {/* Cover photo */}
-                    <a href="https://www.eldercarereview.com/elite-carefinders" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
+                    <a href="https://www.eldercarereview.com/elite-carefinders" target="_blank" rel="noopener noreferrer" className="group rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/images/site/Elite-CareFinders_Cover-2025a.webp"
                             alt="Senior Placement Company of the Year — Elder Care Review"
                             className="w-full object-cover"
                         />
-                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
-                            <div className="flex-1 text-center">
+                        <div className="px-2 py-1 leading-[1.1]">
+                            <div className="text-center">
                                 <span className="text-xs font-medium text-gray-900">Senior Placement Company of the Year</span>
                                 <br /><span className="text-xs font-medium text-gray-900 italic">Elder Care Review</span>
                             </div>
-                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                            <div className="mt-1 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                View Article
+                                <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                            </div>
                         </div>
                     </a>
 
                     {/* Advisory services */}
-                    <a href="https://senior-living-solutions.eldercarereview.com/vendor/elite-carefinders-elite-solutions-for-loved-ones-cid-91-mid-14.html" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
+                    <a href="https://senior-living-solutions.eldercarereview.com/vendor/elite-carefinders-elite-solutions-for-loved-ones-cid-91-mid-14.html" target="_blank" rel="noopener noreferrer" className="group rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-6.png"
                             alt="Top Senior Living Services Provider — Elder Care Review"
                             className="w-full object-cover"
                         />
-                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
-                            <div className="flex-1 text-center">
+                        <div className="px-2 py-1 leading-[1.1]">
+                            <div className="text-center">
                                 <span className="text-xs font-medium text-gray-900">Top Senior Living Services Provider</span>
                                 <br /><span className="text-xs font-medium text-gray-900 italic">Elder Care Review</span>
                             </div>
-                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                            <div className="mt-1 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                View Article
+                                <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                            </div>
                         </div>
                     </a>
 
                     {/* Innovator of the Year */}
-                    <a href="https://theceoviews.com/elite-carefinders-enhancing-senior-living-experience-with-personalized-consultation/" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
+                    <a href="https://theceoviews.com/elite-carefinders-enhancing-senior-living-experience-with-personalized-consultation/" target="_blank" rel="noopener noreferrer" className="group rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-ceo-views-2024-innovator-of-the-year.png"
                             alt="Innovator of the Year — The CEO Views"
                             className="w-full object-cover"
                         />
-                        <div className="px-2 py-1 leading-[1.1] flex items-end gap-1">
-                            <div className="flex-1 text-center">
+                        <div className="px-2 py-1 leading-[1.1]">
+                            <div className="text-center">
                                 <span className="text-xs font-medium text-gray-900">Innovator of the Year</span>
                                 <br /><span className="text-xs font-medium text-gray-900 italic">The CEO Views</span>
                             </div>
-                            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mb-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                            <div className="mt-1 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#239ddb] transition-colors">
+                                View Article
+                                <FontAwesomeIcon icon={faArrowRight} className="h-2.5 w-2.5" />
+                            </div>
                         </div>
                     </a>
                 </div>
