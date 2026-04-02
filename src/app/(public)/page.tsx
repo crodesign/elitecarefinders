@@ -1028,7 +1028,7 @@ function AboutSection() {
                     <a href="https://theceoviews.com/elite-carefinders-enhancing-senior-living-experience-with-personalized-consultation/" target="_blank" rel="noopener noreferrer" className="group rounded-xl bg-white shadow-sm overflow-hidden block hover:shadow-md transition-shadow">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-ceo-views-2024-innovator-of-the-year.png"
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2026.png"
                             alt="Innovator of the Year — The CEO Views"
                             className="w-full object-cover"
                         />
