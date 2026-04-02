@@ -698,11 +698,26 @@ const ELITE_STANDARDS = [
 function ContentSection() {
     return (
         <section className="max-w-6xl mx-auto px-5 py-12">
+            {/* Partners image — mobile: above section content */}
+            <div className="flex flex-col items-center mb-6 lg:hidden">
+                <img
+                    src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                    alt="Senior Living Community Partners"
+                    className="max-w-full h-auto"
+                />
+                <span
+                    className="mt-2 text-center text-gray-600 font-medium"
+                    style={{ fontFamily: 'var(--font-montserrat)', fontSize: 'clamp(11px, 1.2vw, 14px)' }}
+                >
+                    Senior Living Community Partners
+                </span>
+            </div>
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 mb-[30px] lg:mb-0">
 
                 {/* Left column */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center bg-gray-100 rounded-2xl p-5 lg:bg-transparent lg:rounded-none lg:p-0">
-                    <div className="flex flex-col items-center mb-6 lg:pr-8">
+                    {/* Partners image — desktop: inside left column */}
+                    <div className="hidden lg:flex flex-col items-center mb-6 lg:pr-8">
                         <img
                             src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
                             alt="Senior Living Community Partners"
