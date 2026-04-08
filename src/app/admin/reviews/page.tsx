@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { EnhancedSelect } from "@/components/admin/EnhancedSelect";
 import type { Review } from "@/types";
 import { Pagination } from "@/components/admin/Pagination";
@@ -64,6 +65,10 @@ export default function ReviewsPage() {
     const [selectedImageUrl, setSelectedImageUrl] = useState('');
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [reviewToDelete, setReviewToDelete] = useState<Review | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const generateSlug = (review: Review) => {
         const nameSlug = (review.authorName || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -321,14 +326,19 @@ export default function ReviewsPage() {
         setEditingReview({ ...editingReview, images: newImages });
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this review?")) return;
+    const handleDelete = (review: Review) => {
+        setReviewToDelete(review);
+        setDeleteModalOpen(true);
+    };
 
+    const confirmDelete = async () => {
+        if (!reviewToDelete) return;
+        setIsDeleting(true);
         try {
             const { error } = await supabase
                 .from('reviews')
                 .delete()
-                .eq('id', id);
+                .eq('id', reviewToDelete.id);
 
             if (error) throw error;
 
@@ -337,6 +347,10 @@ export default function ReviewsPage() {
         } catch (error: any) {
             console.error('Error deleting review:', error);
             showNotification("Error", "Failed to delete review");
+        } finally {
+            setIsDeleting(false);
+            setDeleteModalOpen(false);
+            setReviewToDelete(null);
         }
     };
 
@@ -477,7 +491,7 @@ export default function ReviewsPage() {
             </button>
             <button
                 className="btn-danger"
-                onClick={() => handleDelete(review.id)}
+                onClick={() => handleDelete(review)}
             >
                 <Trash2 className="h-4 w-4" />
             </button>
@@ -817,6 +831,25 @@ export default function ReviewsPage() {
                 imageUrl={selectedImageUrl}
                 onClose={handleCropCancel}
                 onSave={handleCropSave}
+            />
+
+            <ConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => {
+                    setDeleteModalOpen(false);
+                    setReviewToDelete(null);
+                }}
+                onConfirm={confirmDelete}
+                title="Delete Review"
+                message={
+                    <span>
+                        Are you sure you want to delete the review by <strong>{reviewToDelete?.authorName}</strong>?
+                        <br />
+                        This action cannot be undone.
+                    </span>
+                }
+                confirmLabel="Delete Review"
+                isLoading={isDeleting}
             />
         </>
     );

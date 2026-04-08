@@ -64,7 +64,7 @@ export async function GET(request: Request) {
 
         if (insertError) throw insertError;
 
-        return NextResponse.redirect(`${baseUrl}/admin/reviews?success=Google+account+connected+successfully`);
+        return NextResponse.redirect(`${baseUrl}/admin/reviews/select-location`);
 
     } catch (error: any) {
         console.error('Error during Google callback:', error);
