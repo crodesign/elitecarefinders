@@ -95,19 +95,21 @@ export async function GET(request: Request) {
 
             const locationsList = await mybusinessinfo.accounts.locations.list({
                 parent: accountId,
-                readMask: 'name,title'
+                readMask: 'name,title,metadata'
             });
 
             if (!locationsList.data.locations || locationsList.data.locations.length === 0) {
                 return NextResponse.json({ error: 'No Google Business locations found for this account.' }, { status: 400 });
             }
 
-            locationId = locationsList.data.locations[0].name;
+            const firstLocation = locationsList.data.locations[0];
+            locationId = firstLocation.name;
+            const mapsUri = (firstLocation as any).metadata?.mapsUri || null;
 
             // Save for future runs
             await supabase
                 .from('google_integrations')
-                .update({ account_id: accountId, location_id: locationId })
+                .update({ account_id: accountId, location_id: locationId, ...(mapsUri && { google_maps_url: mapsUri }) })
                 .eq('id', integration.id);
         }
 

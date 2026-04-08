@@ -923,6 +923,16 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
     };
 }
 
+export async function getGoogleReviewsUrl(): Promise<string | null> {
+    const db = getClient();
+    const { data } = await db
+        .from('google_integrations')
+        .select('google_maps_url')
+        .limit(1)
+        .single();
+    return data?.google_maps_url || null;
+}
+
 export async function getVideoTestimonials(): Promise<PublicReview[]> {
     try {
         noStore();

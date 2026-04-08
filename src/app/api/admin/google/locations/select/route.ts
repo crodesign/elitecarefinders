@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
     try {
-        const { accountId, locationId } = await request.json();
+        const { accountId, locationId, mapsUri } = await request.json();
 
         if (!accountId || !locationId) {
             return NextResponse.json({ error: 'accountId and locationId are required' }, { status: 400 });
@@ -58,9 +58,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No Google integration found' }, { status: 404 });
         }
 
+        const updateData: any = { account_id: accountId, location_id: locationId };
+        if (mapsUri) {
+            updateData.google_maps_url = mapsUri;
+        }
+
         const { error: updateError } = await serviceSupabase
             .from('google_integrations')
-            .update({ account_id: accountId, location_id: locationId })
+            .update(updateData)
             .eq('id', integration.id);
 
         if (updateError) throw updateError;

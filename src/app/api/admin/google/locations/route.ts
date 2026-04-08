@@ -72,13 +72,14 @@ export async function GET() {
             accountName: string;
             locationId: string;
             locationTitle: string;
+            mapsUri: string | null;
         }> = [];
 
         for (const account of accountsList.data.accounts) {
             try {
                 const locationsList = await mybusinessinfo.accounts.locations.list({
                     parent: account.name!,
-                    readMask: 'name,title'
+                    readMask: 'name,title,metadata'
                 });
 
                 for (const loc of (locationsList as any).data?.locations || []) {
@@ -87,6 +88,7 @@ export async function GET() {
                         accountName: account.accountName || account.name!,
                         locationId: loc.name!,
                         locationTitle: loc.title || loc.name!,
+                        mapsUri: loc.metadata?.mapsUri || null,
                     });
                 }
             } catch (e: any) {

@@ -83,6 +83,7 @@ export interface Review {
     authorPhotoUrl?: string;
     externalId?: string;
     images?: string[];
+    response?: string;
 }
 
 export type PostType = 'caregiver_resources' | 'news_events' | 'recipes' | 'caregiving_for_caregivers' | 'general' | 'resident_resources';

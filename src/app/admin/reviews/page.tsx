@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube } from "lucide-react";
+import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
@@ -69,6 +70,12 @@ export default function ReviewsPage() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState<Review | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const [googleMapsUrl, setGoogleMapsUrl] = useState<string | null>(null);
+    useEffect(() => {
+        supabase.from('google_integrations').select('google_maps_url').limit(1).single()
+            .then(({ data }) => setGoogleMapsUrl(data?.google_maps_url || null));
+    }, []);
 
     const generateSlug = (review: Review) => {
         const nameSlug = (review.authorName || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -144,7 +151,8 @@ export default function ReviewsPage() {
                 sourceLink: row.source_link,
                 authorPhotoUrl: row.author_photo_url,
                 externalId: row.external_id,
-                images: row.images || []
+                images: row.images || [],
+                response: row.response || ''
             }));
 
             setReviews(mappedReviews);
@@ -228,7 +236,7 @@ export default function ReviewsPage() {
                 images: editingReview.images || [],
                 source: editingReview.source?.trim() || 'internal',
                 source_link: editingReview.sourceLink?.trim() || null,
-                // Temporarily generic entity id for manually created reviews until linked
+                response: editingReview.response?.trim() || null,
                 entity_id: editingReview.entityId || '00000000-0000-0000-0000-000000000000'
             };
 
@@ -536,6 +544,28 @@ export default function ReviewsPage() {
                                 <span className="hidden md:inline">Sync</span>
                             </button>
                         </Tooltip>
+                        {googleMapsUrl && (
+                            <Tooltip content="View business reviews on Google">
+                                <a
+                                    href={googleMapsUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-secondary flex items-center gap-2"
+                                >
+                                    <Globe className="h-4 w-4" />
+                                    <span className="hidden md:inline">View on Google</span>
+                                </a>
+                            </Tooltip>
+                        )}
+                        <Tooltip content="Import Facebook reviews from Trustindex">
+                            <Link
+                                href="/admin/reviews/import"
+                                className="btn-secondary flex items-center gap-2"
+                            >
+                                <Facebook className="h-4 w-4" />
+                                <span className="hidden md:inline">Import Facebook</span>
+                            </Link>
+                        </Tooltip>
                         <button
                             className="btn-primary"
                             onClick={() => {
@@ -822,6 +852,48 @@ export default function ReviewsPage() {
                                 </div>
                             )}
                         </div>}
+
+                        {/* Response Section */}
+                        <div className="space-y-2 pt-4 border-t border-ui-border">
+                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
+                                <MessageSquare className="h-3.5 w-3.5" />
+                                Response
+                            </label>
+                            {(!editingReview.source || editingReview.source === 'internal') ? (
+                                <textarea
+                                    className="form-input w-full min-h-[100px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
+                                    value={editingReview.response || ''}
+                                    onChange={(e) => setEditingReview({ ...editingReview, response: e.target.value })}
+                                    placeholder="Write your response to this review..."
+                                />
+                            ) : editingReview.source === 'google' ? (
+                                googleMapsUrl ? (
+                                    <a
+                                        href={googleMapsUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn-secondary inline-flex items-center gap-2"
+                                    >
+                                        <Globe className="h-4 w-4" />
+                                        Respond on Google
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-content-muted">Connect Google Business Profile to respond to Google reviews.</p>
+                                )
+                            ) : editingReview.source === 'facebook' ? (
+                                <a
+                                    href="https://www.facebook.com/elitecarefinders/reviews"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-secondary inline-flex items-center gap-2"
+                                >
+                                    <Facebook className="h-4 w-4" />
+                                    Respond on Facebook
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                </a>
+                            ) : null}
+                        </div>
                     </div>
                 )}
             </SlidePanel>
