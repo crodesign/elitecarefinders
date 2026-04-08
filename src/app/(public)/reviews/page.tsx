@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { getApprovedReviews } from '@/lib/public-db';
@@ -32,7 +31,8 @@ function AuthorAvatar({ name, photoUrl }: { name: string; photoUrl: string | nul
     if (photoUrl) {
         return (
             <div className="relative h-11 w-11 rounded-full overflow-hidden flex-shrink-0">
-                <Image src={photoUrl} alt={name} fill className="object-cover" sizes="44px" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoUrl} alt={name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
         );
     }
