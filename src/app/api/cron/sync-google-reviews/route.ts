@@ -96,10 +96,9 @@ export async function GET(request: Request) {
         const { token } = await oauth2Client.getAccessToken();
         if (!token) throw new Error("Could not retrieve access token for syncing");
 
-        // Reviews API parent: locations/{locationId}
-        // locationId from mybusinessbusinessinformation is already "locations/{id}"
-        const reviewsParent = locationId.startsWith('locations/') ? locationId : `locations/${locationId}`;
-        const reviewsUrl = `https://mybusinessreviews.googleapis.com/v1/${reviewsParent}/reviews?pageSize=50&orderBy=updateTime desc`;
+        // Reviews API requires the full path: accounts/{id}/locations/{id}/reviews
+        const reviewsParent = `${accountId}/${locationId}`;
+        const reviewsUrl = `https://mybusiness.googleapis.com/v4/${reviewsParent}/reviews?pageSize=50&orderBy=updateTime desc`;
 
         console.log('[reviews sync] accountId:', accountId);
         console.log('[reviews sync] locationId:', locationId);
