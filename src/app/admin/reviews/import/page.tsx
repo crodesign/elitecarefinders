@@ -65,6 +65,12 @@ export default function ImportFacebookReviewsPage() {
     const handleScrape = useCallback(() => {
         if (!widgetContainerRef.current) return;
 
+        // Log the DOM structure for debugging selectors
+        const firstItem = widgetContainerRef.current.querySelector('.ti-review-item');
+        if (firstItem) {
+            console.log('[scraper] First review item HTML:', firstItem.innerHTML);
+        }
+
         const items = widgetContainerRef.current.querySelectorAll('.ti-review-item');
         const reviews: ScrapedReview[] = [];
 
@@ -72,17 +78,44 @@ export default function ImportFacebookReviewsPage() {
             try {
                 const name = item.querySelector('.ti-name')?.textContent?.trim() || 'Unknown';
 
-                const filled = item.querySelectorAll('.ti-stars .ti-star.f').length;
-                const half = item.querySelectorAll('.ti-stars .ti-star.h').length;
-                const rating = Math.min(5, Math.max(1, filled + (half * 0.5)));
+                // Facebook reviews use "recommends" not stars
+                // Check for recommendation text or thumbs-up indicator
+                const reviewText = item.textContent?.toLowerCase() || '';
+                const hasRecommend = reviewText.includes('recommends') || reviewText.includes('recommended');
+                const hasNotRecommend = reviewText.includes('doesn\'t recommend') || reviewText.includes('does not recommend');
+
+                let rating: number;
+                if (hasNotRecommend) {
+                    rating = 1;
+                } else if (hasRecommend) {
+                    rating = 5;
+                } else {
+                    // Fallback to star count for non-Facebook reviews
+                    const filled = item.querySelectorAll('.ti-stars .ti-star.f').length;
+                    const half = item.querySelectorAll('.ti-stars .ti-star.h').length;
+                    rating = Math.min(5, Math.max(1, filled + (half * 0.5)));
+                }
 
                 const text = item.querySelector('.ti-review-text-container')?.textContent?.trim() || '';
 
-                const dateEl = item.querySelector('.ti-date:not(.ti-date-comment)');
+                // Try multiple date selectors and attributes
+                const dateEl = item.querySelector('.ti-date') || item.querySelector('[data-time]');
                 const timestamp = dateEl?.getAttribute('data-time');
-                const dateStr = timestamp
-                    ? new Date(parseInt(timestamp) * 1000).toISOString()
-                    : new Date().toISOString();
+                let dateStr: string;
+                if (timestamp) {
+                    const ts = parseInt(timestamp);
+                    // Handle both seconds and milliseconds timestamps
+                    dateStr = new Date(ts < 1e12 ? ts * 1000 : ts).toISOString();
+                } else {
+                    // Try parsing the visible date text
+                    const dateText = dateEl?.textContent?.trim();
+                    if (dateText) {
+                        const parsed = new Date(dateText);
+                        dateStr = isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+                    } else {
+                        dateStr = new Date().toISOString();
+                    }
+                }
 
                 const imgEl = item.querySelector('.ti-profile-img img') as HTMLImageElement | null;
                 const photoUrl = imgEl?.src?.includes('noprofile') ? null : (imgEl?.src || null);

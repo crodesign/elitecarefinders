@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink } from "lucide-react";
+import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
 import Link from "next/link";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
@@ -443,6 +443,12 @@ export default function ReviewsPage() {
                             {review.source === 'google' && (
                                 <GoogleIcon className="h-3.5 w-3.5 flex-shrink-0" />
                             )}
+                            {review.source === 'facebook' && (
+                                <Facebook className="h-3.5 w-3.5 flex-shrink-0 text-[#1877F2]" />
+                            )}
+                            {(!review.source || review.source === 'internal') && (
+                                <Heart className="h-3.5 w-3.5 flex-shrink-0 text-red-500 fill-current" />
+                            )}
                         </div>
                         <div className="text-xs text-content-muted">
                             {new Date(review.createdAt).toLocaleDateString()}
@@ -455,17 +461,30 @@ export default function ReviewsPage() {
             key: "rating",
             header: "Rating",
             render: (review) => (
-                <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                            key={i}
-                            className={`h-4 w-4 ${i < review.rating
-                                ? "text-yellow-400 fill-current"
-                                : "text-content-muted"
-                                }`}
-                        />
-                    ))}
-                </div>
+                review.source === 'facebook' ? (
+                    <div className="flex items-center gap-1.5">
+                        {review.rating >= 4 ? (
+                            <ThumbsUp className="h-4 w-4 text-[#1877F2] fill-current" />
+                        ) : (
+                            <ThumbsDown className="h-4 w-4 text-red-400 fill-current" />
+                        )}
+                        <span className={`text-xs font-medium ${review.rating >= 4 ? 'text-[#1877F2]' : 'text-red-400'}`}>
+                            {review.rating >= 4 ? 'Recommends' : 'Doesn\'t Recommend'}
+                        </span>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                                key={i}
+                                className={`h-4 w-4 ${i < review.rating
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-content-muted"
+                                    }`}
+                            />
+                        ))}
+                    </div>
+                )
             ),
         },
         {
@@ -755,19 +774,50 @@ export default function ReviewsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">Rating</label>
-                            <div className="flex items-center gap-1.5 bg-surface-input p-4 rounded-lg">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        onClick={() => setEditingReview({ ...editingReview, rating: i + 1 })}
-                                        className={`h-6 w-6 cursor-pointer transition-colors ${i < (editingReview.rating || 0)
-                                            ? "text-yellow-400 fill-current"
-                                            : "text-content-muted hover:text-yellow-400/50"
-                                            }`}
-                                    />
-                                ))}
-                            </div>
+                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">
+                                {editingReview.source === 'facebook' ? 'Recommendation' : 'Rating'}
+                            </label>
+                            {editingReview.source === 'facebook' ? (
+                                <div className="flex bg-surface-input p-1 rounded-lg">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingReview({ ...editingReview, rating: 5 })}
+                                        className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+                                            (editingReview.rating || 0) >= 4
+                                                ? "bg-[#1877F2] text-white shadow-sm"
+                                                : "text-content-muted hover:text-content-secondary"
+                                        }`}
+                                    >
+                                        <ThumbsUp className="h-4 w-4" />
+                                        Recommends
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingReview({ ...editingReview, rating: 1 })}
+                                        className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+                                            (editingReview.rating || 0) < 4
+                                                ? "bg-red-600 text-white shadow-sm"
+                                                : "text-content-muted hover:text-content-secondary"
+                                        }`}
+                                    >
+                                        <ThumbsDown className="h-4 w-4" />
+                                        Doesn't Recommend
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1.5 bg-surface-input p-4 rounded-lg">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            onClick={() => setEditingReview({ ...editingReview, rating: i + 1 })}
+                                            className={`h-6 w-6 cursor-pointer transition-colors ${i < (editingReview.rating || 0)
+                                                ? "text-yellow-400 fill-current"
+                                                : "text-content-muted hover:text-yellow-400/50"
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {editingReview.source === 'video' && (
