@@ -801,7 +801,7 @@ export default function ReviewsPage() {
                                         }`}
                                     >
                                         <ThumbsDown className="h-4 w-4" />
-                                        Doesn't Recommend
+                                        Doesn&apos;t Recommend
                                     </button>
                                 </div>
                             ) : (
