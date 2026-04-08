@@ -20,14 +20,10 @@ export async function GET(request: Request) {
     ];
 
     const authorizationUrl = oauth2Client.generateAuthUrl({
-        // 'online' (default) or 'offline' (gets refresh_token)
         access_type: 'offline',
-
-        // Pass in the scopes array defined above.
         scope: scopes,
-
-        // Force consent so we always get a fresh refresh_token if needed
-        prompt: 'consent'
+        prompt: 'consent',
+        login_hint: 'denis@crodesign.com'
     });
 
     return NextResponse.redirect(authorizationUrl);
