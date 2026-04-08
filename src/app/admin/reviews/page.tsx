@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, Facebook, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
 import Link from "next/link";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { ImageCropModal } from "@/components/admin/ImageCropModal";
@@ -18,6 +18,12 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { usePersistedPageSize } from "@/hooks/usePersistedPageSize";
 import { uploadMedia } from "@/lib/services/mediaService";
 import { getFolderBySlug } from "@/lib/services/mediaFolderService";
+
+const FacebookIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.875V12h3.328l-.532 3.47h-2.796v8.385C19.612 22.954 24 17.99 24 12z" fill="#1877F2" />
+    </svg>
+);
 
 const GoogleIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -444,7 +450,7 @@ export default function ReviewsPage() {
                                 <GoogleIcon className="h-3.5 w-3.5 flex-shrink-0" />
                             )}
                             {review.source === 'facebook' && (
-                                <Facebook className="h-3.5 w-3.5 flex-shrink-0 text-[#1877F2]" />
+                                <FacebookIcon className="h-3.5 w-3.5 flex-shrink-0" />
                             )}
                             {(!review.source || review.source === 'internal') && (
                                 <Heart className="h-3.5 w-3.5 flex-shrink-0 text-red-500 fill-current" />
@@ -581,7 +587,7 @@ export default function ReviewsPage() {
                                 href="/admin/reviews/import"
                                 className="btn-secondary flex items-center gap-2"
                             >
-                                <Facebook className="h-4 w-4" />
+                                <FacebookIcon className="h-4 w-4" />
                                 <span className="hidden md:inline">Import Facebook</span>
                             </Link>
                         </Tooltip>
@@ -938,7 +944,7 @@ export default function ReviewsPage() {
                                     rel="noopener noreferrer"
                                     className="btn-secondary inline-flex items-center gap-2"
                                 >
-                                    <Facebook className="h-4 w-4" />
+                                    <FacebookIcon className="h-4 w-4" />
                                     Respond on Facebook
                                     <ExternalLink className="h-3.5 w-3.5" />
                                 </a>

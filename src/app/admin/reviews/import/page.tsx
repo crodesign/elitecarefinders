@@ -101,20 +101,18 @@ export default function ImportFacebookReviewsPage() {
                 // Try multiple date selectors and attributes
                 const dateEl = item.querySelector('.ti-date') || item.querySelector('[data-time]');
                 const timestamp = dateEl?.getAttribute('data-time');
+                const dateText = dateEl?.textContent?.trim();
+                console.log('[scraper] Date for', name, '- data-time:', timestamp, 'text:', dateText);
+
                 let dateStr: string;
                 if (timestamp) {
                     const ts = parseInt(timestamp);
-                    // Handle both seconds and milliseconds timestamps
                     dateStr = new Date(ts < 1e12 ? ts * 1000 : ts).toISOString();
+                } else if (dateText) {
+                    const parsed = new Date(dateText);
+                    dateStr = isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
                 } else {
-                    // Try parsing the visible date text
-                    const dateText = dateEl?.textContent?.trim();
-                    if (dateText) {
-                        const parsed = new Date(dateText);
-                        dateStr = isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
-                    } else {
-                        dateStr = new Date().toISOString();
-                    }
+                    dateStr = new Date().toISOString();
                 }
 
                 const imgEl = (item.querySelector('.ti-profile-img img') || item.querySelector('.ti-profile-img') || item.querySelector('img[src*="graph.facebook"], img[src*="fbcdn"], img[src*="platform-lookaside"]')) as HTMLImageElement | null;
