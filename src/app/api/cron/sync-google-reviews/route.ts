@@ -58,20 +58,41 @@ export async function GET(request: Request) {
         let accountId = integration.account_id;
         let locationId = integration.location_id;
 
-        // If we haven't stored the account/location IDs yet, find them automatically
-        if (!accountId || !locationId) {
-            const mybusinessaccountmanagement = google.mybusinessaccountmanagement({ version: 'v1', auth: oauth2Client });
+        // Debug mode: list all accounts and locations to identify the correct one
+        const debugMode = url.searchParams.get('debug') === 'true';
 
-            // Get first account
+        // If we haven't stored the account/location IDs yet, or in debug mode, discover them
+        if (!accountId || !locationId || debugMode) {
             const accountsList = await mybusinessaccountmanagement.accounts.list();
             if (!accountsList.data.accounts || accountsList.data.accounts.length === 0) {
                 return NextResponse.json({ error: 'No Google Business accounts found for this user.' }, { status: 400 });
             }
 
-            // Use the primary/first account
+            // In debug mode, list all accounts and their locations
+            if (debugMode) {
+                const allLocations: any[] = [];
+                for (const account of accountsList.data.accounts) {
+                    try {
+                        const locationsList = await mybusinessinfo.accounts.locations.list({
+                            parent: account.name!,
+                            readMask: 'name,title'
+                        });
+                        allLocations.push({
+                            account: { name: account.name, accountName: account.accountName },
+                            locations: (locationsList as any).data?.locations || []
+                        });
+                    } catch (e: any) {
+                        allLocations.push({
+                            account: { name: account.name, accountName: account.accountName },
+                            error: e.message
+                        });
+                    }
+                }
+                return NextResponse.json({ accounts: allLocations });
+            }
+
             accountId = accountsList.data.accounts[0].name;
 
-            // Get first location under this account
             const locationsList = await mybusinessinfo.accounts.locations.list({
                 parent: accountId,
                 readMask: 'name,title'
