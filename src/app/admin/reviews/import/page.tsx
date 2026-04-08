@@ -117,8 +117,10 @@ export default function ImportFacebookReviewsPage() {
                     }
                 }
 
-                const imgEl = item.querySelector('.ti-profile-img img') as HTMLImageElement | null;
-                const photoUrl = imgEl?.src?.includes('noprofile') ? null : (imgEl?.src || null);
+                const imgEl = (item.querySelector('.ti-profile-img img') || item.querySelector('.ti-profile-img') || item.querySelector('img[src*="graph.facebook"], img[src*="fbcdn"], img[src*="platform-lookaside"]')) as HTMLImageElement | null;
+                const imgSrc = imgEl?.tagName === 'IMG' ? (imgEl as HTMLImageElement).src : imgEl?.querySelector('img')?.src;
+                const photoUrl = imgSrc && !imgSrc.includes('noprofile') ? imgSrc : null;
+                console.log('[scraper] Photo for', name, ':', imgSrc || 'none found');
 
                 if (name || text) {
                     reviews.push({ name, rating: Math.round(rating), text, date: dateStr, photoUrl });
