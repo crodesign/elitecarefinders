@@ -165,10 +165,11 @@ export async function GET(request: Request) {
                 rating: rating,
                 content: rev.comment || '',
                 source: 'google',
-                source_link: null, // GMB API doesn't provide a direct link easily here
+                source_link: null,
                 status: 'approved',
                 entity_id: '00000000-0000-0000-0000-000000000000',
-                created_at: rev.createTime || new Date().toISOString()
+                created_at: rev.createTime || new Date().toISOString(),
+                response: rev.reviewReply?.comment || null
             };
         });
 

@@ -55,6 +55,7 @@ export default function ReviewsPage() {
     const [isCreating, setIsCreating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
+    const [isPostingReply, setIsPostingReply] = useState(false);
     const [isUploadingGallery, setIsUploadingGallery] = useState(false);
     const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -648,6 +649,7 @@ export default function ReviewsPage() {
             {/* Edit/Create Review Slide Panel */}
             <SlidePanel
                 isOpen={!!editingReview}
+                width={960}
                 onClose={() => {
                     setEditingReview(null);
                     router.push('/admin/reviews', { scroll: false });
@@ -678,273 +680,310 @@ export default function ReviewsPage() {
                 }
             >
                 {editingReview && (
-                    <div className="space-y-6">
-                        {/* Compact Header Section */}
-                        <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-8 items-start bg-surface-input rounded-lg p-6">
-                            {/* Left: Fields */}
-                            <div className="space-y-4">
-                                <div className="flex bg-surface-input p-1 rounded-lg">
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditingReview({ ...editingReview, status: 'pending' })}
-                                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'pending'
-                                            ? "bg-yellow-600 text-white shadow-sm"
-                                            : "text-content-muted hover:text-content-secondary"
-                                            }`}
-                                    >
-                                        Pending
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditingReview({ ...editingReview, status: 'approved' })}
-                                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'approved'
-                                            ? "bg-emerald-600 text-white shadow-sm"
-                                            : "text-content-muted hover:text-content-secondary"
-                                            }`}
-                                    >
-                                        Approved
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditingReview({ ...editingReview, status: 'rejected' })}
-                                        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'rejected'
-                                            ? "bg-red-600 text-white shadow-sm"
-                                            : "text-content-muted hover:text-content-secondary"
-                                            }`}
-                                    >
-                                        Rejected
-                                    </button>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <input
-                                        type="text"
-                                        className="form-input w-full bg-surface-input text-content-primary p-3 rounded-md border-transparent hover:bg-surface-hover focus:bg-surface-hover transition-colors"
-                                        value={editingReview.authorName || ''}
-                                        onChange={(e) => setEditingReview({ ...editingReview, authorName: e.target.value })}
-                                        placeholder="Author Name"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <EnhancedSelect
-                                        value={editingReview.source || 'internal'}
-                                        onChange={(val) => setEditingReview({ ...editingReview, source: val })}
-                                        options={SOURCE_OPTIONS}
-                                        placeholder="Select Source"
-                                        className="w-full"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Right: Profile Image Upload */}
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="relative w-32 h-32">
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handlePhotoChange}
-                                        className="hidden"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handlePhotoClick}
-                                        className="w-full h-full rounded-full overflow-hidden bg-surface-secondary transition-colors group hover:bg-surface-hover"
-                                    >
-                                        {editingReview.authorPhotoUrl ? (
-                                            <img
-                                                src={editingReview.authorPhotoUrl}
-                                                alt="Review Author"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center text-content-muted transition-colors">
-                                                <User className="h-10 w-10 mb-1" />
-                                                <span className="text-[10px] uppercase font-bold tracking-wider">Upload</span>
-                                            </div>
-                                        )}
-                                    </button>
-                                    <div
-                                        className="absolute bottom-1 right-1 bg-accent rounded-full p-2 shadow-lg cursor-pointer hover:bg-accent-light transition-colors"
-                                        onClick={handlePhotoClick}
-                                    >
-                                        <Upload className="h-4 w-4 text-white" />
-                                    </div>
-                                </div>
-                                <span className="text-[10px] text-content-muted uppercase font-bold tracking-widest">Author Photo</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">
-                                {editingReview.source === 'facebook' ? 'Recommendation' : 'Rating'}
-                            </label>
-                            {editingReview.source === 'facebook' ? (
-                                <div className="flex bg-surface-input p-1 rounded-lg">
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditingReview({ ...editingReview, rating: 5 })}
-                                        className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
-                                            (editingReview.rating || 0) >= 4
-                                                ? "bg-[#1877F2] text-white shadow-sm"
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Column 1: Author, Image, Source, Rating, Status */}
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-8 items-start bg-surface-input rounded-lg p-6">
+                                <div className="space-y-4">
+                                    <div className="flex bg-surface-input p-1 rounded-lg">
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingReview({ ...editingReview, status: 'pending' })}
+                                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'pending'
+                                                ? "bg-yellow-600 text-white shadow-sm"
                                                 : "text-content-muted hover:text-content-secondary"
-                                        }`}
-                                    >
-                                        <ThumbsUp className="h-4 w-4" />
-                                        Recommends
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setEditingReview({ ...editingReview, rating: 1 })}
-                                        className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
-                                            (editingReview.rating || 0) < 4
+                                                }`}
+                                        >
+                                            Pending
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingReview({ ...editingReview, status: 'approved' })}
+                                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'approved'
+                                                ? "bg-emerald-600 text-white shadow-sm"
+                                                : "text-content-muted hover:text-content-secondary"
+                                                }`}
+                                        >
+                                            Approved
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingReview({ ...editingReview, status: 'rejected' })}
+                                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${editingReview.status === 'rejected'
                                                 ? "bg-red-600 text-white shadow-sm"
                                                 : "text-content-muted hover:text-content-secondary"
-                                        }`}
-                                    >
-                                        <ThumbsDown className="h-4 w-4" />
-                                        Doesn&apos;t Recommend
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-1.5 bg-surface-input p-4 rounded-lg">
-                                    {Array.from({ length: 5 }).map((_, i) => (
-                                        <Star
-                                            key={i}
-                                            onClick={() => setEditingReview({ ...editingReview, rating: i + 1 })}
-                                            className={`h-6 w-6 cursor-pointer transition-colors ${i < (editingReview.rating || 0)
-                                                ? "text-yellow-400 fill-current"
-                                                : "text-content-muted hover:text-yellow-400/50"
                                                 }`}
+                                        >
+                                            Rejected
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <input
+                                            type="text"
+                                            className="form-input w-full bg-surface-input text-content-primary p-3 rounded-md border-transparent hover:bg-surface-hover focus:bg-surface-hover transition-colors"
+                                            value={editingReview.authorName || ''}
+                                            onChange={(e) => setEditingReview({ ...editingReview, authorName: e.target.value })}
+                                            placeholder="Author Name"
                                         />
-                                    ))}
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <EnhancedSelect
+                                            value={editingReview.source || 'internal'}
+                                            onChange={(val) => setEditingReview({ ...editingReview, source: val })}
+                                            options={SOURCE_OPTIONS}
+                                            placeholder="Select Source"
+                                            className="w-full"
+                                        />
+                                    </div>
                                 </div>
-                            )}
-                        </div>
 
-                        {editingReview.source === 'video' && (
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
-                                    <Youtube className="h-3.5 w-3.5 text-red-600" />
-                                    YouTube URL
-                                </label>
-                                <input
-                                    type="url"
-                                    className="form-input w-full bg-surface-input text-content-primary p-3 rounded-md"
-                                    value={editingReview.sourceLink || ''}
-                                    onChange={(e) => setEditingReview({ ...editingReview, sourceLink: e.target.value })}
-                                    placeholder="https://www.youtube.com/watch?v=..."
-                                />
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">Review Content</label>
-                            <textarea
-                                className="form-input w-full min-h-[200px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
-                                value={editingReview.content || ''}
-                                onChange={(e) => setEditingReview({ ...editingReview, content: e.target.value })}
-                                placeholder="Enter review content..."
-                            />
-                        </div>
-
-                        {editingReview.source !== 'video' && <div className="space-y-4 pt-4 border-t border-ui-border">
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
-                                    <ImageIcon className="h-3.5 w-3.5" />
-                                    Review Gallery
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => galleryInputRef.current?.click()}
-                                    disabled={isUploadingGallery}
-                                    className="btn-ghost flex items-center gap-1.5 text-xs py-1"
-                                >
-                                    {isUploadingGallery ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
-                                    {isUploadingGallery ? 'Uploading...' : 'Add Images'}
-                                </button>
-                                <input
-                                    ref={galleryInputRef}
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleGalleryUpload}
-                                    className="hidden"
-                                />
-                            </div>
-
-                            {editingReview.images && editingReview.images.length > 0 ? (
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                    {editingReview.images.map((url, index) => (
-                                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden group bg-surface-secondary border border-ui-border">
-                                            <img
-                                                src={url}
-                                                alt={`Review image ${index + 1}`}
-                                                className="w-full h-full object-cover"
-                                            />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleDeleteGalleryImage(index)}
-                                                    className="p-1.5 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="relative w-32 h-32">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handlePhotoChange}
+                                            className="hidden"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handlePhotoClick}
+                                            className="w-full h-full rounded-full overflow-hidden bg-surface-secondary transition-colors group hover:bg-surface-hover"
+                                        >
+                                            {editingReview.authorPhotoUrl ? (
+                                                <img
+                                                    src={editingReview.authorPhotoUrl}
+                                                    alt="Review Author"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex flex-col items-center justify-center text-content-muted transition-colors">
+                                                    <User className="h-10 w-10 mb-1" />
+                                                    <span className="text-[10px] uppercase font-bold tracking-wider">Upload</span>
+                                                </div>
+                                            )}
+                                        </button>
+                                        <div
+                                            className="absolute bottom-1 right-1 bg-accent rounded-full p-2 shadow-lg cursor-pointer hover:bg-accent-light transition-colors"
+                                            onClick={handlePhotoClick}
+                                        >
+                                            <Upload className="h-4 w-4 text-white" />
                                         </div>
-                                    ))}
+                                    </div>
+                                    <span className="text-[10px] text-content-muted uppercase font-bold tracking-widest">Author Photo</span>
                                 </div>
-                            ) : (
-                                <div
-                                    onClick={() => galleryInputRef.current?.click()}
-                                    className="border-2 border-dashed border-ui-border rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-surface-hover transition-colors text-content-muted"
-                                >
-                                    <ImageIcon className="h-8 w-8 opacity-20" />
-                                    <p className="text-xs font-medium uppercase tracking-widest opacity-60">No images uploaded</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">
+                                    {editingReview.source === 'facebook' ? 'Recommendation' : 'Rating'}
+                                </label>
+                                {editingReview.source === 'facebook' ? (
+                                    <div className="flex bg-surface-input p-1 rounded-lg">
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingReview({ ...editingReview, rating: 5 })}
+                                            className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+                                                (editingReview.rating || 0) >= 4
+                                                    ? "bg-[#1877F2] text-white shadow-sm"
+                                                    : "text-content-muted hover:text-content-secondary"
+                                            }`}
+                                        >
+                                            <ThumbsUp className="h-4 w-4" />
+                                            Recommends
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingReview({ ...editingReview, rating: 1 })}
+                                            className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
+                                                (editingReview.rating || 0) < 4
+                                                    ? "bg-red-600 text-white shadow-sm"
+                                                    : "text-content-muted hover:text-content-secondary"
+                                            }`}
+                                        >
+                                            <ThumbsDown className="h-4 w-4" />
+                                            Doesn&apos;t Recommend
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1.5 bg-surface-input p-4 rounded-lg">
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                            <Star
+                                                key={i}
+                                                onClick={() => setEditingReview({ ...editingReview, rating: i + 1 })}
+                                                className={`h-6 w-6 cursor-pointer transition-colors ${i < (editingReview.rating || 0)
+                                                    ? "text-yellow-400 fill-current"
+                                                    : "text-content-muted hover:text-yellow-400/50"
+                                                    }`}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Column 2: Content, Gallery, Response */}
+                        <div className="space-y-6">
+                            {/* YouTube URL (video source only) */}
+                            {editingReview.source === 'video' && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
+                                        <Youtube className="h-3.5 w-3.5 text-red-600" />
+                                        YouTube URL
+                                    </label>
+                                    <input
+                                        type="url"
+                                        className="form-input w-full bg-surface-input text-content-primary p-3 rounded-md"
+                                        value={editingReview.sourceLink || ''}
+                                        onChange={(e) => setEditingReview({ ...editingReview, sourceLink: e.target.value })}
+                                        placeholder="https://www.youtube.com/watch?v=..."
+                                    />
                                 </div>
                             )}
-                        </div>}
 
-                        {/* Response Section */}
-                        <div className="space-y-2 pt-4 border-t border-ui-border">
-                            <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
-                                <MessageSquare className="h-3.5 w-3.5" />
-                                Response
-                            </label>
-                            {(!editingReview.source || editingReview.source === 'internal') ? (
+                            {/* Review Content */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px]">Review Content</label>
                                 <textarea
-                                    className="form-input w-full min-h-[100px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
-                                    value={editingReview.response || ''}
-                                    onChange={(e) => setEditingReview({ ...editingReview, response: e.target.value })}
-                                    placeholder="Write your response to this review..."
+                                    className="form-input w-full min-h-[200px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
+                                    value={editingReview.content || ''}
+                                    onChange={(e) => setEditingReview({ ...editingReview, content: e.target.value })}
+                                    placeholder="Enter review content..."
                                 />
-                            ) : editingReview.source === 'google' ? (
-                                googleMapsUrl ? (
+                            </div>
+
+                            {/* Review Gallery */}
+                            {editingReview.source !== 'video' && (
+                                <div className="space-y-4 pt-4 border-t border-ui-border">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
+                                            <ImageIcon className="h-3.5 w-3.5" />
+                                            Review Gallery
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => galleryInputRef.current?.click()}
+                                            disabled={isUploadingGallery}
+                                            className="btn-ghost flex items-center gap-1.5 text-xs py-1"
+                                        >
+                                            {isUploadingGallery ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                                            {isUploadingGallery ? 'Uploading...' : 'Add Images'}
+                                        </button>
+                                        <input
+                                            ref={galleryInputRef}
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleGalleryUpload}
+                                            className="hidden"
+                                        />
+                                    </div>
+
+                                    {editingReview.images && editingReview.images.length > 0 ? (
+                                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                            {editingReview.images.map((url, index) => (
+                                                <div key={index} className="relative aspect-square rounded-lg overflow-hidden group bg-surface-secondary border border-ui-border">
+                                                    <img
+                                                        src={url}
+                                                        alt={`Review image ${index + 1}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteGalleryImage(index)}
+                                                            className="p-1.5 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div
+                                            onClick={() => galleryInputRef.current?.click()}
+                                            className="border-2 border-dashed border-ui-border rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-surface-hover transition-colors text-content-muted"
+                                        >
+                                            <ImageIcon className="h-8 w-8 opacity-20" />
+                                            <p className="text-xs font-medium uppercase tracking-widest opacity-60">No images uploaded</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Response Section */}
+                            <div className="space-y-2 pt-4 border-t border-ui-border">
+                                <label className="text-sm font-medium text-content-primary uppercase tracking-wider text-[11px] flex items-center gap-2">
+                                    <MessageSquare className="h-3.5 w-3.5" />
+                                    Response
+                                </label>
+                                {(!editingReview.source || editingReview.source === 'internal') ? (
+                                    <textarea
+                                        className="form-input w-full min-h-[100px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
+                                        value={editingReview.response || ''}
+                                        onChange={(e) => setEditingReview({ ...editingReview, response: e.target.value })}
+                                        placeholder="Write your response to this review..."
+                                    />
+                                ) : editingReview.source === 'google' ? (
+                                    <>
+                                        <textarea
+                                            className="form-input w-full min-h-[100px] resize-y bg-surface-input text-content-primary p-4 rounded-lg focus:ring-2 ring-accent/20"
+                                            value={editingReview.response || ''}
+                                            onChange={(e) => setEditingReview({ ...editingReview, response: e.target.value })}
+                                            placeholder="Write your reply to this Google review..."
+                                        />
+                                        {editingReview.externalId && (
+                                            <button
+                                                type="button"
+                                                disabled={isPostingReply}
+                                                onClick={async () => {
+                                                    setIsPostingReply(true);
+                                                    try {
+                                                        const res = await fetch('/api/admin/reviews/reply', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                reviewId: editingReview.id,
+                                                                externalId: editingReview.externalId,
+                                                                comment: editingReview.response || '',
+                                                            }),
+                                                        });
+                                                        const data = await res.json();
+                                                        if (!res.ok) throw new Error(data.details || data.error);
+                                                        showNotification("Success", editingReview.response?.trim() ? "Reply posted to Google" : "Reply removed from Google");
+                                                    } catch (err: any) {
+                                                        showNotification("Error", err.message || "Failed to post reply");
+                                                    } finally {
+                                                        setIsPostingReply(false);
+                                                    }
+                                                }}
+                                                className="btn-secondary inline-flex items-center gap-2"
+                                            >
+                                                {isPostingReply ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <GoogleIcon className="h-4 w-4" />
+                                                )}
+                                                {editingReview.response?.trim() ? 'Post Reply to Google' : 'Remove Reply from Google'}
+                                            </button>
+                                        )}
+                                    </>
+                                ) : editingReview.source === 'facebook' ? (
                                     <a
-                                        href={googleMapsUrl}
+                                        href="https://www.facebook.com/elitecarefinders/reviews"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="btn-secondary inline-flex items-center gap-2"
                                     >
-                                        <Globe className="h-4 w-4" />
-                                        Respond on Google
+                                        <FontAwesomeIcon icon={faFacebook} className="h-4 w-4 text-[#1877F2]" />
+                                        Respond on Facebook
                                         <ExternalLink className="h-3.5 w-3.5" />
                                     </a>
-                                ) : (
-                                    <p className="text-sm text-content-muted">Connect Google Business Profile to respond to Google reviews.</p>
-                                )
-                            ) : editingReview.source === 'facebook' ? (
-                                <a
-                                    href="https://www.facebook.com/elitecarefinders/reviews"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn-secondary inline-flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faFacebook} className="h-4 w-4 text-[#1877F2]" />
-                                    Respond on Facebook
-                                    <ExternalLink className="h-3.5 w-3.5" />
-                                </a>
-                            ) : null}
+                                ) : null}
+                            </div>
                         </div>
                     </div>
                 )}
