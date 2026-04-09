@@ -3,8 +3,9 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faArrowLeft, faArrowRight, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
-import { getApprovedReviews } from '@/lib/public-db';
+import { getApprovedReviews, getReviewStats, getGoogleReviewsUrl } from '@/lib/public-db';
 import { AuthorAvatarWithImage } from '@/components/public/AuthorAvatarWithImage';
+import { WriteReviewDropdown } from '@/components/public/WriteReviewDropdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -101,8 +102,14 @@ function ReviewCard({ review }: { review: { id: string; authorName: string; auth
 
 export default async function ReviewsPage({ searchParams }: { searchParams: { page?: string } }) {
     const page = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1);
-    const { reviews, total } = await getApprovedReviews(page, PER_PAGE);
+    const [{ reviews, total }, stats, googleUrl] = await Promise.all([
+        getApprovedReviews(page, PER_PAGE),
+        getReviewStats(),
+        getGoogleReviewsUrl(),
+    ]);
     const totalPages = Math.ceil(total / PER_PAGE);
+
+    const ratingLabel = stats.avgRating >= 4.5 ? 'Excellent' : stats.avgRating >= 3.5 ? 'Great' : 'Good';
 
     return (
         <main className="min-h-screen bg-white">
@@ -111,9 +118,27 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
                 <div className="mb-10">
                     <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Testimonials</p>
                     <h1 className="text-3xl font-bold text-gray-900">What Our Clients Say</h1>
-                    {total > 0 && (
-                        <p className="text-sm text-gray-500 mt-2">{total} review{total !== 1 ? 's' : ''}</p>
-                    )}
+                </div>
+
+                {/* Rating Summary Bar */}
+                <div className="mb-10 flex flex-wrap items-center gap-4 sm:gap-6 bg-gray-50 rounded-2xl px-6 py-5">
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl font-bold text-gray-900">{ratingLabel}</span>
+                        <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <FontAwesomeIcon
+                                    key={i}
+                                    icon={faStar}
+                                    className={`h-5 w-5 ${i <= Math.round(stats.avgRating) ? 'text-amber-400' : 'text-gray-200'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="h-6 w-px bg-gray-300 hidden sm:block" />
+                    <span className="text-sm text-gray-500">
+                        Based on <strong className="text-gray-900">{stats.total}</strong> review{stats.total !== 1 ? 's' : ''}
+                    </span>
+                    <WriteReviewDropdown googleUrl={googleUrl} />
                 </div>
 
                 {/* Grid */}

@@ -925,6 +925,21 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
     };
 }
 
+export async function getReviewStats(): Promise<{ total: number; avgRating: number }> {
+    const db = getClient();
+    const { count } = await db
+        .from('reviews')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'approved');
+    const { data } = await db
+        .from('reviews')
+        .select('rating')
+        .eq('status', 'approved');
+    const total = count ?? 0;
+    const avg = data?.length ? data.reduce((sum: number, r: any) => sum + r.rating, 0) / data.length : 5;
+    return { total, avgRating: Math.round(avg * 10) / 10 };
+}
+
 export async function getGoogleReviewsUrl(): Promise<string | null> {
     const db = getClient();
     const { data } = await db
