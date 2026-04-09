@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faArrowLeft, faArrowRight, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { getApprovedReviews } from '@/lib/public-db';
+import { AuthorAvatarWithImage } from '@/components/public/AuthorAvatarWithImage';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,25 +36,14 @@ function AuthorAvatar({ name, photoUrl }: { name: string; photoUrl: string | nul
         .slice(0, 2)
         .join('')
         .toUpperCase();
-    return (
-        <div className="relative h-11 w-11 flex-shrink-0">
-            {photoUrl && (
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src={photoUrl}
-                        alt={name}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
-                    />
-                </div>
-            )}
-            <div className="h-11 w-11 rounded-full bg-[#239ddb] flex items-center justify-center">
+    if (!photoUrl) {
+        return (
+            <div className="h-11 w-11 rounded-full bg-[#239ddb] flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-sm font-bold">{initials}</span>
             </div>
-        </div>
-    );
+        );
+    }
+    return <AuthorAvatarWithImage name={name} photoUrl={photoUrl} initials={initials} />;
 }
 
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -99,7 +89,7 @@ function ReviewCard({ review }: { review: { id: string; authorName: string; auth
             </div>
             {review.response && (
                 <div className="ml-10 md:ml-16 mt-2">
-                    <div className="bg-gray-50 border-l-4 border-[#239ddb] rounded-r-xl p-4">
+                    <div className="bg-gray-50 rounded-xl p-4">
                         <p className="text-xs font-semibold text-[#239ddb] uppercase tracking-wider mb-1">Response from Elite CareFinders</p>
                         <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{review.response}</p>
                     </div>
