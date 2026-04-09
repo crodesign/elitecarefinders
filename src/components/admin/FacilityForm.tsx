@@ -950,7 +950,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility, onEntityUpdate
                 title={isEditing ? "Editing Facility" : "Add New Facility"}
                 subtitle={isEditing ? (title || facility?.title || "Update facility details") : "Create a new facility listing"}
                 fullScreen
-                contentClassName={activeTab === 'gallery' ? 'p-4 md:p-6 overflow-y-auto sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col' : activeTab === 'videos' ? 'flex-1 overflow-hidden p-4 md:p-6 flex flex-col' : activeTab === 'information' ? 'flex-1 overflow-hidden flex flex-col p-4 md:p-6' : 'flex-1 overflow-y-auto p-4 md:p-6'}
+                contentClassName={activeTab === 'gallery' ? 'p-4 md:p-6 overflow-y-auto sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col' : activeTab === 'videos' ? 'flex-1 overflow-hidden p-4 md:p-6 flex flex-col' : activeTab === 'information' ? 'flex-1 overflow-y-auto md:overflow-hidden flex flex-col p-4 md:p-6' : 'flex-1 overflow-y-auto p-4 md:p-6'}
                 actions={
                     <button
                         type="submit"
@@ -963,7 +963,7 @@ export function FacilityForm({ isOpen, onClose, onSave, facility, onEntityUpdate
                 }
                 headerChildren={
                     <div className="flex items-center justify-between px-4 sm:pr-6 border-b-[6px]" style={{ borderColor: 'var(--surface-tab-border)' }}>
-                        <div className="flex flex-1 items-start overflow-visible gap-1 pt-2 px-2 justify-center sm:justify-start">
+                        <div className="flex flex-1 items-start overflow-x-auto gap-1 pt-2 px-2 justify-center sm:justify-start scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;

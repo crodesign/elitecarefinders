@@ -187,10 +187,10 @@ export function FacilityInformationTab({
 
     return (
         <>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:flex-1 lg:min-h-0 pb-4 lg:pb-0">
             {/* Col B — Name + Description (order-2, wide) */}
-            <div className="order-2 lg:col-span-2 flex flex-col h-full min-h-0">
-                <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col flex-1 min-h-0">
+            <div className="order-2 lg:col-span-2 flex flex-col lg:h-full lg:min-h-0">
+                <div className="bg-surface-input rounded-lg p-[5px] space-y-4 flex flex-col lg:flex-1 lg:min-h-0">
                     {/* Facility Name & Slug */}
                     <div className="space-y-1.5">
                         <div className="flex items-center justify-between gap-2 p-[3px] bg-surface-hover rounded-lg">
@@ -225,7 +225,7 @@ export function FacilityInformationTab({
                     </div>
 
                     {/* Description */}
-                    <div className="flex flex-col flex-1 min-h-0 gap-2">
+                    <div className="flex flex-col lg:flex-1 lg:min-h-0 gap-2">
                         <h3 className="text-sm font-medium text-content-primary flex items-center gap-2 pt-[5px] pl-[5px] pb-[5px] shrink-0">
                             <AlignLeft className="h-4 w-4 text-accent" />
                             Description
@@ -238,7 +238,7 @@ export function FacilityInformationTab({
                             }}
                             placeholder="Describe the facility, services offered, and amenities..."
                             minHeight="min-h-[140px]"
-                            className="flex-1 min-h-0 bg-surface-input text-content-primary placeholder-content-muted border-none"
+                            className="lg:flex-1 lg:min-h-0 bg-surface-input text-content-primary placeholder-content-muted border-none"
                         />
                     </div>
 
