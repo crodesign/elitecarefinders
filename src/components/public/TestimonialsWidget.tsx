@@ -1,31 +1,20 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { TestimonialsCarousel } from './TestimonialsCarousel';
+import type { PublicReview } from '@/lib/public-db';
 
-export function TestimonialsWidget() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const injected = useRef(false);
-
-    useEffect(() => {
-        if (injected.current || !containerRef.current) return;
-        injected.current = true;
-
-        const s1 = document.createElement('script');
-        s1.src = 'https://cdn.trustindex.io/loader.js?07222ea611b977924806dfcdb0c';
-        s1.defer = true;
-        s1.async = true;
-        containerRef.current.appendChild(s1);
-
-        const s2 = document.createElement('script');
-        s2.src = 'https://cdn.trustindex.io/loader.js?cb4eda061a4577951396bec726d';
-        s2.defer = true;
-        s2.async = true;
-        containerRef.current.appendChild(s2);
-    }, []);
-
+export function TestimonialsWidget({
+    reviews,
+    totalReviews,
+    avgRating,
+    googleUrl,
+}: {
+    reviews: PublicReview[];
+    totalReviews: number;
+    avgRating: number;
+    googleUrl: string | null;
+}) {
     return (
         <section className="max-w-6xl mx-auto px-5 py-16">
             <div className="flex items-end justify-between mb-8">
@@ -46,7 +35,12 @@ export function TestimonialsWidget() {
                     View All Testimonials <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
                 </Link>
             </div>
-            <div ref={containerRef} />
+            <TestimonialsCarousel
+                reviews={reviews}
+                totalReviews={totalReviews}
+                avgRating={avgRating}
+                googleUrl={googleUrl}
+            />
         </section>
     );
 }

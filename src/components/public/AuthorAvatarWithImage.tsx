@@ -14,20 +14,15 @@ export function AuthorAvatarWithImage({ name, photoUrl, initials }: { name: stri
     }
 
     return (
-        <div className="relative h-11 w-11 flex-shrink-0">
-            <div className="absolute inset-0 rounded-full overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src={photoUrl}
-                    alt={name}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                    onError={() => setFailed(true)}
-                />
-            </div>
-            <div className="h-11 w-11 rounded-full bg-[#239ddb] flex items-center justify-center">
-                <span className="text-white text-sm font-bold">{initials}</span>
-            </div>
+        <div className="h-11 w-11 rounded-full overflow-hidden flex-shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src={photoUrl}
+                alt={name}
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                onError={() => setFailed(true)}
+            />
         </div>
     );
 }

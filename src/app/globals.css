@@ -1030,8 +1030,7 @@ select:-webkit-autofill:active {
   border-radius: 4px;
 }
 .review-scroll::-webkit-scrollbar-button {
-  width: 0;
-  height: 0;
+  display: none;
 }
 .review-scroll {
   scrollbar-width: thin;

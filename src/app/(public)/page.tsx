@@ -9,7 +9,7 @@ import { faFacebookF, faInstagram, faXTwitter, faLinkedinIn, faPinterestP, faYou
 import { TestimonialsWidget } from '@/components/public/TestimonialsWidget';
 import { VideoCarousel } from '@/components/public/VideoCarousel';
 import { VideoTestimonialsSection } from '@/components/public/VideoTestimonialsSection';
-import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials, getHomepageSeoSetting, getLocationChildEntriesWithCounts, getBrowseNavTypes, getPublicFixedFieldOptions } from '@/lib/public-db';
+import { getHomeListings, getHomeOfMonth, getTaxonomyEntriesByIds, getFeaturedVideoItems, getHawaiiNeighborhoodsGrouped, getHomepageSections, getFacilityListings, getSocialAccountsPublic, getVideoTestimonials, getHomepageSeoSetting, getLocationChildEntriesWithCounts, getBrowseNavTypes, getPublicFixedFieldOptions, getApprovedReviews, getReviewStats, getGoogleReviewsUrl } from '@/lib/public-db';
 import { NEIGHBORHOOD_COORDS } from '@/lib/neighborhood-coords';
 import type { NeighborhoodPin } from '@/components/public/NeighborhoodMap';
 import { getHomepageSeo } from '@/lib/services/siteSettingsService';
@@ -107,7 +107,7 @@ function socialHref(platform: string, url: string): string {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings, oahuNeighborhoodCounts, mauiNeighborhoodCounts, bigIslandNeighborhoodCounts, kauaiNeighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions] = await Promise.all([
+    const [{ items: homes }, { items: facilities }, featuredVideos, hawaiiIslandsWithNeighborhoods, homeOfMonth, sections, socialAccounts, videoTestimonials, homepageSeoSettings, oahuNeighborhoodCounts, mauiNeighborhoodCounts, bigIslandNeighborhoodCounts, kauaiNeighborhoodCounts, { homeTypes, facilityTypes }, bedroomOptions, bathroomOptions, showerOptions, { reviews: latestReviews, total: totalReviews }, reviewStats, googleReviewsUrl] = await Promise.all([
         getHomeListings({ limit: 3, excludeHomeOfMonth: true }),
         getFacilityListings({ limit: 3 }),
         getFeaturedVideoItems(),
@@ -125,6 +125,9 @@ export default async function HomePage() {
         getPublicFixedFieldOptions('bedroom'),
         getPublicFixedFieldOptions('bathroom'),
         getPublicFixedFieldOptions('shower'),
+        getApprovedReviews(1, 12),
+        getReviewStats(),
+        getGoogleReviewsUrl(),
     ]);
 
     const allIslandCounts: Record<string, typeof oahuNeighborhoodCounts> = {
@@ -188,7 +191,7 @@ export default async function HomePage() {
         'search': <HomepageWizard key="search" islands={hawaiiIslandsWithNeighborhoods} islandCounts={allIslandCounts} mapPins={searchMapPins} homeTypes={homeTypes} facilityTypes={facilityTypes} bedroomOptions={bedroomOptions} bathroomOptions={bathroomOptions} showerOptions={showerOptions} />,
         'about': <AboutSection key="about" />,
         'content': <ContentSection key="content" />,
-        'testimonials': <TestimonialsWidget key="testimonials" />,
+        'testimonials': <TestimonialsWidget key="testimonials" reviews={latestReviews} totalReviews={totalReviews} avgRating={reviewStats.avgRating} googleUrl={googleReviewsUrl} />,
         'video-testimonials': videoTestimonials.length > 0 ? <VideoTestimonialsSection key="video-testimonials" testimonials={videoTestimonials} /> : null,
         'cta': <BlueCTASection key="cta" />,
         'elite-standard': <EliteStandardSection key="elite-standard" />,
