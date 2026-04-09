@@ -71,26 +71,40 @@ function SourceIcon({ source }: { source: string | null }) {
     return <FontAwesomeIcon icon={faHeart} className="h-4 w-4 text-red-500" />;
 }
 
-function ReviewCard({ review }: { review: { id: string; authorName: string; authorPhotoUrl: string | null; rating: number; content: string; createdAt: string; source: string | null } }) {
-    const date = new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+function ReviewCard({ review }: { review: { id: string; authorName: string; authorPhotoUrl: string | null; rating: number; content: string; createdAt: string; source: string | null; response?: string | null } }) {
+    const date = new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     return (
-        <div className="bg-gray-100 rounded-2xl p-5 flex flex-col gap-3 relative">
-            <div className="absolute top-4 right-4">
-                <SourceIcon source={review.source} />
-            </div>
-            <div className="flex items-start gap-3">
-                <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />
-                <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{review.authorName}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{date}</p>
-                    <div className="mt-1">
-                        <StarRating rating={review.rating} />
+        <div>
+            <div className="bg-gray-100 rounded-2xl p-6 relative">
+                <div className="absolute top-5 right-5">
+                    <SourceIcon source={review.source} />
+                </div>
+                <div className="flex items-start gap-4">
+                    <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <p className="font-semibold text-gray-900 text-base">{review.authorName}</p>
+                            <span className="text-xs text-gray-400">{date}</span>
+                        </div>
+                        <div className="mt-1">
+                            {review.source === 'facebook' ? (
+                                <span className="text-xs font-medium text-[#1877F2]">Recommends</span>
+                            ) : (
+                                <StarRating rating={review.rating} />
+                            )}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line mt-3">{review.content}</p>
                     </div>
                 </div>
             </div>
-            <div className="review-scroll overflow-y-auto max-h-44 pr-1">
-                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{review.content}</p>
-            </div>
+            {review.response && (
+                <div className="ml-10 md:ml-16 mt-2">
+                    <div className="bg-gray-50 border-l-4 border-[#239ddb] rounded-r-xl p-4">
+                        <p className="text-xs font-semibold text-[#239ddb] uppercase tracking-wider mb-1">Response from Elite CareFinders</p>
+                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{review.response}</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -102,7 +116,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
 
     return (
         <main className="min-h-screen bg-white">
-            <div className="max-w-6xl mx-auto px-5 py-12">
+            <div className="max-w-3xl mx-auto px-5 py-12">
                 {/* Header */}
                 <div className="mb-10">
                     <p className="text-[11px] font-bold uppercase tracking-widest text-[#239ddb] mb-1">Testimonials</p>
@@ -118,7 +132,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
                         <p>No reviews yet.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="flex flex-col gap-6">
                         {reviews.map(r => (
                             <ReviewCard key={r.id} review={r} />
                         ))}

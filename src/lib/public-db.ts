@@ -896,6 +896,7 @@ export interface PublicReview {
     createdAt: string;
     source: string | null;
     sourceLink?: string | null;
+    response?: string | null;
 }
 
 export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ reviews: PublicReview[]; total: number }> {
@@ -904,7 +905,7 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
     const to = from + perPage - 1;
     const { data, count, error } = await db
         .from('reviews')
-        .select('id, author_name, author_photo_url, rating, content, created_at, source', { count: 'exact' })
+        .select('id, author_name, author_photo_url, rating, content, created_at, source, response', { count: 'exact' })
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
         .range(from, to);
@@ -918,6 +919,7 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
             content: r.content,
             createdAt: r.created_at,
             source: r.source ?? null,
+            response: r.response ?? null,
         })),
         total: count ?? 0,
     };
