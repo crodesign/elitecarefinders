@@ -41,6 +41,7 @@ export default function ReviewsPage() {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [sourceFilter, setSourceFilter] = useState<string | null>(null);
 
     const SOURCE_OPTIONS = [
         { value: 'internal', label: 'Internal Source', icon: Heart, iconColor: 'text-red-500' },
@@ -390,12 +391,13 @@ export default function ReviewsPage() {
     };
 
     const filteredReviews = useMemo(() =>
-        reviews.filter(
-            (r) =>
-                r.authorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                r.content.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        [reviews, searchQuery]
+        reviews.filter((r) => {
+            if (sourceFilter && (r.source || 'internal') !== sourceFilter) return false;
+            if (!searchQuery) return true;
+            return r.authorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                r.content.toLowerCase().includes(searchQuery.toLowerCase());
+        }),
+        [reviews, searchQuery, sourceFilter]
     );
 
     const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
@@ -418,27 +420,54 @@ export default function ReviewsPage() {
     const columns: ColumnDef<Review>[] = [
         {
             key: "author",
-            header: "Author",
+            header: (
+                <div className="flex items-center gap-2">
+                    <span>Author</span>
+                    <div className="flex items-center gap-0.5 ml-1">
+                        {[
+                            { key: 'internal', icon: <Heart className={`h-4 w-4 ${sourceFilter === 'internal' ? 'text-red-500 fill-current' : 'text-content-muted opacity-40'}`} /> },
+                            { key: 'google', icon: <GoogleIcon className={`h-4 w-4 ${sourceFilter === 'google' ? '' : 'opacity-40 grayscale'}`} /> },
+                            { key: 'facebook', icon: <FontAwesomeIcon icon={faFacebook} className={`h-4 w-4 ${sourceFilter === 'facebook' ? 'text-[#1877F2]' : 'text-content-muted opacity-40'}`} /> },
+                            { key: 'video', icon: <Youtube className={`h-4 w-4 ${sourceFilter === 'video' ? 'text-red-600' : 'text-content-muted opacity-40'}`} /> },
+                        ].map(({ key, icon }) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setSourceFilter(sourceFilter === key ? null : key); setCurrentPage(1); }}
+                                className="p-1 rounded hover:bg-surface-hover transition-colors"
+                            >
+                                {icon}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ),
+            headerLabel: "Author",
             render: (review) => (
                 <button
                     type="button"
                     onClick={() => handleOpenEdit(review)}
                     className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
                 >
-                    {review.authorPhotoUrl ? (
+                    {review.authorPhotoUrl && (
                         <img
                             src={review.authorPhotoUrl}
                             alt={review.authorName}
                             className="h-8 w-8 rounded-full object-cover hidden md:block flex-shrink-0"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                                const img = e.target as HTMLImageElement;
+                                img.style.display = 'none';
+                                const fallback = img.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = '';
+                            }}
                         />
-                    ) : (
-                        <div className="h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center hidden md:flex flex-shrink-0">
-                            <span className="text-sm font-medium text-content-primary">
-                                {review.authorName.charAt(0)}
-                            </span>
-                        </div>
                     )}
+                    <div className={`h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center md:flex flex-shrink-0 ${review.authorPhotoUrl ? 'hidden' : 'hidden md:flex'}`}>
+                        <span className="text-sm font-medium text-content-primary">
+                            {review.authorName.charAt(0)}
+                        </span>
+                        </div>
                     <div className="md:ml-3 flex flex-col items-start w-full min-w-0">
                         <div className="font-medium text-content-primary flex items-center gap-2 group-hover:text-accent transition-colors truncate w-full">
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${review.status === 'approved' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />

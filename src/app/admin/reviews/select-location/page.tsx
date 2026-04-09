@@ -9,6 +9,7 @@ interface Location {
     accountName: string;
     locationId: string;
     locationTitle: string;
+    mapsUri: string | null;
 }
 
 export default function SelectLocationPage() {
@@ -43,7 +44,7 @@ export default function SelectLocationPage() {
             const res = await fetch("/api/admin/google/locations/select", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ accountId: loc.accountId, locationId: loc.locationId }),
+                body: JSON.stringify({ accountId: loc.accountId, locationId: loc.locationId, mapsUri: loc.mapsUri }),
             });
             if (!res.ok) {
                 const data = await res.json();
