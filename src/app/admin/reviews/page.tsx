@@ -449,25 +449,22 @@ export default function ReviewsPage() {
                     onClick={() => handleOpenEdit(review)}
                     className="flex items-center text-left hover:opacity-80 transition-opacity w-full group"
                 >
-                    {review.authorPhotoUrl && (
-                        <img
-                            src={review.authorPhotoUrl}
-                            alt={review.authorName}
-                            className="h-8 w-8 rounded-full object-cover hidden md:block flex-shrink-0"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                                const img = e.target as HTMLImageElement;
-                                img.style.display = 'none';
-                                const fallback = img.nextElementSibling as HTMLElement;
-                                if (fallback) fallback.style.display = '';
-                            }}
-                        />
-                    )}
-                    <div className={`h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center md:flex flex-shrink-0 ${review.authorPhotoUrl ? 'hidden' : 'hidden md:flex'}`}>
-                        <span className="text-sm font-medium text-content-primary">
-                            {review.authorName.charAt(0)}
-                        </span>
+                    <div className="relative h-8 w-8 flex-shrink-0 hidden md:block">
+                        {review.authorPhotoUrl && (
+                            <img
+                                src={review.authorPhotoUrl}
+                                alt={review.authorName}
+                                className="absolute inset-0 h-8 w-8 rounded-full object-cover z-10"
+                                referrerPolicy="no-referrer"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                        )}
+                        <div className="h-8 w-8 rounded-full bg-surface-hover flex items-center justify-center">
+                            <span className="text-sm font-medium text-content-primary">
+                                {review.authorName.charAt(0)}
+                            </span>
                         </div>
+                    </div>
                     <div className="md:ml-3 flex flex-col items-start w-full min-w-0">
                         <div className="font-medium text-content-primary flex items-center gap-2 group-hover:text-accent transition-colors truncate w-full">
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${review.status === 'approved' ? 'bg-emerald-500' : 'bg-gray-400/50'}`} />
