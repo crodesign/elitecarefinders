@@ -351,13 +351,13 @@ export default function ProfilePage() {
                                             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Admin Panel</p>
                                         </div>
                                     </div>
-                                    <Link
+                                    <a
                                         href="/admin"
                                         className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#239ddb] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#1a7fb3] transition-colors"
                                     >
                                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3" />
                                         Open Admin
-                                    </Link>
+                                    </a>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-3">

@@ -36,7 +36,7 @@ export default function LoginPage() {
             return;
         }
 
-        router.push('/admin');
+        window.location.href = '/admin';
     };
 
     const handleForgotPassword = async (e: React.FormEvent) => {
