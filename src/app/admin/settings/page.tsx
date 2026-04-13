@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Monitor, PanelLeft, Smartphone } from "lucide-react";
+import { Check, Loader2, Plus, Trash2, Code, BarChart2, ChevronDown, ArrowUp, ArrowDown, Share2, Monitor, PanelLeft, Smartphone, Map, Rss, ExternalLink } from "lucide-react";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import {
     getInjectedScripts, saveInjectedScripts, ScriptEntry,
@@ -482,6 +482,37 @@ export default function GeneralSettingsPage() {
                             {isSavingSocial ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                             Save
                         </button>
+                    </div>
+                </div>
+
+                {/* Sitemap & RSS Feed (column 1, row 2) */}
+                <div className="card border-0 p-6 space-y-4 h-fit">
+                    <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                        <Map className="h-4 w-4 text-accent" />
+                        Sitemap & RSS Feed
+                    </h2>
+                    <p className="text-sm text-content-muted">
+                        Dynamic sitemap and RSS feed auto-generated and cached for 24 hours. Sitemap includes all published homes, facilities, resources, and location pages. RSS feed lists the latest published resources. Unknown URLs are automatically redirected to the homepage.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        <a
+                            href="/sitemap.xml"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-primary inline-flex items-center gap-2 w-fit"
+                        >
+                            <ExternalLink className="h-4 w-4" />
+                            View Sitemap (XML)
+                        </a>
+                        <a
+                            href="/feed.xml"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-secondary inline-flex items-center gap-2 w-fit"
+                        >
+                            <Rss className="h-4 w-4" />
+                            View RSS Feed (XML)
+                        </a>
                     </div>
                 </div>
 

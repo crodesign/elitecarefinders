@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import type { SeoFields } from '@/types';
 
-const SITE_NAME = 'Elite CareFinders';
-const BASE_URL = 'https://www.elitecarefinders.com';
+export const SITE_NAME = 'Elite CareFinders';
+export const BASE_URL = 'https://www.elitecarefinders.com';
 
 interface SeoInput {
     slug: string;
