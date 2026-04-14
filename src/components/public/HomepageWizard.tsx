@@ -118,8 +118,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                                 onFocus={() => setSearchFocused(true)}
                                 onBlur={() => setSearchFocused(false)}
                                 placeholder={`Search all of ${currentIsland?.name ?? 'the island'}...`}
-                                className="w-full min-w-0 border-l border-t border-b border-transparent rounded-l-lg px-3 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 focus:border-[#239ddb] bg-white"
-                                style={{ borderRight: 'none' }}
+                                className="overlay-input public-search w-full min-w-0 rounded-l-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400"
                             />
                             <button
                                 type="submit"
@@ -171,7 +170,7 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                     </div>
 
                     {/* Map */}
-                    <div className="md:w-1/2 flex-none rounded-xl overflow-hidden" style={{ height: 360 }}>
+                    <div className="md:w-1/2 flex-none rounded-xl overflow-hidden" style={{ height: 396 }}>
                         <DynamicMap
                             key={selectedIsland}
                             pins={mapPins}

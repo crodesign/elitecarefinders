@@ -299,8 +299,7 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                     onFocus={() => setSearchFocused(true)}
                                     onBlur={() => setSearchFocused(false)}
                                     placeholder={`Search all of ${selectedIsland?.name ?? 'Hawaii'}...`}
-                                    className="w-full min-w-0 border-l border-t border-b border-transparent rounded-l-lg px-3 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 focus:border-[#239ddb] bg-white"
-                                    style={{ borderRight: 'none' }}
+                                    className="overlay-input public-search w-full min-w-0 rounded-l-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400"
                                 />
                                 <button
                                     type="submit"

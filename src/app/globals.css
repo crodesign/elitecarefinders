@@ -308,6 +308,18 @@ input[type="radio"] {
   background: transparent !important;
 }
 
+/* ── Public search fields: transparent border, accent on focus ── */
+.overlay-input.public-search {
+  border: 2px solid transparent !important;
+  border-right: none !important;
+  background: white !important;
+  outline: none !important;
+}
+.overlay-input.public-search:focus {
+  border-color: var(--accent) !important;
+  outline: none !important;
+}
+
 /* ── Form inputs: 2px bordered, solid bg ─────────── */
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]):not(.overlay-input),
 textarea,
