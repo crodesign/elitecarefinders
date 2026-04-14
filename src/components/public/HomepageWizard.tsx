@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import type { NeighborhoodPin } from '@/components/public/NeighborhoodMap';
 import { HeartLoader } from '@/components/ui/HeartLoader';
 
@@ -41,6 +41,8 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
     const [selectedIsland, setSelectedIsland] = useState('oahu');
     const [hoveredNeighborhood, setHoveredNeighborhood] = useState<string | null>(null);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchFocused, setSearchFocused] = useState(false);
 
     const countMap = useMemo(
         () => new Map((islandCounts[selectedIsland] ?? []).map(c => [c.slug, c.homes + c.facilities])),
@@ -65,6 +67,13 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
     function handleIslandChange(slug: string) {
         setSelectedIsland(slug);
         setHoveredNeighborhood(null);
+    }
+
+    function handleSearchSubmit(e?: React.FormEvent) {
+        e?.preventDefault();
+        const q = searchQuery.trim();
+        if (!q) return;
+        navigate(`/location/hawaii/${selectedIsland}?q=${encodeURIComponent(q)}`);
     }
 
     return (
@@ -100,6 +109,27 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                 <div className="flex flex-col md:flex-row gap-4">
                     {/* Neighborhoods */}
                     <div className="flex-1 min-w-0 flex flex-col">
+                        {/* Keyword search (island-scoped) */}
+                        <form onSubmit={handleSearchSubmit} className="flex w-full min-w-0 mb-3">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={() => setSearchFocused(true)}
+                                onBlur={() => setSearchFocused(false)}
+                                placeholder={`Search all of ${currentIsland?.name ?? 'the island'}...`}
+                                className="w-full min-w-0 border-l border-t border-b border-transparent rounded-l-lg px-3 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 focus:border-[#239ddb] bg-white"
+                                style={{ borderRight: 'none' }}
+                            />
+                            <button
+                                type="submit"
+                                aria-label="Search"
+                                className={`flex items-center justify-center px-2 py-[3px] rounded-r-lg border border-l-0 ${searchFocused ? 'bg-[#239ddb] border-[#239ddb] text-white hover:bg-[#1b8ac4]' : 'bg-gray-300 border-transparent text-gray-500'}`}
+                            >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2.svg" alt="" className="h-8 w-8" />
+                            </button>
+                        </form>
                         {neighborhoods.length === 0 && (
                             <div className="flex-1 flex items-center justify-center py-12 text-center">
                                 <div>
@@ -109,27 +139,23 @@ export function HomepageWizard({ islands, islandCounts, mapPins }: Props) {
                             </div>
                         )}
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
-                            {neighborhoods.map(n => {
-                                const count = countMap.size > 0 ? (countMap.get(n.slug) ?? 0) : null;
-                                return (
-                                    <button
-                                        key={n.slug}
-                                        onClick={() => navigate(`/location/hawaii/${selectedIsland}/${n.slug}`)}
-                                        onMouseEnter={() => setHoveredNeighborhood(n.slug)}
-                                        onMouseLeave={() => setHoveredNeighborhood(null)}
-                                        className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
-                                    >
-                                        <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
-                                            {n.name}
-                                        </span>
-                                        {count !== null && count > 0 && (
-                                            <span className="ml-3 flex-none text-xs font-semibold bg-gray-100 group-hover:bg-blue-50 group-hover:text-[#239ddb] text-gray-500 rounded-md px-2 py-1 transition-colors">
-                                                {count}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                            {neighborhoods.map(n => (
+                                <button
+                                    key={n.slug}
+                                    onClick={() => navigate(`/location/hawaii/${selectedIsland}/${n.slug}`)}
+                                    onMouseEnter={() => setHoveredNeighborhood(n.slug)}
+                                    onMouseLeave={() => setHoveredNeighborhood(null)}
+                                    className="group flex items-center justify-between bg-white rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow"
+                                >
+                                    <span className="font-semibold text-gray-800 text-sm group-hover:text-[#239ddb] transition-colors">
+                                        {n.name}
+                                    </span>
+                                    <FontAwesomeIcon
+                                        icon={faChevronRight}
+                                        className="ml-3 flex-none h-3 w-3 text-[#239ddb] opacity-0 group-hover:opacity-100 transition-opacity"
+                                    />
+                                </button>
+                            ))}
                         </div>
                         {neighborhoods.length > 0 && (
                             <div className="mt-auto">

@@ -110,10 +110,20 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
     const pendingAction = useRef<(() => void | Promise<void>) | null>(null);
     const [isClosing, setIsClosing] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchFocused, setSearchFocused] = useState(false);
 
     function navigate(url: string) {
         setIsNavigating(true);
         router.push(url);
+    }
+
+    function handleSearchSubmit(e?: React.FormEvent) {
+        e?.preventDefault();
+        const q = searchQuery.trim();
+        if (!q) return;
+        const path = selectedIsland ? `/location/hawaii/${selectedIsland.slug}` : `/location/hawaii`;
+        navigate(`${path}?q=${encodeURIComponent(q)}`);
     }
     const handleCloseRef = useRef<() => void>(() => {});
 
@@ -280,6 +290,27 @@ export function BrowseModal({ onClose }: BrowseModalProps) {
                                 )}
                             </div>
 
+                            {/* Keyword search (island-scoped when selected) */}
+                            <form onSubmit={handleSearchSubmit} className="flex w-full min-w-0 mt-3">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onFocus={() => setSearchFocused(true)}
+                                    onBlur={() => setSearchFocused(false)}
+                                    placeholder={`Search all of ${selectedIsland?.name ?? 'Hawaii'}...`}
+                                    className="w-full min-w-0 border-l border-t border-b border-transparent rounded-l-lg px-3 py-2 text-sm outline-none text-gray-700 placeholder-gray-400 focus:border-[#239ddb] bg-white"
+                                    style={{ borderRight: 'none' }}
+                                />
+                                <button
+                                    type="submit"
+                                    aria-label="Search"
+                                    className={`flex items-center justify-center px-2 py-[3px] rounded-r-lg border border-l-0 ${searchFocused ? 'bg-[#239ddb] border-[#239ddb] text-white hover:bg-[#1b8ac4]' : 'bg-gray-300 border-transparent text-gray-500'}`}
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2.svg" alt="" className="h-8 w-8" />
+                                </button>
+                            </form>
                         </div>
                     )}
 
