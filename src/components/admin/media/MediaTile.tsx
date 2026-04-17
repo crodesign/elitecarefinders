@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Copy, Trash2, X, CheckSquare, Square } from "lucide-react";
+import { Loader2, Trash2, X, CheckSquare, Square } from "lucide-react";
 import type { MediaFolder, MediaItem } from "@/types";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
@@ -60,6 +60,7 @@ interface MediaTileProps {
     isFeaturedImage?: boolean;
     stepLabel?: string;
     isTeamView?: boolean;
+    selectToRemove?: boolean;
 }
 
 export function MediaTile({
@@ -82,6 +83,7 @@ export function MediaTile({
     isFeaturedImage = false,
     stepLabel,
     isTeamView = false,
+    selectToRemove = false,
 }: MediaTileProps) {
     const [caption, setCaption] = useState(item.altText || "");
     const [itemTitle, setItemTitle] = useState(item.title || "");
@@ -304,57 +306,51 @@ export function MediaTile({
                     >
                         {isBulkSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                     </button>
-                ) : onMediaSelect ? (
-                    // Gallery mode: stacked select checkbox + edit pencil
-                    <div className="absolute top-2 right-2 flex flex-col gap-1">
-                        <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); onMediaSelect(item); }}
-                            className={`p-1.5 rounded-lg transition-all ${isSelected
-                                ? "bg-accent text-white"
-                                : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
-                                }`}
-                        >
-                            {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
-                            className="p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </button>
-                    </div>
-                ) : (
-                    // Library/Gallery mode: single delete button
+                ) : selectToRemove ? (
+                    // Select-to-remove mode: trash only (hides gallery-select checkbox)
                     <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setShowDeleteModal(true); }}
-                        className="absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-50 group-hover:opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
+                        className="absolute top-2 right-2 p-1.5 rounded-lg shadow-sm backdrop-blur-md bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] opacity-100 hover:bg-[var(--media-edit-btn-hover-bg)] hover:text-red-500 transition-all cursor-pointer"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
-                )}
+                ) : onMediaSelect ? (
+                    // Gallery mode: gallery-select checkbox only (trash is gated behind selectToRemove)
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onMediaSelect(item); }}
+                        className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all ${isSelected
+                            ? "bg-accent text-white"
+                            : "bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] hover:bg-[var(--media-edit-btn-hover-bg)]"
+                            }`}
+                    >
+                        {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                    </button>
+                ) : null}
 
-                {/* URL Overlay */}
-                <div className={`absolute ${isTeamView ? 'bottom-[52px]' : 'bottom-10'} left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--media-edit-btn-bg)]/50 text-[var(--media-edit-btn-text)]">
-                        <span className="text-[9px] uppercase font-black opacity-30 shrink-0">URL</span>
-                        <span className="flex-1 text-[10px] truncate font-mono font-medium opacity-60">{item.url}</span>
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigator.clipboard.writeText(item.url);
-                            }}
-                            className="flex-shrink-0 p-1 opacity-40 hover:opacity-100 transition-all ml-1"
-                        >
-                            <Copy className="h-3 w-3" />
-                        </button>
-                    </div>
-                </div>
                 {/* Caption / Name + Title overlays */}
                 <div className={`absolute bottom-0 left-0 right-0 p-2 flex flex-col gap-1`}>
+                    <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
+                        <input
+                            type="text"
+                            value={caption}
+                            onChange={(e) => setCaption(e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(e, 'caption')}
+                            placeholder={isTeamView ? "Name..." : "Add caption..."}
+                            className={`overlay-input w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
+                        />
+                        {captionChanged && (
+                            <button
+                                type="button"
+                                onClick={() => handleSaveFieldOnly('caption')}
+                                disabled={isSaving}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
+                            >
+                                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                            </button>
+                        )}
+                    </div>
                     {isTeamView && (
                         <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
                             <input
@@ -377,26 +373,6 @@ export function MediaTile({
                             )}
                         </div>
                     )}
-                    <div className="relative rounded-lg focus-within:ring-2 focus-within:ring-accent bg-[var(--media-edit-btn-bg)] text-[var(--media-edit-btn-text)] backdrop-blur-md">
-                        <input
-                            type="text"
-                            value={caption}
-                            onChange={(e) => setCaption(e.target.value)}
-                            onKeyDown={(e) => handleKeyDown(e, 'caption')}
-                            placeholder={isTeamView ? "Name..." : "Add caption..."}
-                            className={`overlay-input w-full text-xs bg-transparent outline-none placeholder:opacity-40 font-medium rounded-lg px-2 py-1.5 ${captionChanged ? 'pr-12' : ''}`}
-                        />
-                        {captionChanged && (
-                            <button
-                                type="button"
-                                onClick={() => handleSaveFieldOnly('caption')}
-                                disabled={isSaving}
-                                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-accent text-white rounded-md hover:bg-accent-light transition-colors disabled:opacity-50 font-medium"
-                            >
-                                {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
-                            </button>
-                        )}
-                    </div>
                 </div>
             </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, X, LayoutGrid, Images, Trash2 } from "lucide-react";
+import { Upload, X, LayoutGrid, Images, MoreVertical, Trash2, CheckSquare } from "lucide-react";
 import { StockImagePicker } from "@/components/admin/media/StockImagePicker";
 import { HeartLoader } from "@/components/ui/HeartLoader";
 import { MediaItem, MediaFolder } from "@/types";
@@ -63,6 +63,9 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     const [isUploading, setIsUploading] = useState(false);
     const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
+    const [isSelectToRemove, setIsSelectToRemove] = useState(false);
+    const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+    const moreMenuRef = useRef<HTMLDivElement>(null);
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [brokenImageUrls, setBrokenImageUrls] = useState<string[]>([]);
     const [showStockPicker, setShowStockPicker] = useState(false);
@@ -136,6 +139,21 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
     useEffect(() => {
         loadMedia();
     }, [loadMedia]);
+
+    useEffect(() => {
+        if (mediaItems.length === 0 && isSelectToRemove) setIsSelectToRemove(false);
+    }, [mediaItems.length, isSelectToRemove]);
+
+    useEffect(() => {
+        if (!isMoreMenuOpen) return;
+        const handleClickOutside = (event: MouseEvent) => {
+            if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+                setIsMoreMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isMoreMenuOpen]);
 
     const handleUpload = async (files: File[]) => {
         if (!folderId) return;
@@ -454,13 +472,40 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                     )}
                     {mediaItems.length > 0 && (
                         <>
-                            <button
-                                type="button"
-                                onClick={() => setShowDeleteAllModal(true)}
-                                className="p-2 bg-surface-hover text-content-secondary hover:bg-red-500 hover:text-white rounded-lg transition-colors shrink-0"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
+                            <div className="relative" ref={moreMenuRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMoreMenuOpen(v => !v)}
+                                    className={`p-2 rounded-lg transition-colors shrink-0 ${isSelectToRemove
+                                        ? "bg-accent text-white"
+                                        : "bg-surface-hover text-content-secondary hover:bg-accent hover:text-white"
+                                        }`}
+                                >
+                                    <MoreVertical className="h-4 w-4" />
+                                </button>
+                                {isMoreMenuOpen && (
+                                    <div className="dropdown-menu absolute z-50 right-0 mt-1 w-max whitespace-nowrap flex flex-col">
+                                        <div className="p-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => { setIsMoreMenuOpen(false); setIsSelectToRemove(v => !v); }}
+                                                className={`dropdown-item w-full rounded text-sm ${isSelectToRemove ? "active" : ""}`}
+                                            >
+                                                <CheckSquare className="h-3.5 w-3.5" />
+                                                <span>{isSelectToRemove ? "Exit Select Mode" : "Select to Remove"}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setIsMoreMenuOpen(false); setShowDeleteAllModal(true); }}
+                                                className="dropdown-item w-full rounded text-sm"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                <span>Remove All</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 type="button"
                                 onClick={() => setShowUploadModal(true)}
@@ -507,6 +552,7 @@ export function MediaGallery({ folderId, title = "Media Gallery", className = ""
                                     stepLabel={stepImageMap && stepImageMap[item.url] !== undefined ? `Step ${stepImageMap[item.url]}` : undefined}
                                     isTeamView={activeGalleryId === 'team'}
                                     onMediaSelect={galleries ? () => handleToggleSelection(item.url) : onMediaSelect}
+                                    selectToRemove={isSelectToRemove}
                                 />
                             </div>
                         ))}
