@@ -983,7 +983,7 @@ function AboutSection() {
                         <div className="px-2 py-1 text-center leading-[1.1]">
                             <span className="text-xs font-medium text-gray-900">Rose Guillermo Gallego RN</span>
                             <br /><span className="text-xs font-medium text-gray-900">Founder &amp; Owner</span>
-                            <br /><span className="text-xs font-medium text-gray-900">Senior Care Advisor</span>
+                            <br /><span className="text-xs font-medium text-gray-900">Senior Placement Specialist</span>
                         </div>
                     </div>
 
