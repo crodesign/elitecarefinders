@@ -21,10 +21,10 @@ const ISLAND_BOUNDS: Record<string, [[number, number], [number, number]]> = {
     kauai:        [[21.872, -159.788], [22.236, -159.286]],
 };
 
-function pinHtml(size: number, total: number, highlighted: boolean): string {
+function pinHtml(size: number, highlighted: boolean): string {
     const bg = highlighted ? '#22c55e' : '#239ddb';
     const scale = highlighted ? 'transform:scale(1.2);' : '';
-    return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-weight:700;font-family:sans-serif;font-size:${size <= 30 ? 11 : 12}px;line-height:1;transition:background 0.15s,transform 0.15s;${scale}">${total}</div>`;
+    return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);cursor:pointer;transition:background 0.15s,transform 0.15s;${scale}"></div>`;
 }
 
 interface Props {
@@ -38,7 +38,7 @@ interface Props {
 export function NeighborhoodMap({ pins, islandSlug, center, onPinClick, highlightedSlug }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
-    const markersRef = useRef<Record<string, { marker: any; total: number; size: number }>>({});
+    const markersRef = useRef<Record<string, { marker: any; size: number }>>({});
     const LRef = useRef<any>(null);
     const router = useRouter();
 
@@ -81,16 +81,10 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick, highligh
                     className: '',
                     iconSize: [size, size],
                     iconAnchor: [size / 2, size / 2],
-                    html: pinHtml(size, total, false),
+                    html: pinHtml(size, false),
                 });
 
-                const tooltipHtml = `
-                    <div style="font-family:sans-serif;min-width:120px;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:4px;">${pin.name}</div>
-                        ${pin.homes > 0 ? `<div style="font-size:12px;color:#555;">${pin.homes} Care Home${pin.homes !== 1 ? 's' : ''}</div>` : ''}
-                        ${pin.facilities > 0 ? `<div style="font-size:12px;color:#555;">${pin.facilities} Communit${pin.facilities !== 1 ? 'ies' : 'y'}</div>` : ''}
-                        <div style="font-size:11px;color:#239ddb;margin-top:4px;">Click to browse →</div>
-                    </div>`;
+                const tooltipHtml = `<div style="font-family:sans-serif;font-weight:700;font-size:13px;white-space:nowrap;">${pin.name}</div>`;
 
                 const marker = L.marker([pin.lat, pin.lng], { icon });
                 marker.bindTooltip(tooltipHtml, { direction: 'top', offset: [0, -size / 2 + 4] });
@@ -102,7 +96,7 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick, highligh
                     }
                 });
                 marker.addTo(map);
-                markersRef.current[pin.slug] = { marker, total, size };
+                markersRef.current[pin.slug] = { marker, size };
             });
 
             mapRef.current = map;
@@ -122,13 +116,16 @@ export function NeighborhoodMap({ pins, islandSlug, center, onPinClick, highligh
     useEffect(() => {
         const L = LRef.current;
         if (!L) return;
-        Object.entries(markersRef.current).forEach(([slug, { marker, total, size }]) => {
+        Object.entries(markersRef.current).forEach(([slug, { marker, size }]) => {
+            const isHighlighted = slug === highlightedSlug;
             marker.setIcon(L.divIcon({
                 className: '',
                 iconSize: [size, size],
                 iconAnchor: [size / 2, size / 2],
-                html: pinHtml(size, total, slug === highlightedSlug),
+                html: pinHtml(size, isHighlighted),
             }));
+            if (isHighlighted) marker.openTooltip();
+            else marker.closeTooltip();
         });
     }, [highlightedSlug]);
 
