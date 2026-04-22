@@ -40,13 +40,23 @@ export function HeadInjector() {
         }
         if (injectedNodes.current.length > 0) return;
 
+        let cancelled = false;
+        const tracker: Node[] = [];
         getInjectedScripts().then((scripts) => {
+            if (cancelled) return;
             const enabled = scripts.filter((s) => s.enabled && s.code?.trim());
-            const tracker: Node[] = [];
             enabled.filter((s) => s.location === "header").forEach((s) => injectNodes(s.code, document.head, tracker));
             enabled.filter((s) => s.location === "body" || s.location === "footer").forEach((s) => injectNodes(s.code, document.body, tracker));
             injectedNodes.current = tracker;
         });
+
+        return () => {
+            cancelled = true;
+            tracker.forEach((n) => {
+                try { n.parentNode?.removeChild(n); } catch {}
+            });
+            injectedNodes.current = [];
+        };
     }, [isAdmin]);
 
     return null;

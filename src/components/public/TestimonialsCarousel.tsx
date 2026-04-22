@@ -4,8 +4,10 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faChevronLeft, faChevronRight, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { faFacebook } from "@fortawesome/free-brands-svg-icons";
+import Link from "next/link";
 import { AuthorAvatarWithImage } from "./AuthorAvatarWithImage";
 import { WriteReviewDropdown } from "./WriteReviewDropdown";
+import { reviewSourceUrl, isExternalSourceUrl } from "@/lib/public-reviews";
 
 const GoogleIcon = ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -24,6 +26,7 @@ interface Review {
     content: string;
     createdAt: string;
     source: string | null;
+    sourceLink?: string | null;
 }
 
 function SourceIcon({ source }: { source: string | null }) {
@@ -44,20 +47,45 @@ function AuthorAvatar({ name, photoUrl }: { name: string; photoUrl: string | nul
     return <AuthorAvatarWithImage name={name} photoUrl={photoUrl} initials={initials} />;
 }
 
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ review, googleUrl }: { review: Review; googleUrl: string | null }) {
     const date = new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const url = reviewSourceUrl(review.source, review.sourceLink, googleUrl, { internalTarget: '/reviews' });
+    const isExternal = url ? isExternalSourceUrl(url) : false;
+
+    const iconEl = <SourceIcon source={review.source} />;
+    const authorEl = (
+        <div className="flex items-center gap-3">
+            <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />
+            <div className="min-w-0">
+                <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{review.authorName}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{date}</p>
+            </div>
+        </div>
+    );
+
+    const wrapIcon = (children: React.ReactNode) => {
+        if (!url) return children;
+        return isExternal ? (
+            <a href={url} target="_blank" rel="noopener noreferrer" className="block hover:opacity-80 transition-opacity">{children}</a>
+        ) : (
+            <Link href={url} className="block hover:opacity-80 transition-opacity">{children}</Link>
+        );
+    };
+    const wrapAuthor = (children: React.ReactNode) => {
+        if (!url) return children;
+        return isExternal ? (
+            <a href={url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 [&_p:first-child]:hover:underline transition-opacity">{children}</a>
+        ) : (
+            <Link href={url} className="hover:opacity-80 [&_p:first-child]:hover:underline transition-opacity">{children}</Link>
+        );
+    };
+
     return (
         <div className="bg-white rounded-xl p-5 flex flex-col gap-3 min-w-[300px] max-w-[340px] flex-shrink-0 snap-start relative h-full">
             <div className="absolute top-4 right-4">
-                <SourceIcon source={review.source} />
+                {wrapIcon(iconEl)}
             </div>
-            <div className="flex items-center gap-3">
-                <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />
-                <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{review.authorName}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{date}</p>
-                </div>
-            </div>
+            {wrapAuthor(authorEl)}
             <div className="flex items-center gap-1">
                 {review.source === 'facebook' ? (
                     <span className="text-xs font-medium text-[#1877F2]">Recommends</span>
@@ -197,7 +225,7 @@ export function TestimonialsCarousel({
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {reviews.map(r => (
-                        <ReviewCard key={r.id} review={r} />
+                        <ReviewCard key={r.id} review={r} googleUrl={googleUrl} />
                     ))}
                 </div>
                 {canScrollRight && (

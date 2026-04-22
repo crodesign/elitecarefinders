@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Star, X, Search, Pencil, Save, Trash2, Loader2, Link as LinkIcon, User, Upload, Globe, MessageSquare, Heart, Image as ImageIcon, Plus, Youtube, ExternalLink, ThumbsUp, ThumbsDown, Check, Ban } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import Link from "next/link";
@@ -524,6 +524,17 @@ export default function ReviewsPage() {
                 <div className="max-w-xs text-sm text-content-muted truncate">
                     {review.content}
                 </div>
+            ),
+        },
+        {
+            key: "responded",
+            header: "Responded",
+            render: (review) => (
+                review.response?.trim() ? (
+                    <Check className="h-4 w-4 text-emerald-500" />
+                ) : (
+                    <Ban className="h-4 w-4 text-content-muted opacity-50" />
+                )
             ),
         },
         {

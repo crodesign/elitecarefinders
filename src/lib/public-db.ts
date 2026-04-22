@@ -905,7 +905,7 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
     const to = from + perPage - 1;
     const { data, count, error } = await db
         .from('reviews')
-        .select('id, author_name, author_photo_url, rating, content, created_at, source, response', { count: 'exact' })
+        .select('id, author_name, author_photo_url, rating, content, created_at, source, source_link, response', { count: 'exact' })
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
         .range(from, to);
@@ -919,6 +919,7 @@ export async function getApprovedReviews(page = 1, perPage = 12): Promise<{ revi
             content: r.content,
             createdAt: r.created_at,
             source: r.source ?? null,
+            sourceLink: r.source_link ?? null,
             response: r.response ?? null,
         })),
         total: count ?? 0,

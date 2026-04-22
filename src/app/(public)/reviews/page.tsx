@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faArrowLeft, faArrowRight, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { getApprovedReviews, getReviewStats, getGoogleReviewsUrl } from '@/lib/public-db';
+import { reviewSourceUrl, isExternalSourceUrl } from '@/lib/public-reviews';
 import { AuthorAvatarWithImage } from '@/components/public/AuthorAvatarWithImage';
 import { WriteReviewDropdown } from '@/components/public/WriteReviewDropdown';
 
@@ -62,19 +63,37 @@ function SourceIcon({ source }: { source: string | null }) {
     return <FontAwesomeIcon icon={faHeart} className="h-4 w-4 text-red-500" />;
 }
 
-function ReviewCard({ review }: { review: { id: string; authorName: string; authorPhotoUrl: string | null; rating: number; content: string; createdAt: string; source: string | null; response?: string | null } }) {
+function ReviewCard({ review, googleUrl }: { review: { id: string; authorName: string; authorPhotoUrl: string | null; rating: number; content: string; createdAt: string; source: string | null; sourceLink?: string | null; response?: string | null }; googleUrl: string | null }) {
     const date = new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const url = reviewSourceUrl(review.source, review.sourceLink, googleUrl, { internalTarget: null });
+    const isExternal = url ? isExternalSourceUrl(url) : false;
+
+    const wrap = (children: React.ReactNode, className: string) => {
+        if (!url) return <div className={className}>{children}</div>;
+        return isExternal ? (
+            <a href={url} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
+        ) : (
+            <Link href={url} className={className}>{children}</Link>
+        );
+    };
+
     return (
         <div>
             <div className="bg-gray-100 rounded-2xl p-6 relative">
                 <div className="absolute top-5 right-5">
-                    <SourceIcon source={review.source} />
+                    {wrap(<SourceIcon source={review.source} />, url ? 'block hover:opacity-80 transition-opacity' : 'block')}
                 </div>
                 <div className="flex items-start gap-4">
-                    <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />
+                    {wrap(
+                        <AuthorAvatar name={review.authorName} photoUrl={review.authorPhotoUrl} />,
+                        url ? 'block hover:opacity-80 transition-opacity' : 'block'
+                    )}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 flex-wrap">
-                            <p className="font-semibold text-gray-900 text-base">{review.authorName}</p>
+                            {wrap(
+                                <p className={`font-semibold text-gray-900 text-base ${url ? 'hover:underline' : ''}`}>{review.authorName}</p>,
+                                'inline-block'
+                            )}
                             <span className="text-xs text-gray-400">{date}</span>
                         </div>
                         <div className="mt-1">
@@ -149,7 +168,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: { pa
                 ) : (
                     <div className="flex flex-col gap-6">
                         {reviews.map(r => (
-                            <ReviewCard key={r.id} review={r} />
+                            <ReviewCard key={r.id} review={r} googleUrl={googleUrl} />
                         ))}
                     </div>
                 )}
