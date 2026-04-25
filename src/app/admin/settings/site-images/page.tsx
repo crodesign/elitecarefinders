@@ -213,6 +213,8 @@ export default function SiteImagesPage() {
             await loadMediaItems();
         } catch (error) {
             console.error("Bulk delete error:", error);
+            showNotification("Delete Failed", error instanceof Error ? error.message : "An error occurred while deleting files.");
+            setShowBulkDeleteConfirm(false);
         } finally {
             setIsActionLoading(false);
         }

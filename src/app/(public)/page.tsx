@@ -778,7 +778,7 @@ function ContentSection() {
                             OUR Senior Living Community Partners
                         </span>
                         <img
-                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                            src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2028.png"
                             alt="Senior Living Community Partners"
                             className="max-w-full h-auto"
                         />
@@ -840,7 +840,7 @@ function ContentSection() {
                     OUR Senior Living Community Partners
                 </span>
                 <img
-                    src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2025.png"
+                    src="https://pub-b05d31f393244be884cdeb6e00ba36b7.r2.dev/media/site-2028.png"
                     alt="Senior Living Community Partners"
                     className="max-w-full h-auto"
                 />

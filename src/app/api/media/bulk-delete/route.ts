@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 import { r2Delete } from "@/lib/r2";
 
 const VARIANT_SUFFIXES = ["-500x500.webp", "-200x200.webp", "-100x100.webp"];
 
 export async function POST(request: NextRequest) {
     try {
+        const supabase = createClient();
         const body = await request.json();
         const { mediaIds } = body;
 
