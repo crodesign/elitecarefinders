@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faXmark, faBorderAll, faImage, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import type { VideoEntry } from '@/types';
 
-type GalleryItem =
+export type GalleryItem =
     | { type: 'image'; url: string; alt?: string; caption?: string }
     | { type: 'video'; url: string; caption?: string; thumbnailUrl?: string };
 
@@ -47,7 +47,7 @@ function isVerticalYouTube(url: string): boolean {
 
 // ─── Tile (pure display, no button wrapper) ────────────────────────────────
 
-function TileContent({ item, index, moreCount }: {
+export function TileContent({ item, index, moreCount }: {
     item: GalleryItem;
     index: number;
     moreCount?: number;
@@ -99,7 +99,7 @@ function TileContent({ item, index, moreCount }: {
 
 type ImageItem = Extract<GalleryItem, { type: 'image' }>;
 
-function LightboxModal({ items, startIndex, onClose }: {
+export function LightboxModal({ items, startIndex, onClose }: {
     items: GalleryItem[];
     startIndex: number;
     onClose: () => void;
@@ -188,7 +188,7 @@ function LightboxModal({ items, startIndex, onClose }: {
 
 // ─── Gallery Modal (Scrolling) ─────────────────────────────────────────────
 
-function GalleryModal({ items, onClose, onImageClick }: {
+export function GalleryModal({ items, onClose, onImageClick }: {
     items: GalleryItem[];
     onClose: () => void;
     onImageClick: (globalIndex: number) => void;

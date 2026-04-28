@@ -3,10 +3,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faUsers, faHandHoldingHeart, faHeart, faShareNodes, faCheck, faXmark, faBed, faCircleInfo, faUtensils, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faUsers, faHandHoldingHeart, faHeart, faShareNodes, faCheck, faXmark, faBed, faCircleInfo, faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { getFacilityBySlug, getTaxonomyEntriesByIds, getRoomFieldData, getMediaCaptionsByUrls, getMediaTitlesByUrls, getAdjacentFacility, getFeaturedFacilities } from '@/lib/public-db';
 import { generateSeoMetadataFromRecord, buildFacilityJsonLd } from '@/lib/seo';
 import { HeroGallery } from '@/components/public/HeroGallery';
+import { DiningGallery } from '@/components/public/DiningGallery';
 import { RoomDetailsSection } from '@/components/public/RoomDetailsSection';
 import { EntityCTAButtons } from '@/components/public/EntityCTAButtons';
 import { FavoriteButton } from '@/components/public/FavoriteButton';
@@ -139,6 +140,16 @@ export default async function FacilityDetailPage({ params }: Props) {
                             videos={facility.videos}
                             title={facility.title}
                             featuredLabel={(facility as any).featured_label}
+                        />
+                    </div>
+                )}
+
+                {/* Dining & Cuisine — directly under main gallery */}
+                {cuisineImageUrls.length > 0 && (
+                    <div className="order-3 lg:order-2 mb-6">
+                        <DiningGallery
+                            images={cuisineImageUrls.map(url => ({ url, caption: mediaCaptions[url] }))}
+                            title={facility.title}
                         />
                     </div>
                 )}
@@ -440,35 +451,6 @@ export default async function FacilityDetailPage({ params }: Props) {
                                     dangerouslySetInnerHTML={{ __html: facility.description }}
                                 />
                             </section>
-                        )}
-
-                        {/* Cuisine / Dining Gallery */}
-                        {cuisineImageUrls.length > 0 && (
-                            <div className="bg-[#f0f8fc] rounded-xl p-6">
-                                <h2 className="flex items-center gap-2 text-sm font-bold text-[#239ddb] uppercase tracking-wider mb-5">
-                                    <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-[#239ddb] shrink-0">
-                                        <FontAwesomeIcon icon={faUtensils} className="h-4 w-4 text-white" />
-                                    </span>
-                                    Dining &amp; Cuisine
-                                </h2>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                    {cuisineImageUrls.map((url, i) => {
-                                        const caption = mediaCaptions[url];
-                                        return (
-                                            <div key={i} className="rounded-lg overflow-hidden bg-white border border-gray-100 shadow-sm">
-                                                <div className="aspect-square overflow-hidden bg-gray-200">
-                                                    <img src={url} alt={caption || `Cuisine ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                                                </div>
-                                                {caption && (
-                                                    <div className="px-2 py-1.5 text-xs text-gray-800 font-medium text-center truncate">
-                                                        {caption}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
                         )}
 
                         {/* Pagination */}
